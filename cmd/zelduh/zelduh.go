@@ -30,7 +30,7 @@ func run() {
 	// Setup GUI window
 	cfg := pixelgl.WindowConfig{
 		Title:  title,
-		Bounds: pixel.R(0, 0, screenW*3, screenH*3),
+		Bounds: pixel.R(0, 0, screenW, screenH),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -42,9 +42,9 @@ func run() {
 	pc := imdraw.New(nil)
 	pc.Color = colornames.White
 
-	var lastX float64 = 100
-	var lastY float64 = 100
-	var size float64 = 32
+	var size float64 = 8
+	var lastX float64 = screenW - size
+	var lastY float64 = screenH - size
 
 	pc.Push(pixel.V(lastX, lastY))
 	pc.Push(pixel.V(lastX+size, lastY+size))
@@ -73,18 +73,27 @@ func run() {
 		pc.Draw(win)
 		win.Update()
 
+		// Detect edge of window
 		if win.JustPressed(pixelgl.KeyUp) {
-			lastY += stride
-			drawPC = true
+			if lastY+stride < screenH {
+				lastY += stride
+				drawPC = true
+			}
 		} else if win.JustPressed(pixelgl.KeyDown) {
-			lastY -= stride
-			drawPC = true
+			if lastY-stride >= 0 {
+				lastY -= stride
+				drawPC = true
+			}
 		} else if win.JustPressed(pixelgl.KeyRight) {
-			lastX += stride
-			drawPC = true
+			if lastX+stride < screenW {
+				lastX += stride
+				drawPC = true
+			}
 		} else if win.JustPressed(pixelgl.KeyLeft) {
-			lastX -= stride
-			drawPC = true
+			if lastX-stride >= 0 {
+				lastX -= stride
+				drawPC = true
+			}
 		}
 
 		if drawPC {
