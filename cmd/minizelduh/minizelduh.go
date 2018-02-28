@@ -9,6 +9,9 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+const screenW = 160
+const screenH = 144
+
 var title string = "Mini Zelduh"
 
 func run() {
@@ -20,7 +23,7 @@ func run() {
 	// Setup GUI window
 	cfg := pixelgl.WindowConfig{
 		Title:  title,
-		Bounds: pixel.R(0, 0, 400, 225),
+		Bounds: pixel.R(0, 0, screenW*3, screenH*3),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
