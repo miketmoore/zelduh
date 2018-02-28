@@ -52,7 +52,17 @@ func run() {
 
 	drawPC := false
 
-	var stride float64 = size
+	var pcStrid float64 = size
+
+	var npcSize float64 = 8
+	var npcLastX float64 = 0
+	var npcLastY float64 = 0
+
+	npc := imdraw.New(nil)
+	npc.Color = colornames.Darkblue
+	npc.Push(pixel.V(npcLastX, npcLastY))
+	npc.Push(pixel.V(npcLastX+npcSize, npcLastY+npcSize))
+	npc.Rectangle(0)
 
 	fmt.Fprintln(txt, title)
 	for !win.Closed() {
@@ -71,27 +81,29 @@ func run() {
 		fmt.Fprintln(coordDebugTxt, fmt.Sprintf("%d, %d", int(math.Ceil(mpos.X)), int(math.Ceil(mpos.Y))))
 		coordDebugTxt.Draw(win, pixel.IM.Moved(coordDebugTxtOrig))
 		pc.Draw(win)
+
+		npc.Draw(win)
 		win.Update()
 
 		// Detect edge of window
 		if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
-			if lastY+stride < screenH {
-				lastY += stride
+			if lastY+pcStrid < screenH {
+				lastY += pcStrid
 				drawPC = true
 			}
 		} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
-			if lastY-stride >= 0 {
-				lastY -= stride
+			if lastY-pcStrid >= 0 {
+				lastY -= pcStrid
 				drawPC = true
 			}
 		} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
-			if lastX+stride < screenW {
-				lastX += stride
+			if lastX+pcStrid < screenW {
+				lastX += pcStrid
 				drawPC = true
 			}
 		} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
-			if lastX-stride >= 0 {
-				lastX -= stride
+			if lastX-pcStrid >= 0 {
+				lastX -= pcStrid
 				drawPC = true
 			}
 		}
