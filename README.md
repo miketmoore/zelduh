@@ -5,7 +5,7 @@ A monochrome 4-color game!
 ## Goals
 
 [ ] Player character movement
-  [ ] Move with arrow keys
+  [x] Move with arrow keys
   [ ] Pressing and holding keys for continuous movement
   [x] Edge of window boundaries
 [ ] NPC movement

@@ -74,22 +74,22 @@ func run() {
 		win.Update()
 
 		// Detect edge of window
-		if win.JustPressed(pixelgl.KeyUp) {
+		if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
 			if lastY+stride < screenH {
 				lastY += stride
 				drawPC = true
 			}
-		} else if win.JustPressed(pixelgl.KeyDown) {
+		} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
 			if lastY-stride >= 0 {
 				lastY -= stride
 				drawPC = true
 			}
-		} else if win.JustPressed(pixelgl.KeyRight) {
+		} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
 			if lastX+stride < screenW {
 				lastX += stride
 				drawPC = true
 			}
-		} else if win.JustPressed(pixelgl.KeyLeft) {
+		} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
 			if lastX-stride >= 0 {
 				lastX -= stride
 				drawPC = true
