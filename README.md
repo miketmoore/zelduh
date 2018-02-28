@@ -6,8 +6,9 @@ A monochrome 4-color game!
 
 [ ] Player character movement
   [x] Move with arrow keys
-  [ ] Pressing and holding keys for continuous movement
+  [x] Pressing and holding keys for continuous movement
   [x] Edge of window boundaries
+  [ ] Get rid of delay on win.Repeated()
 [ ] NPC movement
   [ ] Random
   [ ] If player character is in line of sight, enemies charge/shoot
