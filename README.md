@@ -18,11 +18,16 @@ A monochrome 4-color game!
   * Enemies cause damage
   * Obstacles
   * Block projectiles with shield
+  * Pickup items
+* Interact with environment
+  * Open things
+  * Push things
 * Basic stats
   * Health
   * Charge sword
 * Start fully equiped
 * High score goal
+  * Score points by killing enemies, collecting items
 * Attack
   * Basic sword slash
   * Charged magic sword projectile
