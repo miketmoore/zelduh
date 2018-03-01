@@ -26,6 +26,15 @@ const (
 	GameStateOver  GameState = "over"
 )
 
+type Direction string
+
+const (
+	DirectionXPos Direction = "xPositive"
+	DirectionXNeg Direction = "xNegative"
+	DirectionYPos Direction = "yPositive"
+	DirectionYNeg Direction = "yNegative"
+)
+
 func run() {
 	// Setup Text
 	orig := pixel.V(20, 50)
@@ -50,10 +59,12 @@ func run() {
 	// Draw player character
 
 	var playerSize float64 = 8
-	var playerStartX float64 = screenW - playerSize
-	var playerStartY float64 = screenH - playerSize
+	var playerStartX float64 = (screenW / 2) - playerSize
+	var playerStartY float64 = (screenH / 2) - playerSize
 	var playerLastX float64 = playerStartX
 	var playerLastY float64 = playerStartY
+
+	var playerSwordSize float64 = 8
 
 	var pcStrid float64 = playerSize
 
@@ -66,6 +77,9 @@ func run() {
 	currentState := GameStateStart
 
 	player := imdraw.New(nil)
+	var playerLastDir Direction
+	playerSword := imdraw.New(nil)
+	npc := imdraw.New(nil)
 
 	for !win.Closed() {
 
@@ -100,7 +114,6 @@ func run() {
 		case GameStateGame:
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
-			npc := imdraw.New(nil)
 			npc.Color = colornames.Darkblue
 			npc.Push(pixel.V(npcLastX, npcLastY))
 			npc.Push(pixel.V(npcLastX+npcSize, npcLastY+npcSize))
@@ -118,18 +131,22 @@ func run() {
 			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
 				if playerLastY+pcStrid < screenH {
 					playerLastY += pcStrid
+					playerLastDir = DirectionYPos
 				}
 			} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
 				if playerLastY-pcStrid >= 0 {
 					playerLastY -= pcStrid
+					playerLastDir = DirectionYNeg
 				}
 			} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
 				if playerLastX+pcStrid < screenW {
 					playerLastX += pcStrid
+					playerLastDir = DirectionXPos
 				}
 			} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
 				if playerLastX-pcStrid >= 0 {
 					playerLastX -= pcStrid
+					playerLastDir = DirectionXNeg
 				}
 			}
 
@@ -139,6 +156,32 @@ func run() {
 
 			if win.JustPressed(pixelgl.KeyX) {
 				currentState = GameStateOver
+			}
+
+			if win.JustPressed(pixelgl.KeySpace) {
+				// Attack with sword
+				fmt.Printf("Sword attack direction: %s\n", playerLastDir)
+
+				playerSword.Clear()
+				playerSword.Color = colornames.Darkgray
+
+				switch playerLastDir {
+				case DirectionXPos:
+					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY))
+					playerSword.Push(pixel.V(playerLastX+(playerSwordSize*2), playerLastY+playerSwordSize))
+				case DirectionXNeg:
+					playerSword.Push(pixel.V(playerLastX-playerSwordSize, playerLastY))
+					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY+playerSwordSize))
+				case DirectionYPos:
+					playerSword.Push(pixel.V(playerLastX, playerLastY+playerSwordSize))
+					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY+(playerSwordSize*2)))
+				case DirectionYNeg:
+					playerSword.Push(pixel.V(playerLastX, playerLastY-playerSwordSize))
+					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY+playerSwordSize))
+				}
+
+				playerSword.Rectangle(0)
+				playerSword.Draw(win)
 			}
 		case GameStatePause:
 			win.Clear(colornames.Darkblue)
