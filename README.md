@@ -5,10 +5,11 @@ A monochrome 4-color game!
 ## Goals
 
 [ ] State machines
-    [ ] State machine for UI
-        [ ] Start screen
-        [ ] Game screen
-        [ ] Pause screen
+    [x] State machine for UI
+        [x] Start screen
+        [x] Game screen
+        [x] Pause screen
+        [x] Game over screen
     [ ] State machine for actual game (maybe multiple)
 [ ] Player character movement
     [x] Move with arrow keys
