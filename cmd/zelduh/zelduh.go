@@ -49,15 +49,19 @@ func run() {
 
 	// Draw player character
 
-	var size float64 = 8
-	var lastX float64 = screenW - size
-	var lastY float64 = screenH - size
+	var playerSize float64 = 8
+	var playerStartX float64 = screenW - playerSize
+	var playerStartY float64 = screenH - playerSize
+	var playerLastX float64 = playerStartX
+	var playerLastY float64 = playerStartY
 
-	var pcStrid float64 = size
+	var pcStrid float64 = playerSize
 
 	var npcSize float64 = 8
-	var npcLastX float64 = 0
-	var npcLastY float64 = 0
+	var npcStartX float64 = 0
+	var npcStartY float64 = 0
+	var npcLastX float64 = npcStartX
+	var npcLastY float64 = npcStartY
 
 	currentState := GameStateStart
 
@@ -83,6 +87,12 @@ func run() {
 			fmt.Fprintln(txt, title)
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
+			playerLastX = playerStartX
+			playerLastY = playerStartY
+
+			npcLastX = npcStartX
+			npcLastY = npcStartY
+
 			if win.JustPressed(pixelgl.KeyEnter) {
 				fmt.Println("Transition from state %s to %s\n", currentState, GameStateGame)
 				currentState = GameStateGame
@@ -99,32 +109,36 @@ func run() {
 
 			player.Clear()
 			player.Color = colornames.White
-			player.Push(pixel.V(lastX, lastY))
-			player.Push(pixel.V(lastX+size, lastY+size))
+			player.Push(pixel.V(playerLastX, playerLastY))
+			player.Push(pixel.V(playerLastX+playerSize, playerLastY+playerSize))
 			player.Rectangle(0)
 			player.Draw(win)
 
 			// Detect edge of window
 			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
-				if lastY+pcStrid < screenH {
-					lastY += pcStrid
+				if playerLastY+pcStrid < screenH {
+					playerLastY += pcStrid
 				}
 			} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
-				if lastY-pcStrid >= 0 {
-					lastY -= pcStrid
+				if playerLastY-pcStrid >= 0 {
+					playerLastY -= pcStrid
 				}
 			} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
-				if lastX+pcStrid < screenW {
-					lastX += pcStrid
+				if playerLastX+pcStrid < screenW {
+					playerLastX += pcStrid
 				}
 			} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
-				if lastX-pcStrid >= 0 {
-					lastX -= pcStrid
+				if playerLastX-pcStrid >= 0 {
+					playerLastX -= pcStrid
 				}
 			}
 
 			if win.JustPressed(pixelgl.KeyP) {
 				currentState = GameStatePause
+			}
+
+			if win.JustPressed(pixelgl.KeyX) {
+				currentState = GameStateOver
 			}
 		case GameStatePause:
 			win.Clear(colornames.Darkblue)
@@ -138,7 +152,15 @@ func run() {
 			if win.JustPressed(pixelgl.KeyEscape) {
 				currentState = GameStateStart
 			}
+		case GameStateOver:
+			win.Clear(colornames.Black)
+			txt.Clear()
+			fmt.Fprintln(txt, "Game Over")
+			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
+			if win.JustPressed(pixelgl.KeyEnter) {
+				currentState = GameStateStart
+			}
 		}
 
 		win.Update()
