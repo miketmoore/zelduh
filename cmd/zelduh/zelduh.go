@@ -35,6 +35,74 @@ const (
 	DirectionYNeg Direction = "yNegative"
 )
 
+// Player represents the player character
+type Player struct {
+	// Size is the dimensions (square)
+	Size float64
+	// Start is the starting vector
+	Start pixel.Vec
+	// Last is the last vector
+	Last pixel.Vec
+	// LastDir is the last direction the player was headed in
+	LastDir Direction
+	// Shape is the view
+	Shape *imdraw.IMDraw
+	// Win is a pointer to the GUI window
+	Win *pixelgl.Window
+	// SwordSize is the dimensions of the sword
+	SwordSize float64
+	// Stride is how many tiles character can move in one "step"
+	Stride float64
+}
+
+func (player *Player) Draw() {
+	shape := player.Shape
+	shape.Clear()
+	shape.Color = colornames.White
+	shape.Push(pixel.V(player.Last.X, player.Last.Y))
+	shape.Push(pixel.V(player.Last.X+player.Size, player.Last.Y+player.Size))
+	shape.Rectangle(0)
+	shape.Draw(player.Win)
+}
+
+// NPC represents one non-player character
+type NPC struct {
+	// Size is the dimensions (square)
+	Size float64
+	// Start is the starting vector
+	Start pixel.Vec
+	// Last is the last vector
+	Last pixel.Vec
+	// LastDir is the last direction the NPC was headed in
+	LastDir Direction
+	// Shape is the view
+	Shape *imdraw.IMDraw
+	// Win is a pointer to the GUI window
+	Win *pixelgl.Window
+}
+
+func (npc *NPC) Draw(playerLast pixel.Vec) {
+	// Move npc with AI
+	// velocity := 1
+	// max_velocity = 2
+	// desired_velocity = normalize(target - position) * max_velocity
+	// steering = desired_velocity - velocity
+	// velocity := float64(1)    // move one space per update
+	npc.Shape.Clear()
+	maxVelocity := float64(0.75) // move three spaces per update
+	normalized := normalize(playerLast, npc.Last)
+	desiredVelocity := pixel.V(normalized.X*maxVelocity, normalized.Y*maxVelocity)
+	fmt.Printf("desiredVelocity: %f, %f\n", desiredVelocity.X, desiredVelocity.Y)
+
+	npc.Shape.Color = colornames.Darkblue
+	// npc.Push(pixel.V(npcLastX, npcLastY))
+	// npc.Push(pixel.V(npcLastX+npcSize, npcLastY+npcSize))
+	npc.Shape.Push(desiredVelocity)
+	npc.Shape.Push(pixel.V(desiredVelocity.X+npc.Size, desiredVelocity.Y+npc.Size))
+	npc.Shape.Rectangle(0)
+	npc.Shape.Draw(npc.Win)
+}
+
 func run() {
 	// Setup Text
 	orig := pixel.V(20, 50)
@@ -56,30 +124,29 @@ func run() {
 		panic(err)
 	}
 
-	// Draw player character
+	// Init player character
+	player := Player{
+		Win:       win,
+		Size:      8,
+		Shape:     imdraw.New(nil),
+		SwordSize: 8,
+	}
+	player.Start = pixel.V((screenW/2)-player.Size, (screenH/2)-player.Size)
+	player.Last = player.Start
+	player.Stride = player.Size
 
-	var playerSize float64 = 8
-	var playerStartX float64 = (screenW / 2) - playerSize
-	var playerStartY float64 = (screenH / 2) - playerSize
-	var playerLastX float64 = playerStartX
-	var playerLastY float64 = playerStartY
-
-	var playerSwordSize float64 = 8
-
-	var pcStrid float64 = playerSize
-
-	var npcSize float64 = 8
-	var npcStartX float64 = 0
-	var npcStartY float64 = 0
-	var npcLastX float64 = npcStartX
-	var npcLastY float64 = npcStartY
+	// Init non-player character
+	var npc = NPC{
+		Win:   win,
+		Size:  8,
+		Start: pixel.V(0, 0),
+		Last:  pixel.V(0, 0),
+		Shape: imdraw.New(nil),
+	}
 
 	currentState := GameStateStart
 
-	player := imdraw.New(nil)
-	var playerLastDir Direction
 	playerSword := imdraw.New(nil)
-	npc := imdraw.New(nil)
 
 	for !win.Closed() {
 
@@ -101,11 +168,13 @@ func run() {
 			fmt.Fprintln(txt, title)
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
-			playerLastX = playerStartX
-			playerLastY = playerStartY
+			// player.Last.X = playerStartX
+			// player.Last.Y = playerStartY
+			player.Last = player.Start
 
-			npcLastX = npcStartX
-			npcLastY = npcStartY
+			// npcLastX = npcStartX
+			// npcLastY = npcStartY
+			npc.Last = npc.Start
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				fmt.Println("Transition from state %s to %s\n", currentState, GameStateGame)
@@ -114,39 +183,30 @@ func run() {
 		case GameStateGame:
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
-			npc.Color = colornames.Darkblue
-			npc.Push(pixel.V(npcLastX, npcLastY))
-			npc.Push(pixel.V(npcLastX+npcSize, npcLastY+npcSize))
-			npc.Rectangle(0)
-			npc.Draw(win)
 
-			player.Clear()
-			player.Color = colornames.White
-			player.Push(pixel.V(playerLastX, playerLastY))
-			player.Push(pixel.V(playerLastX+playerSize, playerLastY+playerSize))
-			player.Rectangle(0)
-			player.Draw(win)
+			npc.Draw(pixel.V(player.Last.X, player.Last.Y))
+			player.Draw()
 
 			// Detect edge of window
 			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
-				if playerLastY+pcStrid < screenH {
-					playerLastY += pcStrid
-					playerLastDir = DirectionYPos
+				if player.Last.Y+player.Stride < screenH {
+					player.Last.Y += player.Stride
+					player.LastDir = DirectionYPos
 				}
 			} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
-				if playerLastY-pcStrid >= 0 {
-					playerLastY -= pcStrid
-					playerLastDir = DirectionYNeg
+				if player.Last.Y-player.Stride >= 0 {
+					player.Last.Y -= player.Stride
+					player.LastDir = DirectionYNeg
 				}
 			} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
-				if playerLastX+pcStrid < screenW {
-					playerLastX += pcStrid
-					playerLastDir = DirectionXPos
+				if player.Last.X+player.Stride < screenW {
+					player.Last.X += player.Stride
+					player.LastDir = DirectionXPos
 				}
 			} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
-				if playerLastX-pcStrid >= 0 {
-					playerLastX -= pcStrid
-					playerLastDir = DirectionXNeg
+				if player.Last.X-player.Stride >= 0 {
+					player.Last.X -= player.Stride
+					player.LastDir = DirectionXNeg
 				}
 			}
 
@@ -160,25 +220,25 @@ func run() {
 
 			if win.JustPressed(pixelgl.KeySpace) {
 				// Attack with sword
-				fmt.Printf("Sword attack direction: %s\n", playerLastDir)
+				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
 				playerSword.Clear()
 				playerSword.Color = colornames.Darkgray
 
 				// Attack in direction player last moved
-				switch playerLastDir {
+				switch player.LastDir {
 				case DirectionXPos:
-					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY))
-					playerSword.Push(pixel.V(playerLastX+(playerSwordSize*2), playerLastY+playerSwordSize))
+					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y))
+					playerSword.Push(pixel.V(player.Last.X+(player.SwordSize*2), player.Last.Y+player.SwordSize))
 				case DirectionXNeg:
-					playerSword.Push(pixel.V(playerLastX-playerSwordSize, playerLastY))
-					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY+playerSwordSize))
+					playerSword.Push(pixel.V(player.Last.X-player.SwordSize, player.Last.Y))
+					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
 				case DirectionYPos:
-					playerSword.Push(pixel.V(playerLastX, playerLastY+playerSwordSize))
-					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY+(playerSwordSize*2)))
+					playerSword.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
+					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+(player.SwordSize*2)))
 				case DirectionYNeg:
-					playerSword.Push(pixel.V(playerLastX, playerLastY-playerSwordSize))
-					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY+playerSwordSize))
+					playerSword.Push(pixel.V(player.Last.X, player.Last.Y-player.SwordSize))
+					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
 				}
 
 				playerSword.Rectangle(0)
@@ -214,4 +274,8 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func normalize(target, position pixel.Vec) pixel.Vec {
+	return pixel.V(target.X-position.X, target.Y-position.Y)
 }
