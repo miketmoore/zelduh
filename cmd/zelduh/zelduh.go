@@ -165,6 +165,7 @@ func run() {
 				playerSword.Clear()
 				playerSword.Color = colornames.Darkgray
 
+				// Attack in direction player last moved
 				switch playerLastDir {
 				case DirectionXPos:
 					playerSword.Push(pixel.V(playerLastX+playerSwordSize, playerLastY))
