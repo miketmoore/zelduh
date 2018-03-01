@@ -61,6 +61,8 @@ func run() {
 
 	currentState := GameStateStart
 
+	player := imdraw.New(nil)
+
 	for !win.Closed() {
 
 		// For every state, allow quiting by pressing <q>
@@ -95,12 +97,12 @@ func run() {
 			npc.Rectangle(0)
 			npc.Draw(win)
 
-			pc := imdraw.New(nil)
-			pc.Color = colornames.White
-			pc.Push(pixel.V(lastX, lastY))
-			pc.Push(pixel.V(lastX+size, lastY+size))
-			pc.Rectangle(0)
-			pc.Draw(win)
+			player.Clear()
+			player.Color = colornames.White
+			player.Push(pixel.V(lastX, lastY))
+			player.Push(pixel.V(lastX+size, lastY+size))
+			player.Rectangle(0)
+			player.Draw(win)
 
 			// Detect edge of window
 			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
