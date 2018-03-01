@@ -123,6 +123,22 @@ func run() {
 				}
 			}
 
+			if win.JustPressed(pixelgl.KeyP) {
+				currentState = GameStatePause
+			}
+		case GameStatePause:
+			win.Clear(colornames.Darkblue)
+			txt.Clear()
+			fmt.Fprintln(txt, "Pause")
+			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+
+			if win.JustPressed(pixelgl.KeyP) {
+				currentState = GameStateGame
+			}
+			if win.JustPressed(pixelgl.KeyEscape) {
+				currentState = GameStateStart
+			}
+
 		}
 
 		win.Update()
