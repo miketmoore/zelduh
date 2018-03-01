@@ -17,6 +17,15 @@ const screenH = 144
 
 var title string = "Zelduh"
 
+type GameState string
+
+const (
+	GameStateStart GameState = "start"
+	GameStateGame  GameState = "game"
+	GameStatePause GameState = "pause"
+	GameStateOver  GameState = "over"
+)
+
 func run() {
 	// Setup Text
 	orig := pixel.V(20, 50)
@@ -39,18 +48,10 @@ func run() {
 	}
 
 	// Draw player character
-	pc := imdraw.New(nil)
-	pc.Color = colornames.White
 
 	var size float64 = 8
 	var lastX float64 = screenW - size
 	var lastY float64 = screenH - size
-
-	pc.Push(pixel.V(lastX, lastY))
-	pc.Push(pixel.V(lastX+size, lastY+size))
-	pc.Rectangle(0)
-
-	drawPC := false
 
 	var pcStrid float64 = size
 
@@ -58,64 +59,71 @@ func run() {
 	var npcLastX float64 = 0
 	var npcLastY float64 = 0
 
-	npc := imdraw.New(nil)
-	npc.Color = colornames.Darkblue
-	npc.Push(pixel.V(npcLastX, npcLastY))
-	npc.Push(pixel.V(npcLastX+npcSize, npcLastY+npcSize))
-	npc.Rectangle(0)
+	currentState := GameStateStart
 
-	fmt.Fprintln(txt, title)
 	for !win.Closed() {
 
+		// For every state, allow quiting by pressing <q>
 		if win.JustPressed(pixelgl.KeyQ) {
 			os.Exit(1)
 		}
-
-		win.Clear(colornames.Darkgreen)
-
-		txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 		// Get mouse position and log to screen
 		mpos := win.MousePosition()
 		coordDebugTxt.Clear()
 		fmt.Fprintln(coordDebugTxt, fmt.Sprintf("%d, %d", int(math.Ceil(mpos.X)), int(math.Ceil(mpos.Y))))
 		coordDebugTxt.Draw(win, pixel.IM.Moved(coordDebugTxtOrig))
-		pc.Draw(win)
 
-		npc.Draw(win)
-		win.Update()
+		switch currentState {
+		case GameStateStart:
+			win.Clear(colornames.Darkgreen)
+			txt.Clear()
+			fmt.Fprintln(txt, title)
+			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
-		// Detect edge of window
-		if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
-			if lastY+pcStrid < screenH {
-				lastY += pcStrid
-				drawPC = true
+			if win.JustPressed(pixelgl.KeyEnter) {
+				fmt.Println("Transition from state %s to %s\n", currentState, GameStateGame)
+				currentState = GameStateGame
 			}
-		} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
-			if lastY-pcStrid >= 0 {
-				lastY -= pcStrid
-				drawPC = true
-			}
-		} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
-			if lastX+pcStrid < screenW {
-				lastX += pcStrid
-				drawPC = true
-			}
-		} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
-			if lastX-pcStrid >= 0 {
-				lastX -= pcStrid
-				drawPC = true
-			}
-		}
+		case GameStateGame:
+			win.Clear(colornames.Darkgreen)
+			txt.Clear()
+			npc := imdraw.New(nil)
+			npc.Color = colornames.Darkblue
+			npc.Push(pixel.V(npcLastX, npcLastY))
+			npc.Push(pixel.V(npcLastX+npcSize, npcLastY+npcSize))
+			npc.Rectangle(0)
+			npc.Draw(win)
 
-		if drawPC {
-			pc.Clear()
+			pc := imdraw.New(nil)
 			pc.Color = colornames.White
 			pc.Push(pixel.V(lastX, lastY))
 			pc.Push(pixel.V(lastX+size, lastY+size))
 			pc.Rectangle(0)
-			drawPC = false
+			pc.Draw(win)
+
+			// Detect edge of window
+			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
+				if lastY+pcStrid < screenH {
+					lastY += pcStrid
+				}
+			} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
+				if lastY-pcStrid >= 0 {
+					lastY -= pcStrid
+				}
+			} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
+				if lastX+pcStrid < screenW {
+					lastX += pcStrid
+				}
+			} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
+				if lastX-pcStrid >= 0 {
+					lastX -= pcStrid
+				}
+			}
+
 		}
+
+		win.Update()
 
 	}
 }
