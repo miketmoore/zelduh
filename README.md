@@ -26,6 +26,8 @@ A monochrome 4-color game!
         * Don't box in what enemies can do too early
     [ ] If player character is in line of sight, enemies charge/shoot
 [ ] Projectiles
+    [ ] Player sword is a projectile that shoots one tile 
+    [ ] Enemies can shoot projectiles that go x tiles
 [ ] Animated sprites
     [ ] Pixel art
     [ ] Sprite sheet
