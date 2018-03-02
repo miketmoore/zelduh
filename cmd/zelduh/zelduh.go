@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -25,6 +27,8 @@ const characterSize float64 = 16
 
 const translationFile = "i18n/zelduh/en-US.all.json"
 const lang = "en-US"
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func run() {
 	// i18n
@@ -69,11 +73,13 @@ func run() {
 
 	// Create enemies
 	enemies := []npc.Blob{}
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 3; i++ {
+		x := r.Intn(int(screenW - characterSize))
+		y := r.Intn(int(screenH - characterSize))
 		var enemy = npc.Blob{
 			Win:         win,
 			Size:        characterSize,
-			Start:       pixel.V(0, 0),
+			Start:       pixel.V(float64(x), float64(y)),
 			Last:        pixel.V(0, 0),
 			Shape:       imdraw.New(nil),
 			Stride:      1,
