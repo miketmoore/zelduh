@@ -83,7 +83,7 @@ func (blob *Blob) Draw(screenW, screenH float64) {
 			blob.moveCounter--
 		} else {
 			blob.totalMoves--
-			blob.moveCounter = 8
+			blob.moveCounter = int(blob.Size)
 		}
 
 	}
