@@ -9,6 +9,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/npc"
@@ -73,7 +74,7 @@ func run() {
 
 	currentState := gamestate.Start
 
-	playerSword := imdraw.New(nil)
+	playerSword := equipment.NewSword()
 
 	for !win.Closed() {
 
@@ -149,27 +150,27 @@ func run() {
 				// Attack with sword
 				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
-				playerSword.Clear()
-				playerSword.Color = colornames.Darkgray
+				playerSword.Shape.Clear()
+				playerSword.Shape.Color = colornames.Darkgray
 
 				// Attack in direction player last moved
 				switch player.LastDir {
 				case mvmt.DirectionXPos:
-					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y))
-					playerSword.Push(pixel.V(player.Last.X+(player.SwordSize*2), player.Last.Y+player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y))
+					playerSword.Shape.Push(pixel.V(player.Last.X+(player.SwordSize*2), player.Last.Y+player.SwordSize))
 				case mvmt.DirectionXNeg:
-					playerSword.Push(pixel.V(player.Last.X-player.SwordSize, player.Last.Y))
-					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X-player.SwordSize, player.Last.Y))
+					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
 				case mvmt.DirectionYPos:
-					playerSword.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
-					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+(player.SwordSize*2)))
+					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+(player.SwordSize*2)))
 				case mvmt.DirectionYNeg:
-					playerSword.Push(pixel.V(player.Last.X, player.Last.Y-player.SwordSize))
-					playerSword.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y-player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
 				}
 
-				playerSword.Rectangle(0)
-				playerSword.Draw(win)
+				playerSword.Shape.Rectangle(0)
+				playerSword.Shape.Draw(win)
 			}
 		case gamestate.Pause:
 			win.Clear(colornames.Darkblue)
