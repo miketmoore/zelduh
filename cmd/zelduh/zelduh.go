@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 
 	"github.com/faiface/pixel"
@@ -83,11 +82,11 @@ func run() {
 			os.Exit(1)
 		}
 
-		// Get mouse position and log to screen
-		mpos := win.MousePosition()
-		coordDebugTxt.Clear()
-		fmt.Fprintln(coordDebugTxt, fmt.Sprintf("%d, %d", int(math.Ceil(mpos.X)), int(math.Ceil(mpos.Y))))
-		coordDebugTxt.Draw(win, pixel.IM.Moved(coordDebugTxtOrig))
+		// // Get mouse position and log to screen
+		// mpos := win.MousePosition()
+		// coordDebugTxt.Clear()
+		// fmt.Fprintln(coordDebugTxt, fmt.Sprintf("%d, %d", int(math.Ceil(mpos.X)), int(math.Ceil(mpos.Y))))
+		// coordDebugTxt.Draw(win, pixel.IM.Moved(coordDebugTxtOrig))
 
 		switch currentState {
 		case gamestate.Start:
@@ -96,12 +95,8 @@ func run() {
 			fmt.Fprintln(txt, T("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
-			// player.Last.X = playerStartX
-			// player.Last.Y = playerStartY
+			// Reset characters to starting positions
 			player.Last = player.Start
-
-			// npcLastX = npcStartX
-			// npcLastY = npcStartY
 			blob.Last = blob.Start
 
 			if win.JustPressed(pixelgl.KeyEnter) {
