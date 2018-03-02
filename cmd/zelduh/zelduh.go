@@ -76,15 +76,7 @@ func run() {
 	for i := 0; i < 3; i++ {
 		x := r.Intn(int(screenW - characterSize))
 		y := r.Intn(int(screenH - characterSize))
-		var enemy = npc.Blob{
-			Win:         win,
-			Size:        characterSize,
-			Start:       pixel.V(float64(x), float64(y)),
-			Last:        pixel.V(0, 0),
-			Shape:       imdraw.New(nil),
-			Stride:      1,
-			AttackPower: 1,
-		}
+		var enemy = npc.NewBlob(win, characterSize, float64(x), float64(y), 1, 1)
 		enemies = append(enemies, enemy)
 	}
 

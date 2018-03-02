@@ -6,6 +6,8 @@ A monochrome 4-color game!
 
 ## Goals
 
+- [ ] Move to new screen
+    - Slide transition
 - [ ] State machines
     - [x] State machine for UI
         - [x] Start screen
