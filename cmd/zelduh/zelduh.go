@@ -95,7 +95,7 @@ func run() {
 			blob.Last = blob.Start
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				fmt.Println("Transition from state %s to %s\n", currentState, gamestate.Game)
+				fmt.Printf("Transition from state %s to %s\n", currentState, gamestate.Game)
 				currentState = gamestate.Game
 			}
 		case gamestate.Game:
