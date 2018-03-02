@@ -37,6 +37,11 @@ type Blob struct {
 	moveCounter int
 }
 
+// Reset updates all values to starting values
+func (blob *Blob) Reset() {
+	blob.Last = blob.Start
+}
+
 // Draw the blob's current state
 func (blob *Blob) Draw(screenW, screenH float64) {
 	// v1 will just move randomly

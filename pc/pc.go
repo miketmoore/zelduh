@@ -28,6 +28,8 @@ type Player struct {
 	Stride float64
 
 	Health int
+
+	MaxHealth int
 }
 
 // Draw renders the current state of the player character
@@ -49,4 +51,10 @@ func (player *Player) Hit(attackPower int) {
 // IsDead returns a bool indicating if the player is dead or not
 func (player *Player) IsDead() bool {
 	return player.Health == 0
+}
+
+// Reset updates all values to starting values
+func (player *Player) Reset() {
+	player.Last = player.Start
+	player.Health = player.MaxHealth
 }

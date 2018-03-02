@@ -59,6 +59,7 @@ func run() {
 		Shape:     imdraw.New(nil),
 		SwordSize: 8,
 		Health:    3,
+		MaxHealth: 3,
 	}
 	player.Start = pixel.V((screenW/2)-player.Size, (screenH/2)-player.Size)
 	player.Last = player.Start
@@ -104,9 +105,9 @@ func run() {
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			// Reset characters to starting positions
-			player.Last = player.Start
+			player.Reset()
 			for i := 0; i < len(enemies); i++ {
-				enemies[i].Last = enemies[i].Start
+				enemies[i].Reset()
 			}
 
 			if win.JustPressed(pixelgl.KeyEnter) {
