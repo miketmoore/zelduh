@@ -9,6 +9,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/npc"
 	"github.com/miketmoore/zelduh/pc"
@@ -19,15 +20,6 @@ const screenW = 160
 const screenH = 144
 
 var title = "Zelduh"
-
-type GameState string
-
-const (
-	GameStateStart GameState = "start"
-	GameStateGame  GameState = "game"
-	GameStatePause GameState = "pause"
-	GameStateOver  GameState = "over"
-)
 
 func run() {
 	// Setup Text
@@ -70,7 +62,7 @@ func run() {
 		Shape: imdraw.New(nil),
 	}
 
-	currentState := GameStateStart
+	currentState := gamestate.Start
 
 	playerSword := imdraw.New(nil)
 
@@ -88,7 +80,7 @@ func run() {
 		coordDebugTxt.Draw(win, pixel.IM.Moved(coordDebugTxtOrig))
 
 		switch currentState {
-		case GameStateStart:
+		case gamestate.Start:
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
 			fmt.Fprintln(txt, title)
@@ -103,10 +95,10 @@ func run() {
 			blob.Last = blob.Start
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				fmt.Println("Transition from state %s to %s\n", currentState, GameStateGame)
-				currentState = GameStateGame
+				fmt.Println("Transition from state %s to %s\n", currentState, gamestate.Game)
+				currentState = gamestate.Game
 			}
-		case GameStateGame:
+		case gamestate.Game:
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
 
@@ -137,11 +129,11 @@ func run() {
 			}
 
 			if win.JustPressed(pixelgl.KeyP) {
-				currentState = GameStatePause
+				currentState = gamestate.Pause
 			}
 
 			if win.JustPressed(pixelgl.KeyX) {
-				currentState = GameStateOver
+				currentState = gamestate.Over
 			}
 
 			if win.JustPressed(pixelgl.KeySpace) {
@@ -170,26 +162,26 @@ func run() {
 				playerSword.Rectangle(0)
 				playerSword.Draw(win)
 			}
-		case GameStatePause:
+		case gamestate.Pause:
 			win.Clear(colornames.Darkblue)
 			txt.Clear()
 			fmt.Fprintln(txt, "Pause")
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyP) {
-				currentState = GameStateGame
+				currentState = gamestate.Game
 			}
 			if win.JustPressed(pixelgl.KeyEscape) {
-				currentState = GameStateStart
+				currentState = gamestate.Start
 			}
-		case GameStateOver:
+		case gamestate.Over:
 			win.Clear(colornames.Black)
 			txt.Clear()
 			fmt.Fprintln(txt, "Game Over")
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				currentState = GameStateStart
+				currentState = gamestate.Start
 			}
 		}
 
