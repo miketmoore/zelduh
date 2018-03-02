@@ -17,8 +17,9 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const screenW float64 = 500
-const screenH float64 = 500
+// These should be multiples of 8 for now
+const screenW float64 = 160
+const screenH float64 = 144
 
 const translationFile = "i18n/zelduh/en-US.all.json"
 const lang = "en-US"
