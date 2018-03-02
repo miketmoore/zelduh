@@ -13,15 +13,24 @@ import (
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/npc"
 	"github.com/miketmoore/zelduh/pc"
+	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
 )
 
 const screenW = 160
 const screenH = 144
 
-var title = "Zelduh"
+const translationFile = "i18n/zelduh/en-US.all.json"
+const lang = "en-US"
 
 func run() {
+	// i18n
+	i18n.MustLoadTranslationFile(translationFile)
+	T, err := i18n.Tfunc(lang)
+	if err != nil {
+		panic(err)
+	}
+
 	// Setup Text
 	orig := pixel.V(20, 50)
 	txt := text.New(orig, text.Atlas7x13)
@@ -33,7 +42,7 @@ func run() {
 
 	// Setup GUI window
 	cfg := pixelgl.WindowConfig{
-		Title:  title,
+		Title:  T("title"),
 		Bounds: pixel.R(0, 0, screenW, screenH),
 		VSync:  true,
 	}
@@ -83,7 +92,7 @@ func run() {
 		case gamestate.Start:
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
-			fmt.Fprintln(txt, title)
+			fmt.Fprintln(txt, T("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			// player.Last.X = playerStartX
@@ -165,7 +174,7 @@ func run() {
 		case gamestate.Pause:
 			win.Clear(colornames.Darkblue)
 			txt.Clear()
-			fmt.Fprintln(txt, "Pause")
+			fmt.Fprintln(txt, T("paused"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -177,7 +186,7 @@ func run() {
 		case gamestate.Over:
 			win.Clear(colornames.Black)
 			txt.Clear()
-			fmt.Fprintln(txt, "Game Over")
+			fmt.Fprintln(txt, T("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyEnter) {
