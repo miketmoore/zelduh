@@ -63,14 +63,19 @@ func run() {
 	player.Last = player.Start
 	player.Stride = player.Size
 
-	// Init non-player character
-	var blob = npc.Blob{
-		Win:    win,
-		Size:   8,
-		Start:  pixel.V(0, 0),
-		Last:   pixel.V(0, 0),
-		Shape:  imdraw.New(nil),
-		Stride: 1,
+	enemies := []npc.Blob{}
+
+	for i := 0; i < 10; i++ {
+		// Init non-player character
+		var blob = npc.Blob{
+			Win:    win,
+			Size:   8,
+			Start:  pixel.V(0, 0),
+			Last:   pixel.V(0, 0),
+			Shape:  imdraw.New(nil),
+			Stride: 1,
+		}
+		enemies = append(enemies, blob)
 	}
 
 	currentState := gamestate.Start
@@ -99,7 +104,9 @@ func run() {
 
 			// Reset characters to starting positions
 			player.Last = player.Start
-			blob.Last = blob.Start
+			for i := 0; i < len(enemies); i++ {
+				enemies[i].Last = enemies[i].Start
+			}
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				fmt.Printf("Transition from state %s to %s\n", currentState, gamestate.Game)
@@ -109,8 +116,10 @@ func run() {
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
 
-			blob.Draw(screenW, screenH)
 			player.Draw()
+			for i := 0; i < len(enemies); i++ {
+				enemies[i].Draw(screenW, screenH)
+			}
 
 			// Detect edge of window
 			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
