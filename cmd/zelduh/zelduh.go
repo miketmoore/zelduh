@@ -18,8 +18,10 @@ import (
 )
 
 // These should be multiples of 8 for now
-const screenW float64 = 160
-const screenH float64 = 144
+const screenW float64 = 320
+const screenH float64 = 288
+
+const characterSize float64 = 16
 
 const translationFile = "i18n/zelduh/en-US.all.json"
 const lang = "en-US"
@@ -55,9 +57,9 @@ func run() {
 	// Init player character
 	player := pc.Player{
 		Win:       win,
-		Size:      8,
+		Size:      characterSize,
 		Shape:     imdraw.New(nil),
-		SwordSize: 8,
+		SwordSize: characterSize,
 		Health:    3,
 		MaxHealth: 3,
 	}
@@ -70,7 +72,7 @@ func run() {
 	for i := 0; i < 10; i++ {
 		var enemy = npc.Blob{
 			Win:         win,
-			Size:        8,
+			Size:        characterSize,
 			Start:       pixel.V(0, 0),
 			Last:        pixel.V(0, 0),
 			Shape:       imdraw.New(nil),
