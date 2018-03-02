@@ -17,8 +17,8 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const screenW = 160
-const screenH = 144
+const screenW float64 = 500
+const screenH float64 = 500
 
 const translationFile = "i18n/zelduh/en-US.all.json"
 const lang = "en-US"
@@ -64,11 +64,12 @@ func run() {
 
 	// Init non-player character
 	var blob = npc.Blob{
-		Win:   win,
-		Size:  8,
-		Start: pixel.V(0, 0),
-		Last:  pixel.V(0, 0),
-		Shape: imdraw.New(nil),
+		Win:    win,
+		Size:   8,
+		Start:  pixel.V(0, 0),
+		Last:   pixel.V(0, 0),
+		Shape:  imdraw.New(nil),
+		Stride: 1,
 	}
 
 	currentState := gamestate.Start
@@ -107,7 +108,7 @@ func run() {
 			win.Clear(colornames.Darkgreen)
 			txt.Clear()
 
-			blob.Draw(pixel.V(player.Last.X, player.Last.Y))
+			blob.Draw(screenW, screenH)
 			player.Draw()
 
 			// Detect edge of window

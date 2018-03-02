@@ -1,7 +1,8 @@
 package npc
 
 import (
-	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -9,6 +10,8 @@ import (
 	"github.com/miketmoore/zelduh/mvmt"
 	"golang.org/x/image/colornames"
 )
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 // Blob represents one non-player character
 type Blob struct {
@@ -24,26 +27,71 @@ type Blob struct {
 	Shape *imdraw.IMDraw
 	// Win is a pointer to the GUI window
 	Win *pixelgl.Window
+
+	Stride float64
+
+	totalMoves int
+
+	moveCounter int
 }
 
-func (blob *Blob) Draw(playerLast pixel.Vec) {
-	// Move blob with AI
-	// velocity := 1
-	// max_velocity = 2
-	// desired_velocity = normalize(target - position) * max_velocity
-	// steering = desired_velocity - velocity
-	// velocity := float64(1)    // move one space per update
-	blob.Shape.Clear()
-	maxVelocity := float64(0.75) // move three spaces per update
-	normalized := mvmt.Normalize(playerLast, blob.Last)
-	desiredVelocity := pixel.V(normalized.X*maxVelocity, normalized.Y*maxVelocity)
-	fmt.Printf("desiredVelocity: %f, %f\n", desiredVelocity.X, desiredVelocity.Y)
+// Draw the blob's current state
+func (blob *Blob) Draw(screenW, screenH float64) {
+	// v1 will just move randomly
 
+	// move smoothly into next tile, then orient for next move
+	stride := blob.Stride
+
+	if blob.totalMoves == 0 {
+		// number of tiles to move until next change in movement
+		maxMoves := 10
+		blob.totalMoves = r.Intn(maxMoves)
+
+		// which direction to move
+		directionIndex := r.Intn(4)
+		switch directionIndex {
+		case 0:
+			blob.LastDir = mvmt.DirectionYPos
+		case 1:
+			blob.LastDir = mvmt.DirectionXPos
+		case 2:
+			blob.LastDir = mvmt.DirectionYNeg
+		case 3:
+			blob.LastDir = mvmt.DirectionXNeg
+		}
+
+	} else {
+		if blob.moveCounter > 0 {
+			switch blob.LastDir {
+			case mvmt.DirectionYPos:
+				if blob.Last.Y+stride < screenH {
+					blob.Last = pixel.V(blob.Last.X, blob.Last.Y+stride)
+				}
+			case mvmt.DirectionXPos:
+				if blob.Last.X+stride < screenW {
+					blob.Last = pixel.V(blob.Last.X+stride, blob.Last.Y)
+				}
+			case mvmt.DirectionYNeg:
+				if blob.Last.Y-stride >= 0 {
+					blob.Last = pixel.V(blob.Last.X, blob.Last.Y-stride)
+				}
+			case mvmt.DirectionXNeg:
+				if blob.Last.X-stride >= 0 {
+					blob.Last = pixel.V(blob.Last.X-stride, blob.Last.Y)
+				}
+			}
+			blob.moveCounter--
+		} else {
+			blob.totalMoves--
+			blob.moveCounter = 8
+		}
+
+	}
+
+	blob.Shape.Clear()
 	blob.Shape.Color = colornames.Darkblue
-	// blob.Push(pixel.V(blobLastX, blobLastY))
-	// blob.Push(pixel.V(blobLastX+blobSize, blobLastY+blobSize))
-	blob.Shape.Push(desiredVelocity)
-	blob.Shape.Push(pixel.V(desiredVelocity.X+blob.Size, desiredVelocity.Y+blob.Size))
+	blob.Shape.Push(blob.Last)
+	blob.Shape.Push(pixel.V(blob.Last.X+blob.Size, blob.Last.Y+blob.Size))
 	blob.Shape.Rectangle(0)
 	blob.Shape.Draw(blob.Win)
 }
