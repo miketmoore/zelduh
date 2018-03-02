@@ -30,6 +30,8 @@ type Blob struct {
 
 	Stride float64
 
+	AttackPower int
+
 	totalMoves int
 
 	moveCounter int

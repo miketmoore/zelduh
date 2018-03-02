@@ -58,24 +58,25 @@ func run() {
 		Size:      8,
 		Shape:     imdraw.New(nil),
 		SwordSize: 8,
+		Health:    3,
 	}
 	player.Start = pixel.V((screenW/2)-player.Size, (screenH/2)-player.Size)
 	player.Last = player.Start
 	player.Stride = player.Size
 
+	// Create enemies
 	enemies := []npc.Blob{}
-
 	for i := 0; i < 10; i++ {
-		// Init non-player character
-		var blob = npc.Blob{
-			Win:    win,
-			Size:   8,
-			Start:  pixel.V(0, 0),
-			Last:   pixel.V(0, 0),
-			Shape:  imdraw.New(nil),
-			Stride: 1,
+		var enemy = npc.Blob{
+			Win:         win,
+			Size:        8,
+			Start:       pixel.V(0, 0),
+			Last:        pixel.V(0, 0),
+			Shape:       imdraw.New(nil),
+			Stride:      1,
+			AttackPower: 1,
 		}
-		enemies = append(enemies, blob)
+		enemies = append(enemies, enemy)
 	}
 
 	currentState := gamestate.Start
@@ -109,7 +110,6 @@ func run() {
 			}
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				fmt.Printf("Transition from state %s to %s\n", currentState, gamestate.Game)
 				currentState = gamestate.Game
 			}
 		case gamestate.Game:
@@ -118,7 +118,25 @@ func run() {
 
 			player.Draw()
 			for i := 0; i < len(enemies); i++ {
-				enemies[i].Draw(screenW, screenH)
+
+				// collision detection
+				collision := player.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
+					(player.Last.Y+player.Size) < enemies[i].Last.Y ||
+					player.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
+					(player.Last.X+player.Size) < enemies[i].Last.X
+
+				if !collision {
+					fmt.Printf("Collision\n")
+					// TODO move character back x pixels, in opposite direction that enemy
+					// is facing.
+					player.Hit(enemies[i].AttackPower)
+					if player.IsDead() {
+						currentState = gamestate.Over
+					}
+				} else {
+					// fmt.Printf("No collision\n")
+					enemies[i].Draw(screenW, screenH)
+				}
 			}
 
 			// Detect edge of window
