@@ -18,6 +18,7 @@ type stateName string
 const (
 	stateNameAppear stateName = "appear"
 	stateNameActive stateName = "active"
+	stateNamePause  stateName = "pause"
 )
 
 // Blob represents one non-player character
@@ -39,14 +40,11 @@ type Blob struct {
 
 	AttackPower int
 
-	totalMoves int
-
-	moveCounter int
-
-	currentState stateName
-
-	appearDelay int
-
+	totalMoves         int
+	moveCounter        int
+	currentState       stateName
+	lastState          stateName
+	appearDelay        int
 	currentAppearDelay int
 }
 

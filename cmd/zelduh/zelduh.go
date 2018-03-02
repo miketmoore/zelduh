@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"github.com/miketmoore/zelduh/equipment"
@@ -59,17 +58,7 @@ func run() {
 	}
 
 	// Init player character
-	player := pc.Player{
-		Win:       win,
-		Size:      characterSize,
-		Shape:     imdraw.New(nil),
-		SwordSize: characterSize,
-		Health:    3,
-		MaxHealth: 3,
-	}
-	player.Start = pixel.V((screenW/2)-player.Size, (screenH/2)-player.Size)
-	player.Last = player.Start
-	player.Stride = player.Size
+	player := pc.New(win, characterSize, 3, 3)
 
 	// Create enemies
 	enemies := []npc.Blob{}

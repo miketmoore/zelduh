@@ -32,6 +32,22 @@ type Player struct {
 	MaxHealth int
 }
 
+// New returns a new Player instance
+func New(win *pixelgl.Window, size float64, health, maxHealth int) Player {
+	player := Player{
+		Win:       win,
+		Size:      size,
+		Shape:     imdraw.New(nil),
+		SwordSize: size,
+		Health:    health,
+		MaxHealth: maxHealth,
+	}
+	player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
+	player.Last = player.Start
+	player.Stride = player.Size
+	return player
+}
+
 // Draw renders the current state of the player character
 func (player *Player) Draw() {
 	shape := player.Shape
