@@ -16,15 +16,7 @@ A monochrome 4-color game!
     - [x] Pressing and holding keys for continuous movement
     - [x] Edge of window boundaries
     - [ ] Get rid of delay on win.Repeated()
-- [ ] NPC movement
-    - [ ] AI
-        * Look at "steering patterns"
-        * What behaviors do I want characters to have and how can this be achieved realistically
-        * Keep it flexible
-        * Iterative process
-        * Units should react in situations that seem realistic in an environment they seem to be interactin with
-        * Don't box in what enemies can do too early
-    - [ ] If player character is in line of sight, enemies charge/shoot
+- [x] NPC movement
 - [ ] Projectiles
     - [ ] Player sword is a projectile that shoots one tile 
     - [ ] Enemies can shoot projectiles that go x tiles
