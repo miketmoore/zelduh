@@ -68,6 +68,8 @@ func NewBlob(win *pixelgl.Window, size, x, y, stride float64, attackPower int) B
 
 // Reset updates all values to starting values
 func (blob *Blob) Reset() {
+	// TODO reset to random start position
+	// need limits defined, probably on blob constructor
 	blob.Last = blob.Start
 	blob.currentState = stateNameAppear
 	blob.currentAppearDelay = blob.appearDelay
@@ -112,19 +114,19 @@ func (blob *Blob) Draw(screenW, screenH float64) {
 			if blob.moveCounter > 0 {
 				switch blob.LastDir {
 				case mvmt.DirectionYPos:
-					if blob.Last.Y+stride < screenH {
+					if blob.Last.Y+blob.Size < screenH {
 						blob.Last = pixel.V(blob.Last.X, blob.Last.Y+stride)
 					}
 				case mvmt.DirectionXPos:
-					if blob.Last.X+stride < screenW {
+					if blob.Last.X+blob.Size < screenW {
 						blob.Last = pixel.V(blob.Last.X+stride, blob.Last.Y)
 					}
 				case mvmt.DirectionYNeg:
-					if blob.Last.Y-stride >= 0 {
+					if blob.Last.Y >= 0 {
 						blob.Last = pixel.V(blob.Last.X, blob.Last.Y-stride)
 					}
 				case mvmt.DirectionXNeg:
-					if blob.Last.X-stride >= 0 {
+					if blob.Last.X >= 0 {
 						blob.Last = pixel.V(blob.Last.X-stride, blob.Last.Y)
 					}
 				}
