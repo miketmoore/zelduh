@@ -13,9 +13,9 @@ import (
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/npc"
+	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/pc"
 	"github.com/nicksnyder/go-i18n/i18n"
-	"golang.org/x/image/colornames"
 )
 
 // These should be multiples of 8 for now
@@ -40,11 +40,11 @@ func run() {
 	// Setup Text
 	orig := pixel.V(20, 50)
 	txt := text.New(orig, text.Atlas7x13)
-	txt.Color = colornames.White
+	txt.Color = palette.Map[palette.Darkest]
 
 	coordDebugTxtOrig := pixel.V(5, 5)
 	coordDebugTxt := text.New(coordDebugTxtOrig, text.Atlas7x13)
-	coordDebugTxt.Color = colornames.White
+	coordDebugTxt.Color = palette.Map[palette.Darkest]
 
 	// Setup GUI window
 	cfg := pixelgl.WindowConfig{
@@ -88,8 +88,9 @@ func run() {
 
 		switch currentState {
 		case gamestate.Start:
-			win.Clear(colornames.Darkgreen)
+			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
+			txt.Color = palette.Map[palette.Darkest]
 			fmt.Fprintln(txt, T("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
@@ -103,8 +104,9 @@ func run() {
 				currentState = gamestate.Game
 			}
 		case gamestate.Game:
-			win.Clear(colornames.Darkgreen)
+			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
+			txt.Color = palette.Map[palette.Darkest]
 
 			player.Draw()
 			for i := 0; i < len(enemies); i++ {
@@ -169,7 +171,7 @@ func run() {
 				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
 				playerSword.Shape.Clear()
-				playerSword.Shape.Color = colornames.Darkgray
+				playerSword.Shape.Color = palette.Map[palette.Lightest]
 
 				// Attack in direction player last moved
 				switch player.LastDir {
@@ -191,7 +193,7 @@ func run() {
 				playerSword.Shape.Draw(win)
 			}
 		case gamestate.Pause:
-			win.Clear(colornames.Darkblue)
+			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
 			fmt.Fprintln(txt, T("paused"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
@@ -203,8 +205,9 @@ func run() {
 				currentState = gamestate.Start
 			}
 		case gamestate.Over:
-			win.Clear(colornames.Black)
+			win.Clear(palette.Map[palette.Darkest])
 			txt.Clear()
+			txt.Color = palette.Map[palette.Lightest]
 			fmt.Fprintln(txt, T("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 

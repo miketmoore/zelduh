@@ -8,7 +8,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/mvmt"
-	"golang.org/x/image/colornames"
+	"github.com/miketmoore/zelduh/palette"
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -79,14 +79,14 @@ func (blob *Blob) Draw(screenW, screenH float64) {
 
 	switch blob.currentState {
 	case stateNameAppear:
-		blob.Shape.Color = colornames.Yellow
+		blob.Shape.Color = palette.Map[palette.Lightest]
 		if blob.currentAppearDelay > 0 {
 			blob.currentAppearDelay--
 		} else {
 			blob.currentState = stateNameActive
 		}
 	case stateNameActive:
-		blob.Shape.Color = colornames.Blanchedalmond
+		blob.Shape.Color = palette.Map[palette.Darkest]
 		// move smoothly into next tile, then orient for next move
 		stride := blob.Stride
 
@@ -137,7 +137,6 @@ func (blob *Blob) Draw(screenW, screenH float64) {
 		}
 	}
 
-	// blob.Shape.Color = colornames.Darkblue
 	blob.Shape.Push(blob.Last)
 	blob.Shape.Push(pixel.V(blob.Last.X+blob.Size, blob.Last.Y+blob.Size))
 	blob.Shape.Rectangle(0)

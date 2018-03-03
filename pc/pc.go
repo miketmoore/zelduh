@@ -5,7 +5,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/mvmt"
-	"golang.org/x/image/colornames"
+	"github.com/miketmoore/zelduh/palette"
 )
 
 // Player represents the player character
@@ -52,7 +52,7 @@ func New(win *pixelgl.Window, size, stride float64, health, maxHealth int) Playe
 func (player *Player) Draw() {
 	shape := player.Shape
 	shape.Clear()
-	shape.Color = colornames.White
+	shape.Color = palette.Map[palette.Lightest]
 	shape.Push(pixel.V(player.Last.X, player.Last.Y))
 	shape.Push(pixel.V(player.Last.X+player.Size, player.Last.Y+player.Size))
 	shape.Rectangle(0)
