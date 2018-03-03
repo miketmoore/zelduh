@@ -33,7 +33,7 @@ type Player struct {
 }
 
 // New returns a new Player instance
-func New(win *pixelgl.Window, size float64, health, maxHealth int) Player {
+func New(win *pixelgl.Window, size, stride float64, health, maxHealth int) Player {
 	player := Player{
 		Win:       win,
 		Size:      size,
@@ -44,7 +44,7 @@ func New(win *pixelgl.Window, size float64, health, maxHealth int) Player {
 	}
 	player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
 	player.Last = player.Start
-	player.Stride = player.Size
+	player.Stride = stride
 	return player
 }
 

@@ -58,7 +58,7 @@ func run() {
 	}
 
 	// Init player character
-	player := pc.New(win, characterSize, 3, 3)
+	player := pc.New(win, characterSize, 2, 3, 3)
 
 	// Create enemies
 	enemies := []npc.Blob{}
@@ -130,22 +130,22 @@ func run() {
 			}
 
 			// Detect edge of window
-			if win.JustPressed(pixelgl.KeyUp) || win.Repeated(pixelgl.KeyUp) {
+			if win.Pressed(pixelgl.KeyUp) {
 				if player.Last.Y+player.Stride < screenH {
 					player.Last.Y += player.Stride
 					player.LastDir = mvmt.DirectionYPos
 				}
-			} else if win.JustPressed(pixelgl.KeyDown) || win.Repeated(pixelgl.KeyDown) {
+			} else if win.Pressed(pixelgl.KeyDown) {
 				if player.Last.Y-player.Stride >= 0 {
 					player.Last.Y -= player.Stride
 					player.LastDir = mvmt.DirectionYNeg
 				}
-			} else if win.JustPressed(pixelgl.KeyRight) || win.Repeated(pixelgl.KeyRight) {
+			} else if win.Pressed(pixelgl.KeyRight) {
 				if player.Last.X+player.Stride < screenW {
 					player.Last.X += player.Stride
 					player.LastDir = mvmt.DirectionXPos
 				}
-			} else if win.JustPressed(pixelgl.KeyLeft) || win.Repeated(pixelgl.KeyLeft) {
+			} else if win.Pressed(pixelgl.KeyLeft) {
 				if player.Last.X-player.Stride >= 0 {
 					player.Last.X -= player.Stride
 					player.LastDir = mvmt.DirectionXNeg
@@ -160,7 +160,7 @@ func run() {
 				currentState = gamestate.Over
 			}
 
-			if win.JustPressed(pixelgl.KeySpace) {
+			if win.Pressed(pixelgl.KeySpace) {
 				// Attack with sword
 				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
@@ -174,13 +174,13 @@ func run() {
 					playerSword.Shape.Push(pixel.V(player.Last.X+(player.SwordSize*2), player.Last.Y+player.SwordSize))
 				case mvmt.DirectionXNeg:
 					playerSword.Shape.Push(pixel.V(player.Last.X-player.SwordSize, player.Last.Y))
-					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
 				case mvmt.DirectionYPos:
 					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
 					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+(player.SwordSize*2)))
 				case mvmt.DirectionYNeg:
 					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y-player.SwordSize))
-					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+player.SwordSize))
+					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y))
 				}
 
 				playerSword.Shape.Rectangle(0)
