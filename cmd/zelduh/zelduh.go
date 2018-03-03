@@ -131,27 +131,18 @@ func run() {
 				}
 			}
 
-			// Detect edge of window
-			if win.Pressed(pixelgl.KeyUp) {
-				if player.Last.Y+player.Stride < screenH {
-					player.Last.Y += player.Stride
-					player.LastDir = mvmt.DirectionYPos
-				}
-			} else if win.Pressed(pixelgl.KeyDown) {
-				if player.Last.Y-player.Stride >= 0 {
-					player.Last.Y -= player.Stride
-					player.LastDir = mvmt.DirectionYNeg
-				}
-			} else if win.Pressed(pixelgl.KeyRight) {
-				if player.Last.X+player.Stride < screenW {
-					player.Last.X += player.Stride
-					player.LastDir = mvmt.DirectionXPos
-				}
-			} else if win.Pressed(pixelgl.KeyLeft) {
-				if player.Last.X-player.Stride >= 0 {
-					player.Last.X -= player.Stride
-					player.LastDir = mvmt.DirectionXNeg
-				}
+			if win.Pressed(pixelgl.KeyUp) && player.Last.Y+player.Stride <= (screenH-player.Size) {
+				player.Last.Y += player.Stride
+				player.LastDir = mvmt.DirectionYPos
+			} else if win.Pressed(pixelgl.KeyDown) && player.Last.Y-player.Stride >= 0 {
+				player.Last.Y -= player.Stride
+				player.LastDir = mvmt.DirectionYNeg
+			} else if win.Pressed(pixelgl.KeyRight) && player.Last.X+player.Stride <= (screenW-player.Size) {
+				player.Last.X += player.Stride
+				player.LastDir = mvmt.DirectionXPos
+			} else if win.Pressed(pixelgl.KeyLeft) && player.Last.X-player.Stride >= 0 {
+				player.Last.X -= player.Stride
+				player.LastDir = mvmt.DirectionXNeg
 			}
 
 			if win.JustPressed(pixelgl.KeyP) {
