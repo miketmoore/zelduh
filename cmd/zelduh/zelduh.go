@@ -160,8 +160,12 @@ func run() {
 				currentState = gamestate.Over
 			}
 
-			if win.Pressed(pixelgl.KeySpace) {
+			if win.JustPressed(pixelgl.KeySpace) {
 				// Attack with sword
+				// TODO sword should appear on screen longer
+				// I think a state machine for the sword makes sense
+				// [sheathed]
+				// [attacking] - this would go away after x ticks
 				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
 				playerSword.Shape.Clear()
