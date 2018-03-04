@@ -4,7 +4,7 @@
 
 ![Alt Text](assets/bink.gif)
 
-A monochrome 4-color game!
+An "8-bit Zelda" like game. Not an exact clone, but an homage!
 
 ## Goals
 
@@ -16,12 +16,12 @@ A monochrome 4-color game!
         - [x] Game screen
         - [x] Pause screen
         - [x] Game over screen
-    - [ ] State machine for actual game (maybe multiple)
+    - [x] State machine for actual game (maybe multiple)
 - [ ] Player character movement
     - [x] Move with arrow keys
     - [x] Pressing and holding keys for continuous movement
     - [x] Edge of window boundaries
-    - [ ] Get rid of delay on win.Repeated()
+    - [x] Get rid of delay on win.Repeated()
 - [x] NPC movement
 - [ ] Projectiles
     - [ ] Player sword is a projectile that shoots one tile 
@@ -30,6 +30,7 @@ A monochrome 4-color game!
     - [ ] Pixel art
     - [ ] Sprite sheet
 - [ ] Collision detection
+    - [x] Basic implementation
     - [ ] Enemies cause damage
     - [ ] Obstacles
     - [ ] Block projectiles with shield
@@ -40,9 +41,6 @@ A monochrome 4-color game!
 - [ ] Basic stats
     - [ ] Health
     - [ ] Charge sword
-- [ ] Start fully equiped
-- [ ] High score goal
-    - [ ] Score points by killing enemies, collecting items
 - [ ] Attack
     - [ ] Basic sword slash
     - [ ] Charged magic sword projectile
