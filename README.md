@@ -2,6 +2,8 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/miketmoore/zelduh)](https://goreportcard.com/report/github.com/miketmoore/zelduh)
 
+![Alt Text](assets/bink.gif)
+
 A monochrome 4-color game!
 
 ## Goals
