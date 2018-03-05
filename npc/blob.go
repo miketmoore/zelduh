@@ -32,7 +32,11 @@ type Blob struct {
 	// LastDir is the last direction the Blob was headed in
 	LastDir mvmt.Direction
 	// Shape is the view
-	Shape *imdraw.IMDraw
+	Shape             *imdraw.IMDraw
+	Sprites           map[string]*pixel.Sprite
+	WalkCycleCountMax int
+	WalkCycleCount    int
+	WalkCycleFlag     bool
 	// Win is a pointer to the GUI window
 	Win *pixelgl.Window
 
@@ -49,19 +53,24 @@ type Blob struct {
 }
 
 // NewBlob returns a new blob
-func NewBlob(win *pixelgl.Window, size, x, y, stride float64, attackPower int) Blob {
-	return Blob{
+func NewBlob(win *pixelgl.Window, size, x, y, stride float64, attackPower int, sprites map[string]*pixel.Sprite) Blob {
+	blob := Blob{
 		Win:                win,
 		Size:               size,
 		Start:              pixel.V(x, y),
 		Last:               pixel.V(0, 0),
 		Shape:              imdraw.New(nil),
+		Sprites:            sprites,
+		WalkCycleCountMax:  7,
+		WalkCycleFlag:      false,
 		Stride:             stride,
 		AttackPower:        attackPower,
 		currentState:       stateNameAppear,
 		appearDelay:        20,
 		currentAppearDelay: 20,
 	}
+	blob.WalkCycleCount = blob.WalkCycleCountMax
+	return blob
 }
 
 // Reset updates all values to starting values
@@ -140,5 +149,47 @@ func (blob *Blob) Draw(screenW, screenH float64) {
 	blob.Shape.Push(blob.Last)
 	blob.Shape.Push(pixel.V(blob.Last.X+blob.Size, blob.Last.Y+blob.Size))
 	blob.Shape.Rectangle(0)
-	blob.Shape.Draw(blob.Win)
+	// blob.Shape.Draw(blob.Win)
+
+	// Do some walk cycle "math"
+	if blob.WalkCycleCount > 0 {
+		blob.WalkCycleCount--
+	} else {
+		blob.WalkCycleCount = blob.WalkCycleCountMax
+		blob.WalkCycleFlag = !blob.WalkCycleFlag
+	}
+
+	// Figure out which walk cycle sprite to use
+	var sprite *pixel.Sprite
+
+	if blob.LastDir == mvmt.DirectionYNeg {
+		if blob.WalkCycleFlag {
+			sprite = blob.Sprites["downA"]
+		} else {
+			sprite = blob.Sprites["downB"]
+		}
+	} else if blob.LastDir == mvmt.DirectionYPos {
+		if blob.WalkCycleFlag {
+			sprite = blob.Sprites["upA"]
+		} else {
+			sprite = blob.Sprites["upB"]
+		}
+	} else if blob.LastDir == mvmt.DirectionXPos {
+		if blob.WalkCycleFlag {
+			sprite = blob.Sprites["rightA"]
+		} else {
+			sprite = blob.Sprites["rightB"]
+		}
+	} else if blob.LastDir == mvmt.DirectionXNeg {
+		if blob.WalkCycleFlag {
+			sprite = blob.Sprites["leftA"]
+		} else {
+			sprite = blob.Sprites["leftB"]
+		}
+	} else {
+		sprite = blob.Sprites["downA"]
+	}
+
+	matrix := pixel.IM.Moved(pixel.V(blob.Last.X+blob.Size/2, blob.Last.Y+blob.Size/2))
+	sprite.Draw(blob.Win, matrix)
 }

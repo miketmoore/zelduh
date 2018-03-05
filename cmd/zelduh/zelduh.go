@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"image"
+	_ "image/png"
 	"math/rand"
 	"os"
 	"time"
@@ -28,6 +30,8 @@ const translationFile = "i18n/zelduh/en-US.all.json"
 const lang = "en-US"
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+var spritePlayerPath = "assets/bink-spritesheet.png"
 
 func run() {
 	// i18n
@@ -57,15 +61,40 @@ func run() {
 		panic(err)
 	}
 
+	// Load sprite sheet graphic
+	pic, err := loadPicture(spritePlayerPath)
+	if err != nil {
+		panic(err)
+	}
+
 	// Init player character
-	player := pc.New(win, characterSize, 2, 3, 3)
+	player := pc.New(win, characterSize, 2, 3, 3, map[string]*pixel.Sprite{
+		"downA":  newSprite(pic, 0, 7*16, 16, 8*16),
+		"downB":  newSprite(pic, 0, 3*16, 16, 4*16),
+		"upA":    newSprite(pic, 16, 7*16, 32, 8*16),
+		"upB":    newSprite(pic, 16, 3*16, 32, 4*16),
+		"rightA": newSprite(pic, 32, 7*16, 48, 8*16),
+		"rightB": newSprite(pic, 32, 3*16, 48, 4*16),
+		"leftA":  newSprite(pic, 48, 7*16, 64, 8*16),
+		"leftB":  newSprite(pic, 48, 3*16, 64, 4*16),
+	})
 
 	// Create enemies
 	enemies := []npc.Blob{}
-	for i := 0; i < 3; i++ {
+	enemySprites := map[string]*pixel.Sprite{
+		"downA":  newSprite(pic, 0, 6*16, 16, 7*16),
+		"downB":  newSprite(pic, 0, 2*16, 16, 3*16),
+		"upA":    newSprite(pic, 16, 6*16, 32, 7*16),
+		"upB":    newSprite(pic, 16, 2*16, 32, 3*16),
+		"rightA": newSprite(pic, 32, 6*16, 48, 7*16),
+		"rightB": newSprite(pic, 32, 2*16, 48, 3*16),
+		"leftA":  newSprite(pic, 48, 6*16, 64, 7*16),
+		"leftB":  newSprite(pic, 48, 2*16, 64, 3*16),
+	}
+	for i := 0; i < 5; i++ {
 		x := r.Intn(int(screenW - characterSize))
 		y := r.Intn(int(screenH - characterSize))
-		var enemy = npc.NewBlob(win, characterSize, float64(x), float64(y), 1, 1)
+		var enemy = npc.NewBlob(win, characterSize, float64(x), float64(y), 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
 
@@ -214,4 +243,24 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func newSprite(pic pixel.Picture, xa, ya, xb, yb float64) *pixel.Sprite {
+	return pixel.NewSprite(pic, pixel.Rect{
+		Min: pixel.V(xa, ya),
+		Max: pixel.V(xb, yb),
+	})
+}
+
+func loadPicture(path string) (pixel.Picture, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+	return pixel.PictureDataFromImage(img), nil
 }

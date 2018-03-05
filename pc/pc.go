@@ -19,7 +19,11 @@ type Player struct {
 	// LastDir is the last direction the player was headed in
 	LastDir mvmt.Direction
 	// Shape is the view
-	Shape *imdraw.IMDraw
+	Shape             *imdraw.IMDraw
+	Sprites           map[string]*pixel.Sprite
+	WalkCycleCountMax int
+	WalkCycleCount    int
+	WalkCycleFlag     bool
 	// Win is a pointer to the GUI window
 	Win *pixelgl.Window
 	// SwordSize is the dimensions of the sword
@@ -33,15 +37,19 @@ type Player struct {
 }
 
 // New returns a new Player instance
-func New(win *pixelgl.Window, size, stride float64, health, maxHealth int) Player {
+func New(win *pixelgl.Window, size, stride float64, health, maxHealth int, sprites map[string]*pixel.Sprite) Player {
 	player := Player{
-		Win:       win,
-		Size:      size,
-		Shape:     imdraw.New(nil),
-		SwordSize: size,
-		Health:    health,
-		MaxHealth: maxHealth,
+		Win:               win,
+		Size:              size,
+		Shape:             imdraw.New(nil),
+		Sprites:           sprites,
+		WalkCycleCountMax: 7,
+		WalkCycleFlag:     false,
+		SwordSize:         size,
+		Health:            health,
+		MaxHealth:         maxHealth,
 	}
+	player.WalkCycleCount = player.WalkCycleCountMax
 	player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
 	player.Last = player.Start
 	player.Stride = stride
@@ -50,13 +58,56 @@ func New(win *pixelgl.Window, size, stride float64, health, maxHealth int) Playe
 
 // Draw renders the current state of the player character
 func (player *Player) Draw() {
+	// Create a shape that we won't draw
 	shape := player.Shape
 	shape.Clear()
 	shape.Color = palette.Map[palette.Lightest]
 	shape.Push(pixel.V(player.Last.X, player.Last.Y))
 	shape.Push(pixel.V(player.Last.X+player.Size, player.Last.Y+player.Size))
 	shape.Rectangle(0)
-	shape.Draw(player.Win)
+
+	// Do some walk cycle "math"
+	if player.WalkCycleCount > 0 {
+		player.WalkCycleCount--
+	} else {
+		player.WalkCycleCount = player.WalkCycleCountMax
+		player.WalkCycleFlag = !player.WalkCycleFlag
+	}
+
+	// Figure out which walk cycle sprite to use
+	var sprite *pixel.Sprite
+
+	if player.LastDir == mvmt.DirectionYNeg {
+		if player.WalkCycleFlag {
+			sprite = player.Sprites["downA"]
+		} else {
+			sprite = player.Sprites["downB"]
+		}
+	} else if player.LastDir == mvmt.DirectionYPos {
+		if player.WalkCycleFlag {
+			sprite = player.Sprites["upA"]
+		} else {
+			sprite = player.Sprites["upB"]
+		}
+	} else if player.LastDir == mvmt.DirectionXPos {
+		if player.WalkCycleFlag {
+			sprite = player.Sprites["rightA"]
+		} else {
+			sprite = player.Sprites["rightB"]
+		}
+	} else if player.LastDir == mvmt.DirectionXNeg {
+		if player.WalkCycleFlag {
+			sprite = player.Sprites["leftA"]
+		} else {
+			sprite = player.Sprites["leftB"]
+		}
+	} else {
+		sprite = player.Sprites["downA"]
+	}
+
+	matrix := pixel.IM.Moved(pixel.V(player.Last.X+player.Size/2, player.Last.Y+player.Size/2))
+	sprite.Draw(player.Win, matrix)
+
 }
 
 // Hit handles what happens when something with attack power gits the character
