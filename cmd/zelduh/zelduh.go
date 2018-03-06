@@ -31,7 +31,7 @@ const lang = "en-US"
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-var spritePlayerPath = "assets/bink-spritesheet.png"
+var spritePlayerPath = "assets/bink-spritesheet-01.png"
 
 func run() {
 	// i18n
@@ -69,27 +69,31 @@ func run() {
 
 	// Init player character
 	player := pc.New(win, characterSize, 2, 3, 3, map[string]*pixel.Sprite{
-		"downA":  newSprite(pic, 0, 7*16, 16, 8*16),
-		"downB":  newSprite(pic, 0, 3*16, 16, 4*16),
-		"upA":    newSprite(pic, 16, 7*16, 32, 8*16),
-		"upB":    newSprite(pic, 16, 3*16, 32, 4*16),
-		"rightA": newSprite(pic, 32, 7*16, 48, 8*16),
-		"rightB": newSprite(pic, 32, 3*16, 48, 4*16),
-		"leftA":  newSprite(pic, 48, 7*16, 64, 8*16),
-		"leftB":  newSprite(pic, 48, 3*16, 64, 4*16),
+		"downA": newSprite(pic, 0, 7*16, 16, 8*16),
+		"downB": newSprite(pic, 8*16, 7*16, 9*16, 8*16),
+
+		"upA": newSprite(pic, 16, 7*16, 2*16, 8*16),
+		"upB": newSprite(pic, 9*16, 7*16, 10*16, 8*16),
+
+		"rightA": newSprite(pic, 2*16, 7*16, 3*16, 8*16),
+		"rightB": newSprite(pic, 10*16, 7*16, 11*16, 8*16),
+
+		"leftA": newSprite(pic, 3*16, 7*16, 4*16, 8*16),
+		"leftB": newSprite(pic, 11*16, 7*16, 12*16, 8*16),
 	})
 
 	// Create enemies
 	enemies := []npc.Blob{}
 	enemySprites := map[string]*pixel.Sprite{
-		"downA":  newSprite(pic, 0, 6*16, 16, 7*16),
-		"downB":  newSprite(pic, 0, 2*16, 16, 3*16),
-		"upA":    newSprite(pic, 16, 6*16, 32, 7*16),
-		"upB":    newSprite(pic, 16, 2*16, 32, 3*16),
-		"rightA": newSprite(pic, 32, 6*16, 48, 7*16),
-		"rightB": newSprite(pic, 32, 2*16, 48, 3*16),
-		"leftA":  newSprite(pic, 48, 6*16, 64, 7*16),
-		"leftB":  newSprite(pic, 48, 2*16, 64, 3*16),
+		"downA": newSprite(pic, 0, 6*16, 16, 7*16),
+		"downB": newSprite(pic, 8*16, 6*16, 9*16, 7*16),
+		"upA":   newSprite(pic, 0, 6*16, 16, 7*16),
+		"upB":   newSprite(pic, 8*16, 6*16, 9*16, 7*16),
+
+		"rightA": newSprite(pic, 16, 6*16, 2*16, 7*16),
+		"rightB": newSprite(pic, 9*16, 6*16, 10*16, 7*16),
+		"leftA":  newSprite(pic, 16, 6*16, 2*16, 7*16),
+		"leftB":  newSprite(pic, 9*16, 6*16, 10*16, 7*16),
 	}
 	for i := 0; i < 5; i++ {
 		x := r.Intn(int(screenW - characterSize))
