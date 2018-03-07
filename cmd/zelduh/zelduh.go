@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"github.com/miketmoore/zelduh/equipment"
@@ -20,9 +21,14 @@ import (
 	"github.com/nicksnyder/go-i18n/i18n"
 )
 
-// These should be multiples of 8 for now
-const screenW float64 = 320
-const screenH float64 = 288
+const winW float64 = 800
+const winH float64 = 800
+
+const mapW float64 = 320
+const mapH float64 = 288
+
+var mapOriginX = (winW - mapW) / 2
+var mapOriginY = (winH - mapH) / 2
 
 const characterSize float64 = 16
 
@@ -53,7 +59,7 @@ func run() {
 	// Setup GUI window
 	cfg := pixelgl.WindowConfig{
 		Title:  T("title"),
-		Bounds: pixel.R(0, 0, screenW, screenH),
+		Bounds: pixel.R(0, 0, winW, winH),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -80,7 +86,7 @@ func run() {
 
 		"leftA": newSprite(pic, 3*16, 7*16, 4*16, 8*16),
 		"leftB": newSprite(pic, 11*16, 7*16, 12*16, 8*16),
-	})
+	}, pixel.V(mapOriginX+(mapW/2), mapOriginY+(mapH/2)))
 
 	// Create enemies
 	enemies := []npc.Blob{}
@@ -96,8 +102,8 @@ func run() {
 		"leftB":  newSprite(pic, 9*16, 6*16, 10*16, 7*16),
 	}
 	for i := 0; i < 5; i++ {
-		x := r.Intn(int(screenW - characterSize))
-		y := r.Intn(int(screenH - characterSize))
+		x := float64(r.Intn(int(mapW-characterSize))) + mapOriginX
+		y := float64(r.Intn(int(mapH-characterSize))) + mapOriginY
 		var enemy = npc.NewBlob(win, characterSize, float64(x), float64(y), 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
@@ -141,6 +147,13 @@ func run() {
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
+			// s.Push(pixel.V(mapOriginX, mapOriginY))
+
+			// top right point
+			// s.Push(pixel.V(mapOriginX+mapW, mapOriginY+mapH))?
+			mapOrigin := pixel.V(mapOriginX, mapOriginY)
+			drawMapBG(win, mapOrigin, mapW, mapH)
+
 			player.Draw()
 			for i := 0; i < len(enemies); i++ {
 
@@ -160,20 +173,20 @@ func run() {
 					}
 				} else {
 					// fmt.Printf("No collision\n")
-					enemies[i].Draw(screenW, screenH)
+					enemies[i].Draw(mapOrigin.X, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.Y+mapH)
 				}
 			}
 
-			if win.Pressed(pixelgl.KeyUp) && player.Last.Y+player.Stride <= (screenH-player.Size) {
+			if win.Pressed(pixelgl.KeyUp) && player.Last.Y+player.Stride <= ((mapOrigin.Y+mapH)-player.Size) {
 				player.Last.Y += player.Stride
 				player.LastDir = mvmt.DirectionYPos
-			} else if win.Pressed(pixelgl.KeyDown) && player.Last.Y-player.Stride >= 0 {
+			} else if win.Pressed(pixelgl.KeyDown) && player.Last.Y-player.Stride >= mapOrigin.Y {
 				player.Last.Y -= player.Stride
 				player.LastDir = mvmt.DirectionYNeg
-			} else if win.Pressed(pixelgl.KeyRight) && player.Last.X+player.Stride <= (screenW-player.Size) {
+			} else if win.Pressed(pixelgl.KeyRight) && player.Last.X+player.Stride <= ((mapOrigin.X+mapW)-player.Size) {
 				player.Last.X += player.Stride
 				player.LastDir = mvmt.DirectionXPos
-			} else if win.Pressed(pixelgl.KeyLeft) && player.Last.X-player.Stride >= 0 {
+			} else if win.Pressed(pixelgl.KeyLeft) && player.Last.X-player.Stride >= mapOrigin.X {
 				player.Last.X -= player.Stride
 				player.LastDir = mvmt.DirectionXNeg
 			}
@@ -267,4 +280,18 @@ func loadPicture(path string) (pixel.Picture, error) {
 		return nil, err
 	}
 	return pixel.PictureDataFromImage(img), nil
+}
+
+func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64) {
+	s := imdraw.New(nil)
+
+	// bottom left point
+	s.Push(origin)
+
+	// top right point
+	s.Push(pixel.V(origin.X+w, origin.Y+h))
+
+	s.Color = palette.Map[palette.Lightest]
+	s.Rectangle(0)
+	s.Draw(win)
 }

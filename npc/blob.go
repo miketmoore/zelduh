@@ -83,7 +83,7 @@ func (blob *Blob) Reset() {
 }
 
 // Draw the blob's current state
-func (blob *Blob) Draw(screenW, screenH float64) {
+func (blob *Blob) Draw(minX, minY, maxX, maxY float64) {
 	blob.Shape.Clear()
 
 	switch blob.currentState {
@@ -121,19 +121,19 @@ func (blob *Blob) Draw(screenW, screenH float64) {
 			if blob.moveCounter > 0 {
 				switch blob.LastDir {
 				case mvmt.DirectionYPos:
-					if blob.Last.Y+blob.Size < screenH {
+					if blob.Last.Y+blob.Size < maxY {
 						blob.Last = pixel.V(blob.Last.X, blob.Last.Y+stride)
 					}
 				case mvmt.DirectionXPos:
-					if blob.Last.X+blob.Size < screenW {
+					if blob.Last.X+blob.Size < maxX {
 						blob.Last = pixel.V(blob.Last.X+stride, blob.Last.Y)
 					}
 				case mvmt.DirectionYNeg:
-					if blob.Last.Y >= 0 {
+					if blob.Last.Y >= minY {
 						blob.Last = pixel.V(blob.Last.X, blob.Last.Y-stride)
 					}
 				case mvmt.DirectionXNeg:
-					if blob.Last.X >= 0 {
+					if blob.Last.X >= minX {
 						blob.Last = pixel.V(blob.Last.X-stride, blob.Last.Y)
 					}
 				}

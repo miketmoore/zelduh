@@ -37,7 +37,7 @@ type Player struct {
 }
 
 // New returns a new Player instance
-func New(win *pixelgl.Window, size, stride float64, health, maxHealth int, sprites map[string]*pixel.Sprite) Player {
+func New(win *pixelgl.Window, size, stride float64, health, maxHealth int, sprites map[string]*pixel.Sprite, start pixel.Vec) Player {
 	player := Player{
 		Win:               win,
 		Size:              size,
@@ -50,7 +50,8 @@ func New(win *pixelgl.Window, size, stride float64, health, maxHealth int, sprit
 		MaxHealth:         maxHealth,
 	}
 	player.WalkCycleCount = player.WalkCycleCountMax
-	player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
+	// player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
+	player.Start = start
 	player.Last = player.Start
 	player.Stride = stride
 	return player
