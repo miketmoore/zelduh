@@ -153,6 +153,26 @@ func run() {
 			mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 			drawMapBG(win, mapOrigin, mapW, mapH)
 
+			// draw tiles
+
+			abc := mapW / 16
+			var i float64
+			// fmt.Println(abc)
+			for ; i < abc; i++ {
+				tileASprite := newSprite(pic, g(6), g(3), g(7), g(4))
+				tileA := imdraw.New(nil)
+				tileA.Push(pixel.V(0, 0))
+				tileA.Push(pixel.V(16, 16))
+				tileA.Rectangle(0)
+				a := mapOrigin.X + 16/2
+				b := mapOrigin.Y + 16/2
+				// fmt.Printf("%f %f\n", a, b)
+				tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(16*i), b)))
+			}
+
+			// matrix := pixel.IM.Moved(pixel.V(player.Last.X+player.Size/2, player.Last.Y+player.Size/2))
+			// sprite.Draw(player.Win, matrix)
+
 			player.Draw()
 			for i := 0; i < len(enemies); i++ {
 
