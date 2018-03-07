@@ -27,8 +27,7 @@ const winH float64 = 800
 const mapW float64 = 320
 const mapH float64 = 288
 
-var mapOriginX = (winW - mapW) / 2
-var mapOriginY = (winH - mapH) / 2
+var mapOrigin = pixel.V((winW-mapW)/2, (winH-mapH)/2)
 
 const characterSize float64 = 16
 
@@ -86,7 +85,7 @@ func run() {
 
 		"leftA": newSprite(pic, 3*16, 7*16, 4*16, 8*16),
 		"leftB": newSprite(pic, 11*16, 7*16, 12*16, 8*16),
-	}, pixel.V(mapOriginX+(mapW/2), mapOriginY+(mapH/2)))
+	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
 	enemies := []npc.Blob{}
@@ -102,8 +101,8 @@ func run() {
 		"leftB":  newSprite(pic, 9*16, 6*16, 10*16, 7*16),
 	}
 	for i := 0; i < 5; i++ {
-		x := float64(r.Intn(int(mapW-characterSize))) + mapOriginX
-		y := float64(r.Intn(int(mapH-characterSize))) + mapOriginY
+		x := float64(r.Intn(int(mapW-characterSize))) + mapOrigin.X
+		y := float64(r.Intn(int(mapH-characterSize))) + mapOrigin.Y
 		var enemy = npc.NewBlob(win, characterSize, float64(x), float64(y), 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
@@ -147,11 +146,7 @@ func run() {
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
-			// s.Push(pixel.V(mapOriginX, mapOriginY))
-
-			// top right point
-			// s.Push(pixel.V(mapOriginX+mapW, mapOriginY+mapH))?
-			mapOrigin := pixel.V(mapOriginX, mapOriginY)
+			mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 			drawMapBG(win, mapOrigin, mapW, mapH)
 
 			player.Draw()
