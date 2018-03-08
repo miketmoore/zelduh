@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 	_ "image/png"
 	"math/rand"
 	"os"
@@ -24,12 +25,12 @@ import (
 const winW float64 = 800
 const winH float64 = 800
 
-const mapW float64 = 320
-const mapH float64 = 288
+const mapW float64 = 640
+const mapH float64 = 576
 
 var mapOrigin = pixel.V((winW-mapW)/2, (winH-mapH)/2)
 
-const characterSize float64 = 16
+const spriteSize float64 = 48
 
 const translationFile = "i18n/zelduh/en-US.all.json"
 const lang = "en-US"
@@ -39,7 +40,7 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 var spritePlayerPath = "assets/bink-spritesheet-01.png"
 
 func g(n float64) float64 {
-	return n * 16
+	return n * spriteSize
 }
 
 func run() {
@@ -77,43 +78,71 @@ func run() {
 	}
 
 	// Init player character
-	player := pc.New(win, characterSize, 2, 3, 3, map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, g(7), g(1), g(8)),
-		"downB": newSprite(pic, g(8), g(7), g(9), g(8)),
+	player := pc.New(win, spriteSize, 2, 3, 3, map[string]*pixel.Sprite{
+		"downA": newSprite(pic, 0, g(5), g(1), g(6)),
+		"downB": newSprite(pic, g(8), g(5), g(9), g(6)),
 
-		"upA": newSprite(pic, g(1), g(7), g(2), g(8)),
-		"upB": newSprite(pic, g(9), g(7), g(10), g(8)),
+		"upA": newSprite(pic, g(1), g(5), g(2), g(6)),
+		"upB": newSprite(pic, g(9), g(5), g(10), g(6)),
 
-		"rightA": newSprite(pic, g(2), g(7), g(3), g(8)),
-		"rightB": newSprite(pic, g(10), g(7), g(11), g(8)),
+		"rightA": newSprite(pic, g(2), g(5), g(3), g(6)),
+		"rightB": newSprite(pic, g(10), g(5), g(11), g(6)),
 
-		"leftA": newSprite(pic, g(3), g(7), g(4), g(8)),
-		"leftB": newSprite(pic, g(11), g(7), g(12), g(8)),
+		"leftA": newSprite(pic, g(3), g(5), g(4), g(6)),
+		"leftB": newSprite(pic, g(11), g(5), g(12), g(6)),
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
 	enemies := []npc.Blob{}
 	enemySprites := map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, g(6), g(1), g(7)),
-		"downB": newSprite(pic, g(8), g(6), g(9), g(7)),
-		"upA":   newSprite(pic, 0, g(6), g(1), g(7)),
-		"upB":   newSprite(pic, g(8), g(6), g(9), g(7)),
+		"downA": newSprite(pic, 0, g(4), g(1), g(5)),
+		"downB": newSprite(pic, g(8), g(4), g(9), g(5)),
+		"upA":   newSprite(pic, 0, g(4), g(1), g(5)),
+		"upB":   newSprite(pic, g(8), g(4), g(9), g(5)),
 
-		"rightA": newSprite(pic, g(1), g(6), g(2), g(7)),
-		"rightB": newSprite(pic, g(9), g(6), g(10), g(7)),
-		"leftA":  newSprite(pic, g(1), g(6), g(2), g(7)),
-		"leftB":  newSprite(pic, g(9), g(6), g(10), g(7)),
+		"rightA": newSprite(pic, g(1), g(4), g(2), g(5)),
+		"rightB": newSprite(pic, g(9), g(4), g(10), g(5)),
+		"leftA":  newSprite(pic, g(1), g(4), g(2), g(5)),
+		"leftB":  newSprite(pic, g(9), g(4), g(10), g(5)),
 	}
 	for i := 0; i < 5; i++ {
-		x := float64(r.Intn(int(mapW-characterSize))) + mapOrigin.X
-		y := float64(r.Intn(int(mapH-characterSize))) + mapOrigin.Y
-		var enemy = npc.NewBlob(win, characterSize, float64(x), float64(y), 1, 1, enemySprites)
+		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
+		y := float64(r.Intn(int(mapH-spriteSize))) + mapOrigin.Y
+		var enemy = npc.NewBlob(win, spriteSize, float64(x), float64(y), 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
 
 	currentState := gamestate.Start
 
 	playerSword := equipment.NewSword()
+
+	// flags := map[string]bool{
+	// 	"drawMap": true,
+	// }
+
+	batchDryGround := pixel.NewBatch(&pixel.TrianglesData{}, pic)
+
+	var spriteFrames []pixel.Rect
+	fmt.Println(pic.Bounds())
+	for x := pic.Bounds().Min.X; x < pic.Bounds().Max.X; x += spriteSize {
+		for y := pic.Bounds().Min.Y; y < pic.Bounds().Max.Y; y += spriteSize {
+			spriteFrames = append(spriteFrames, pixel.R(x, y, x+spriteSize, y+spriteSize))
+		}
+	}
+
+	spriteDryGround := pixel.NewSprite(pic, spriteFrames[42])
+	// mouse := cam.Unproject(win.MousePosition())
+	// tree.Draw(batch, pixel.IM.Scaled(pixel.ZV, 4).Moved(mouse))
+	for i := 0.0; i < mapW/spriteSize; i++ {
+		for j := 0.0; j < mapH/spriteSize; j++ {
+			spriteDryGround.Draw(batchDryGround,
+				pixel.IM.Moved(pixel.V(mapOrigin.X+(spriteSize/2)+float64(spriteSize*i),
+					mapOrigin.Y+(spriteSize/2)+float64(spriteSize*j))),
+			)
+		}
+	}
+
+	mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 
 	for !win.Closed() {
 
@@ -132,6 +161,7 @@ func run() {
 		case gamestate.Start:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
+			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
 			txt.Color = palette.Map[palette.Darkest]
 			fmt.Fprintln(txt, T("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
@@ -146,29 +176,21 @@ func run() {
 				currentState = gamestate.Game
 			}
 		case gamestate.Game:
+
+			// draw tiles
+			// if flags["drawMap"] {
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
-			mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
-			drawMapBG(win, mapOrigin, mapW, mapH)
+			// drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
+			// drawMap(pic, win, "drycracked")
+			// 	flags["drawMap"] = false
+			// }
 
-			// draw tiles
+			// tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(16*x), b+(16*y))))
 
-			abc := mapW / 16
-			var i float64
-			// fmt.Println(abc)
-			for ; i < abc; i++ {
-				tileASprite := newSprite(pic, g(6), g(3), g(7), g(4))
-				tileA := imdraw.New(nil)
-				tileA.Push(pixel.V(0, 0))
-				tileA.Push(pixel.V(16, 16))
-				tileA.Rectangle(0)
-				a := mapOrigin.X + 16/2
-				b := mapOrigin.Y + 16/2
-				// fmt.Printf("%f %f\n", a, b)
-				tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(16*i), b)))
-			}
+			batchDryGround.Draw(win)
 
 			// matrix := pixel.IM.Moved(pixel.V(player.Last.X+player.Size/2, player.Last.Y+player.Size/2))
 			// sprite.Draw(player.Win, matrix)
@@ -252,6 +274,7 @@ func run() {
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
 			fmt.Fprintln(txt, T("paused"))
+			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -261,9 +284,10 @@ func run() {
 				currentState = gamestate.Start
 			}
 		case gamestate.Over:
-			win.Clear(palette.Map[palette.Darkest])
+			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
-			txt.Color = palette.Map[palette.Lightest]
+			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Darkest])
+			txt.Color = palette.Map[palette.Darkest]
 			fmt.Fprintln(txt, T("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
@@ -301,7 +325,7 @@ func loadPicture(path string) (pixel.Picture, error) {
 	return pixel.PictureDataFromImage(img), nil
 }
 
-func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64) {
+func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.RGBA) {
 	s := imdraw.New(nil)
 
 	// bottom left point
@@ -310,7 +334,30 @@ func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64) {
 	// top right point
 	s.Push(pixel.V(origin.X+w, origin.Y+h))
 
-	s.Color = palette.Map[palette.Lightest]
+	s.Color = color
 	s.Rectangle(0)
 	s.Draw(win)
+}
+
+func drawMap(pic pixel.Picture, win *pixelgl.Window, name string) {
+	if name == "drycracked" {
+		abc := mapW / spriteSize
+		def := mapH / spriteSize
+		var x, y float64
+		// fmt.Println(abc)
+		for ; x < abc; x++ {
+			for y = 0; y < def; y++ {
+				tileASprite := newSprite(pic, g(6), g(3), g(7), g(4))
+				tileA := imdraw.New(nil)
+				tileA.Push(pixel.V(0, 0))
+				tileA.Push(pixel.V(spriteSize, spriteSize))
+				tileA.Rectangle(0)
+				a := mapOrigin.X + spriteSize/2
+				b := mapOrigin.Y + spriteSize/2
+				// fmt.Printf("%f %f\n", a, b)
+				tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(spriteSize*x), b+(spriteSize*y))))
+			}
+		}
+	}
+
 }
