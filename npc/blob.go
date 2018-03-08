@@ -43,6 +43,7 @@ type Blob struct {
 	Stride float64
 
 	AttackPower int
+	Health      int
 
 	totalMoves         int
 	moveCounter        int
@@ -53,7 +54,7 @@ type Blob struct {
 }
 
 // NewBlob returns a new blob
-func NewBlob(win *pixelgl.Window, size, x, y, stride float64, attackPower int, sprites map[string]*pixel.Sprite) Blob {
+func NewBlob(win *pixelgl.Window, size, x, y, stride float64, health, attackPower int, sprites map[string]*pixel.Sprite) Blob {
 	blob := Blob{
 		Win:                win,
 		Size:               size,
@@ -64,6 +65,7 @@ func NewBlob(win *pixelgl.Window, size, x, y, stride float64, attackPower int, s
 		WalkCycleCountMax:  7,
 		WalkCycleFlag:      false,
 		Stride:             stride,
+		Health:             health,
 		AttackPower:        attackPower,
 		currentState:       stateNameAppear,
 		appearDelay:        20,
@@ -80,6 +82,15 @@ func (blob *Blob) Reset() {
 	blob.Last = blob.Start
 	blob.currentState = stateNameAppear
 	blob.currentAppearDelay = blob.appearDelay
+}
+
+// Hit registers a hit
+func (blob *Blob) Hit(attackPower int) {
+	blob.Health -= attackPower
+}
+
+func (blob *Blob) IsDead() bool {
+	return blob.Health == 0
 }
 
 // Draw the blob's current state
