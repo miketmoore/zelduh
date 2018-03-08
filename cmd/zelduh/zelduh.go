@@ -130,7 +130,7 @@ func run() {
 		}
 	}
 
-	spriteDryGround := pixel.NewSprite(pic, spriteFrames[42])
+	spriteDryGround := pixel.NewSprite(pic, spriteFrames[38])
 	// mouse := cam.Unproject(win.MousePosition())
 	// tree.Draw(batch, pixel.IM.Scaled(pixel.ZV, 4).Moved(mouse))
 	for i := 0.0; i < mapW/spriteSize; i++ {
