@@ -79,31 +79,31 @@ func run() {
 
 	// Init player character
 	player := pc.New(win, spriteSize, 2, 3, 3, 1, map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, g(5), g(1), g(6)),
-		"downB": newSprite(pic, g(8), g(5), g(9), g(6)),
+		"downA": newSprite(pic, 0, g(9), g(1), g(10)),
+		"downB": newSprite(pic, g(8), g(9), g(9), g(10)),
 
-		"upA": newSprite(pic, g(1), g(5), g(2), g(6)),
-		"upB": newSprite(pic, g(9), g(5), g(10), g(6)),
+		"upA": newSprite(pic, g(1), g(9), g(2), g(10)),
+		"upB": newSprite(pic, g(9), g(9), g(10), g(10)),
 
-		"rightA": newSprite(pic, g(2), g(5), g(3), g(6)),
-		"rightB": newSprite(pic, g(10), g(5), g(11), g(6)),
+		"rightA": newSprite(pic, g(2), g(9), g(3), g(10)),
+		"rightB": newSprite(pic, g(10), g(9), g(11), g(10)),
 
-		"leftA": newSprite(pic, g(3), g(5), g(4), g(6)),
-		"leftB": newSprite(pic, g(11), g(5), g(12), g(6)),
+		"leftA": newSprite(pic, g(3), g(9), g(4), g(10)),
+		"leftB": newSprite(pic, g(11), g(9), g(12), g(10)),
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
 	enemies := []npc.Blob{}
 	enemySprites := map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, g(4), g(1), g(5)),
-		"downB": newSprite(pic, g(8), g(4), g(9), g(5)),
-		"upA":   newSprite(pic, 0, g(4), g(1), g(5)),
-		"upB":   newSprite(pic, g(8), g(4), g(9), g(5)),
+		"downA": newSprite(pic, 0, g(8), g(1), g(9)),
+		"downB": newSprite(pic, g(8), g(8), g(9), g(9)),
+		"upA":   newSprite(pic, 0, g(8), g(1), g(9)),
+		"upB":   newSprite(pic, g(8), g(8), g(9), g(9)),
 
-		"rightA": newSprite(pic, g(1), g(4), g(2), g(5)),
-		"rightB": newSprite(pic, g(9), g(4), g(10), g(5)),
-		"leftA":  newSprite(pic, g(1), g(4), g(2), g(5)),
-		"leftB":  newSprite(pic, g(9), g(4), g(10), g(5)),
+		"rightA": newSprite(pic, g(1), g(8), g(2), g(9)),
+		"rightB": newSprite(pic, g(9), g(8), g(10), g(9)),
+		"leftA":  newSprite(pic, g(1), g(8), g(2), g(9)),
+		"leftB":  newSprite(pic, g(9), g(8), g(10), g(9)),
 	}
 	for i := 0; i < 5; i++ {
 		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
@@ -130,7 +130,7 @@ func run() {
 		}
 	}
 
-	spriteDryGround := pixel.NewSprite(pic, spriteFrames[38])
+	spriteDryGround := pixel.NewSprite(pic, spriteFrames[66])
 	// mouse := cam.Unproject(win.MousePosition())
 	// tree.Draw(batch, pixel.IM.Scaled(pixel.ZV, 4).Moved(mouse))
 	for i := 0.0; i < mapW/spriteSize; i++ {
@@ -226,16 +226,6 @@ func run() {
 						enemyBottom > swordTop ||
 						swordLeft > enemyRight ||
 						enemyLeft > swordRight || false
-					// collision detection
-					// collision := player.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
-					// 	(player.Last.Y+player.Size) < enemies[i].Last.Y ||
-					// 	player.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
-					// 	(player.Last.X+player.Size) < enemies[i].Last.X
-
-					// swordCollision := playerSword.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
-					// 	(playerSword.Last.Y+playerSword.Size) < enemies[i].Last.Y ||
-					// 	playerSword.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
-					// 	(playerSword.Last.X+player.Size) < enemies[i].Last.X
 
 					if !notCollidingWithPlayer {
 						fmt.Printf("Enemy collided with player!\n")
