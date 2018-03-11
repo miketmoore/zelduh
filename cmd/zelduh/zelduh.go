@@ -196,20 +196,50 @@ func run() {
 			// sprite.Draw(player.Win, matrix)
 
 			player.Draw()
+
+			// Define player bounds
+			playerBottom := player.Last.Y
+			playerTop := player.Last.Y + player.Size
+			playerLeft := player.Last.X
+			playerRight := player.Last.X + player.Size
+
+			swordBottom := playerSword.Last.Y
+			swordTop := playerSword.Last.Y + playerSword.Size
+			swordLeft := playerSword.Last.X
+			swordRight := playerSword.Last.X + playerSword.Size
+
 			for i := 0; i < len(enemies); i++ {
 				if !enemies[i].IsDead() {
+
+					// Define enemy bounds
+					enemyBottom := enemies[i].Last.Y
+					enemyTop := enemies[i].Last.Y + enemies[i].Size
+					enemyLeft := enemies[i].Last.X
+					enemyRight := enemies[i].Last.X + enemies[i].Size
+
+					notCollidingWithPlayer := playerBottom > enemyTop ||
+						enemyBottom > playerTop ||
+						playerLeft > enemyRight ||
+						enemyLeft > playerRight || false
+
+					notCollidingWithSword := swordBottom > enemyTop ||
+						enemyBottom > swordTop ||
+						swordLeft > enemyRight ||
+						enemyLeft > swordRight || false
 					// collision detection
-					collision := player.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
-						(player.Last.Y+player.Size) < enemies[i].Last.Y ||
-						player.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
-						(player.Last.X+player.Size) < enemies[i].Last.X
+					// collision := player.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
+					// 	(player.Last.Y+player.Size) < enemies[i].Last.Y ||
+					// 	player.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
+					// 	(player.Last.X+player.Size) < enemies[i].Last.X
 
-					swordCollision := playerSword.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
-						(playerSword.Last.Y+playerSword.Size) < enemies[i].Last.Y ||
-						playerSword.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
-						(playerSword.Last.X+player.Size) < enemies[i].Last.X
+					// swordCollision := playerSword.Last.Y > (enemies[i].Last.Y+enemies[i].Size) ||
+					// 	(playerSword.Last.Y+playerSword.Size) < enemies[i].Last.Y ||
+					// 	playerSword.Last.X > (enemies[i].Last.X+enemies[i].Size) ||
+					// 	(playerSword.Last.X+player.Size) < enemies[i].Last.X
 
-					if !collision {
+					if !notCollidingWithPlayer {
+						fmt.Printf("Enemy collided with player!\n")
+
 						fmt.Printf("Collision\n")
 						// TODO move character back x pixels, in opposite direction that enemy
 						// is facing.
@@ -217,7 +247,8 @@ func run() {
 						if player.IsDead() {
 							currentState = gamestate.Over
 						}
-					} else if !swordCollision {
+					} else if !notCollidingWithSword {
+						fmt.Printf("Sword hit enemy!\n")
 						enemies[i].Hit(player.AttackPower)
 					}
 				}
