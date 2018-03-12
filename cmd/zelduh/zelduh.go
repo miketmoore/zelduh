@@ -79,31 +79,31 @@ func run() {
 
 	// Init player character
 	player := pc.New(win, spriteSize, 2, 3, 3, 1, map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, g(9), g(1), g(10)),
-		"downB": newSprite(pic, g(8), g(9), g(9), g(10)),
+		"downA": newSprite(pic, 0, 4, 1, 5),
+		"downB": newSprite(pic, 8, 4, 9, 5),
 
-		"upA": newSprite(pic, g(1), g(9), g(2), g(10)),
-		"upB": newSprite(pic, g(9), g(9), g(10), g(10)),
+		"upA": newSprite(pic, 1, 4, 2, 5),
+		"upB": newSprite(pic, 9, 4, 10, 5),
 
-		"rightA": newSprite(pic, g(2), g(9), g(3), g(10)),
-		"rightB": newSprite(pic, g(10), g(9), g(11), g(10)),
+		"rightA": newSprite(pic, 2, 4, 3, 5),
+		"rightB": newSprite(pic, 10, 4, 11, 5),
 
-		"leftA": newSprite(pic, g(3), g(9), g(4), g(10)),
-		"leftB": newSprite(pic, g(11), g(9), g(12), g(10)),
+		"leftA": newSprite(pic, 3, 4, 4, 5),
+		"leftB": newSprite(pic, 11, 4, 12, 5),
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
 	enemies := []npc.Blob{}
 	enemySprites := map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, g(8), g(1), g(9)),
-		"downB": newSprite(pic, g(8), g(8), g(9), g(9)),
-		"upA":   newSprite(pic, 0, g(8), g(1), g(9)),
-		"upB":   newSprite(pic, g(8), g(8), g(9), g(9)),
+		"downA": newSprite(pic, 0, 0, 1, 1),
+		"downB": newSprite(pic, 8, 0, 9, 1),
+		"upA":   newSprite(pic, 0, 0, 1, 1),
+		"upB":   newSprite(pic, 8, 0, 9, 1),
 
-		"rightA": newSprite(pic, g(1), g(8), g(2), g(9)),
-		"rightB": newSprite(pic, g(9), g(8), g(10), g(9)),
-		"leftA":  newSprite(pic, g(1), g(8), g(2), g(9)),
-		"leftB":  newSprite(pic, g(9), g(8), g(10), g(9)),
+		"rightA": newSprite(pic, 0, 0, 1, 1),
+		"rightB": newSprite(pic, 8, 0, 9, 1),
+		"leftA":  newSprite(pic, 0, 0, 1, 1),
+		"leftB":  newSprite(pic, 8, 0, 9, 1),
 	}
 	for i := 0; i < 5; i++ {
 		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
@@ -342,8 +342,8 @@ func main() {
 
 func newSprite(pic pixel.Picture, xa, ya, xb, yb float64) *pixel.Sprite {
 	return pixel.NewSprite(pic, pixel.Rect{
-		Min: pixel.V(xa, ya),
-		Max: pixel.V(xb, yb),
+		Min: pixel.V(g(xa), g(ya)),
+		Max: pixel.V(g(xb), g(yb)),
 	})
 }
 
@@ -382,7 +382,7 @@ func drawMap(pic pixel.Picture, win *pixelgl.Window, name string) {
 		// fmt.Println(abc)
 		for ; x < abc; x++ {
 			for y = 0; y < def; y++ {
-				tileASprite := newSprite(pic, g(6), g(3), g(7), g(4))
+				tileASprite := newSprite(pic, 6, 3, 7, 4)
 				tileA := imdraw.New(nil)
 				tileA.Push(pixel.V(0, 0))
 				tileA.Push(pixel.V(spriteSize, spriteSize))
