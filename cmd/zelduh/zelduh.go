@@ -309,9 +309,6 @@ func run() {
 				// [attacking] - this would go away after x ticks
 				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
-				// sword.Shape.Clear()
-				// sword.Shape.Color = palette.Map[palette.Lightest]
-
 				// Attack in direction player last moved
 				switch player.LastDir {
 				case mvmt.DirectionXPos:
