@@ -77,33 +77,55 @@ func run() {
 		panic(err)
 	}
 
+	sprites := map[string]*pixel.Sprite{
+		"playerDownA":  newSpriteIndexed(pic, 73),
+		"playerDownB":  newSpriteIndexed(pic, 82),
+		"playerUpA":    newSpriteIndexed(pic, 74),
+		"playerUpB":    newSpriteIndexed(pic, 83),
+		"playerRightA": newSpriteIndexed(pic, 75),
+		"playerRightB": newSpriteIndexed(pic, 84),
+		"playerLeftA":  newSpriteIndexed(pic, 76),
+		"playerLeftB":  newSpriteIndexed(pic, 85),
+
+		"turtleNoShellDownA":  newSpriteIndexed(pic, 1),
+		"turtleNoShellDownB":  newSpriteIndexed(pic, 10),
+		"turtleNoShellUpA":    newSpriteIndexed(pic, 2),
+		"turtleNoShellUpB":    newSpriteIndexed(pic, 11),
+		"turtleNoShellRightA": newSpriteIndexed(pic, 3),
+		"turtleNoShellRightB": newSpriteIndexed(pic, 12),
+		"turtleNoShellLeftA":  newSpriteIndexed(pic, 4),
+		"turtleNoShellLeftB":  newSpriteIndexed(pic, 13),
+
+		"ground": newSpriteIndexed(pic, 8),
+	}
+
 	// Init player character
 	player := pc.New(win, spriteSize, 2, 3, 3, 1, map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, 4, 1, 5),
-		"downB": newSprite(pic, 8, 4, 9, 5),
+		"downA": sprites["playerDownA"],
+		"downB": sprites["playerDownB"],
 
-		"upA": newSprite(pic, 1, 4, 2, 5),
-		"upB": newSprite(pic, 9, 4, 10, 5),
+		"upA": sprites["playerUpA"],
+		"upB": sprites["playerUpB"],
 
-		"rightA": newSprite(pic, 2, 4, 3, 5),
-		"rightB": newSprite(pic, 10, 4, 11, 5),
+		"rightA": sprites["playerRightA"],
+		"rightB": sprites["playerRightB"],
 
-		"leftA": newSprite(pic, 3, 4, 4, 5),
-		"leftB": newSprite(pic, 11, 4, 12, 5),
+		"leftA": sprites["playerLeftA"],
+		"leftB": sprites["playerLeftB"],
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
 	enemies := []npc.Blob{}
 	enemySprites := map[string]*pixel.Sprite{
-		"downA": newSprite(pic, 0, 0, 1, 1),
-		"downB": newSprite(pic, 8, 0, 9, 1),
-		"upA":   newSprite(pic, 0, 0, 1, 1),
-		"upB":   newSprite(pic, 8, 0, 9, 1),
+		"downA": sprites["turtleNoShellDownA"],
+		"downB": sprites["turtleNoShellDownB"],
+		"upA":   sprites["turtleNoShellUpA"],
+		"upB":   sprites["turtleNoShellUpB"],
 
-		"rightA": newSprite(pic, 0, 0, 1, 1),
-		"rightB": newSprite(pic, 8, 0, 9, 1),
-		"leftA":  newSprite(pic, 0, 0, 1, 1),
-		"leftB":  newSprite(pic, 8, 0, 9, 1),
+		"rightA": sprites["turtleNoShellRightA"],
+		"rightB": sprites["turtleNoShellRightB"],
+		"leftA":  sprites["turtleNoShellLeftA"],
+		"leftB":  sprites["turtleNoShellLeftB"],
 	}
 	for i := 0; i < 5; i++ {
 		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
@@ -130,7 +152,7 @@ func run() {
 		}
 	}
 
-	spriteDryGround := pixel.NewSprite(pic, spriteFrames[39])
+	spriteDryGround := pixel.NewSprite(pic, spriteFrames[35])
 	// mouse := cam.Unproject(win.MousePosition())
 	// tree.Draw(batch, pixel.IM.Scaled(pixel.ZV, 4).Moved(mouse))
 	for i := 0.0; i < mapW/spriteSize; i++ {
@@ -344,6 +366,45 @@ func newSprite(pic pixel.Picture, xa, ya, xb, yb float64) *pixel.Sprite {
 	return pixel.NewSprite(pic, pixel.Rect{
 		Min: pixel.V(g(xa), g(ya)),
 		Max: pixel.V(g(xb), g(yb)),
+	})
+}
+
+func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
+	fmt.Printf("newSpriteIndexed index: %f\n", index)
+	// iterate over width every spriteSize
+	totalRows := pic.Bounds().H() / spriteSize
+	totalCols := pic.Bounds().W() / spriteSize
+	fmt.Printf("total rows: %f\n", totalRows)
+	fmt.Printf("total cols: %f\n", totalCols)
+
+	find := func() (float64, float64) {
+		i := 0.0
+		var row = 0.0
+		var col = 0.0
+		for ; row < totalRows; row++ {
+			fmt.Printf("i:%f\n", i)
+			if i == index {
+				return row, col
+			}
+			for col = 0.0; col < totalCols; col++ {
+				i++
+				if i == index {
+
+					return row, col
+				}
+			}
+		}
+		return row, col
+	}
+
+	row, col := find()
+
+	fmt.Printf("found row, col: %f, %f\n", row, col)
+	fmt.Println(row*spriteSize, col*spriteSize)
+
+	return pixel.NewSprite(pic, pixel.Rect{
+		Min: pixel.V(col*spriteSize, row*spriteSize),
+		Max: pixel.V(col*spriteSize+spriteSize, row*spriteSize+spriteSize),
 	})
 }
 
