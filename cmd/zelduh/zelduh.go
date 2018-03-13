@@ -243,17 +243,6 @@ func run() {
 				coins[i].Draw()
 			}
 
-			// Define player bounds
-			playerBottom := player.Last.Y
-			playerTop := player.Last.Y + player.Size
-			playerLeft := player.Last.X
-			playerRight := player.Last.X + player.Size
-
-			swordBottom := sword.Last.Y
-			swordTop := sword.Last.Y + sword.Size
-			swordLeft := sword.Last.X
-			swordRight := sword.Last.X + sword.Size
-
 			// check if player picked up a coin
 			for i := len(coins) - 1; i > 0; i-- {
 				collision := isColliding(player.Last, coins[i].Last)
@@ -268,23 +257,7 @@ func run() {
 			for i := 0; i < len(enemies); i++ {
 				if !enemies[i].IsDead() {
 
-					// Define enemy bounds
-					enemyBottom := enemies[i].Last.Y
-					enemyTop := enemies[i].Last.Y + enemies[i].Size
-					enemyLeft := enemies[i].Last.X
-					enemyRight := enemies[i].Last.X + enemies[i].Size
-
-					notCollidingWithPlayer := playerBottom > enemyTop ||
-						enemyBottom > playerTop ||
-						playerLeft > enemyRight ||
-						enemyLeft > playerRight || false
-
-					notCollidingWithSword := swordBottom > enemyTop ||
-						enemyBottom > swordTop ||
-						swordLeft > enemyRight ||
-						enemyLeft > swordRight || false
-
-					if !notCollidingWithPlayer {
+					if isColliding(player.Last, enemies[i].Last) {
 						fmt.Printf("Enemy collided with player!\n")
 
 						fmt.Printf("Collision\n")
@@ -294,7 +267,7 @@ func run() {
 						if player.IsDead() {
 							currentState = gamestate.Over
 						}
-					} else if !notCollidingWithSword {
+					} else if isColliding(sword.Last, enemies[i].Last) {
 						fmt.Printf("Sword hit enemy!\n")
 						enemies[i].Hit(player.AttackPower)
 					}
