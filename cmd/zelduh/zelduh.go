@@ -13,6 +13,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/mvmt"
@@ -100,8 +101,22 @@ func run() {
 
 		"ground": newSpriteIndexed(pic, 8),
 
-		"coinA": newSpriteIndexed(pic, 25),
-		"coinB": newSpriteIndexed(pic, 39),
+		"coinA": newSpriteIndexed(pic, 77),
+		"coinB": newSpriteIndexed(pic, 86),
+	}
+
+	coins := []entity.Entity{}
+
+	coinX := mapOrigin.X
+	coinY := mapOrigin.Y
+	for i := 0; i < 12; i++ {
+		coin := entity.New(win, spriteSize, pixel.V(coinX, coinY), []*pixel.Sprite{
+			sprites["coinA"],
+			sprites["coinB"],
+		}, 7)
+		coins = append(coins, coin)
+		coinX = mapOrigin.X + float64(r.Intn(12)*48)
+		coinY += 48
 	}
 
 	// Init player character
@@ -223,6 +238,10 @@ func run() {
 			// sprite.Draw(player.Win, matrix)
 
 			player.Draw()
+
+			for i := 0; i < len(coins); i++ {
+				coins[i].Draw()
+			}
 
 			// Define player bounds
 			playerBottom := player.Last.Y
