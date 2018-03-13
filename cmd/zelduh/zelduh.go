@@ -96,7 +96,12 @@ func run() {
 		"turtleNoShellLeftA":  newSpriteIndexed(pic, 4),
 		"turtleNoShellLeftB":  newSpriteIndexed(pic, 13),
 
+		"sword": newSpriteIndexed(pic, 57),
+
 		"ground": newSpriteIndexed(pic, 8),
+
+		"coinA": newSpriteIndexed(pic, 25),
+		"coinB": newSpriteIndexed(pic, 39),
 	}
 
 	// Init player character
@@ -136,7 +141,7 @@ func run() {
 
 	currentState := gamestate.Start
 
-	playerSword := equipment.NewSword(spriteSize)
+	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
 
 	// flags := map[string]bool{
 	// 	"drawMap": true,
@@ -225,10 +230,10 @@ func run() {
 			playerLeft := player.Last.X
 			playerRight := player.Last.X + player.Size
 
-			swordBottom := playerSword.Last.Y
-			swordTop := playerSword.Last.Y + playerSword.Size
-			swordLeft := playerSword.Last.X
-			swordRight := playerSword.Last.X + playerSword.Size
+			swordBottom := sword.Last.Y
+			swordTop := sword.Last.Y + sword.Size
+			swordLeft := sword.Last.X
+			swordRight := sword.Last.X + sword.Size
 
 			for i := 0; i < len(enemies); i++ {
 				if !enemies[i].IsDead() {
@@ -301,31 +306,22 @@ func run() {
 				// [attacking] - this would go away after x ticks
 				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
 
-				playerSword.Shape.Clear()
-				playerSword.Shape.Color = palette.Map[palette.Lightest]
+				// sword.Shape.Clear()
+				// sword.Shape.Color = palette.Map[palette.Lightest]
 
 				// Attack in direction player last moved
 				switch player.LastDir {
 				case mvmt.DirectionXPos:
-					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y))
-					playerSword.Shape.Push(pixel.V(player.Last.X+(player.SwordSize*2), player.Last.Y+player.SwordSize))
-					playerSword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
+					sword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
 				case mvmt.DirectionXNeg:
-					playerSword.Shape.Push(pixel.V(player.Last.X-player.SwordSize, player.Last.Y))
-					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
-					playerSword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
+					sword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
 				case mvmt.DirectionYPos:
-					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y+player.SwordSize))
-					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y+(player.SwordSize*2)))
-					playerSword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
+					sword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
 				case mvmt.DirectionYNeg:
-					playerSword.Shape.Push(pixel.V(player.Last.X, player.Last.Y-player.SwordSize))
-					playerSword.Shape.Push(pixel.V(player.Last.X+player.SwordSize, player.Last.Y))
-					playerSword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
+					sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
 				}
 
-				playerSword.Shape.Rectangle(0)
-				playerSword.Shape.Draw(win)
+				sword.Draw()
 			}
 		case gamestate.Pause:
 			win.Clear(palette.Map[palette.Dark])
