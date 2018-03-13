@@ -254,6 +254,17 @@ func run() {
 			swordLeft := sword.Last.X
 			swordRight := sword.Last.X + sword.Size
 
+			// check if player picked up a coin
+			for i := len(coins) - 1; i > 0; i-- {
+				collision := isColliding(player.Last, coins[i].Last)
+				if collision {
+					player.Deposit(1)
+					// destroy coin
+					coins = append(coins[:i], coins[i+1:]...)
+					fmt.Printf("Coins remaining: %d\n", len(coins))
+				}
+			}
+
 			for i := 0; i < len(enemies); i++ {
 				if !enemies[i].IsDead() {
 
@@ -471,4 +482,23 @@ func drawMap(pic pixel.Picture, win *pixelgl.Window, name string) {
 		}
 	}
 
+}
+
+func isColliding(a, b pixel.Vec) bool {
+	aBottom := a.Y
+	aTop := a.Y + spriteSize
+	aLeft := a.X
+	aRight := a.X + spriteSize
+
+	bBottom := b.Y
+	bTop := b.Y + spriteSize
+	bLeft := b.X
+	bRight := b.X + spriteSize
+
+	notCollidingWithPlayer := aBottom > bTop ||
+		bBottom > aTop ||
+		aLeft > bRight ||
+		bLeft > aRight || false
+
+	return !notCollidingWithPlayer
 }

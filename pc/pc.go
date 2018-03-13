@@ -1,6 +1,8 @@
 package pc
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -35,6 +37,7 @@ type Player struct {
 
 	MaxHealth   int
 	AttackPower int
+	Money       int
 }
 
 // New returns a new Player instance
@@ -50,6 +53,7 @@ func New(win *pixelgl.Window, size, stride float64, health, maxHealth, attackPow
 		Health:            health,
 		MaxHealth:         maxHealth,
 		AttackPower:       attackPower,
+		Money:             0,
 	}
 	player.WalkCycleCount = player.WalkCycleCountMax
 	// player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
@@ -127,4 +131,10 @@ func (player *Player) IsDead() bool {
 func (player *Player) Reset() {
 	player.Last = player.Start
 	player.Health = player.MaxHealth
+}
+
+// Deposit puts coin in your bag!
+func (player *Player) Deposit(n int) {
+	player.Money += n
+	fmt.Printf("Player money: %d (+%d)\n", player.Money, n)
 }
