@@ -149,25 +149,7 @@ func run() {
 
 	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
 
-	batchDryGround := pixel.NewBatch(&pixel.TrianglesData{}, pic)
-
-	var spriteFrames []pixel.Rect
-	fmt.Println(pic.Bounds())
-	for x := pic.Bounds().Min.X; x < pic.Bounds().Max.X; x += spriteSize {
-		for y := pic.Bounds().Min.Y; y < pic.Bounds().Max.Y; y += spriteSize {
-			spriteFrames = append(spriteFrames, pixel.R(x, y, x+spriteSize, y+spriteSize))
-		}
-	}
-
-	spriteDryGround := pixel.NewSprite(pic, spriteFrames[35])
-	for i := 0.0; i < mapW/spriteSize; i++ {
-		for j := 0.0; j < mapH/spriteSize; j++ {
-			spriteDryGround.Draw(batchDryGround,
-				pixel.IM.Moved(pixel.V(mapOrigin.X+(spriteSize/2)+float64(spriteSize*i),
-					mapOrigin.Y+(spriteSize/2)+float64(spriteSize*j))),
-			)
-		}
-	}
+	mapBgDryGround := buildBatchSprite(pic, spriteSize, 35, mapOrigin, mapW, mapH)
 
 	mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 
@@ -202,7 +184,7 @@ func run() {
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
-			batchDryGround.Draw(win)
+			mapBgDryGround.Draw(win)
 
 			player.Draw()
 
@@ -372,4 +354,28 @@ func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.
 	s.Color = color
 	s.Rectangle(0)
 	s.Draw(win)
+}
+
+func buildBatchSprite(pic pixel.Picture, spriteSize float64, spriteIndex int, origin pixel.Vec, w, h float64) *pixel.Batch {
+	batch := pixel.NewBatch(&pixel.TrianglesData{}, pic)
+
+	var spriteFrames []pixel.Rect
+	fmt.Println(pic.Bounds())
+	for x := pic.Bounds().Min.X; x < pic.Bounds().Max.X; x += spriteSize {
+		for y := pic.Bounds().Min.Y; y < pic.Bounds().Max.Y; y += spriteSize {
+			spriteFrames = append(spriteFrames, pixel.R(x, y, x+spriteSize, y+spriteSize))
+		}
+	}
+
+	sprite := pixel.NewSprite(pic, spriteFrames[spriteIndex])
+	for i := 0.0; i < w/spriteSize; i++ {
+		for j := 0.0; j < h/spriteSize; j++ {
+			sprite.Draw(batch,
+				pixel.IM.Moved(pixel.V(origin.X+(spriteSize/2)+float64(spriteSize*i),
+					origin.Y+(spriteSize/2)+float64(spriteSize*j))),
+			)
+		}
+	}
+
+	return batch
 }
