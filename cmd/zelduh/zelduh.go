@@ -72,6 +72,8 @@ func run() {
 		panic(err)
 	}
 
+	win.SetSmooth(true)
+
 	// Load sprite sheet graphic
 	pic, err := loadPicture(spritePlayerPath)
 	if err != nil {
@@ -322,6 +324,8 @@ func run() {
 				case mvmt.DirectionYNeg:
 					sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
 				}
+
+				sword.LastDir = player.LastDir
 
 				sword.Draw()
 			}
