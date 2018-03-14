@@ -14,11 +14,11 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"github.com/miketmoore/zelduh/collision"
+	"github.com/miketmoore/zelduh/enemy"
 	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/mvmt"
-	"github.com/miketmoore/zelduh/npc"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
 	"github.com/nicksnyder/go-i18n/i18n"
@@ -140,7 +140,7 @@ func run() {
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
-	enemies := []npc.Blob{}
+	enemies := []enemy.Enemy{}
 	enemySprites := map[string]*pixel.Sprite{
 		"downA": sprites["turtleNoShellDownA"],
 		"downB": sprites["turtleNoShellDownB"],
@@ -155,7 +155,7 @@ func run() {
 	for i := 0; i < 5; i++ {
 		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
 		y := float64(r.Intn(int(mapH-spriteSize))) + mapOrigin.Y
-		var enemy = npc.NewBlob(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
+		var enemy = enemy.NewBlob(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
 
