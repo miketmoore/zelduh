@@ -41,10 +41,6 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 var spritePlayerPath = "assets/bink-spritesheet-01.png"
 
-func g(n float64) float64 {
-	return n * spriteSize
-}
-
 func run() {
 	// i18n
 	i18n.MustLoadTranslationFile(translationFile)
@@ -330,13 +326,6 @@ func main() {
 	pixelgl.Run(run)
 }
 
-func newSprite(pic pixel.Picture, xa, ya, xb, yb float64) *pixel.Sprite {
-	return pixel.NewSprite(pic, pixel.Rect{
-		Min: pixel.V(g(xa), g(ya)),
-		Max: pixel.V(g(xb), g(yb)),
-	})
-}
-
 func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
 	fmt.Printf("newSpriteIndexed index: %f\n", index)
 	// iterate over width every spriteSize
@@ -402,24 +391,3 @@ func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.
 	s.Rectangle(0)
 	s.Draw(win)
 }
-
-// func drawMap(pic pixel.Picture, win *pixelgl.Window, name string) {
-// 	if name == "drycracked" {
-// 		abc := mapW / spriteSize
-// 		def := mapH / spriteSize
-// 		var x, y float64
-// 		for ; x < abc; x++ {
-// 			for y = 0; y < def; y++ {
-// 				tileASprite := newSprite(pic, 6, 3, 7, 4)
-// 				tileA := imdraw.New(nil)
-// 				tileA.Push(pixel.V(0, 0))
-// 				tileA.Push(pixel.V(spriteSize, spriteSize))
-// 				tileA.Rectangle(0)
-// 				a := mapOrigin.X + spriteSize/2
-// 				b := mapOrigin.Y + spriteSize/2
-// 				tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(spriteSize*x), b+(spriteSize*y))))
-// 			}
-// 		}
-// 	}
-
-// }
