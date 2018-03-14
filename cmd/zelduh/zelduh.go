@@ -97,7 +97,7 @@ func run() {
 		"turtleNoShellLeftA":  newSpriteIndexed(pic, 4),
 		"turtleNoShellLeftB":  newSpriteIndexed(pic, 13),
 
-		"sword": newSpriteIndexed(pic, 57),
+		"sword": newSpriteIndexed(pic, 84),
 
 		"ground": newSpriteIndexed(pic, 8),
 
