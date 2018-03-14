@@ -11,6 +11,13 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type state string
+
+const (
+	stateAttacking state = "attacking"
+	stateSheathed  state = "sheathed"
+)
+
 // Sword represents one sword item
 type Sword struct {
 	// Size is the dimensions (square)
@@ -26,58 +33,62 @@ type Sword struct {
 	// Sprite is the graphic of the sword
 	Sprite *pixel.Sprite
 
-	swordEntity *entity.Entity
+	swordEntity    *entity.Entity
+	state          state
+	attackingCount int
 }
 
 // NewSword returns a new sword
 func NewSword(win *pixelgl.Window, size float64, sprite *pixel.Sprite) Sword {
 	return Sword{
-		Win:    win,
-		Size:   size,
-		Shape:  imdraw.New(nil),
-		Sprite: sprite,
+		Win:            win,
+		Size:           size,
+		Shape:          imdraw.New(nil),
+		Sprite:         sprite,
+		state:          stateSheathed,
+		attackingCount: 0,
 	}
 }
 
 // Draw renders the sword in the correct location on the window/map
 func (sword *Sword) Draw() {
-	sword.Shape.Clear()
-	sword.Shape.Color = colornames.White
+	if sword.state == stateAttacking {
+		if sword.attackingCount < 10 {
+			sword.attackingCount++
 
-	sword.Shape.Push(sword.Last)
-	sword.Shape.Push(pixel.V(sword.Last.X+sword.Size, sword.Last.Y+sword.Size))
+			sword.Shape.Clear()
+			sword.Shape.Color = colornames.White
 
-	// matrix := pixel.IM.Moved(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2))
-	// sword.Sprite.Draw(sword.Win, matrix)
-	// matrix.Rotated(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2), math.Pi/6)
-	mat := pixel.IM
-	mat = mat.Moved(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2))
+			sword.Shape.Push(sword.Last)
+			sword.Shape.Push(pixel.V(sword.Last.X+sword.Size, sword.Last.Y+sword.Size))
 
-	// up no rotation
-	// down math.Pi (180)
-	// left math.Pi/2 (-90)
-	// right math.Pi*3/2 (90)
-	// mat = mat.Rotated(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2), math.Pi*3/2)
-	degrees := 0.0
-	if sword.LastDir == mvmt.DirectionXPos {
-		degrees = math.Pi * 3 / 2
-	} else if sword.LastDir == mvmt.DirectionYNeg {
-		degrees = math.Pi
-	} else if sword.LastDir == mvmt.DirectionXNeg {
-		degrees = math.Pi / 2
+			mat := pixel.IM
+			mat = mat.Moved(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2))
+
+			degrees := 0.0
+			if sword.LastDir == mvmt.DirectionXPos {
+				degrees = math.Pi * 3 / 2
+			} else if sword.LastDir == mvmt.DirectionYNeg {
+				degrees = math.Pi
+			} else if sword.LastDir == mvmt.DirectionXNeg {
+				degrees = math.Pi / 2
+			}
+			mat = mat.Rotated(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2), degrees)
+			sword.Sprite.Draw(sword.Win, mat)
+		} else {
+			sword.attackingCount = 0
+			sword.state = stateSheathed
+		}
 	}
-	mat = mat.Rotated(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2), degrees)
-	sword.Sprite.Draw(sword.Win, mat)
 
-	// if sword.swordEntity == nil {
-	// 	e := entity.New(sword.Win, sword.Size, sword.Last, []*pixel.Sprite{
-	// 		sword.Sprite,
-	// 	}, 5)
-	// 	sword.swordEntity = &e
-	// } else {
-	// 	// matrix := pixel.IM.Moved(pixel.V(sword.Last.X+sword.Size/2, sword.Last.Y+sword.Size/2))
-	// 	// sword.swordEntity.Last = sword.Last.Rotated(10)
-	// 	sword.swordEntity.Draw()
-	// }
+}
 
+// Attack starts the attack sequence for the sword
+func (sword *Sword) Attack() {
+	sword.state = stateAttacking
+}
+
+// IsAttacking indicates if the sword is currently attacking or no
+func (sword *Sword) IsAttacking() bool {
+	return sword.state == stateAttacking
 }

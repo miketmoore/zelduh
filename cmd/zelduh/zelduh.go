@@ -260,23 +260,20 @@ func run() {
 
 			for i := 0; i < len(enemies); i++ {
 				if !enemies[i].IsDead() {
-
-					if isColliding(player.Last, enemies[i].Last) {
-						fmt.Printf("Enemy collided with player!\n")
-
-						fmt.Printf("Collision\n")
-						// TODO move character back x pixels, in opposite direction that enemy
-						// is facing.
+					// Check for collisions with enemy
+					if sword.IsAttacking() && isColliding(sword.Last, enemies[i].Last) {
+						// Sword hit enemy
+						enemies[i].Hit(player.AttackPower)
+					} else if isColliding(player.Last, enemies[i].Last) {
+						// Enemy hit player
 						player.Hit(enemies[i].AttackPower)
 						if player.IsDead() {
 							currentState = gamestate.Over
 						}
-					} else if isColliding(sword.Last, enemies[i].Last) {
-						fmt.Printf("Sword hit enemy!\n")
-						enemies[i].Hit(player.AttackPower)
 					}
 				}
 
+				// Draw enemy if not dead
 				if !enemies[i].IsDead() {
 					enemies[i].Draw(mapOrigin.X, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.Y+mapH)
 				}
@@ -304,31 +301,25 @@ func run() {
 			if win.JustPressed(pixelgl.KeyX) {
 				currentState = gamestate.Over
 			}
-
 			if win.JustPressed(pixelgl.KeySpace) {
-				// Attack with sword
-				// TODO sword should appear on screen longer
-				// I think a state machine for the sword makes sense
-				// [sheathed]
-				// [attacking] - this would go away after x ticks
-				fmt.Printf("Sword attack direction: %s\n", player.LastDir)
-
-				// Attack in direction player last moved
-				switch player.LastDir {
-				case mvmt.DirectionXPos:
-					sword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
-				case mvmt.DirectionXNeg:
-					sword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
-				case mvmt.DirectionYPos:
-					sword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
-				case mvmt.DirectionYNeg:
-					sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
-				}
-
-				sword.LastDir = player.LastDir
-
-				sword.Draw()
+				sword.Attack()
 			}
+
+			// Attack in direction player last moved
+			switch player.LastDir {
+			case mvmt.DirectionXPos:
+				sword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
+			case mvmt.DirectionXNeg:
+				sword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
+			case mvmt.DirectionYPos:
+				sword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
+			case mvmt.DirectionYNeg:
+				sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
+			}
+
+			sword.LastDir = player.LastDir
+
+			sword.Draw()
 		case gamestate.Pause:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
