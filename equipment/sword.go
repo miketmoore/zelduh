@@ -33,27 +33,29 @@ type Sword struct {
 	// Sprite is the graphic of the sword
 	Sprite *pixel.Sprite
 
-	swordEntity    *entity.Entity
-	state          state
-	attackingCount int
+	swordEntity         *entity.Entity
+	state               state
+	attackingCount      int
+	attackingFrameTotal int
 }
 
 // NewSword returns a new sword
 func NewSword(win *pixelgl.Window, size float64, sprite *pixel.Sprite) Sword {
 	return Sword{
-		Win:            win,
-		Size:           size,
-		Shape:          imdraw.New(nil),
-		Sprite:         sprite,
-		state:          stateSheathed,
-		attackingCount: 0,
+		Win:                 win,
+		Size:                size,
+		Shape:               imdraw.New(nil),
+		Sprite:              sprite,
+		state:               stateSheathed,
+		attackingCount:      0,
+		attackingFrameTotal: 10,
 	}
 }
 
 // Draw renders the sword in the correct location on the window/map
 func (sword *Sword) Draw() {
 	if sword.state == stateAttacking {
-		if sword.attackingCount < 10 {
+		if sword.attackingCount < sword.attackingFrameTotal {
 			sword.attackingCount++
 
 			sword.Shape.Clear()
