@@ -20,7 +20,7 @@ import (
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/npc"
 	"github.com/miketmoore/zelduh/palette"
-	"github.com/miketmoore/zelduh/pc"
+	"github.com/miketmoore/zelduh/player"
 	"github.com/nicksnyder/go-i18n/i18n"
 )
 
@@ -125,7 +125,7 @@ func run() {
 	}
 
 	// Init player character
-	player := pc.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
+	player := player.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
 		"downA": sprites["playerDownA"],
 		"downB": sprites["playerDownB"],
 
