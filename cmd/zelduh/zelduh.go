@@ -77,33 +77,33 @@ func run() {
 		panic(err)
 	}
 
-	sprites := map[string]*pixel.Sprite{
-		"playerDownA":  newSpriteIndexed(pic, 109),
-		"playerDownB":  newSpriteIndexed(pic, 118),
-		"playerUpA":    newSpriteIndexed(pic, 110),
-		"playerUpB":    newSpriteIndexed(pic, 119),
-		"playerRightA": newSpriteIndexed(pic, 111),
-		"playerRightB": newSpriteIndexed(pic, 120),
-		"playerLeftA":  newSpriteIndexed(pic, 112),
-		"playerLeftB":  newSpriteIndexed(pic, 121),
+	sprites := buildSpriteMap(pic, map[string]float64{
+		"playerDownA":  109,
+		"playerDownB":  118,
+		"playerUpA":    110,
+		"playerUpB":    119,
+		"playerRightA": 111,
+		"playerRightB": 120,
+		"playerLeftA":  112,
+		"playerLeftB":  121,
 
-		"turtleNoShellDownA":  newSpriteIndexed(pic, 1),
-		"turtleNoShellDownB":  newSpriteIndexed(pic, 10),
-		"turtleNoShellUpA":    newSpriteIndexed(pic, 2),
-		"turtleNoShellUpB":    newSpriteIndexed(pic, 11),
-		"turtleNoShellRightA": newSpriteIndexed(pic, 3),
-		"turtleNoShellRightB": newSpriteIndexed(pic, 12),
-		"turtleNoShellLeftA":  newSpriteIndexed(pic, 4),
-		"turtleNoShellLeftB":  newSpriteIndexed(pic, 13),
+		"turtleNoShellDownA":  1,
+		"turtleNoShellDownB":  10,
+		"turtleNoShellUpA":    2,
+		"turtleNoShellUpB":    11,
+		"turtleNoShellRightA": 3,
+		"turtleNoShellRightB": 12,
+		"turtleNoShellLeftA":  4,
+		"turtleNoShellLeftB":  13,
 
-		"sword": newSpriteIndexed(pic, 84),
+		"sword": 84,
 
-		"ground": newSpriteIndexed(pic, 8),
+		"ground": 8,
 
-		"coinA": newSpriteIndexed(pic, 113),
-		"coinB": newSpriteIndexed(pic, 122),
-		"coinC": newSpriteIndexed(pic, 131),
-	}
+		"coinA": 113,
+		"coinB": 122,
+		"coinC": 131,
+	})
 
 	coins := []entity.Entity{}
 
@@ -324,6 +324,14 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func buildSpriteMap(pic pixel.Picture, config map[string]float64) map[string]*pixel.Sprite {
+	spriteMap := map[string]*pixel.Sprite{}
+	for k, v := range config {
+		spriteMap[k] = newSpriteIndexed(pic, v)
+	}
+	return spriteMap
 }
 
 func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
