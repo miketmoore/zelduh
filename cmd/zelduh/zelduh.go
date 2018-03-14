@@ -125,7 +125,7 @@ func run() {
 	}
 
 	// Init player character
-	player := pc.New(win, spriteSize, 2, 3, 3, 1, map[string]*pixel.Sprite{
+	player := pc.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
 		"downA": sprites["playerDownA"],
 		"downB": sprites["playerDownB"],
 
