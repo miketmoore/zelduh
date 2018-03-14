@@ -69,8 +69,6 @@ func run() {
 		panic(err)
 	}
 
-	win.SetSmooth(true)
-
 	// Load sprite sheet graphic
 	pic, err := loadPicture(spritePlayerPath)
 	if err != nil {
@@ -78,15 +76,14 @@ func run() {
 	}
 
 	sprites := buildSpriteMap(pic, map[string]float64{
-		"playerDownA":  109,
-		"playerDownB":  118,
-		"playerUpA":    110,
-		"playerUpB":    119,
-		"playerRightA": 111,
-		"playerRightB": 120,
-		"playerLeftA":  112,
-		"playerLeftB":  121,
-
+		"playerDownA":         109,
+		"playerDownB":         118,
+		"playerUpA":           110,
+		"playerUpB":           119,
+		"playerRightA":        111,
+		"playerRightB":        120,
+		"playerLeftA":         112,
+		"playerLeftB":         121,
 		"turtleNoShellDownA":  1,
 		"turtleNoShellDownB":  10,
 		"turtleNoShellUpA":    2,
@@ -95,14 +92,11 @@ func run() {
 		"turtleNoShellRightB": 12,
 		"turtleNoShellLeftA":  4,
 		"turtleNoShellLeftB":  13,
-
-		"sword": 84,
-
-		"ground": 8,
-
-		"coinA": 113,
-		"coinB": 122,
-		"coinC": 131,
+		"sword":               84,
+		"ground":              8,
+		"coinA":               113,
+		"coinB":               122,
+		"coinC":               131,
 	})
 
 	coins := []entity.Entity{}
@@ -122,27 +116,23 @@ func run() {
 
 	// Init player character
 	player := player.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
-		"downA": sprites["playerDownA"],
-		"downB": sprites["playerDownB"],
-
-		"upA": sprites["playerUpA"],
-		"upB": sprites["playerUpB"],
-
+		"downA":  sprites["playerDownA"],
+		"downB":  sprites["playerDownB"],
+		"upA":    sprites["playerUpA"],
+		"upB":    sprites["playerUpB"],
 		"rightA": sprites["playerRightA"],
 		"rightB": sprites["playerRightB"],
-
-		"leftA": sprites["playerLeftA"],
-		"leftB": sprites["playerLeftB"],
+		"leftA":  sprites["playerLeftA"],
+		"leftB":  sprites["playerLeftB"],
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
 
 	// Create enemies
 	enemies := []enemy.Enemy{}
 	enemySprites := map[string]*pixel.Sprite{
-		"downA": sprites["turtleNoShellDownA"],
-		"downB": sprites["turtleNoShellDownB"],
-		"upA":   sprites["turtleNoShellUpA"],
-		"upB":   sprites["turtleNoShellUpB"],
-
+		"downA":  sprites["turtleNoShellDownA"],
+		"downB":  sprites["turtleNoShellDownB"],
+		"upA":    sprites["turtleNoShellUpA"],
+		"upB":    sprites["turtleNoShellUpB"],
 		"rightA": sprites["turtleNoShellRightA"],
 		"rightB": sprites["turtleNoShellRightB"],
 		"leftA":  sprites["turtleNoShellLeftA"],
@@ -170,8 +160,6 @@ func run() {
 	}
 
 	spriteDryGround := pixel.NewSprite(pic, spriteFrames[35])
-	// mouse := cam.Unproject(win.MousePosition())
-	// tree.Draw(batch, pixel.IM.Scaled(pixel.ZV, 4).Moved(mouse))
 	for i := 0.0; i < mapW/spriteSize; i++ {
 		for j := 0.0; j < mapH/spriteSize; j++ {
 			spriteDryGround.Draw(batchDryGround,
@@ -335,26 +323,20 @@ func buildSpriteMap(pic pixel.Picture, config map[string]float64) map[string]*pi
 }
 
 func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
-	fmt.Printf("newSpriteIndexed index: %f\n", index)
-	// iterate over width every spriteSize
 	totalRows := pic.Bounds().H() / spriteSize
 	totalCols := pic.Bounds().W() / spriteSize
-	fmt.Printf("total rows: %f\n", totalRows)
-	fmt.Printf("total cols: %f\n", totalCols)
 
 	find := func() (float64, float64) {
 		i := 0.0
 		var row = 0.0
 		var col = 0.0
 		for ; row < totalRows; row++ {
-			fmt.Printf("i:%f\n", i)
 			if i == index {
 				return row, col
 			}
 			for col = 0.0; col < totalCols; col++ {
 				i++
 				if i == index {
-
 					return row, col
 				}
 			}
@@ -363,9 +345,6 @@ func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
 	}
 
 	row, col := find()
-
-	fmt.Printf("found row, col: %f, %f\n", row, col)
-	fmt.Println(row*spriteSize, col*spriteSize)
 
 	return pixel.NewSprite(pic, pixel.Rect{
 		Min: pixel.V(col*spriteSize, row*spriteSize),
@@ -388,13 +367,8 @@ func loadPicture(path string) (pixel.Picture, error) {
 
 func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.RGBA) {
 	s := imdraw.New(nil)
-
-	// bottom left point
 	s.Push(origin)
-
-	// top right point
 	s.Push(pixel.V(origin.X+w, origin.Y+h))
-
 	s.Color = color
 	s.Rectangle(0)
 	s.Draw(win)
