@@ -2,7 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/miketmoore/zelduh)](https://goreportcard.com/report/github.com/miketmoore/zelduh)
 
-**Note** This is an alpha release - use at your own risk :)
+**Note** This is in pre-alpha development - use at your own risk :)
 
 Zelduh is a tile based adventure game. 
 
