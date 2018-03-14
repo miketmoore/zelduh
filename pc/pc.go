@@ -140,20 +140,29 @@ func (player *Player) Deposit(n int) {
 }
 
 // Move moves the player in the specified direction
-func (player *Player) Move(dir mvmt.Direction) {
+func (player *Player) Move(dir mvmt.Direction, yPosBound, yNegBound, xPosBound, xNegBound float64) {
+
 	switch dir {
 	case mvmt.DirectionYPos:
-		player.Last.Y += player.Stride
-		player.LastDir = mvmt.DirectionYPos
+		if player.Last.Y+player.Stride <= (yPosBound - player.Size) {
+			player.Last.Y += player.Stride
+			player.LastDir = mvmt.DirectionYPos
+		}
 	case mvmt.DirectionYNeg:
-		player.Last.Y -= player.Stride
-		player.LastDir = mvmt.DirectionYNeg
+		if player.Last.Y-player.Stride >= yNegBound {
+			player.Last.Y -= player.Stride
+			player.LastDir = mvmt.DirectionYNeg
+		}
 	case mvmt.DirectionXPos:
-		player.Last.X += player.Stride
-		player.LastDir = mvmt.DirectionXPos
+		if player.Last.X+player.Stride <= (xPosBound - player.Size) {
+			player.Last.X += player.Stride
+			player.LastDir = mvmt.DirectionXPos
+		}
 	case mvmt.DirectionXNeg:
-		player.Last.X -= player.Stride
-		player.LastDir = mvmt.DirectionXNeg
+		if player.Last.X-player.Stride >= xNegBound {
+			player.Last.X -= player.Stride
+			player.LastDir = mvmt.DirectionXNeg
+		}
 	}
 
 }

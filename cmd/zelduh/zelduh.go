@@ -259,14 +259,14 @@ func run() {
 
 			}
 
-			if win.Pressed(pixelgl.KeyUp) && player.Last.Y+player.Stride <= ((mapOrigin.Y+mapH)-player.Size) {
-				player.Move(mvmt.DirectionYPos)
-			} else if win.Pressed(pixelgl.KeyDown) && player.Last.Y-player.Stride >= mapOrigin.Y {
-				player.Move(mvmt.DirectionYNeg)
-			} else if win.Pressed(pixelgl.KeyRight) && player.Last.X+player.Stride <= ((mapOrigin.X+mapW)-player.Size) {
-				player.Move(mvmt.DirectionXPos)
-			} else if win.Pressed(pixelgl.KeyLeft) && player.Last.X-player.Stride >= mapOrigin.X {
-				player.Move(mvmt.DirectionXNeg)
+			if win.Pressed(pixelgl.KeyUp) {
+				player.Move(mvmt.DirectionYPos, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+			} else if win.Pressed(pixelgl.KeyRight) {
+				player.Move(mvmt.DirectionXPos, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+			} else if win.Pressed(pixelgl.KeyDown) {
+				player.Move(mvmt.DirectionYNeg, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+			} else if win.Pressed(pixelgl.KeyLeft) {
+				player.Move(mvmt.DirectionXNeg, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
 			}
 
 			if win.JustPressed(pixelgl.KeyP) {
