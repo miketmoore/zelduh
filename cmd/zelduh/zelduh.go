@@ -13,6 +13,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/miketmoore/zelduh/collision"
 	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
@@ -162,10 +163,6 @@ func run() {
 
 	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
 
-	// flags := map[string]bool{
-	// 	"drawMap": true,
-	// }
-
 	batchDryGround := pixel.NewBatch(&pixel.TrianglesData{}, pic)
 
 	var spriteFrames []pixel.Rect
@@ -197,12 +194,6 @@ func run() {
 			os.Exit(1)
 		}
 
-		// // Get mouse position and log to screen
-		// mpos := win.MousePosition()
-		// coordDebugTxt.Clear()
-		// fmt.Fprintln(coordDebugTxt, fmt.Sprintf("%d, %d", int(math.Ceil(mpos.X)), int(math.Ceil(mpos.Y))))
-		// coordDebugTxt.Draw(win, pixel.IM.Moved(coordDebugTxtOrig))
-
 		switch currentState {
 		case gamestate.Start:
 			win.Clear(palette.Map[palette.Dark])
@@ -223,23 +214,11 @@ func run() {
 			}
 		case gamestate.Game:
 
-			// draw tiles
-			// if flags["drawMap"] {
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
-			// drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
-			// drawMap(pic, win, "drycracked")
-			// 	flags["drawMap"] = false
-			// }
-
-			// tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(16*x), b+(16*y))))
-
 			batchDryGround.Draw(win)
-
-			// matrix := pixel.IM.Moved(pixel.V(player.Last.X+player.Size/2, player.Last.Y+player.Size/2))
-			// sprite.Draw(player.Win, matrix)
 
 			player.Draw()
 
@@ -249,7 +228,7 @@ func run() {
 
 			// check if player picked up a coin
 			for i := len(coins) - 1; i > 0; i-- {
-				collision := isColliding(player.Last, coins[i].Last)
+				collision := collision.IsColliding(player.Last, coins[i].Last, spriteSize)
 				if collision {
 					player.Deposit(1)
 					// destroy coin
@@ -261,10 +240,10 @@ func run() {
 			for i := 0; i < len(enemies); i++ {
 				if !enemies[i].IsDead() {
 					// Check for collisions with enemy
-					if sword.IsAttacking() && isColliding(sword.Last, enemies[i].Last) {
+					if sword.IsAttacking() && collision.IsColliding(sword.Last, enemies[i].Last, spriteSize) {
 						// Sword hit enemy
 						enemies[i].Hit(player.AttackPower)
-					} else if isColliding(player.Last, enemies[i].Last) {
+					} else if collision.IsColliding(player.Last, enemies[i].Last, spriteSize) {
 						// Enemy hit player
 						player.Hit(enemies[i].AttackPower)
 						if player.IsDead() {
@@ -428,44 +407,23 @@ func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.
 	s.Draw(win)
 }
 
-func drawMap(pic pixel.Picture, win *pixelgl.Window, name string) {
-	if name == "drycracked" {
-		abc := mapW / spriteSize
-		def := mapH / spriteSize
-		var x, y float64
-		// fmt.Println(abc)
-		for ; x < abc; x++ {
-			for y = 0; y < def; y++ {
-				tileASprite := newSprite(pic, 6, 3, 7, 4)
-				tileA := imdraw.New(nil)
-				tileA.Push(pixel.V(0, 0))
-				tileA.Push(pixel.V(spriteSize, spriteSize))
-				tileA.Rectangle(0)
-				a := mapOrigin.X + spriteSize/2
-				b := mapOrigin.Y + spriteSize/2
-				// fmt.Printf("%f %f\n", a, b)
-				tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(spriteSize*x), b+(spriteSize*y))))
-			}
-		}
-	}
+// func drawMap(pic pixel.Picture, win *pixelgl.Window, name string) {
+// 	if name == "drycracked" {
+// 		abc := mapW / spriteSize
+// 		def := mapH / spriteSize
+// 		var x, y float64
+// 		for ; x < abc; x++ {
+// 			for y = 0; y < def; y++ {
+// 				tileASprite := newSprite(pic, 6, 3, 7, 4)
+// 				tileA := imdraw.New(nil)
+// 				tileA.Push(pixel.V(0, 0))
+// 				tileA.Push(pixel.V(spriteSize, spriteSize))
+// 				tileA.Rectangle(0)
+// 				a := mapOrigin.X + spriteSize/2
+// 				b := mapOrigin.Y + spriteSize/2
+// 				tileASprite.Draw(win, pixel.IM.Moved(pixel.V(a+(spriteSize*x), b+(spriteSize*y))))
+// 			}
+// 		}
+// 	}
 
-}
-
-func isColliding(a, b pixel.Vec) bool {
-	aBottom := a.Y
-	aTop := a.Y + spriteSize
-	aLeft := a.X
-	aRight := a.X + spriteSize
-
-	bBottom := b.Y
-	bTop := b.Y + spriteSize
-	bLeft := b.X
-	bRight := b.X + spriteSize
-
-	notCollidingWithPlayer := aBottom > bTop ||
-		bBottom > aTop ||
-		aLeft > bRight ||
-		bLeft > aRight || false
-
-	return !notCollidingWithPlayer
-}
+// }
