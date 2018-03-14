@@ -40,7 +40,7 @@ type Enemy struct {
 	// Win is a pointer to the GUI window
 	Win *pixelgl.Window
 
-	Stride float64
+	speed float64
 
 	AttackPower int
 	Health      int
@@ -53,8 +53,8 @@ type Enemy struct {
 	currentAppearDelay int
 }
 
-// NewBlob returns a new enemy
-func NewBlob(win *pixelgl.Window, size, x, y, stride float64, health, attackPower int, sprites map[string]*pixel.Sprite) Enemy {
+// New returns a new enemy
+func New(win *pixelgl.Window, size, x, y, speed float64, health, attackPower int, sprites map[string]*pixel.Sprite) Enemy {
 	enemy := Enemy{
 		Win:                win,
 		Size:               size,
@@ -64,7 +64,7 @@ func NewBlob(win *pixelgl.Window, size, x, y, stride float64, health, attackPowe
 		Sprites:            sprites,
 		WalkCycleCountMax:  7,
 		WalkCycleFlag:      false,
-		Stride:             stride,
+		speed:              speed,
 		Health:             health,
 		AttackPower:        attackPower,
 		currentState:       stateNameAppear,
@@ -108,7 +108,7 @@ func (enemy *Enemy) Draw(minX, minY, maxX, maxY float64) {
 	case stateNameActive:
 		enemy.Shape.Color = palette.Map[palette.Darkest]
 		// move smoothly into next tile, then orient for next move
-		stride := enemy.Stride
+		stride := enemy.speed
 
 		if enemy.totalMoves == 0 {
 			// number of tiles to move until next change in movement

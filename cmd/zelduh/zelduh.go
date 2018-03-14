@@ -141,7 +141,7 @@ func run() {
 	for i := 0; i < 5; i++ {
 		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
 		y := float64(r.Intn(int(mapH-spriteSize))) + mapOrigin.Y
-		var enemy = enemy.NewBlob(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
+		var enemy = enemy.New(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
 
