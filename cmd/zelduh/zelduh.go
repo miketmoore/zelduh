@@ -79,14 +79,14 @@ func run() {
 	}
 
 	sprites := map[string]*pixel.Sprite{
-		"playerDownA":  newSpriteIndexed(pic, 73),
-		"playerDownB":  newSpriteIndexed(pic, 82),
-		"playerUpA":    newSpriteIndexed(pic, 74),
-		"playerUpB":    newSpriteIndexed(pic, 83),
-		"playerRightA": newSpriteIndexed(pic, 75),
-		"playerRightB": newSpriteIndexed(pic, 84),
-		"playerLeftA":  newSpriteIndexed(pic, 76),
-		"playerLeftB":  newSpriteIndexed(pic, 85),
+		"playerDownA":  newSpriteIndexed(pic, 109),
+		"playerDownB":  newSpriteIndexed(pic, 118),
+		"playerUpA":    newSpriteIndexed(pic, 110),
+		"playerUpB":    newSpriteIndexed(pic, 119),
+		"playerRightA": newSpriteIndexed(pic, 111),
+		"playerRightB": newSpriteIndexed(pic, 120),
+		"playerLeftA":  newSpriteIndexed(pic, 112),
+		"playerLeftB":  newSpriteIndexed(pic, 121),
 
 		"turtleNoShellDownA":  newSpriteIndexed(pic, 1),
 		"turtleNoShellDownB":  newSpriteIndexed(pic, 10),
@@ -101,8 +101,9 @@ func run() {
 
 		"ground": newSpriteIndexed(pic, 8),
 
-		"coinA": newSpriteIndexed(pic, 77),
-		"coinB": newSpriteIndexed(pic, 86),
+		"coinA": newSpriteIndexed(pic, 113),
+		"coinB": newSpriteIndexed(pic, 122),
+		"coinC": newSpriteIndexed(pic, 131),
 	}
 
 	coins := []entity.Entity{}
@@ -113,6 +114,7 @@ func run() {
 		coin := entity.New(win, spriteSize, pixel.V(coinX, coinY), []*pixel.Sprite{
 			sprites["coinA"],
 			sprites["coinB"],
+			sprites["coinC"],
 		}, 7)
 		coins = append(coins, coin)
 		coinX = mapOrigin.X + float64(r.Intn(12)*48)
