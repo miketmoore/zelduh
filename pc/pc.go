@@ -138,3 +138,22 @@ func (player *Player) Deposit(n int) {
 	player.Money += n
 	fmt.Printf("Player money: %d (+%d)\n", player.Money, n)
 }
+
+// Move moves the player in the specified direction
+func (player *Player) Move(dir mvmt.Direction) {
+	switch dir {
+	case mvmt.DirectionYPos:
+		player.Last.Y += player.Stride
+		player.LastDir = mvmt.DirectionYPos
+	case mvmt.DirectionYNeg:
+		player.Last.Y -= player.Stride
+		player.LastDir = mvmt.DirectionYNeg
+	case mvmt.DirectionXPos:
+		player.Last.X += player.Stride
+		player.LastDir = mvmt.DirectionXPos
+	case mvmt.DirectionXNeg:
+		player.Last.X -= player.Stride
+		player.LastDir = mvmt.DirectionXNeg
+	}
+
+}

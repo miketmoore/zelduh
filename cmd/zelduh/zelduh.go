@@ -260,17 +260,13 @@ func run() {
 			}
 
 			if win.Pressed(pixelgl.KeyUp) && player.Last.Y+player.Stride <= ((mapOrigin.Y+mapH)-player.Size) {
-				player.Last.Y += player.Stride
-				player.LastDir = mvmt.DirectionYPos
+				player.Move(mvmt.DirectionYPos)
 			} else if win.Pressed(pixelgl.KeyDown) && player.Last.Y-player.Stride >= mapOrigin.Y {
-				player.Last.Y -= player.Stride
-				player.LastDir = mvmt.DirectionYNeg
+				player.Move(mvmt.DirectionYNeg)
 			} else if win.Pressed(pixelgl.KeyRight) && player.Last.X+player.Stride <= ((mapOrigin.X+mapW)-player.Size) {
-				player.Last.X += player.Stride
-				player.LastDir = mvmt.DirectionXPos
+				player.Move(mvmt.DirectionXPos)
 			} else if win.Pressed(pixelgl.KeyLeft) && player.Last.X-player.Stride >= mapOrigin.X {
-				player.Last.X -= player.Stride
-				player.LastDir = mvmt.DirectionXNeg
+				player.Move(mvmt.DirectionXNeg)
 			}
 
 			if win.JustPressed(pixelgl.KeyP) {
