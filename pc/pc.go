@@ -30,18 +30,18 @@ type Player struct {
 	Win *pixelgl.Window
 	// SwordSize is the dimensions of the sword
 	SwordSize float64
-	// Stride is how many tiles character can move in one "step"
-	Stride float64
 
 	Health int
 
 	MaxHealth   int
 	AttackPower int
 	Money       int
+
+	speed float64
 }
 
 // New returns a new Player instance
-func New(win *pixelgl.Window, size, stride float64, health, maxHealth, attackPower int, sprites map[string]*pixel.Sprite, start pixel.Vec) Player {
+func New(win *pixelgl.Window, size, speed float64, health, maxHealth, attackPower int, sprites map[string]*pixel.Sprite, start pixel.Vec) Player {
 	player := Player{
 		Win:               win,
 		Size:              size,
@@ -54,12 +54,12 @@ func New(win *pixelgl.Window, size, stride float64, health, maxHealth, attackPow
 		MaxHealth:         maxHealth,
 		AttackPower:       attackPower,
 		Money:             0,
+		speed:             speed,
 	}
 	player.WalkCycleCount = player.WalkCycleCountMax
 	// player.Start = pixel.V((win.Bounds().W()/2.0)-player.Size, (win.Bounds().H()/2.0)-player.Size)
 	player.Start = start
 	player.Last = player.Start
-	player.Stride = stride
 	return player
 }
 
@@ -144,23 +144,23 @@ func (player *Player) Move(dir mvmt.Direction, yPosBound, yNegBound, xPosBound, 
 
 	switch dir {
 	case mvmt.DirectionYPos:
-		if player.Last.Y+player.Stride <= (yPosBound - player.Size) {
-			player.Last.Y += player.Stride
+		if player.Last.Y+player.speed <= (yPosBound - player.Size) {
+			player.Last.Y += player.speed
 			player.LastDir = mvmt.DirectionYPos
 		}
 	case mvmt.DirectionYNeg:
-		if player.Last.Y-player.Stride >= yNegBound {
-			player.Last.Y -= player.Stride
+		if player.Last.Y-player.speed >= yNegBound {
+			player.Last.Y -= player.speed
 			player.LastDir = mvmt.DirectionYNeg
 		}
 	case mvmt.DirectionXPos:
-		if player.Last.X+player.Stride <= (xPosBound - player.Size) {
-			player.Last.X += player.Stride
+		if player.Last.X+player.speed <= (xPosBound - player.Size) {
+			player.Last.X += player.speed
 			player.LastDir = mvmt.DirectionXPos
 		}
 	case mvmt.DirectionXNeg:
-		if player.Last.X-player.Stride >= xNegBound {
-			player.Last.X -= player.Stride
+		if player.Last.X-player.speed >= xNegBound {
+			player.Last.X -= player.speed
 			player.LastDir = mvmt.DirectionXNeg
 		}
 	}
