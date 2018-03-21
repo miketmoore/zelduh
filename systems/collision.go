@@ -5,7 +5,18 @@ import (
 
 	"engo.io/ecs"
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/message"
 )
+
+// CollisionMessage is sent whenever a collision is detected by the CollisionSystem.
+type CollisionMessage struct {
+	Entity collisionEntity
+	To     collisionEntity
+	// Groups CollisionGroup
+}
+
+// Type implements the zelduh.Message interface
+func (CollisionMessage) Type() string { return "CollisionMessage" }
 
 type collisionEntity struct {
 	ecs.BasicEntity
@@ -15,6 +26,7 @@ type collisionEntity struct {
 // CollisionSystem determines effect of vehicle input on vehicle physics
 type CollisionSystem struct {
 	entities []collisionEntity
+	Mailbox  *message.Manager
 }
 
 // New is called by World when the system is added (I think)
@@ -57,6 +69,12 @@ func (s *CollisionSystem) Update(dt float32) {
 				if entity.SpatialComponent.Rect.Contains(entityB.SpatialComponent.Rect.Min) ||
 					entity.SpatialComponent.Rect.Contains(entityB.SpatialComponent.Rect.Max) {
 					fmt.Println("Collision!")
+					// Determine what to do
+					// If one is a coin and the other is a player...
+					s.Mailbox.Dispatch(CollisionMessage{
+						Entity: entity,
+						To:     entityB,
+					})
 				}
 			}
 		}

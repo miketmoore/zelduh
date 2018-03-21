@@ -22,6 +22,7 @@ import (
 	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
+	"github.com/miketmoore/zelduh/message"
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
@@ -105,11 +106,15 @@ func run() {
 		"coinC":               395,
 	})
 
+	messageManager := message.Manager{}
+
 	world := ecs.World{}
 	world.AddSystem(&systems.SpatialSystem{})
 	world.AddSystem(&systems.RenderSystem{Win: win})
 	world.AddSystem(&systems.PlayerInputSystem{Win: win})
-	world.AddSystem(&systems.CollisionSystem{})
+	world.AddSystem(&systems.CollisionSystem{
+		Mailbox: &messageManager,
+	})
 
 	coins := []entity.Entity{}
 
@@ -237,6 +242,10 @@ func run() {
 			}
 		}
 	}
+
+	messageManager.Listen("CollisionMessage", func(msg message.Message) {
+		fmt.Printf("Inbox alert: %v", msg.Type())
+	})
 
 	for !win.Closed() {
 
