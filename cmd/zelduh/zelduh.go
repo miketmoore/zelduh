@@ -76,27 +76,27 @@ func run() {
 	}
 
 	sprites := buildSpriteMap(pic, map[string]float64{
-		"playerDownA":         109,
-		"playerDownB":         118,
-		"playerUpA":           110,
-		"playerUpB":           119,
-		"playerRightA":        111,
-		"playerRightB":        120,
-		"playerLeftA":         112,
-		"playerLeftB":         121,
-		"turtleNoShellDownA":  1,
-		"turtleNoShellDownB":  10,
-		"turtleNoShellUpA":    2,
-		"turtleNoShellUpB":    11,
-		"turtleNoShellRightA": 3,
-		"turtleNoShellRightB": 12,
-		"turtleNoShellLeftA":  4,
-		"turtleNoShellLeftB":  13,
+		"playerDownA":         361,
+		"playerDownB":         376,
+		"playerUpA":           362,
+		"playerUpB":           377,
+		"playerRightA":        363,
+		"playerRightB":        378,
+		"playerLeftA":         364,
+		"playerLeftB":         379,
+		"turtleNoShellDownA":  316,
+		"turtleNoShellDownB":  331,
+		"turtleNoShellUpA":    316,
+		"turtleNoShellUpB":    331,
+		"turtleNoShellRightA": 317,
+		"turtleNoShellRightB": 332,
+		"turtleNoShellLeftA":  317,
+		"turtleNoShellLeftB":  332,
 		"sword":               84,
 		"ground":              8,
-		"coinA":               113,
-		"coinB":               122,
-		"coinC":               131,
+		"coinA":               365,
+		"coinB":               380,
+		"coinC":               395,
 	})
 
 	coins := []entity.Entity{}
@@ -149,7 +149,8 @@ func run() {
 
 	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
 
-	mapBgDryGround := buildBatchSprite(pic, spriteSize, 35, mapOrigin, mapW, mapH)
+	// TODO just pass a sprite in here
+	mapBgDryGround := buildBatchSprite(pic, spriteSize, 67, mapOrigin, mapW, mapH)
 
 	mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 
