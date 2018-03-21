@@ -232,7 +232,9 @@ func run() {
 			}
 		case *systems.CollisionSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
-			// 	sys.Add(&car.BasicEntity, car.SpatialComponent)
+			for _, coin := range coinEntities {
+				sys.Add(&coin.BasicEntity, coin.SpatialComponent)
+			}
 		}
 	}
 
