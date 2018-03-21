@@ -6,4 +6,5 @@ import "github.com/miketmoore/zelduh/direction"
 type MovementComponent struct {
 	Direction direction.Name
 	Moving    bool
+	Speed     float64
 }

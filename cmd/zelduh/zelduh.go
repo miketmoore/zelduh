@@ -156,6 +156,7 @@ func run() {
 		MovementComponent: &components.MovementComponent{
 			Moving:    false,
 			Direction: direction.Down,
+			Speed:     4.0,
 		},
 	}
 

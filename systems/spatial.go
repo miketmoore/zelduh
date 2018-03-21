@@ -58,7 +58,7 @@ func (s *SpatialSystem) Update(dt float32) {
 	for _, entity := range s.entities {
 		if entity.MovementComponent.Moving {
 			var v pixel.Vec
-			speed := 4.0
+			speed := entity.MovementComponent.Speed
 			switch entity.MovementComponent.Direction {
 			case direction.Up:
 				v = pixel.V(0, speed)
