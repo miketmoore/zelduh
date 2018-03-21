@@ -10,5 +10,6 @@ import (
 type Player struct {
 	ecs.BasicEntity
 	Win *pixelgl.Window
+	*components.AppearanceComponent
 	*components.SpatialComponent
 }

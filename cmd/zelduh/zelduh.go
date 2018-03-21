@@ -26,6 +26,7 @@ import (
 	"github.com/miketmoore/zelduh/player"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/nicksnyder/go-i18n/i18n"
+	"golang.org/x/image/colornames"
 )
 
 const winW float64 = 800
@@ -105,6 +106,7 @@ func run() {
 
 	world := ecs.World{}
 	world.AddSystem(&systems.SpatialSystem{})
+	world.AddSystem(&systems.RenderSystem{Win: win})
 
 	coins := []entity.Entity{}
 
@@ -135,6 +137,9 @@ func run() {
 
 	playerEntity := entities.Player{
 		BasicEntity: ecs.NewBasic(),
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Green,
+		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
 			Height: spriteSize,
@@ -144,6 +149,7 @@ func run() {
 				mapOrigin.X+(mapW/2)+spriteSize,
 				mapOrigin.Y+(mapH/2)+spriteSize,
 			),
+			Shape: imdraw.New(nil),
 		},
 	}
 
@@ -185,10 +191,10 @@ func run() {
 		// 	sys.Add(&car.BasicEntity, car.VehicleInputComponent, car.PhysicsComponent)
 		case *systems.SpatialSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
-			// sys.Add(&car.BasicEntity, car.PhysicsComponent, car.SpatialComponent, false)
-			// case *systems.RenderSystem:
+		// sys.Add(&car.BasicEntity, car.PhysicsComponent, car.SpatialComponent, false)
+		case *systems.RenderSystem:
 			// 	sys.Add(&background.BasicEntity, background.SpatialComponent, background.AppearanceComponent)
-			// 	sys.Add(&player.BasicEntity, player.SpatialComponent, player.AppearanceComponent)
+			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.AppearanceComponent)
 			// 	sys.Add(&car.BasicEntity, car.SpatialComponent, car.AppearanceComponent)
 			// 	sys.Add(&topMask.BasicEntity, topMask.SpatialComponent, topMask.AppearanceComponent)
 			// 	sys.Add(&bottomMask.BasicEntity, bottomMask.SpatialComponent, bottomMask.AppearanceComponent)
