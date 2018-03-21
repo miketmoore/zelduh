@@ -167,6 +167,32 @@ func run() {
 		},
 	}
 
+	coinEntities := []entities.Coin{
+		entities.Coin{
+			BasicEntity: ecs.NewBasic(),
+			AppearanceComponent: &components.AppearanceComponent{
+				Color: colornames.Yellow,
+			},
+			SpatialComponent: &components.SpatialComponent{
+				Width:  spriteSize,
+				Height: spriteSize,
+				Rect: pixel.R(
+					mapOrigin.X,
+					mapOrigin.Y,
+					mapOrigin.X+spriteSize,
+					mapOrigin.Y+spriteSize,
+				),
+				BoundsRect: pixel.R(
+					mapOrigin.X,
+					mapOrigin.Y,
+					mapOrigin.X+mapW,
+					mapOrigin.Y+mapH,
+				),
+				Shape: imdraw.New(nil),
+			},
+		},
+	}
+
 	// Create enemies
 	enemies := []enemy.Enemy{}
 	enemySprites := map[string]*pixel.Sprite{
@@ -201,6 +227,9 @@ func run() {
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.MovementComponent)
 		case *systems.RenderSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.AppearanceComponent)
+			for _, coin := range coinEntities {
+				sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.AppearanceComponent)
+			}
 		case *systems.CollisionSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
 			// 	sys.Add(&car.BasicEntity, car.SpatialComponent)
