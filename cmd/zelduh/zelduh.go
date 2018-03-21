@@ -9,18 +9,22 @@ import (
 	"os"
 	"time"
 
+	"engo.io/ecs"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"github.com/miketmoore/zelduh/collision"
+	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/enemy"
+	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
+	"github.com/miketmoore/zelduh/systems"
 	"github.com/nicksnyder/go-i18n/i18n"
 )
 
@@ -99,6 +103,9 @@ func run() {
 		"coinC":               395,
 	})
 
+	world := ecs.World{}
+	world.AddSystem(&systems.SpatialSystem{})
+
 	coins := []entity.Entity{}
 
 	coinX := mapOrigin.X
@@ -125,6 +132,20 @@ func run() {
 		"leftA":  sprites["playerLeftA"],
 		"leftB":  sprites["playerLeftB"],
 	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
+
+	playerEntity := entities.Player{
+		BasicEntity: ecs.NewBasic(),
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect: pixel.R(
+				mapOrigin.X+(mapW/2),
+				mapOrigin.Y+(mapH/2),
+				mapOrigin.X+(mapW/2)+spriteSize,
+				mapOrigin.Y+(mapH/2)+spriteSize,
+			),
+		},
+	}
 
 	// Create enemies
 	enemies := []enemy.Enemy{}
@@ -153,6 +174,29 @@ func run() {
 	mapBgDryGround := buildBatchSprite(pic, spriteSize, 67, mapOrigin, mapW, mapH)
 
 	mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
+
+	// Add entities and components to systems
+	for _, system := range world.Systems() {
+		switch sys := system.(type) {
+		// case *systems.PlayerInputSystem:
+		// sys.Add(&playerEntity.BasicEntity, player.PlayerInputComponent, player.VehicleInputComponent)
+		// case *systems.PhysicsSystem:
+		// 	sys.Add(&player.BasicEntity, player.VehicleInputComponent, player.PhysicsComponent)
+		// 	sys.Add(&car.BasicEntity, car.VehicleInputComponent, car.PhysicsComponent)
+		case *systems.SpatialSystem:
+			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
+			// sys.Add(&car.BasicEntity, car.PhysicsComponent, car.SpatialComponent, false)
+			// case *systems.RenderSystem:
+			// 	sys.Add(&background.BasicEntity, background.SpatialComponent, background.AppearanceComponent)
+			// 	sys.Add(&player.BasicEntity, player.SpatialComponent, player.AppearanceComponent)
+			// 	sys.Add(&car.BasicEntity, car.SpatialComponent, car.AppearanceComponent)
+			// 	sys.Add(&topMask.BasicEntity, topMask.SpatialComponent, topMask.AppearanceComponent)
+			// 	sys.Add(&bottomMask.BasicEntity, bottomMask.SpatialComponent, bottomMask.AppearanceComponent)
+			// case *systems.CollisionSystem:
+			// 	sys.Add(&player.BasicEntity, player.SpatialComponent)
+			// 	sys.Add(&car.BasicEntity, car.SpatialComponent)
+		}
+	}
 
 	for !win.Closed() {
 
@@ -186,6 +230,8 @@ func run() {
 			txt.Color = palette.Map[palette.Darkest]
 
 			mapBgDryGround.Draw(win)
+
+			world.Update(0.125)
 
 			player.Draw()
 
