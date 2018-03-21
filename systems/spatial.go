@@ -69,7 +69,11 @@ func (s *SpatialSystem) Update(dt float32) {
 			case direction.Left:
 				v = pixel.V(-speed, 0)
 			}
-			entity.SpatialComponent.Rect = entity.SpatialComponent.Rect.Moved(v)
+			newRect := entity.SpatialComponent.Rect.Moved(v)
+			if entity.SpatialComponent.BoundsRect.Contains(newRect.Min) &&
+				entity.SpatialComponent.BoundsRect.Contains(newRect.Max) {
+				entity.SpatialComponent.Rect = newRect
+			}
 		}
 	}
 }

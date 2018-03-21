@@ -151,6 +151,12 @@ func run() {
 				mapOrigin.X+(mapW/2)+spriteSize,
 				mapOrigin.Y+(mapH/2)+spriteSize,
 			),
+			BoundsRect: pixel.R(
+				mapOrigin.X,
+				mapOrigin.Y,
+				mapOrigin.X+mapW,
+				mapOrigin.Y+mapH,
+			),
 			Shape: imdraw.New(nil),
 		},
 		MovementComponent: &components.MovementComponent{
@@ -182,9 +188,6 @@ func run() {
 	currentState := gamestate.Start
 
 	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
-
-	// TODO just pass a sprite in here
-	mapBgDryGround := buildBatchSprite(pic, spriteSize, 67, mapOrigin, mapW, mapH)
 
 	mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 
@@ -239,10 +242,9 @@ func run() {
 		case gamestate.Game:
 
 			win.Clear(palette.Map[palette.Dark])
+			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
-
-			mapBgDryGround.Draw(win)
 
 			world.Update(0.125)
 
@@ -414,28 +416,4 @@ func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.
 	s.Color = color
 	s.Rectangle(0)
 	s.Draw(win)
-}
-
-func buildBatchSprite(pic pixel.Picture, spriteSize float64, spriteIndex int, origin pixel.Vec, w, h float64) *pixel.Batch {
-	batch := pixel.NewBatch(&pixel.TrianglesData{}, pic)
-
-	var spriteFrames []pixel.Rect
-	fmt.Println(pic.Bounds())
-	for x := pic.Bounds().Min.X; x < pic.Bounds().Max.X; x += spriteSize {
-		for y := pic.Bounds().Min.Y; y < pic.Bounds().Max.Y; y += spriteSize {
-			spriteFrames = append(spriteFrames, pixel.R(x, y, x+spriteSize, y+spriteSize))
-		}
-	}
-
-	sprite := pixel.NewSprite(pic, spriteFrames[spriteIndex])
-	for i := 0.0; i < w/spriteSize; i++ {
-		for j := 0.0; j < h/spriteSize; j++ {
-			sprite.Draw(batch,
-				pixel.IM.Moved(pixel.V(origin.X+(spriteSize/2)+float64(spriteSize*i),
-					origin.Y+(spriteSize/2)+float64(spriteSize*j))),
-			)
-		}
-	}
-
-	return batch
 }
