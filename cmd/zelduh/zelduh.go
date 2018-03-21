@@ -109,6 +109,7 @@ func run() {
 	world.AddSystem(&systems.SpatialSystem{})
 	world.AddSystem(&systems.RenderSystem{Win: win})
 	world.AddSystem(&systems.PlayerInputSystem{Win: win})
+	world.AddSystem(&systems.CollisionSystem{})
 
 	coins := []entity.Entity{}
 
@@ -196,20 +197,12 @@ func run() {
 		switch sys := system.(type) {
 		case *systems.PlayerInputSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.MovementComponent)
-		// case *systems.PhysicsSystem:
-		// 	sys.Add(&player.BasicEntity, player.VehicleInputComponent, player.PhysicsComponent)
-		// 	sys.Add(&car.BasicEntity, car.VehicleInputComponent, car.PhysicsComponent)
 		case *systems.SpatialSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.MovementComponent)
-		// sys.Add(&car.BasicEntity, car.PhysicsComponent, car.SpatialComponent, false)
 		case *systems.RenderSystem:
-			// 	sys.Add(&background.BasicEntity, background.SpatialComponent, background.AppearanceComponent)
 			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.AppearanceComponent)
-			// 	sys.Add(&car.BasicEntity, car.SpatialComponent, car.AppearanceComponent)
-			// 	sys.Add(&topMask.BasicEntity, topMask.SpatialComponent, topMask.AppearanceComponent)
-			// 	sys.Add(&bottomMask.BasicEntity, bottomMask.SpatialComponent, bottomMask.AppearanceComponent)
-			// case *systems.CollisionSystem:
-			// 	sys.Add(&player.BasicEntity, player.SpatialComponent)
+		case *systems.CollisionSystem:
+			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
 			// 	sys.Add(&car.BasicEntity, car.SpatialComponent)
 		}
 	}
