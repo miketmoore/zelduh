@@ -30,8 +30,25 @@ type CollisionSystem struct {
 }
 
 // New is called by World when the system is added (I think)
-func (*CollisionSystem) New(*ecs.World) {
+func (s *CollisionSystem) New(*ecs.World) {
 	fmt.Println("CollisionSystem was added to the Scene")
+	s.Mailbox.Listen("CollisionMessage", func(msg message.Message) {
+		fmt.Printf("Inbox alert: %v", msg.Type())
+
+		collision, isCollision := msg.(CollisionMessage)
+		// fmt.Printf("%v %v\n", x, y)
+
+		if isCollision {
+			// See if we also have that Entity, and if so, change the speed
+			for _, e := range s.entities {
+				if e.ID() == collision.Entity.BasicEntity.ID() {
+					// e.SpeedComponent.X *= -1
+					fmt.Println("YES")
+					fmt.Printf("Yes %v\n", e.SpatialComponent)
+				}
+			}
+		}
+	})
 }
 
 // Add defines which components are required for an entity in this system and adds it

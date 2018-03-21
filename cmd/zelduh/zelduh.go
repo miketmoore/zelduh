@@ -248,10 +248,12 @@ func run() {
 	// Listen inside systems
 	// Create "New" methods for systems and start listening inside this method
 	// When message is received, loop through this system's entities and look for an ID match
-	messageManager.Listen("CollisionMessage", func(msg message.Message) {
-		fmt.Printf("Inbox alert: %v", msg.Type())
+	// messageManager.Listen("CollisionMessage", func(msg message.Message) {
+	// fmt.Printf("Inbox alert: %v", msg.Type())
 
-	})
+	// collision, isCollision := msg.(systems.CollisionMessage)
+	// fmt.Printf("%v %v\n", x, y)
+	// })
 
 	for !win.Closed() {
 
