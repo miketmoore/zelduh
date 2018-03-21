@@ -4,12 +4,15 @@ import (
 	"fmt"
 
 	"engo.io/ecs"
+	"github.com/faiface/pixel"
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/direction"
 )
 
 type spatialEntity struct {
 	ecs.BasicEntity
 	*components.SpatialComponent
+	*components.MovementComponent
 }
 
 // SpatialSystem updates spatial component data based on physics component data
@@ -26,10 +29,12 @@ func (*SpatialSystem) New(*ecs.World) {
 func (s *SpatialSystem) Add(
 	basic *ecs.BasicEntity,
 	space *components.SpatialComponent,
+	movement *components.MovementComponent,
 ) {
 	s.entities = append(s.entities, spatialEntity{
-		BasicEntity:      *basic,
-		SpatialComponent: space,
+		BasicEntity:       *basic,
+		SpatialComponent:  space,
+		MovementComponent: movement,
 	})
 }
 
@@ -51,6 +56,20 @@ func (s *SpatialSystem) Remove(basic ecs.BasicEntity) {
 // dt is the time in seconds since the last frame
 func (s *SpatialSystem) Update(dt float32) {
 	for _, entity := range s.entities {
-		fmt.Printf("SpatialSystem Update loop %v\n", entity)
+		// fmt.Printf("SpatialSystem Update loop %v\n", entity)
+		if entity.MovementComponent.Moving {
+			var v pixel.Vec
+			switch entity.MovementComponent.Direction {
+			case direction.Up:
+				v = pixel.V(0, 1)
+			case direction.Right:
+				v = pixel.V(1, 0)
+			case direction.Down:
+				v = pixel.V(0, -1)
+			case direction.Left:
+				v = pixel.V(-1, 0)
+			}
+			entity.SpatialComponent.Rect = entity.SpatialComponent.Rect.Moved(v)
+		}
 	}
 }

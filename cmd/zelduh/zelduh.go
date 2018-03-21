@@ -196,7 +196,7 @@ func run() {
 		// 	sys.Add(&player.BasicEntity, player.VehicleInputComponent, player.PhysicsComponent)
 		// 	sys.Add(&car.BasicEntity, car.VehicleInputComponent, car.PhysicsComponent)
 		case *systems.SpatialSystem:
-			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
+			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.MovementComponent)
 		// sys.Add(&car.BasicEntity, car.PhysicsComponent, car.SpatialComponent, false)
 		case *systems.RenderSystem:
 			// 	sys.Add(&background.BasicEntity, background.SpatialComponent, background.AppearanceComponent)
