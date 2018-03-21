@@ -16,6 +16,7 @@ import (
 	"github.com/faiface/pixel/text"
 	"github.com/miketmoore/zelduh/collision"
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/enemy"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/entity"
@@ -107,6 +108,7 @@ func run() {
 	world := ecs.World{}
 	world.AddSystem(&systems.SpatialSystem{})
 	world.AddSystem(&systems.RenderSystem{Win: win})
+	world.AddSystem(&systems.PlayerInputSystem{Win: win})
 
 	coins := []entity.Entity{}
 
@@ -151,6 +153,10 @@ func run() {
 			),
 			Shape: imdraw.New(nil),
 		},
+		MovementComponent: &components.MovementComponent{
+			Moving:    false,
+			Direction: direction.Down,
+		},
 	}
 
 	// Create enemies
@@ -184,8 +190,8 @@ func run() {
 	// Add entities and components to systems
 	for _, system := range world.Systems() {
 		switch sys := system.(type) {
-		// case *systems.PlayerInputSystem:
-		// sys.Add(&playerEntity.BasicEntity, player.PlayerInputComponent, player.VehicleInputComponent)
+		case *systems.PlayerInputSystem:
+			sys.Add(&playerEntity.BasicEntity, playerEntity.MovementComponent)
 		// case *systems.PhysicsSystem:
 		// 	sys.Add(&player.BasicEntity, player.VehicleInputComponent, player.PhysicsComponent)
 		// 	sys.Add(&car.BasicEntity, car.VehicleInputComponent, car.PhysicsComponent)

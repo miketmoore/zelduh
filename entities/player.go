@@ -12,4 +12,5 @@ type Player struct {
 	Win *pixelgl.Window
 	*components.AppearanceComponent
 	*components.SpatialComponent
+	*components.MovementComponent
 }
