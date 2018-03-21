@@ -243,8 +243,14 @@ func run() {
 		}
 	}
 
+	// TODO
+	// https://github.com/EngoEngine/engo/blob/1b75afe871eca0c876f5884d0e24b86084b968f0/demos/pong/pong.go
+	// Listen inside systems
+	// Create "New" methods for systems and start listening inside this method
+	// When message is received, loop through this system's entities and look for an ID match
 	messageManager.Listen("CollisionMessage", func(msg message.Message) {
 		fmt.Printf("Inbox alert: %v", msg.Type())
+
 	})
 
 	for !win.Closed() {
