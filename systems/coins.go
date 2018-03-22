@@ -19,6 +19,12 @@ type CoinsSystem struct {
 	Mailbox  *message.Manager
 }
 
+// DestroyCoinMessage is used to notify that a coin should be destroyed
+type DestroyCoinMessage struct{}
+
+// Type satisfies the Message interface
+func (DestroyCoinMessage) Type() string { return "DestroyCoinMessage" }
+
 // New is called by World when the system is added (I think)
 func (s *CoinsSystem) New(*ecs.World) {
 	fmt.Println("CoinsSystem was added to the Scene")
@@ -33,10 +39,14 @@ func (s *CoinsSystem) New(*ecs.World) {
 			for _, e := range s.entities {
 				if e.ID() == collision.Entity.BasicEntity.ID() {
 					// e.SpeedComponent.X *= -1
-					// fmt.Println("YES")
+					fmt.Println("CollisionMessage listener, Entity matched")
 					// fmt.Printf("Yes %v\n", e.CoinsComponent)
-					e.CoinsComponent.Coins++
-					fmt.Printf("Player gets a coin: %d\n", e.CoinsComponent.Coins)
+					// e.CoinsComponent.Coins++
+					// fmt.Printf("Player gets a coin: %d\n", e.CoinsComponent.Coins)
+					// Now I want to destroy the coin
+					// s.Mailbox.Dispatch(DestroyCoinMessage{})
+				} else if e.ID() == collision.To.BasicEntity.ID() {
+					fmt.Println("CollisionMessage listener, To matched")
 				}
 			}
 		}

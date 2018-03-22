@@ -263,6 +263,10 @@ func run() {
 	// fmt.Printf("%v %v\n", x, y)
 	// })
 
+	messageManager.Listen("DestroyCoinMessage", func(msg message.Message) {
+		fmt.Printf("DESTROY COIN NOW!\n")
+	})
+
 	for !win.Closed() {
 
 		// For every state, allow quiting by pressing <q>
