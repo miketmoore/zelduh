@@ -39,14 +39,14 @@ func (s *CoinsSystem) New(*ecs.World) {
 			for _, e := range s.entities {
 				if e.ID() == collision.Entity.BasicEntity.ID() {
 					// e.SpeedComponent.X *= -1
-					fmt.Println("CollisionMessage listener, Entity matched")
+					fmt.Printf("CollisionMessage listener, Entity matched: %s\n", collision.EntityType)
 					// fmt.Printf("Yes %v\n", e.CoinsComponent)
 					// e.CoinsComponent.Coins++
 					// fmt.Printf("Player gets a coin: %d\n", e.CoinsComponent.Coins)
 					// Now I want to destroy the coin
 					// s.Mailbox.Dispatch(DestroyCoinMessage{})
 				} else if e.ID() == collision.To.BasicEntity.ID() {
-					fmt.Println("CollisionMessage listener, To matched")
+					fmt.Printf("CollisionMessage listener, To matched: %s\n", collision.ToType)
 				}
 			}
 		}

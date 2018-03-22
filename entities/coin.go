@@ -12,4 +12,5 @@ type Coin struct {
 	Win *pixelgl.Window
 	*components.AppearanceComponent
 	*components.SpatialComponent
+	*components.EntityTypeComponent
 }

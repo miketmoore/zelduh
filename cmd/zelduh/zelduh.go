@@ -148,6 +148,9 @@ func run() {
 
 	playerEntity := entities.Player{
 		BasicEntity: ecs.NewBasic(),
+		EntityTypeComponent: &components.EntityTypeComponent{
+			Type: "player",
+		},
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Green,
 		},
@@ -181,6 +184,9 @@ func run() {
 	coinEntities := []entities.Coin{
 		entities.Coin{
 			BasicEntity: ecs.NewBasic(),
+			EntityTypeComponent: &components.EntityTypeComponent{
+				Type: "coin",
+			},
 			AppearanceComponent: &components.AppearanceComponent{
 				Color: colornames.Yellow,
 			},
@@ -242,9 +248,9 @@ func run() {
 				sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.AppearanceComponent)
 			}
 		case *systems.CollisionSystem:
-			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent)
+			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.EntityTypeComponent)
 			for _, coin := range coinEntities {
-				sys.Add(&coin.BasicEntity, coin.SpatialComponent)
+				sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.EntityTypeComponent)
 			}
 		case *systems.CoinsSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.CoinsComponent)

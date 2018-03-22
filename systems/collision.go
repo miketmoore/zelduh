@@ -10,8 +10,10 @@ import (
 
 // CollisionMessage is sent whenever a collision is detected by the CollisionSystem.
 type CollisionMessage struct {
-	Entity collisionEntity
-	To     collisionEntity
+	Entity     collisionEntity
+	EntityType string
+	To         collisionEntity
+	ToType     string
 	// Groups CollisionGroup
 }
 
@@ -21,6 +23,7 @@ func (CollisionMessage) Type() string { return "CollisionMessage" }
 type collisionEntity struct {
 	ecs.BasicEntity
 	*components.SpatialComponent
+	*components.EntityTypeComponent
 }
 
 // CollisionSystem determines effect of vehicle input on vehicle physics
@@ -38,10 +41,12 @@ func (s *CollisionSystem) New(*ecs.World) {
 func (s *CollisionSystem) Add(
 	basic *ecs.BasicEntity,
 	spatial *components.SpatialComponent,
+	entityType *components.EntityTypeComponent,
 ) {
 	s.entities = append(s.entities, collisionEntity{
-		BasicEntity:      *basic,
-		SpatialComponent: spatial,
+		BasicEntity:         *basic,
+		SpatialComponent:    spatial,
+		EntityTypeComponent: entityType,
 	})
 }
 
@@ -69,11 +74,14 @@ func (s *CollisionSystem) Update(dt float32) {
 				if entity.SpatialComponent.Rect.Contains(entityB.SpatialComponent.Rect.Min) ||
 					entity.SpatialComponent.Rect.Contains(entityB.SpatialComponent.Rect.Max) {
 					fmt.Println("Collision!")
-					// Determine what to do
+					// TODO Determine what to do
+					// How do I know which is the player and which is the coin?
 					// If one is a coin and the other is a player...
 					s.Mailbox.Dispatch(CollisionMessage{
-						Entity: entity,
-						To:     entityB,
+						Entity:     entity,
+						EntityType: entity.EntityTypeComponent.Type,
+						To:         entityB,
+						ToType:     entity.EntityTypeComponent.Type,
 					})
 				}
 			}
