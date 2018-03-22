@@ -11,4 +11,5 @@ type Player struct {
 	*components.AppearanceComponent
 	*components.SpatialComponent
 	*components.MovementComponent
+	*components.CoinsComponent
 }

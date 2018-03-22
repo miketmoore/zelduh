@@ -115,6 +115,9 @@ func run() {
 	world.AddSystem(&systems.CollisionSystem{
 		Mailbox: &messageManager,
 	})
+	world.AddSystem(&systems.CoinsSystem{
+		Mailbox: &messageManager,
+	})
 
 	coins := []entity.Entity{}
 
@@ -169,6 +172,9 @@ func run() {
 			Moving:    false,
 			Direction: direction.Down,
 			Speed:     4.0,
+		},
+		CoinsComponent: &components.CoinsComponent{
+			Coins: 0,
 		},
 	}
 
@@ -240,6 +246,8 @@ func run() {
 			for _, coin := range coinEntities {
 				sys.Add(&coin.BasicEntity, coin.SpatialComponent)
 			}
+		case *systems.CoinsSystem:
+			sys.Add(&playerEntity.BasicEntity, playerEntity.CoinsComponent)
 		}
 	}
 
