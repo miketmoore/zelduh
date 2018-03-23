@@ -474,7 +474,7 @@ func buildPlayerEntity() entities.Player {
 			Direction: direction.Down,
 			Speed:     4.0,
 		},
-		CoinsComponent: &components.CoinsComponent{
+		CoinsComponent: &systems.CoinsComponent{
 			Coins: 0,
 		},
 	}

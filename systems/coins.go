@@ -4,13 +4,17 @@ import (
 	"fmt"
 
 	"engo.io/ecs"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/message"
 )
 
+// CoinsComponent contains info about an entity's coins
+type CoinsComponent struct {
+	Coins int
+}
+
 type coinsEntity struct {
 	ecs.BasicEntity
-	*components.CoinsComponent
+	*CoinsComponent
 }
 
 // CoinsSystem determines effect of vehicle input on vehicle physics
@@ -49,7 +53,7 @@ func (s *CoinsSystem) New(*ecs.World) {
 // Add defines which components are required for an entity in this system and adds it
 func (s *CoinsSystem) Add(
 	basic *ecs.BasicEntity,
-	coins *components.CoinsComponent,
+	coins *CoinsComponent,
 ) {
 	s.entities = append(s.entities, coinsEntity{
 		BasicEntity:    *basic,
