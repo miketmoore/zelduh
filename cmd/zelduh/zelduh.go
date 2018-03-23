@@ -115,14 +115,13 @@ func run() {
 	coins := buildCoins()
 	player := buildPlayer()
 	enemies := buildEnemies()
+	sword := buildSword()
 
 	// New entities
 	playerEntity := buildPlayerEntity()
 	coinEntities := buildCoinEntities()
 
 	currentState := gamestate.Start
-
-	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
 
 	// Add entities and components to systems
 	for _, system := range world.Systems() {
@@ -532,4 +531,8 @@ func buildEnemies() []enemy.Enemy {
 		enemies = append(enemies, enemy)
 	}
 	return enemies
+}
+
+func buildSword() equipment.Sword {
+	return equipment.NewSword(win, spriteSize, sprites["sword"])
 }
