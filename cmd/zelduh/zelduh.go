@@ -90,13 +90,15 @@ var spriteMap = map[string]float64{
 	"coinC":               395,
 }
 
+var sprites map[string]*pixel.Sprite
+
 func run() {
 	// Initializations
 	t = initI18n()
 	txt = initText(20, 50, palette.Map[palette.Darkest])
 	win = initWindow(t("title"), winX, winY, winW, winH)
 	pic = loadPicture(spritePlayerPath)
-	sprites := buildSpriteMap(pic, spriteMap)
+	sprites = buildSpriteMap(pic, spriteMap)
 	messageManager := message.Manager{}
 	world := ecs.World{}
 	world.AddSystem(&systems.SpatialSystem{})
@@ -109,115 +111,14 @@ func run() {
 		Mailbox: &messageManager,
 	})
 
-	coins := []entity.Entity{}
+	// Old "entities"... phasing out
+	coins := buildCoins()
+	player := buildPlayer()
+	enemies := buildEnemies()
 
-	coinX := mapX
-	coinY := mapY
-	for i := 0; i < 12; i++ {
-		coin := entity.New(win, spriteSize, pixel.V(coinX, coinY), []*pixel.Sprite{
-			sprites["coinA"],
-			sprites["coinB"],
-			sprites["coinC"],
-		}, 7)
-		coins = append(coins, coin)
-		coinX = mapX + float64(r.Intn(12)*48)
-		coinY += 48
-	}
-
-	// Init player character
-	player := player.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
-		"downA":  sprites["playerDownA"],
-		"downB":  sprites["playerDownB"],
-		"upA":    sprites["playerUpA"],
-		"upB":    sprites["playerUpB"],
-		"rightA": sprites["playerRightA"],
-		"rightB": sprites["playerRightB"],
-		"leftA":  sprites["playerLeftA"],
-		"leftB":  sprites["playerLeftB"],
-	}, pixel.V(mapX+(mapW/2), mapY+(mapH/2)))
-
-	playerEntity := entities.Player{
-		BasicEntity: ecs.NewBasic(),
-		EntityTypeComponent: &components.EntityTypeComponent{
-			Type: "player",
-		},
-		AppearanceComponent: &components.AppearanceComponent{
-			Color: colornames.Green,
-		},
-		SpatialComponent: &components.SpatialComponent{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect: pixel.R(
-				mapX+(mapW/2),
-				mapY+(mapH/2),
-				mapX+(mapW/2)+spriteSize,
-				mapY+(mapH/2)+spriteSize,
-			),
-			BoundsRect: pixel.R(
-				mapX,
-				mapY,
-				mapX+mapW,
-				mapY+mapH,
-			),
-			Shape: imdraw.New(nil),
-		},
-		MovementComponent: &components.MovementComponent{
-			Moving:    false,
-			Direction: direction.Down,
-			Speed:     4.0,
-		},
-		CoinsComponent: &components.CoinsComponent{
-			Coins: 0,
-		},
-	}
-
-	coinEntities := []entities.Coin{
-		entities.Coin{
-			BasicEntity: ecs.NewBasic(),
-			EntityTypeComponent: &components.EntityTypeComponent{
-				Type: "coin",
-			},
-			AppearanceComponent: &components.AppearanceComponent{
-				Color: colornames.Yellow,
-			},
-			SpatialComponent: &components.SpatialComponent{
-				Width:  spriteSize,
-				Height: spriteSize,
-				Rect: pixel.R(
-					mapX,
-					mapY,
-					mapX+spriteSize,
-					mapY+spriteSize,
-				),
-				BoundsRect: pixel.R(
-					mapX,
-					mapY,
-					mapX+mapW,
-					mapY+mapH,
-				),
-				Shape: imdraw.New(nil),
-			},
-		},
-	}
-
-	// Create enemies
-	enemies := []enemy.Enemy{}
-	enemySprites := map[string]*pixel.Sprite{
-		"downA":  sprites["turtleNoShellDownA"],
-		"downB":  sprites["turtleNoShellDownB"],
-		"upA":    sprites["turtleNoShellUpA"],
-		"upB":    sprites["turtleNoShellUpB"],
-		"rightA": sprites["turtleNoShellRightA"],
-		"rightB": sprites["turtleNoShellRightB"],
-		"leftA":  sprites["turtleNoShellLeftA"],
-		"leftB":  sprites["turtleNoShellLeftB"],
-	}
-	for i := 0; i < 5; i++ {
-		x := float64(r.Intn(int(mapW-spriteSize))) + mapX
-		y := float64(r.Intn(int(mapH-spriteSize))) + mapY
-		var enemy = enemy.New(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
-		enemies = append(enemies, enemy)
-	}
+	// New entities
+	playerEntity := buildPlayerEntity()
+	coinEntities := buildCoinEntities()
 
 	currentState := gamestate.Start
 
@@ -511,11 +412,124 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-// func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.RGBA) {
-// 	s := imdraw.New(nil)
-// 	s.Push(origin)
-// 	s.Push(pixel.V(origin.X+w, origin.Y+h))
-// 	s.Color = color
-// 	s.Rectangle(0)
-// 	s.Draw(win)
-// }
+func buildCoins() []entity.Entity {
+	coins := []entity.Entity{}
+
+	coinX := mapX
+	coinY := mapY
+	for i := 0; i < 12; i++ {
+		coin := entity.New(win, spriteSize, pixel.V(coinX, coinY), []*pixel.Sprite{
+			sprites["coinA"],
+			sprites["coinB"],
+			sprites["coinC"],
+		}, 7)
+		coins = append(coins, coin)
+		coinX = mapX + float64(r.Intn(12)*48)
+		coinY += 48
+	}
+
+	return coins
+}
+
+func buildPlayer() player.Player {
+	return player.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
+		"downA":  sprites["playerDownA"],
+		"downB":  sprites["playerDownB"],
+		"upA":    sprites["playerUpA"],
+		"upB":    sprites["playerUpB"],
+		"rightA": sprites["playerRightA"],
+		"rightB": sprites["playerRightB"],
+		"leftA":  sprites["playerLeftA"],
+		"leftB":  sprites["playerLeftB"],
+	}, pixel.V(mapX+(mapW/2), mapY+(mapH/2)))
+}
+
+func buildPlayerEntity() entities.Player {
+	return entities.Player{
+		BasicEntity: ecs.NewBasic(),
+		EntityTypeComponent: &components.EntityTypeComponent{
+			Type: "player",
+		},
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Green,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect: pixel.R(
+				mapX+(mapW/2),
+				mapY+(mapH/2),
+				mapX+(mapW/2)+spriteSize,
+				mapY+(mapH/2)+spriteSize,
+			),
+			BoundsRect: pixel.R(
+				mapX,
+				mapY,
+				mapX+mapW,
+				mapY+mapH,
+			),
+			Shape: imdraw.New(nil),
+		},
+		MovementComponent: &components.MovementComponent{
+			Moving:    false,
+			Direction: direction.Down,
+			Speed:     4.0,
+		},
+		CoinsComponent: &components.CoinsComponent{
+			Coins: 0,
+		},
+	}
+}
+
+func buildCoinEntities() []entities.Coin {
+	return []entities.Coin{
+		entities.Coin{
+			BasicEntity: ecs.NewBasic(),
+			EntityTypeComponent: &components.EntityTypeComponent{
+				Type: "coin",
+			},
+			AppearanceComponent: &components.AppearanceComponent{
+				Color: colornames.Yellow,
+			},
+			SpatialComponent: &components.SpatialComponent{
+				Width:  spriteSize,
+				Height: spriteSize,
+				Rect: pixel.R(
+					mapX,
+					mapY,
+					mapX+spriteSize,
+					mapY+spriteSize,
+				),
+				BoundsRect: pixel.R(
+					mapX,
+					mapY,
+					mapX+mapW,
+					mapY+mapH,
+				),
+				Shape: imdraw.New(nil),
+			},
+		},
+	}
+}
+
+func buildEnemies() []enemy.Enemy {
+	// Create enemies
+	enemies := []enemy.Enemy{}
+	enemySprites := map[string]*pixel.Sprite{
+		"downA":  sprites["turtleNoShellDownA"],
+		"downB":  sprites["turtleNoShellDownB"],
+		"upA":    sprites["turtleNoShellUpA"],
+		"upB":    sprites["turtleNoShellUpB"],
+		"rightA": sprites["turtleNoShellRightA"],
+		"rightB": sprites["turtleNoShellRightB"],
+		"leftA":  sprites["turtleNoShellLeftA"],
+		"leftB":  sprites["turtleNoShellLeftB"],
+	}
+	for i := 0; i < 5; i++ {
+		x := float64(r.Intn(int(mapW-spriteSize))) + mapX
+		y := float64(r.Intn(int(mapH-spriteSize))) + mapY
+		var enemy = enemy.New(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
+		enemies = append(enemies, enemy)
+	}
+	return enemies
+}
