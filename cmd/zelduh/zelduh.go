@@ -64,32 +64,10 @@ var spritePlayerPath = "assets/bink-spritesheet-01.png"
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func run() {
-	// i18n
-	i18n.MustLoadTranslationFile(translationFile)
-	T, err := i18n.Tfunc(lang)
-	if err != nil {
-		panic(err)
-	}
-
-	// Setup Text
-	orig := pixel.V(20, 50)
-	txt := text.New(orig, text.Atlas7x13)
-	txt.Color = palette.Map[palette.Darkest]
-
-	coordDebugTxtOrig := pixel.V(5, 5)
-	coordDebugTxt := text.New(coordDebugTxtOrig, text.Atlas7x13)
-	coordDebugTxt.Color = palette.Map[palette.Darkest]
-
-	// Setup GUI window
-	cfg := pixelgl.WindowConfig{
-		Title:  T("title"),
-		Bounds: pixel.R(0, 0, winW, winH),
-		VSync:  true,
-	}
-	win, err := pixelgl.NewWindow(cfg)
-	if err != nil {
-		panic(err)
-	}
+	// Initializations
+	t = initI18n()
+	txt = initText(20, 50, palette.Map[palette.Darkest])
+	win = initWindow(t("title"), winX, winY, winW, winH)
 
 	// Load sprite sheet graphic
 	pic, err := loadPicture(spritePlayerPath)
@@ -288,18 +266,15 @@ func run() {
 
 	for !win.Closed() {
 
-		// For every state, allow quiting by pressing <q>
-		if win.JustPressed(pixelgl.KeyQ) {
-			os.Exit(1)
-		}
+		allowQuit()
 
 		switch currentState {
 		case gamestate.Start:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
-			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Lightest])
+			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
 			txt.Color = palette.Map[palette.Darkest]
-			fmt.Fprintln(txt, T("title"))
+			fmt.Fprintln(txt, t("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			// Reset characters to starting positions
@@ -314,7 +289,7 @@ func run() {
 		case gamestate.Game:
 
 			win.Clear(palette.Map[palette.Dark])
-			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Lightest])
+			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
@@ -398,8 +373,8 @@ func run() {
 		case gamestate.Pause:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
-			fmt.Fprintln(txt, T("paused"))
-			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Lightest])
+			fmt.Fprintln(txt, t("paused"))
+			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -411,9 +386,9 @@ func run() {
 		case gamestate.Over:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
-			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Darkest])
+			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Darkest])
 			txt.Color = palette.Map[palette.Darkest]
-			fmt.Fprintln(txt, T("gameOver"))
+			fmt.Fprintln(txt, t("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyEnter) {
@@ -428,6 +403,60 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func initI18n() i18n.TranslateFunc {
+	i18n.LoadTranslationFile(translationFile)
+	T, err := i18n.Tfunc(lang)
+	if err != nil {
+		fmt.Println("Initializing i18n failed:")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	return T
+}
+
+func initText(x, y float64, color color.RGBA) *text.Text {
+	orig := pixel.V(x, y)
+	txt := text.New(orig, text.Atlas7x13)
+	txt.Color = color
+	return txt
+}
+
+func initWindow(title string, x, y, w, h float64) *pixelgl.Window {
+	cfg := pixelgl.WindowConfig{
+		Title:  title,
+		Bounds: pixel.R(x, y, w, h),
+		VSync:  true,
+	}
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		fmt.Println("Initializing GUI window failed:")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	return win
+}
+
+func allowQuit() {
+	if win.JustPressed(pixelgl.KeyQ) {
+		os.Exit(1)
+	}
+}
+
+func drawCenterText(s string, c color.RGBA) {
+	txt.Color = c
+	fmt.Fprintln(txt, s)
+	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+}
+
+func drawMapBG(x, y, w, h float64, color color.Color) {
+	s := imdraw.New(nil)
+	s.Color = color
+	s.Push(pixel.V(x, y))
+	s.Push(pixel.V(x+w, y+h))
+	s.Rectangle(0)
+	s.Draw(win)
 }
 
 func buildSpriteMap(pic pixel.Picture, config map[string]float64) map[string]*pixel.Sprite {
@@ -481,11 +510,11 @@ func loadPicture(path string) (pixel.Picture, error) {
 	return pixel.PictureDataFromImage(img), nil
 }
 
-func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.RGBA) {
-	s := imdraw.New(nil)
-	s.Push(origin)
-	s.Push(pixel.V(origin.X+w, origin.Y+h))
-	s.Color = color
-	s.Rectangle(0)
-	s.Draw(win)
-}
+// func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.RGBA) {
+// 	s := imdraw.New(nil)
+// 	s.Push(origin)
+// 	s.Push(pixel.V(origin.X+w, origin.Y+h))
+// 	s.Color = color
+// 	s.Rectangle(0)
+// 	s.Draw(win)
+// }
