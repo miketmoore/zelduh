@@ -2,16 +2,22 @@ package systems
 
 import (
 	"fmt"
+	"image/color"
 
 	"engo.io/ecs"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 )
 
+// AppearanceComponent contains data about visual appearance
+type AppearanceComponent struct {
+	Color color.RGBA
+}
+
 type renderEntity struct {
 	ecs.BasicEntity
 	*components.SpatialComponent
-	*components.AppearanceComponent
+	*AppearanceComponent
 }
 
 // RenderSystem translates player input to vehicle input
@@ -29,7 +35,7 @@ func (*RenderSystem) New(*ecs.World) {
 func (s *RenderSystem) Add(
 	basic *ecs.BasicEntity,
 	spatial *components.SpatialComponent,
-	appearance *components.AppearanceComponent,
+	appearance *AppearanceComponent,
 ) {
 	s.entities = append(s.entities, renderEntity{
 		BasicEntity:         *basic,

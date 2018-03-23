@@ -449,7 +449,7 @@ func buildPlayerEntity() entities.Player {
 		EntityTypeComponent: &components.EntityTypeComponent{
 			Type: "player",
 		},
-		AppearanceComponent: &components.AppearanceComponent{
+		AppearanceComponent: &systems.AppearanceComponent{
 			Color: colornames.Green,
 		},
 		SpatialComponent: &components.SpatialComponent{
@@ -487,7 +487,7 @@ func buildCoinEntities() []entities.Coin {
 			EntityTypeComponent: &components.EntityTypeComponent{
 				Type: "coin",
 			},
-			AppearanceComponent: &components.AppearanceComponent{
+			AppearanceComponent: &systems.AppearanceComponent{
 				Color: colornames.Yellow,
 			},
 			SpatialComponent: &components.SpatialComponent{
