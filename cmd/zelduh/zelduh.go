@@ -56,51 +56,48 @@ var (
 	txt       *text.Text
 	t         i18n.TranslateFunc
 	currState state.State
+	pic       pixel.Picture
 )
 
-const spriteSize float64 = 48
+const (
+	spriteSize       float64 = 48
+	spritePlayerPath string  = "assets/bink-spritesheet-01.png"
+)
 
-var spritePlayerPath = "assets/bink-spritesheet-01.png"
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+var spriteMap = map[string]float64{
+	"playerDownA":         361,
+	"playerDownB":         376,
+	"playerUpA":           362,
+	"playerUpB":           377,
+	"playerRightA":        363,
+	"playerRightB":        378,
+	"playerLeftA":         364,
+	"playerLeftB":         379,
+	"turtleNoShellDownA":  316,
+	"turtleNoShellDownB":  331,
+	"turtleNoShellUpA":    316,
+	"turtleNoShellUpB":    331,
+	"turtleNoShellRightA": 317,
+	"turtleNoShellRightB": 332,
+	"turtleNoShellLeftA":  317,
+	"turtleNoShellLeftB":  332,
+	"sword":               84,
+	"ground":              8,
+	"coinA":               365,
+	"coinB":               380,
+	"coinC":               395,
+}
 
 func run() {
 	// Initializations
 	t = initI18n()
 	txt = initText(20, 50, palette.Map[palette.Darkest])
 	win = initWindow(t("title"), winX, winY, winW, winH)
-
-	// Load sprite sheet graphic
-	pic, err := loadPicture(spritePlayerPath)
-	if err != nil {
-		panic(err)
-	}
-
-	sprites := buildSpriteMap(pic, map[string]float64{
-		"playerDownA":         361,
-		"playerDownB":         376,
-		"playerUpA":           362,
-		"playerUpB":           377,
-		"playerRightA":        363,
-		"playerRightB":        378,
-		"playerLeftA":         364,
-		"playerLeftB":         379,
-		"turtleNoShellDownA":  316,
-		"turtleNoShellDownB":  331,
-		"turtleNoShellUpA":    316,
-		"turtleNoShellUpB":    331,
-		"turtleNoShellRightA": 317,
-		"turtleNoShellRightB": 332,
-		"turtleNoShellLeftA":  317,
-		"turtleNoShellLeftB":  332,
-		"sword":               84,
-		"ground":              8,
-		"coinA":               365,
-		"coinB":               380,
-		"coinC":               395,
-	})
-
+	pic = loadPicture(spritePlayerPath)
+	sprites := buildSpriteMap(pic, spriteMap)
 	messageManager := message.Manager{}
-
 	world := ecs.World{}
 	world.AddSystem(&systems.SpatialSystem{})
 	world.AddSystem(&systems.RenderSystem{Win: win})
@@ -497,17 +494,21 @@ func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
 	})
 }
 
-func loadPicture(path string) (pixel.Picture, error) {
+func loadPicture(path string) pixel.Picture {
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		fmt.Println("Could not open the picture:")
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
-		return nil, err
+		fmt.Println("Could not decode the picture:")
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	return pixel.PictureDataFromImage(img), nil
+	return pixel.PictureDataFromImage(img)
 }
 
 // func drawMapBG(win *pixelgl.Window, origin pixel.Vec, w, h float64, color color.RGBA) {
