@@ -14,6 +14,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/miketmoore/go-pixel-game-template/state"
 	"github.com/miketmoore/zelduh/collision"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -31,22 +32,36 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const winW float64 = 800
-const winH float64 = 800
+const (
+	translationFile = "i18n/zelduh/en-US.all.json"
+	lang            = "en-US"
+)
 
-const mapW float64 = 640
-const mapH float64 = 576
+const (
+	winX float64 = 0
+	winY float64 = 0
+	winW float64 = 800
+	winH float64 = 800
+)
 
-var mapOrigin = pixel.V((winW-mapW)/2, (winH-mapH)/2)
+const (
+	mapW float64 = 640
+	mapH float64 = 576
+	mapX         = (winW - mapW) / 2
+	mapY         = (winH - mapH) / 2
+)
+
+var (
+	win       *pixelgl.Window
+	txt       *text.Text
+	t         i18n.TranslateFunc
+	currState state.State
+)
 
 const spriteSize float64 = 48
 
-const translationFile = "i18n/zelduh/en-US.all.json"
-const lang = "en-US"
-
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
-
 var spritePlayerPath = "assets/bink-spritesheet-01.png"
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func run() {
 	// i18n
@@ -121,8 +136,8 @@ func run() {
 
 	coins := []entity.Entity{}
 
-	coinX := mapOrigin.X
-	coinY := mapOrigin.Y
+	coinX := mapX
+	coinY := mapY
 	for i := 0; i < 12; i++ {
 		coin := entity.New(win, spriteSize, pixel.V(coinX, coinY), []*pixel.Sprite{
 			sprites["coinA"],
@@ -130,7 +145,7 @@ func run() {
 			sprites["coinC"],
 		}, 7)
 		coins = append(coins, coin)
-		coinX = mapOrigin.X + float64(r.Intn(12)*48)
+		coinX = mapX + float64(r.Intn(12)*48)
 		coinY += 48
 	}
 
@@ -144,7 +159,7 @@ func run() {
 		"rightB": sprites["playerRightB"],
 		"leftA":  sprites["playerLeftA"],
 		"leftB":  sprites["playerLeftB"],
-	}, pixel.V(mapOrigin.X+(mapW/2), mapOrigin.Y+(mapH/2)))
+	}, pixel.V(mapX+(mapW/2), mapY+(mapH/2)))
 
 	playerEntity := entities.Player{
 		BasicEntity: ecs.NewBasic(),
@@ -158,16 +173,16 @@ func run() {
 			Width:  spriteSize,
 			Height: spriteSize,
 			Rect: pixel.R(
-				mapOrigin.X+(mapW/2),
-				mapOrigin.Y+(mapH/2),
-				mapOrigin.X+(mapW/2)+spriteSize,
-				mapOrigin.Y+(mapH/2)+spriteSize,
+				mapX+(mapW/2),
+				mapY+(mapH/2),
+				mapX+(mapW/2)+spriteSize,
+				mapY+(mapH/2)+spriteSize,
 			),
 			BoundsRect: pixel.R(
-				mapOrigin.X,
-				mapOrigin.Y,
-				mapOrigin.X+mapW,
-				mapOrigin.Y+mapH,
+				mapX,
+				mapY,
+				mapX+mapW,
+				mapY+mapH,
 			),
 			Shape: imdraw.New(nil),
 		},
@@ -194,16 +209,16 @@ func run() {
 				Width:  spriteSize,
 				Height: spriteSize,
 				Rect: pixel.R(
-					mapOrigin.X,
-					mapOrigin.Y,
-					mapOrigin.X+spriteSize,
-					mapOrigin.Y+spriteSize,
+					mapX,
+					mapY,
+					mapX+spriteSize,
+					mapY+spriteSize,
 				),
 				BoundsRect: pixel.R(
-					mapOrigin.X,
-					mapOrigin.Y,
-					mapOrigin.X+mapW,
-					mapOrigin.Y+mapH,
+					mapX,
+					mapY,
+					mapX+mapW,
+					mapY+mapH,
 				),
 				Shape: imdraw.New(nil),
 			},
@@ -223,8 +238,8 @@ func run() {
 		"leftB":  sprites["turtleNoShellLeftB"],
 	}
 	for i := 0; i < 5; i++ {
-		x := float64(r.Intn(int(mapW-spriteSize))) + mapOrigin.X
-		y := float64(r.Intn(int(mapH-spriteSize))) + mapOrigin.Y
+		x := float64(r.Intn(int(mapW-spriteSize))) + mapX
+		y := float64(r.Intn(int(mapH-spriteSize))) + mapY
 		var enemy = enemy.New(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
 		enemies = append(enemies, enemy)
 	}
@@ -232,8 +247,6 @@ func run() {
 	currentState := gamestate.Start
 
 	sword := equipment.NewSword(win, spriteSize, sprites["sword"])
-
-	mapOrigin := pixel.V(mapOrigin.X, mapOrigin.Y)
 
 	// Add entities and components to systems
 	for _, system := range world.Systems() {
@@ -284,7 +297,7 @@ func run() {
 		case gamestate.Start:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
-			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
+			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Lightest])
 			txt.Color = palette.Map[palette.Darkest]
 			fmt.Fprintln(txt, T("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
@@ -301,7 +314,7 @@ func run() {
 		case gamestate.Game:
 
 			win.Clear(palette.Map[palette.Dark])
-			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
+			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Lightest])
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
@@ -341,19 +354,19 @@ func run() {
 
 				// Draw enemy if not dead
 				if !enemies[i].IsDead() {
-					enemies[i].Draw(mapOrigin.X, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.Y+mapH)
+					enemies[i].Draw(mapX, mapY, mapX+mapW, mapY+mapH)
 				}
 
 			}
 
 			if win.Pressed(pixelgl.KeyUp) {
-				player.Move(mvmt.DirectionYPos, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+				player.Move(mvmt.DirectionYPos, mapY+mapH, mapY, mapX+mapW, mapX)
 			} else if win.Pressed(pixelgl.KeyRight) {
-				player.Move(mvmt.DirectionXPos, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+				player.Move(mvmt.DirectionXPos, mapY+mapH, mapY, mapX+mapW, mapX)
 			} else if win.Pressed(pixelgl.KeyDown) {
-				player.Move(mvmt.DirectionYNeg, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+				player.Move(mvmt.DirectionYNeg, mapY+mapH, mapY, mapX+mapW, mapX)
 			} else if win.Pressed(pixelgl.KeyLeft) {
-				player.Move(mvmt.DirectionXNeg, mapOrigin.Y+mapH, mapOrigin.Y, mapOrigin.X+mapW, mapOrigin.X)
+				player.Move(mvmt.DirectionXNeg, mapY+mapH, mapY, mapX+mapW, mapX)
 			}
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -386,7 +399,7 @@ func run() {
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
 			fmt.Fprintln(txt, T("paused"))
-			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Lightest])
+			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Lightest])
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -398,7 +411,7 @@ func run() {
 		case gamestate.Over:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
-			drawMapBG(win, mapOrigin, mapW, mapH, palette.Map[palette.Darkest])
+			drawMapBG(win, pixel.V(mapX, mapY), mapW, mapH, palette.Map[palette.Darkest])
 			txt.Color = palette.Map[palette.Darkest]
 			fmt.Fprintln(txt, T("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
