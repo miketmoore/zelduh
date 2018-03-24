@@ -28,6 +28,7 @@ import (
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
 	"github.com/miketmoore/zelduh/playerinput"
+	"github.com/miketmoore/zelduh/spatial"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/miketmoore/zelduh/world"
 	"github.com/nicksnyder/go-i18n/i18n"
@@ -116,6 +117,7 @@ func run() {
 	customWorld := world.New()
 
 	customWorld.AddSystem(&playerinput.System{Win: win})
+	customWorld.AddSystem(&spatial.System{})
 	customWorld.AddSystem(&collision.System{})
 
 	// Old "entities"... phasing out
@@ -135,6 +137,8 @@ func run() {
 		switch sys := system.(type) {
 		case *playerinput.System:
 			sys.AddPlayer(playerEntity.MovementComponent)
+		case *spatial.System:
+			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
 		case *collision.System:
 			sys.AddPlayer(playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
