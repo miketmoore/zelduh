@@ -28,30 +28,18 @@ func (s *System) Update() {
 	win := s.Win
 	player := s.playerEntity
 
+	player.PhysicsComponent.ForceUp = 0
+	player.PhysicsComponent.ForceRight = 0
+	player.PhysicsComponent.ForceDown = 0
+	player.PhysicsComponent.ForceLeft = 0
+
 	if win.Pressed(pixelgl.KeyUp) {
 		player.PhysicsComponent.ForceUp = 1
-		player.PhysicsComponent.ForceRight = 0
-		player.PhysicsComponent.ForceDown = 0
-		player.PhysicsComponent.ForceLeft = 0
 	} else if win.Pressed(pixelgl.KeyRight) {
-		player.PhysicsComponent.ForceUp = 0
 		player.PhysicsComponent.ForceRight = 1
-		player.PhysicsComponent.ForceDown = 0
-		player.PhysicsComponent.ForceLeft = 0
 	} else if win.Pressed(pixelgl.KeyDown) {
-		player.PhysicsComponent.ForceUp = 0
-		player.PhysicsComponent.ForceRight = 0
 		player.PhysicsComponent.ForceDown = 1
-		player.PhysicsComponent.ForceLeft = 0
 	} else if win.Pressed(pixelgl.KeyLeft) {
-		player.PhysicsComponent.ForceUp = 0
-		player.PhysicsComponent.ForceRight = 0
-		player.PhysicsComponent.ForceDown = 0
 		player.PhysicsComponent.ForceLeft = 1
-	} else {
-		player.PhysicsComponent.ForceUp = 0
-		player.PhysicsComponent.ForceRight = 0
-		player.PhysicsComponent.ForceDown = 0
-		player.PhysicsComponent.ForceLeft = 0
 	}
 }
