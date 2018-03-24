@@ -5,13 +5,12 @@ import (
 
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
-	"github.com/miketmoore/zelduh/systems"
 )
 
 type renderEntity struct {
 	ID int
 	*components.SpatialComponent
-	*systems.AppearanceComponent
+	*components.AppearanceComponent
 }
 
 // System is a custom system
@@ -23,7 +22,7 @@ type System struct {
 }
 
 // AddPlayer adds the player to the system
-func (s *System) AddPlayer(appearance *systems.AppearanceComponent, spatial *components.SpatialComponent) {
+func (s *System) AddPlayer(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.playerEntity = renderEntity{
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
@@ -31,7 +30,7 @@ func (s *System) AddPlayer(appearance *systems.AppearanceComponent, spatial *com
 }
 
 // AddCoin adds the player to the system
-func (s *System) AddCoin(id int, appearance *systems.AppearanceComponent, spatial *components.SpatialComponent) {
+func (s *System) AddCoin(id int, appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	fmt.Printf("render.System.AddCoin() id %d\n", id)
 	s.coins = append(s.coins, renderEntity{
 		ID:                  id,
@@ -41,7 +40,7 @@ func (s *System) AddCoin(id int, appearance *systems.AppearanceComponent, spatia
 }
 
 // AddEnemy adds an enemy to the system
-func (s *System) AddEnemy(id int, appearance *systems.AppearanceComponent, spatial *components.SpatialComponent) {
+func (s *System) AddEnemy(id int, appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.enemies = append(s.enemies, renderEntity{
 		ID:                  id,
 		AppearanceComponent: appearance,

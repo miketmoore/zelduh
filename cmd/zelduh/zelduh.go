@@ -23,7 +23,6 @@ import (
 	"github.com/miketmoore/zelduh/playerinput"
 	"github.com/miketmoore/zelduh/render"
 	"github.com/miketmoore/zelduh/spatial"
-	"github.com/miketmoore/zelduh/systems"
 	"github.com/miketmoore/zelduh/world"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
@@ -329,7 +328,7 @@ func loadPicture(path string) pixel.Picture {
 
 func buildPlayerEntity() entities.Player {
 	return entities.Player{
-		AppearanceComponent: &systems.AppearanceComponent{
+		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Green,
 		},
 		SpatialComponent: &components.SpatialComponent{
@@ -369,7 +368,7 @@ func buildCoinEntities(w world.World) []entities.Coin {
 	for i := 0; i < totalCoins; i++ {
 		coins = append(coins, entities.Coin{
 			ID: w.NewEntityID(),
-			AppearanceComponent: &systems.AppearanceComponent{
+			AppearanceComponent: &components.AppearanceComponent{
 				Color: colornames.Yellow,
 			},
 			SpatialComponent: &components.SpatialComponent{
@@ -406,7 +405,7 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 		yInc := float64(i) * spriteSize
 		enemies = append(enemies, entities.Enemy{
 			ID: w.NewEntityID(),
-			AppearanceComponent: &systems.AppearanceComponent{
+			AppearanceComponent: &components.AppearanceComponent{
 				Color: colornames.Red,
 			},
 			SpatialComponent: &components.SpatialComponent{
