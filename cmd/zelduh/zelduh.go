@@ -403,6 +403,7 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 	y := mapY
 
 	for i := 0; i < 5; i++ {
+		yInc := float64(i) * spriteSize
 		enemies = append(enemies, entities.Enemy{
 			ID: w.NewEntityID(),
 			AppearanceComponent: &systems.AppearanceComponent{
@@ -413,9 +414,9 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 				Height: spriteSize,
 				Rect: pixel.R(
 					x,
-					y+(float64(i)*spriteSize),
+					y+yInc,
 					x+spriteSize,
-					y+(float64(i)*spriteSize)+spriteSize,
+					y+yInc+spriteSize,
 				),
 				BoundsRect: pixel.R(
 					mapX,
