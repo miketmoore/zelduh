@@ -197,10 +197,10 @@ func run() {
 				currentState = gamestate.Start
 			}
 		case gamestate.Over:
-			win.Clear(palette.Map[palette.Dark])
+			win.Clear(palette.Map[palette.Darkest])
 			txt.Clear()
 			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Darkest])
-			txt.Color = palette.Map[palette.Darkest]
+			txt.Color = palette.Map[palette.Lightest]
 			fmt.Fprintln(txt, t("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
