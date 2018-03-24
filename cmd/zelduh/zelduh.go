@@ -104,6 +104,7 @@ func run() {
 	// New entities
 	playerEntity := buildPlayerEntity()
 	coinEntities := buildCoinEntities(gameWorld)
+	enemyEntities := buildEnemyEntities(gameWorld)
 
 	gameWorld.AddSystem(&playerinput.System{Win: win})
 	gameWorld.AddSystem(&spatial.System{})
@@ -114,6 +115,9 @@ func run() {
 			playerEntity.CoinsComponent.Coins++
 			fmt.Printf("After: %d\n", playerEntity.CoinsComponent.Coins)
 			gameWorld.RemoveCoin(coinID)
+		},
+		PlayerCollisionWithEnemy: func(enemyID int) {
+			fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
 		},
 	})
 
@@ -126,15 +130,24 @@ func run() {
 			sys.AddPlayer(playerEntity.MovementComponent)
 		case *spatial.System:
 			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
+			for _, enemy := range enemyEntities {
+				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
+			}
 		case *collision.System:
 			sys.AddPlayer(playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
 				sys.AddCoin(coin.ID, coin.SpatialComponent)
 			}
+			for _, enemy := range enemyEntities {
+				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
+			}
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
 				sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
+			}
+			for _, enemy := range enemyEntities {
+				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
 			}
 		}
 	}
@@ -316,9 +329,6 @@ func loadPicture(path string) pixel.Picture {
 
 func buildPlayerEntity() entities.Player {
 	return entities.Player{
-		EntityTypeComponent: &components.EntityTypeComponent{
-			Type: "player",
-		},
 		AppearanceComponent: &systems.AppearanceComponent{
 			Color: colornames.Green,
 		},
@@ -350,7 +360,7 @@ func buildPlayerEntity() entities.Player {
 	}
 }
 
-func buildCoinEntities(world world.World) []entities.Coin {
+func buildCoinEntities(w world.World) []entities.Coin {
 	coins := []entities.Coin{}
 	yInc := spriteSize
 	x := mapX
@@ -358,7 +368,7 @@ func buildCoinEntities(world world.World) []entities.Coin {
 	totalCoins := 12
 	for i := 0; i < totalCoins; i++ {
 		coins = append(coins, entities.Coin{
-			ID: world.NewEntityID(),
+			ID: w.NewEntityID(),
 			AppearanceComponent: &systems.AppearanceComponent{
 				Color: colornames.Yellow,
 			},
@@ -384,6 +394,39 @@ func buildCoinEntities(world world.World) []entities.Coin {
 		y += yInc
 	}
 	return coins
+}
+
+func buildEnemyEntities(w world.World) []entities.Enemy {
+	enemies := []entities.Enemy{}
+	enemies = append(enemies, entities.Enemy{
+		ID: w.NewEntityID(),
+		AppearanceComponent: &systems.AppearanceComponent{
+			Color: colornames.Red,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect: pixel.R(
+				mapX,
+				mapY,
+				mapX+spriteSize,
+				mapY+spriteSize,
+			),
+			BoundsRect: pixel.R(
+				mapX,
+				mapY,
+				mapX+mapW,
+				mapY+mapH,
+			),
+			Shape: imdraw.New(nil),
+		},
+		MovementComponent: &components.MovementComponent{
+			Moving:    true,
+			Direction: direction.Down,
+			Speed:     1.0,
+		},
+	})
+	return enemies
 }
 
 func buildEnemies() []enemy.Enemy {

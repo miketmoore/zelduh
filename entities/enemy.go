@@ -5,9 +5,10 @@ import (
 	"github.com/miketmoore/zelduh/systems"
 )
 
-// Coin is a collectible item entity
-type Coin struct {
+// Enemy is an entity made up of components
+type Enemy struct {
 	ID int
 	*systems.AppearanceComponent
 	*components.SpatialComponent
+	*components.MovementComponent
 }

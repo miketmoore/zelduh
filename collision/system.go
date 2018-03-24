@@ -13,10 +13,11 @@ type collisionEntity struct {
 
 // System is a custom system for detecting collisions and what to do when they occur
 type System struct {
-	playerEntity collisionEntity
-	enemies      []collisionEntity
-	coins        []collisionEntity
-	CollectCoin  func(int)
+	playerEntity             collisionEntity
+	enemies                  []collisionEntity
+	coins                    []collisionEntity
+	CollectCoin              func(int)
+	PlayerCollisionWithEnemy func(int)
 }
 
 // AddPlayer adds the player to the system
@@ -27,8 +28,9 @@ func (s *System) AddPlayer(spatial *components.SpatialComponent) {
 }
 
 // AddEnemy adds an enemy to the system
-func (s *System) AddEnemy(spatial *components.SpatialComponent) {
+func (s *System) AddEnemy(id int, spatial *components.SpatialComponent) {
 	s.enemies = append(s.enemies, collisionEntity{
+		ID:               id,
 		SpatialComponent: spatial,
 	})
 }
@@ -59,6 +61,7 @@ func (s *System) Update() {
 		intersection := enemy.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
 		if intersection.Area() > 0 {
 			fmt.Println("Player collision with enemy!")
+			s.PlayerCollisionWithEnemy(enemy.ID)
 		}
 	}
 	for _, coin := range s.coins {

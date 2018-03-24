@@ -19,6 +19,7 @@ type System struct {
 	Win          *pixelgl.Window
 	playerEntity renderEntity
 	coins        []renderEntity
+	enemies      []renderEntity
 }
 
 // AddPlayer adds the player to the system
@@ -33,6 +34,15 @@ func (s *System) AddPlayer(appearance *systems.AppearanceComponent, spatial *com
 func (s *System) AddCoin(id int, appearance *systems.AppearanceComponent, spatial *components.SpatialComponent) {
 	fmt.Printf("render.System.AddCoin() id %d\n", id)
 	s.coins = append(s.coins, renderEntity{
+		ID:                  id,
+		AppearanceComponent: appearance,
+		SpatialComponent:    spatial,
+	})
+}
+
+// AddEnemy adds an enemy to the system
+func (s *System) AddEnemy(id int, appearance *systems.AppearanceComponent, spatial *components.SpatialComponent) {
+	s.enemies = append(s.enemies, renderEntity{
 		ID:                  id,
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
@@ -59,7 +69,6 @@ func (s *System) Update() {
 	player.Shape.Rectangle(0)
 	player.Shape.Draw(s.Win)
 
-	// fmt.Printf("render system update length of coins: %d\n", len(s.coins))
 	for _, coin := range s.coins {
 		coin.Shape.Clear()
 		coin.Shape.Color = coin.AppearanceComponent.Color
@@ -67,5 +76,14 @@ func (s *System) Update() {
 		coin.Shape.Push(coin.SpatialComponent.Rect.Max)
 		coin.Shape.Rectangle(0)
 		coin.Shape.Draw(s.Win)
+	}
+
+	for _, enemy := range s.enemies {
+		enemy.Shape.Clear()
+		enemy.Shape.Color = enemy.AppearanceComponent.Color
+		enemy.Shape.Push(enemy.SpatialComponent.Rect.Min)
+		enemy.Shape.Push(enemy.SpatialComponent.Rect.Max)
+		enemy.Shape.Rectangle(0)
+		enemy.Shape.Draw(s.Win)
 	}
 }

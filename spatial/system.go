@@ -15,6 +15,7 @@ type spatialEntity struct {
 // System is a custom system
 type System struct {
 	playerEntity spatialEntity
+	enemies      []spatialEntity
 }
 
 // AddPlayer adds the player to the system
@@ -23,6 +24,14 @@ func (s *System) AddPlayer(spatial *components.SpatialComponent, movement *compo
 		SpatialComponent:  spatial,
 		MovementComponent: movement,
 	}
+}
+
+// AddEnemy adds an enemy to the system
+func (s *System) AddEnemy(id int, spatial *components.SpatialComponent, movement *components.MovementComponent) {
+	s.enemies = append(s.enemies, spatialEntity{
+		SpatialComponent:  spatial,
+		MovementComponent: movement,
+	})
 }
 
 // Update changes spatial data based on movement data
@@ -47,4 +56,5 @@ func (s *System) Update() {
 			player.SpatialComponent.Rect = newRect
 		}
 	}
+
 }
