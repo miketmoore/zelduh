@@ -27,6 +27,7 @@ import (
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
+	"github.com/miketmoore/zelduh/playerinput"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/miketmoore/zelduh/world"
 	"github.com/nicksnyder/go-i18n/i18n"
@@ -114,6 +115,7 @@ func run() {
 
 	customWorld := world.New()
 
+	customWorld.AddSystem(&playerinput.System{Win: win})
 	customWorld.AddSystem(&collision.System{})
 
 	// Old "entities"... phasing out
@@ -131,6 +133,8 @@ func run() {
 	// Add entity components to custom ECS systems
 	for _, system := range customWorld.Systems() {
 		switch sys := system.(type) {
+		case *playerinput.System:
+			sys.AddPlayer(playerEntity.MovementComponent)
 		case *collision.System:
 			sys.AddPlayer(playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
