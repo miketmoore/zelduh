@@ -19,11 +19,9 @@ import (
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/enemy"
 	"github.com/miketmoore/zelduh/entities"
-	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/palette"
-	"github.com/miketmoore/zelduh/player"
 	"github.com/miketmoore/zelduh/playerinput"
 	"github.com/miketmoore/zelduh/render"
 	"github.com/miketmoore/zelduh/spatial"
@@ -314,38 +312,6 @@ func loadPicture(path string) pixel.Picture {
 		os.Exit(1)
 	}
 	return pixel.PictureDataFromImage(img)
-}
-
-func buildCoins() []entity.Entity {
-	coins := []entity.Entity{}
-
-	coinX := mapX
-	coinY := mapY
-	for i := 0; i < 12; i++ {
-		coin := entity.New(win, spriteSize, pixel.V(coinX, coinY), []*pixel.Sprite{
-			sprites["coinA"],
-			sprites["coinB"],
-			sprites["coinC"],
-		}, 7)
-		coins = append(coins, coin)
-		coinX = mapX + float64(r.Intn(12)*48)
-		coinY += 48
-	}
-
-	return coins
-}
-
-func buildPlayer() player.Player {
-	return player.New(win, spriteSize, 4, 3, 3, 1, map[string]*pixel.Sprite{
-		"downA":  sprites["playerDownA"],
-		"downB":  sprites["playerDownB"],
-		"upA":    sprites["playerUpA"],
-		"upB":    sprites["playerUpB"],
-		"rightA": sprites["playerRightA"],
-		"rightB": sprites["playerRightB"],
-		"leftA":  sprites["playerLeftA"],
-		"leftB":  sprites["playerLeftB"],
-	}, pixel.V(mapX+(mapW/2), mapY+(mapH/2)))
 }
 
 func buildPlayerEntity() entities.Player {
