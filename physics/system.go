@@ -2,6 +2,7 @@ package physics
 
 import (
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/direction"
 )
 
 type physicsEntity struct {
@@ -25,7 +26,22 @@ func (s *System) AddPlayer(physics *components.PhysicsComponent, movement *compo
 
 // Update changes spatial data based on movement data
 func (s *System) Update() {
-	// player := s.playerEntity
+	player := s.playerEntity
 
-	// TODO
+	// Determine speed by forces
+	if player.PhysicsComponent.ForceUp > 0 {
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Up
+	} else if player.PhysicsComponent.ForceRight > 0 {
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Right
+	} else if player.PhysicsComponent.ForceDown > 0 {
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Down
+	} else if player.PhysicsComponent.ForceLeft > 0 {
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Left
+	} else {
+		player.MovementComponent.Speed = 0
+	}
 }

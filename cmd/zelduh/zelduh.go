@@ -164,7 +164,7 @@ func run() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *playerinput.System:
-			sys.AddPlayer(playerEntity.MovementComponent)
+			sys.AddPlayer(playerEntity.PhysicsComponent)
 		case *spatial.System:
 			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
 			for _, enemy := range enemyEntities {
@@ -373,6 +373,12 @@ func buildPlayerEntity() entities.Player {
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Green,
 		},
+		PhysicsComponent: &components.PhysicsComponent{
+			ForceDown:  0,
+			ForceLeft:  0,
+			ForceRight: 0,
+			ForceUp:    0,
+		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
 			Height: spriteSize,
@@ -391,7 +397,6 @@ func buildPlayerEntity() entities.Player {
 			Shape: imdraw.New(nil),
 		},
 		MovementComponent: &components.MovementComponent{
-			Moving:    false,
 			Direction: direction.Down,
 			Speed:     4.0,
 		},
@@ -468,7 +473,6 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 				Shape: imdraw.New(nil),
 			},
 			MovementComponent: &components.MovementComponent{
-				Moving:    true,
 				Direction: direction.Down,
 				Speed:     1.0,
 			},
