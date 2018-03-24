@@ -56,8 +56,8 @@ func (s *System) RemoveCoin(id int) {
 func (s *System) Update() {
 	// fmt.Println("collision.System Update")
 	for _, enemy := range s.enemies {
-		if enemy.SpatialComponent.Rect.Contains(s.playerEntity.SpatialComponent.Rect.Min) ||
-			enemy.SpatialComponent.Rect.Contains(s.playerEntity.SpatialComponent.Rect.Max) {
+		intersection := enemy.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
+		if intersection.Area() > 0 {
 			fmt.Println("Player collision with enemy!")
 		}
 	}
