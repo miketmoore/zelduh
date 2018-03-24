@@ -105,7 +105,9 @@ func run() {
 	enemyEntities := buildEnemyEntities(gameWorld)
 
 	gameWorld.AddSystem(&playerinput.System{Win: win})
-	gameWorld.AddSystem(&spatial.System{})
+	gameWorld.AddSystem(&spatial.System{
+		Rand: r,
+	})
 	gameWorld.AddSystem(&render.System{Win: win})
 	gameWorld.AddSystem(&collision.System{
 		CollectCoin: func(coinID int) {
