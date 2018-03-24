@@ -1,5 +1,10 @@
 package world
 
+import (
+	"github.com/miketmoore/zelduh/collision"
+	"github.com/miketmoore/zelduh/render"
+)
+
 // System is an interface
 type System interface {
 	Update()
@@ -39,4 +44,16 @@ func (w *World) Systems() []System {
 func (w *World) NewEntityID() int {
 	w.lastEntityID++
 	return w.lastEntityID
+}
+
+// RemoveCoin removes the specified coin from all relevant systems
+func (w *World) RemoveCoin(id int) {
+	for _, sys := range w.systems {
+		switch sys := sys.(type) {
+		case *collision.System:
+			sys.RemoveCoin(id)
+		case *render.System:
+			sys.RemoveCoin(id)
+		}
+	}
 }

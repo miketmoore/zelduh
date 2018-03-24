@@ -1,8 +1,6 @@
 package playerinput
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -44,5 +42,5 @@ func (s *System) Update() {
 		player.MovementComponent.Moving = false
 	}
 
-	fmt.Printf("%v\n", player.MovementComponent)
+	// fmt.Printf("%v\n", player.MovementComponent)
 }

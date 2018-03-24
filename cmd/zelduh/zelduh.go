@@ -23,7 +23,6 @@ import (
 	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
-	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
 	"github.com/miketmoore/zelduh/playerinput"
@@ -103,22 +102,31 @@ func run() {
 	pic = loadPicture(spritePlayerPath)
 	sprites = buildSpriteMap(pic, spriteMap)
 
-	customWorld := world.New()
-
-	customWorld.AddSystem(&playerinput.System{Win: win})
-	customWorld.AddSystem(&spatial.System{})
-	customWorld.AddSystem(&render.System{Win: win})
-	customWorld.AddSystem(&collision.System{})
-
 	// Old "entities"... phasing out
-	coins := buildCoins()
-	player := buildPlayer()
-	enemies := buildEnemies()
-	sword := buildSword()
+	// coins := buildCoins()
+	// player := buildPlayer()
+	// enemies := buildEnemies()
+	// sword := buildSword()
+
+	customWorld := world.New()
 
 	// New entities
 	playerEntity := buildPlayerEntity()
 	coinEntities := buildCoinEntities(customWorld)
+
+	customWorld.AddSystem(&playerinput.System{Win: win})
+	customWorld.AddSystem(&spatial.System{})
+	customWorld.AddSystem(&render.System{Win: win})
+	customWorld.AddSystem(&collision.System{
+		CollectCoin: func(coinID int) {
+			fmt.Printf("Player collecting coin %d, before: %d\n", coinID, playerEntity.CoinsComponent.Coins)
+			// TODO add coin value to player's bank
+			playerEntity.CoinsComponent.Coins++
+			fmt.Printf("After: %d\n", playerEntity.CoinsComponent.Coins)
+			// TODO remove coin
+			customWorld.RemoveCoin(coinID)
+		},
+	})
 
 	currentState := gamestate.Start
 
@@ -156,10 +164,10 @@ func run() {
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			// Reset characters to starting positions
-			player.Reset()
-			for i := 0; i < len(enemies); i++ {
-				enemies[i].Reset()
-			}
+			// player.Reset()
+			// for i := 0; i < len(enemies); i++ {
+			// 	enemies[i].Reset()
+			// }
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				currentState = gamestate.Game
@@ -168,59 +176,59 @@ func run() {
 
 			win.Clear(palette.Map[palette.Dark])
 			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
-			txt.Clear()
-			txt.Color = palette.Map[palette.Darkest]
+			// txt.Clear()
+			// txt.Color = palette.Map[palette.Darkest]
 
 			customWorld.Update()
 
-			player.Draw()
+			// player.Draw()
 
-			for i := 0; i < len(coins); i++ {
-				coins[i].Draw()
-			}
+			// for i := 0; i < len(coins); i++ {
+			// 	coins[i].Draw()
+			// }
 
 			// check if player picked up a coin
-			for i := len(coins) - 1; i > 0; i-- {
-				collision := collision.IsColliding(player.Last, coins[i].Last, spriteSize)
-				if collision {
-					player.Deposit(1)
-					// destroy coin
-					coins = append(coins[:i], coins[i+1:]...)
-					fmt.Printf("Coins remaining: %d\n", len(coins))
-				}
-			}
+			// for i := len(coins) - 1; i > 0; i-- {
+			// 	collision := collision.IsColliding(player.Last, coins[i].Last, spriteSize)
+			// 	if collision {
+			// 		player.Deposit(1)
+			// 		// destroy coin
+			// 		coins = append(coins[:i], coins[i+1:]...)
+			// 		fmt.Printf("Coins remaining: %d\n", len(coins))
+			// 	}
+			// }
 
-			for i := 0; i < len(enemies); i++ {
-				if !enemies[i].IsDead() {
-					// Check for collisions with enemy
-					if sword.IsAttacking() && collision.IsColliding(sword.Last, enemies[i].Last, spriteSize) {
-						// Sword hit enemy
-						enemies[i].Hit(player.AttackPower)
-					} else if collision.IsColliding(player.Last, enemies[i].Last, spriteSize) {
-						// Enemy hit player
-						player.Hit(enemies[i].AttackPower)
-						if player.IsDead() {
-							currentState = gamestate.Over
-						}
-					}
-				}
+			// for i := 0; i < len(enemies); i++ {
+			// 	if !enemies[i].IsDead() {
+			// 		// Check for collisions with enemy
+			// 		if sword.IsAttacking() && collision.IsColliding(sword.Last, enemies[i].Last, spriteSize) {
+			// 			// Sword hit enemy
+			// 			enemies[i].Hit(player.AttackPower)
+			// 		} else if collision.IsColliding(player.Last, enemies[i].Last, spriteSize) {
+			// 			// Enemy hit player
+			// 			player.Hit(enemies[i].AttackPower)
+			// 			if player.IsDead() {
+			// 				currentState = gamestate.Over
+			// 			}
+			// 		}
+			// 	}
 
-				// Draw enemy if not dead
-				if !enemies[i].IsDead() {
-					enemies[i].Draw(mapX, mapY, mapX+mapW, mapY+mapH)
-				}
+			// 	// Draw enemy if not dead
+			// 	if !enemies[i].IsDead() {
+			// 		enemies[i].Draw(mapX, mapY, mapX+mapW, mapY+mapH)
+			// 	}
 
-			}
+			// }
 
-			if win.Pressed(pixelgl.KeyUp) {
-				player.Move(mvmt.DirectionYPos, mapY+mapH, mapY, mapX+mapW, mapX)
-			} else if win.Pressed(pixelgl.KeyRight) {
-				player.Move(mvmt.DirectionXPos, mapY+mapH, mapY, mapX+mapW, mapX)
-			} else if win.Pressed(pixelgl.KeyDown) {
-				player.Move(mvmt.DirectionYNeg, mapY+mapH, mapY, mapX+mapW, mapX)
-			} else if win.Pressed(pixelgl.KeyLeft) {
-				player.Move(mvmt.DirectionXNeg, mapY+mapH, mapY, mapX+mapW, mapX)
-			}
+			// if win.Pressed(pixelgl.KeyUp) {
+			// 	player.Move(mvmt.DirectionYPos, mapY+mapH, mapY, mapX+mapW, mapX)
+			// } else if win.Pressed(pixelgl.KeyRight) {
+			// 	player.Move(mvmt.DirectionXPos, mapY+mapH, mapY, mapX+mapW, mapX)
+			// } else if win.Pressed(pixelgl.KeyDown) {
+			// 	player.Move(mvmt.DirectionYNeg, mapY+mapH, mapY, mapX+mapW, mapX)
+			// } else if win.Pressed(pixelgl.KeyLeft) {
+			// 	player.Move(mvmt.DirectionXNeg, mapY+mapH, mapY, mapX+mapW, mapX)
+			// }
 
 			if win.JustPressed(pixelgl.KeyP) {
 				currentState = gamestate.Pause
@@ -229,25 +237,25 @@ func run() {
 			if win.JustPressed(pixelgl.KeyX) {
 				currentState = gamestate.Over
 			}
-			if win.JustPressed(pixelgl.KeySpace) {
-				sword.Attack()
-			}
+			// if win.JustPressed(pixelgl.KeySpace) {
+			// 	sword.Attack()
+			// }
 
 			// Attack in direction player last moved
-			switch player.LastDir {
-			case mvmt.DirectionXPos:
-				sword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
-			case mvmt.DirectionXNeg:
-				sword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
-			case mvmt.DirectionYPos:
-				sword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
-			case mvmt.DirectionYNeg:
-				sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
-			}
+			// switch player.LastDir {
+			// case mvmt.DirectionXPos:
+			// 	sword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
+			// case mvmt.DirectionXNeg:
+			// 	sword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
+			// case mvmt.DirectionYPos:
+			// 	sword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
+			// case mvmt.DirectionYNeg:
+			// 	sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
+			// }
 
-			sword.LastDir = player.LastDir
+			// sword.LastDir = player.LastDir
 
-			sword.Draw()
+			// sword.Draw()
 		case gamestate.Pause:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
