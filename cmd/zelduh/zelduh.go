@@ -19,7 +19,6 @@ import (
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
-	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/playerinput"
 	"github.com/miketmoore/zelduh/render"
 	"github.com/miketmoore/zelduh/spatial"
@@ -91,7 +90,7 @@ var sprites map[string]*pixel.Sprite
 func run() {
 	// Initializations
 	t = initI18n()
-	txt = initText(20, 50, palette.Map[palette.Darkest])
+	txt = initText(20, 50, colornames.Black)
 	win = initWindow(t("title"), winX, winY, winW, winH)
 	pic = loadPicture(spritePlayerPath)
 	sprites = buildSpriteMap(pic, spriteMap)
@@ -196,10 +195,10 @@ func run() {
 
 		switch currentState {
 		case gamestate.Start:
-			win.Clear(palette.Map[palette.Dark])
+			win.Clear(colornames.Darkgray)
 			txt.Clear()
-			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
-			txt.Color = palette.Map[palette.Darkest]
+			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+			txt.Color = colornames.Black
 			fmt.Fprintln(txt, t("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
@@ -208,8 +207,8 @@ func run() {
 			}
 		case gamestate.Game:
 
-			win.Clear(palette.Map[palette.Dark])
-			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
+			win.Clear(colornames.Darkgray)
+			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
 			gameWorld.Update()
 
@@ -222,10 +221,10 @@ func run() {
 			}
 
 		case gamestate.Pause:
-			win.Clear(palette.Map[palette.Dark])
+			win.Clear(colornames.Darkgray)
 			txt.Clear()
 			fmt.Fprintln(txt, t("paused"))
-			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
+			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -235,10 +234,10 @@ func run() {
 				currentState = gamestate.Start
 			}
 		case gamestate.Over:
-			win.Clear(palette.Map[palette.Darkest])
+			win.Clear(colornames.Darkgray)
 			txt.Clear()
-			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Darkest])
-			txt.Color = palette.Map[palette.Lightest]
+			drawMapBG(mapX, mapY, mapW, mapH, colornames.Black)
+			txt.Color = colornames.White
 			fmt.Fprintln(txt, t("gameOver"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
