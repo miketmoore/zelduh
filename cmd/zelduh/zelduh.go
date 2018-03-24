@@ -103,6 +103,31 @@ func run() {
 	coinEntities := buildCoinEntities(gameWorld)
 	enemyEntities := buildEnemyEntities(gameWorld)
 
+	// Obstacles are impassable tiles, that essentially make up the map.
+	// There could easily be other uses for them, such as preventing passing through a locked door.
+	obstacle := entities.Obstacle{
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Darkgray,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect: pixel.R(
+				mapX,
+				mapY,
+				mapX+spriteSize,
+				mapY+spriteSize,
+			),
+			BoundsRect: pixel.R(
+				mapX,
+				mapY,
+				mapX+mapW,
+				mapY+mapH,
+			),
+			Shape: imdraw.New(nil),
+		},
+	}
+
 	// Create systems and add to game world
 	gameWorld.AddSystem(&playerinput.System{Win: win})
 	gameWorld.AddSystem(&spatial.System{
@@ -141,6 +166,7 @@ func run() {
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
 			}
+			sys.AddObstacle(obstacle.SpatialComponent)
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
@@ -149,6 +175,7 @@ func run() {
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
 			}
+			sys.AddObstacle(obstacle.AppearanceComponent, obstacle.SpatialComponent)
 		}
 	}
 

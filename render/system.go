@@ -19,6 +19,7 @@ type System struct {
 	playerEntity renderEntity
 	coins        []renderEntity
 	enemies      []renderEntity
+	obstacles    []renderEntity
 }
 
 // AddPlayer adds the player to the system
@@ -27,6 +28,14 @@ func (s *System) AddPlayer(appearance *components.AppearanceComponent, spatial *
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
 	}
+}
+
+// AddObstacle adds an enemy to the system
+func (s *System) AddObstacle(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
+	s.obstacles = append(s.obstacles, renderEntity{
+		AppearanceComponent: appearance,
+		SpatialComponent:    spatial,
+	})
 }
 
 // AddCoin adds the player to the system
@@ -84,5 +93,14 @@ func (s *System) Update() {
 		enemy.Shape.Push(enemy.SpatialComponent.Rect.Max)
 		enemy.Shape.Rectangle(0)
 		enemy.Shape.Draw(s.Win)
+	}
+
+	for _, obstacle := range s.obstacles {
+		obstacle.Shape.Clear()
+		obstacle.Shape.Color = obstacle.AppearanceComponent.Color
+		obstacle.Shape.Push(obstacle.SpatialComponent.Rect.Min)
+		obstacle.Shape.Push(obstacle.SpatialComponent.Rect.Max)
+		obstacle.Shape.Rectangle(0)
+		obstacle.Shape.Draw(s.Win)
 	}
 }

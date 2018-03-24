@@ -16,6 +16,7 @@ type System struct {
 	playerEntity             collisionEntity
 	enemies                  []collisionEntity
 	coins                    []collisionEntity
+	obstacles                []collisionEntity
 	PlayerCollisionWithCoin  func(int)
 	PlayerCollisionWithEnemy func(int)
 }
@@ -31,6 +32,13 @@ func (s *System) AddPlayer(spatial *components.SpatialComponent) {
 func (s *System) AddEnemy(id int, spatial *components.SpatialComponent) {
 	s.enemies = append(s.enemies, collisionEntity{
 		ID:               id,
+		SpatialComponent: spatial,
+	})
+}
+
+// AddObstacle adds an obstacle entity to the system
+func (s *System) AddObstacle(spatial *components.SpatialComponent) {
+	s.obstacles = append(s.obstacles, collisionEntity{
 		SpatialComponent: spatial,
 	})
 }
@@ -69,6 +77,14 @@ func (s *System) Update() {
 		if intersection.Area() > 0 {
 			fmt.Println("Player collision with coin!")
 			s.PlayerCollisionWithCoin(coin.ID)
+		}
+	}
+	for _, obstacle := range s.obstacles {
+		intersection := obstacle.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
+		if intersection.Area() > 0 {
+			fmt.Println("Player collision with obstacle!")
+			// TODO prevent player movement... maybe messaging is a good idea, because we could send a message
+			// directly to the mailbox and a listener in another system could prevent movement.
 		}
 	}
 }
