@@ -1,7 +1,6 @@
 package spatial
 
 import (
-	"fmt"
 	"math/rand"
 
 	"github.com/faiface/pixel"
@@ -102,16 +101,16 @@ func moveEnemy(s *System, enemy spatialEntity) {
 				speed := 1.0
 				switch enemy.SpatialComponent.LastDir {
 				case direction.Up:
-					fmt.Printf("Up\n")
+					// fmt.Printf("Up\n")
 					moveVec = pixel.V(0, speed)
 				case direction.Right:
-					fmt.Printf("Right\n")
+					// fmt.Printf("Right\n")
 					moveVec = pixel.V(speed, 0)
 				case direction.Down:
-					fmt.Printf("Down\n")
+					// fmt.Printf("Down\n")
 					moveVec = pixel.V(0, -speed)
 				case direction.Left:
-					fmt.Printf("Left\n")
+					// fmt.Printf("Left\n")
 					moveVec = pixel.V(-speed, 0)
 				}
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.Rect.Moved(moveVec)

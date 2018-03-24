@@ -106,6 +106,7 @@ func run() {
 	// Obstacles are impassable tiles, that essentially make up the map.
 	// There could easily be other uses for them, such as preventing passing through a locked door.
 	obstacle := entities.Obstacle{
+		ID: gameWorld.NewEntityID(),
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Darkgray,
 		},
@@ -144,6 +145,16 @@ func run() {
 		PlayerCollisionWithEnemy: func(enemyID int) {
 			fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
 		},
+		PlayerCollisionWithObstacle: func(obstacleID int) {
+			// Player collided with obstacle
+			// I want the player to stop moving in this direction
+			// But movement is handled in the spatial system
+			// I think I need to switch to a physics engine and use forces
+			// When encountering an obstacle, a force will be put on the character
+			// Perhaps a wall would mean equal force in opposite direction of movement?
+			// I think that would "stop" the character.
+			fmt.Printf("PlayerCollisionWithObstacle")
+		},
 	})
 
 	currentState := gamestate.Start
@@ -166,7 +177,7 @@ func run() {
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
 			}
-			sys.AddObstacle(obstacle.SpatialComponent)
+			sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
@@ -175,7 +186,7 @@ func run() {
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
 			}
-			sys.AddObstacle(obstacle.AppearanceComponent, obstacle.SpatialComponent)
+			sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
 		}
 	}
 

@@ -13,12 +13,13 @@ type collisionEntity struct {
 
 // System is a custom system for detecting collisions and what to do when they occur
 type System struct {
-	playerEntity             collisionEntity
-	enemies                  []collisionEntity
-	coins                    []collisionEntity
-	obstacles                []collisionEntity
-	PlayerCollisionWithCoin  func(int)
-	PlayerCollisionWithEnemy func(int)
+	playerEntity                collisionEntity
+	enemies                     []collisionEntity
+	coins                       []collisionEntity
+	obstacles                   []collisionEntity
+	PlayerCollisionWithCoin     func(int)
+	PlayerCollisionWithEnemy    func(int)
+	PlayerCollisionWithObstacle func(int)
 }
 
 // AddPlayer adds the player to the system
@@ -37,8 +38,9 @@ func (s *System) AddEnemy(id int, spatial *components.SpatialComponent) {
 }
 
 // AddObstacle adds an obstacle entity to the system
-func (s *System) AddObstacle(spatial *components.SpatialComponent) {
+func (s *System) AddObstacle(id int, spatial *components.SpatialComponent) {
 	s.obstacles = append(s.obstacles, collisionEntity{
+		ID:               id,
 		SpatialComponent: spatial,
 	})
 }
@@ -85,6 +87,7 @@ func (s *System) Update() {
 			fmt.Println("Player collision with obstacle!")
 			// TODO prevent player movement... maybe messaging is a good idea, because we could send a message
 			// directly to the mailbox and a listener in another system could prevent movement.
+			s.PlayerCollisionWithObstacle(obstacle.ID)
 		}
 	}
 }

@@ -31,8 +31,9 @@ func (s *System) AddPlayer(appearance *components.AppearanceComponent, spatial *
 }
 
 // AddObstacle adds an enemy to the system
-func (s *System) AddObstacle(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
+func (s *System) AddObstacle(id int, appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.obstacles = append(s.obstacles, renderEntity{
+		ID:                  id,
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
 	})
