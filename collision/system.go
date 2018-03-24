@@ -47,7 +47,6 @@ func (s *System) RemoveCoin(id int) {
 		coin := s.coins[i]
 		if coin.ID == id {
 			s.coins = append(s.coins[:i], s.coins[i+1:]...)
-			i--
 		}
 	}
 }
