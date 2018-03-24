@@ -470,13 +470,14 @@ func buildPlayerEntity() entities.Player {
 }
 
 func buildCoinEntities(world world.World) []entities.Coin {
-	return []entities.Coin{
-		entities.Coin{
-			ID:          world.NewEntityID(),
-			BasicEntity: ecs.NewBasic(),
-			EntityTypeComponent: &components.EntityTypeComponent{
-				Type: "coin",
-			},
+	coins := []entities.Coin{}
+	xInc := spriteSize
+	yInc := spriteSize
+	x := mapX
+	y := mapY
+	for i := 0; i < 5; i++ {
+		coins = append(coins, entities.Coin{
+			ID: world.NewEntityID(),
 			AppearanceComponent: &systems.AppearanceComponent{
 				Color: colornames.Yellow,
 			},
@@ -484,10 +485,10 @@ func buildCoinEntities(world world.World) []entities.Coin {
 				Width:  spriteSize,
 				Height: spriteSize,
 				Rect: pixel.R(
-					mapX,
-					mapY,
-					mapX+spriteSize,
-					mapY+spriteSize,
+					x,
+					y,
+					x+spriteSize,
+					y+spriteSize,
 				),
 				BoundsRect: pixel.R(
 					mapX,
@@ -497,8 +498,11 @@ func buildCoinEntities(world world.World) []entities.Coin {
 				),
 				Shape: imdraw.New(nil),
 			},
-		},
+		})
+		x += xInc
+		y += yInc
 	}
+	return coins
 }
 
 func buildEnemies() []enemy.Enemy {

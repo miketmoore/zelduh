@@ -35,6 +35,7 @@ func (s *System) AddEnemy(spatial *components.SpatialComponent) {
 
 // AddCoin adds a coin to the system
 func (s *System) AddCoin(id int, spatial *components.SpatialComponent) {
+	fmt.Printf("collision.System.AddCoin() id %d\n", id)
 	s.coins = append(s.coins, collisionEntity{
 		ID:               id,
 		SpatialComponent: spatial,
@@ -61,8 +62,8 @@ func (s *System) Update() {
 		}
 	}
 	for _, coin := range s.coins {
-		if coin.SpatialComponent.Rect.Contains(s.playerEntity.SpatialComponent.Rect.Min) ||
-			coin.SpatialComponent.Rect.Contains(s.playerEntity.SpatialComponent.Rect.Max) {
+		intersection := coin.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
+		if intersection.Area() > 0 {
 			fmt.Println("Player collision with coin!")
 			s.CollectCoin(coin.ID)
 		}

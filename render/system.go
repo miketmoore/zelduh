@@ -1,6 +1,8 @@
 package render
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/systems"
@@ -29,6 +31,7 @@ func (s *System) AddPlayer(appearance *systems.AppearanceComponent, spatial *com
 
 // AddCoin adds the player to the system
 func (s *System) AddCoin(id int, appearance *systems.AppearanceComponent, spatial *components.SpatialComponent) {
+	fmt.Printf("render.System.AddCoin() id %d\n", id)
 	s.coins = append(s.coins, renderEntity{
 		ID:                  id,
 		AppearanceComponent: appearance,
