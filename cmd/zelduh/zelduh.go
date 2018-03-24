@@ -23,7 +23,6 @@ import (
 	"github.com/miketmoore/zelduh/entity"
 	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
-	"github.com/miketmoore/zelduh/message"
 	"github.com/miketmoore/zelduh/mvmt"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
@@ -103,17 +102,6 @@ func run() {
 	win = initWindow(t("title"), winX, winY, winW, winH)
 	pic = loadPicture(spritePlayerPath)
 	sprites = buildSpriteMap(pic, spriteMap)
-	messageManager := message.Manager{}
-	ecsWorld := ecs.World{}
-	ecsWorld.AddSystem(&systems.SpatialSystem{})
-	ecsWorld.AddSystem(&systems.RenderSystem{Win: win})
-	ecsWorld.AddSystem(&systems.PlayerInputSystem{Win: win})
-	// ecsWorld.AddSystem(&systems.CollisionSystem{
-	// 	Mailbox: &messageManager,
-	// })
-	ecsWorld.AddSystem(&systems.CoinsSystem{
-		Mailbox: &messageManager,
-	})
 
 	customWorld := world.New()
 
@@ -151,44 +139,6 @@ func run() {
 		}
 	}
 
-	// Add entities and components to systems
-	// for _, system := range ecsWorld.Systems() {
-	// 	switch sys := system.(type) {
-	// 	// case *systems.PlayerInputSystem:
-	// 	// sys.Add(&playerEntity.BasicEntity, playerEntity.MovementComponent)
-	// 	// case *systems.SpatialSystem:
-	// 	// 	sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.MovementComponent)
-	// 	case *systems.RenderSystem:
-	// 		// sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.AppearanceComponent)
-	// 		for _, coin := range coinEntities {
-	// 			sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.AppearanceComponent)
-	// 		}
-	// 		// case *systems.CollisionSystem:
-	// 		// 	sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.EntityTypeComponent)
-	// 		// 	for _, coin := range coinEntities {
-	// 		// 		sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.EntityTypeComponent)
-	// 		// 	}
-	// 		// case *systems.CoinsSystem:
-	// 		// 	sys.Add(&playerEntity.BasicEntity, playerEntity.CoinsComponent)
-	// 	}
-	// }
-
-	// TODO
-	// https://github.com/EngoEngine/engo/blob/1b75afe871eca0c876f5884d0e24b86084b968f0/demos/pong/pong.go
-	// Listen inside systems
-	// Create "New" methods for systems and start listening inside this method
-	// When message is received, loop through this system's entities and look for an ID match
-	// messageManager.Listen("CollisionMessage", func(msg message.Message) {
-	// fmt.Printf("Inbox alert: %v", msg.Type())
-
-	// collision, isCollision := msg.(systems.CollisionMessage)
-	// fmt.Printf("%v %v\n", x, y)
-	// })
-
-	// messageManager.Listen("DestroyCoinMessage", func(msg message.Message) {
-	// 	fmt.Printf("DESTROY COIN NOW!\n")
-	// })
-
 	for !win.Closed() {
 
 		allowQuit()
@@ -218,7 +168,6 @@ func run() {
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
-			ecsWorld.Update(0.125)
 			customWorld.Update()
 
 			player.Draw()
