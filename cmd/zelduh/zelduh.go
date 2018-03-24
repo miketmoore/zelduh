@@ -28,6 +28,7 @@ import (
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/player"
 	"github.com/miketmoore/zelduh/systems"
+	"github.com/miketmoore/zelduh/world"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
 )
@@ -100,16 +101,20 @@ func run() {
 	pic = loadPicture(spritePlayerPath)
 	sprites = buildSpriteMap(pic, spriteMap)
 	messageManager := message.Manager{}
-	world := ecs.World{}
-	world.AddSystem(&systems.SpatialSystem{})
-	world.AddSystem(&systems.RenderSystem{Win: win})
-	world.AddSystem(&systems.PlayerInputSystem{Win: win})
-	world.AddSystem(&systems.CollisionSystem{
+	ecsWorld := ecs.World{}
+	ecsWorld.AddSystem(&systems.SpatialSystem{})
+	ecsWorld.AddSystem(&systems.RenderSystem{Win: win})
+	ecsWorld.AddSystem(&systems.PlayerInputSystem{Win: win})
+	// ecsWorld.AddSystem(&systems.CollisionSystem{
+	// 	Mailbox: &messageManager,
+	// })
+	ecsWorld.AddSystem(&systems.CoinsSystem{
 		Mailbox: &messageManager,
 	})
-	world.AddSystem(&systems.CoinsSystem{
-		Mailbox: &messageManager,
-	})
+
+	customWorld := world.New()
+
+	customWorld.AddSystem(&collision.System{})
 
 	// Old "entities"... phasing out
 	coins := buildCoins()
@@ -119,12 +124,23 @@ func run() {
 
 	// New entities
 	playerEntity := buildPlayerEntity()
-	coinEntities := buildCoinEntities()
+	coinEntities := buildCoinEntities(customWorld)
 
 	currentState := gamestate.Start
 
+	// Add entity components to custom ECS systems
+	for _, system := range customWorld.Systems() {
+		switch sys := system.(type) {
+		case *collision.System:
+			sys.AddPlayer(playerEntity.SpatialComponent)
+			for _, coin := range coinEntities {
+				sys.AddCoin(coin.ID, coin.SpatialComponent)
+			}
+		}
+	}
+
 	// Add entities and components to systems
-	for _, system := range world.Systems() {
+	for _, system := range ecsWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.PlayerInputSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.MovementComponent)
@@ -135,11 +151,11 @@ func run() {
 			for _, coin := range coinEntities {
 				sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.AppearanceComponent)
 			}
-		case *systems.CollisionSystem:
-			sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.EntityTypeComponent)
-			for _, coin := range coinEntities {
-				sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.EntityTypeComponent)
-			}
+		// case *systems.CollisionSystem:
+		// 	sys.Add(&playerEntity.BasicEntity, playerEntity.SpatialComponent, playerEntity.EntityTypeComponent)
+		// 	for _, coin := range coinEntities {
+		// 		sys.Add(&coin.BasicEntity, coin.SpatialComponent, coin.EntityTypeComponent)
+		// 	}
 		case *systems.CoinsSystem:
 			sys.Add(&playerEntity.BasicEntity, playerEntity.CoinsComponent)
 		}
@@ -157,9 +173,9 @@ func run() {
 	// fmt.Printf("%v %v\n", x, y)
 	// })
 
-	messageManager.Listen("DestroyCoinMessage", func(msg message.Message) {
-		fmt.Printf("DESTROY COIN NOW!\n")
-	})
+	// messageManager.Listen("DestroyCoinMessage", func(msg message.Message) {
+	// 	fmt.Printf("DESTROY COIN NOW!\n")
+	// })
 
 	for !win.Closed() {
 
@@ -190,7 +206,8 @@ func run() {
 			txt.Clear()
 			txt.Color = palette.Map[palette.Darkest]
 
-			world.Update(0.125)
+			ecsWorld.Update(0.125)
+			customWorld.Update()
 
 			player.Draw()
 
@@ -480,9 +497,10 @@ func buildPlayerEntity() entities.Player {
 	}
 }
 
-func buildCoinEntities() []entities.Coin {
+func buildCoinEntities(world world.World) []entities.Coin {
 	return []entities.Coin{
 		entities.Coin{
+			ID:          world.NewEntityID(),
 			BasicEntity: ecs.NewBasic(),
 			EntityTypeComponent: &components.EntityTypeComponent{
 				Type: "coin",
