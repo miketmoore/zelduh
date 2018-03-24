@@ -136,6 +136,9 @@ func run() {
 			}
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
+			for _, coin := range coinEntities {
+				sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
+			}
 		}
 	}
 
