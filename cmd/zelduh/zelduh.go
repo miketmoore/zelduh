@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"engo.io/ecs"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -102,36 +101,28 @@ func run() {
 	pic = loadPicture(spritePlayerPath)
 	sprites = buildSpriteMap(pic, spriteMap)
 
-	// Old "entities"... phasing out
-	// coins := buildCoins()
-	// player := buildPlayer()
-	// enemies := buildEnemies()
-	// sword := buildSword()
-
-	customWorld := world.New()
+	gameWorld := world.New()
 
 	// New entities
 	playerEntity := buildPlayerEntity()
-	coinEntities := buildCoinEntities(customWorld)
+	coinEntities := buildCoinEntities(gameWorld)
 
-	customWorld.AddSystem(&playerinput.System{Win: win})
-	customWorld.AddSystem(&spatial.System{})
-	customWorld.AddSystem(&render.System{Win: win})
-	customWorld.AddSystem(&collision.System{
+	gameWorld.AddSystem(&playerinput.System{Win: win})
+	gameWorld.AddSystem(&spatial.System{})
+	gameWorld.AddSystem(&render.System{Win: win})
+	gameWorld.AddSystem(&collision.System{
 		CollectCoin: func(coinID int) {
 			fmt.Printf("Player collecting coin %d, before: %d\n", coinID, playerEntity.CoinsComponent.Coins)
-			// TODO add coin value to player's bank
 			playerEntity.CoinsComponent.Coins++
 			fmt.Printf("After: %d\n", playerEntity.CoinsComponent.Coins)
-			// TODO remove coin
-			customWorld.RemoveCoin(coinID)
+			gameWorld.RemoveCoin(coinID)
 		},
 	})
 
 	currentState := gamestate.Start
 
 	// Add entity components to custom ECS systems
-	for _, system := range customWorld.Systems() {
+	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *playerinput.System:
 			sys.AddPlayer(playerEntity.MovementComponent)
@@ -163,12 +154,6 @@ func run() {
 			fmt.Fprintln(txt, t("title"))
 			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 
-			// Reset characters to starting positions
-			// player.Reset()
-			// for i := 0; i < len(enemies); i++ {
-			// 	enemies[i].Reset()
-			// }
-
 			if win.JustPressed(pixelgl.KeyEnter) {
 				currentState = gamestate.Game
 			}
@@ -176,59 +161,8 @@ func run() {
 
 			win.Clear(palette.Map[palette.Dark])
 			drawMapBG(mapX, mapY, mapW, mapH, palette.Map[palette.Lightest])
-			// txt.Clear()
-			// txt.Color = palette.Map[palette.Darkest]
 
-			customWorld.Update()
-
-			// player.Draw()
-
-			// for i := 0; i < len(coins); i++ {
-			// 	coins[i].Draw()
-			// }
-
-			// check if player picked up a coin
-			// for i := len(coins) - 1; i > 0; i-- {
-			// 	collision := collision.IsColliding(player.Last, coins[i].Last, spriteSize)
-			// 	if collision {
-			// 		player.Deposit(1)
-			// 		// destroy coin
-			// 		coins = append(coins[:i], coins[i+1:]...)
-			// 		fmt.Printf("Coins remaining: %d\n", len(coins))
-			// 	}
-			// }
-
-			// for i := 0; i < len(enemies); i++ {
-			// 	if !enemies[i].IsDead() {
-			// 		// Check for collisions with enemy
-			// 		if sword.IsAttacking() && collision.IsColliding(sword.Last, enemies[i].Last, spriteSize) {
-			// 			// Sword hit enemy
-			// 			enemies[i].Hit(player.AttackPower)
-			// 		} else if collision.IsColliding(player.Last, enemies[i].Last, spriteSize) {
-			// 			// Enemy hit player
-			// 			player.Hit(enemies[i].AttackPower)
-			// 			if player.IsDead() {
-			// 				currentState = gamestate.Over
-			// 			}
-			// 		}
-			// 	}
-
-			// 	// Draw enemy if not dead
-			// 	if !enemies[i].IsDead() {
-			// 		enemies[i].Draw(mapX, mapY, mapX+mapW, mapY+mapH)
-			// 	}
-
-			// }
-
-			// if win.Pressed(pixelgl.KeyUp) {
-			// 	player.Move(mvmt.DirectionYPos, mapY+mapH, mapY, mapX+mapW, mapX)
-			// } else if win.Pressed(pixelgl.KeyRight) {
-			// 	player.Move(mvmt.DirectionXPos, mapY+mapH, mapY, mapX+mapW, mapX)
-			// } else if win.Pressed(pixelgl.KeyDown) {
-			// 	player.Move(mvmt.DirectionYNeg, mapY+mapH, mapY, mapX+mapW, mapX)
-			// } else if win.Pressed(pixelgl.KeyLeft) {
-			// 	player.Move(mvmt.DirectionXNeg, mapY+mapH, mapY, mapX+mapW, mapX)
-			// }
+			gameWorld.Update()
 
 			if win.JustPressed(pixelgl.KeyP) {
 				currentState = gamestate.Pause
@@ -237,25 +171,7 @@ func run() {
 			if win.JustPressed(pixelgl.KeyX) {
 				currentState = gamestate.Over
 			}
-			// if win.JustPressed(pixelgl.KeySpace) {
-			// 	sword.Attack()
-			// }
 
-			// Attack in direction player last moved
-			// switch player.LastDir {
-			// case mvmt.DirectionXPos:
-			// 	sword.Last = pixel.V(player.Last.X+player.SwordSize, player.Last.Y)
-			// case mvmt.DirectionXNeg:
-			// 	sword.Last = pixel.V(player.Last.X-player.SwordSize, player.Last.Y)
-			// case mvmt.DirectionYPos:
-			// 	sword.Last = pixel.V(player.Last.X, player.Last.Y+player.SwordSize)
-			// case mvmt.DirectionYNeg:
-			// 	sword.Last = pixel.V(player.Last.X, player.Last.Y-player.SwordSize)
-			// }
-
-			// sword.LastDir = player.LastDir
-
-			// sword.Draw()
 		case gamestate.Pause:
 			win.Clear(palette.Map[palette.Dark])
 			txt.Clear()
@@ -434,7 +350,6 @@ func buildPlayer() player.Player {
 
 func buildPlayerEntity() entities.Player {
 	return entities.Player{
-		BasicEntity: ecs.NewBasic(),
 		EntityTypeComponent: &components.EntityTypeComponent{
 			Type: "player",
 		},
