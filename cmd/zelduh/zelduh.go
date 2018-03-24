@@ -19,6 +19,7 @@ import (
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
+	"github.com/miketmoore/zelduh/physics"
 	"github.com/miketmoore/zelduh/playerinput"
 	"github.com/miketmoore/zelduh/render"
 	"github.com/miketmoore/zelduh/spatial"
@@ -134,6 +135,7 @@ func run() {
 		Rand: r,
 	})
 	gameWorld.AddSystem(&render.System{Win: win})
+	gameWorld.AddSystem(&physics.System{})
 	gameWorld.AddSystem(&collision.System{
 		PlayerCollisionWithCoin: func(coinID int) {
 			fmt.Printf("Player collecting coin %d, before: %d\n", coinID, playerEntity.CoinsComponent.Coins)
@@ -177,6 +179,8 @@ func run() {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
 			}
 			sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
+		case *physics.System:
+			sys.AddPlayer(playerEntity.PhysicsComponent, playerEntity.MovementComponent)
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			for _, coin := range coinEntities {
