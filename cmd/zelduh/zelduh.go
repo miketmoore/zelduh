@@ -386,11 +386,11 @@ func buildPlayerEntity() entities.Player {
 
 func buildCoinEntities(world world.World) []entities.Coin {
 	coins := []entities.Coin{}
-	xInc := spriteSize
 	yInc := spriteSize
 	x := mapX
 	y := mapY
-	for i := 0; i < 5; i++ {
+	totalCoins := 12
+	for i := 0; i < totalCoins; i++ {
 		coins = append(coins, entities.Coin{
 			ID: world.NewEntityID(),
 			AppearanceComponent: &systems.AppearanceComponent{
@@ -414,7 +414,7 @@ func buildCoinEntities(world world.World) []entities.Coin {
 				Shape: imdraw.New(nil),
 			},
 		})
-		x += xInc
+		x = mapX + float64(r.Intn(totalCoins))*spriteSize
 		y += yInc
 	}
 	return coins
