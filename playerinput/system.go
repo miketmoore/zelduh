@@ -48,5 +48,10 @@ func (s *System) Update() {
 		player.PhysicsComponent.ForceRight = 0
 		player.PhysicsComponent.ForceDown = 0
 		player.PhysicsComponent.ForceLeft = 1
+	} else {
+		player.PhysicsComponent.ForceUp = 0
+		player.PhysicsComponent.ForceRight = 0
+		player.PhysicsComponent.ForceDown = 0
+		player.PhysicsComponent.ForceLeft = 0
 	}
 }
