@@ -16,7 +16,7 @@ type System struct {
 	playerEntity             collisionEntity
 	enemies                  []collisionEntity
 	coins                    []collisionEntity
-	CollectCoin              func(int)
+	PlayerCollisionWithCoin  func(int)
 	PlayerCollisionWithEnemy func(int)
 }
 
@@ -68,7 +68,7 @@ func (s *System) Update() {
 		intersection := coin.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
 		if intersection.Area() > 0 {
 			fmt.Println("Player collision with coin!")
-			s.CollectCoin(coin.ID)
+			s.PlayerCollisionWithCoin(coin.ID)
 		}
 	}
 }

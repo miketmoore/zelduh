@@ -103,13 +103,14 @@ func run() {
 	coinEntities := buildCoinEntities(gameWorld)
 	enemyEntities := buildEnemyEntities(gameWorld)
 
+	// Create systems and add to game world
 	gameWorld.AddSystem(&playerinput.System{Win: win})
 	gameWorld.AddSystem(&spatial.System{
 		Rand: r,
 	})
 	gameWorld.AddSystem(&render.System{Win: win})
 	gameWorld.AddSystem(&collision.System{
-		CollectCoin: func(coinID int) {
+		PlayerCollisionWithCoin: func(coinID int) {
 			fmt.Printf("Player collecting coin %d, before: %d\n", coinID, playerEntity.CoinsComponent.Coins)
 			playerEntity.CoinsComponent.Coins++
 			fmt.Printf("After: %d\n", playerEntity.CoinsComponent.Coins)
