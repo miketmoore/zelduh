@@ -17,9 +17,7 @@ import (
 	"github.com/miketmoore/zelduh/collision"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
-	"github.com/miketmoore/zelduh/enemy"
 	"github.com/miketmoore/zelduh/entities"
-	"github.com/miketmoore/zelduh/equipment"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/palette"
 	"github.com/miketmoore/zelduh/playerinput"
@@ -398,6 +396,10 @@ func buildCoinEntities(w world.World) []entities.Coin {
 
 func buildEnemyEntities(w world.World) []entities.Enemy {
 	enemies := []entities.Enemy{}
+
+	x := float64(r.Intn(int(mapW-spriteSize))) + mapX
+	y := mapY
+
 	enemies = append(enemies, entities.Enemy{
 		ID: w.NewEntityID(),
 		AppearanceComponent: &systems.AppearanceComponent{
@@ -407,10 +409,10 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 			Width:  spriteSize,
 			Height: spriteSize,
 			Rect: pixel.R(
-				mapX,
-				mapY,
-				mapX+spriteSize,
-				mapY+spriteSize,
+				x,
+				y,
+				x+spriteSize,
+				y+spriteSize,
 			),
 			BoundsRect: pixel.R(
 				mapX,
@@ -427,30 +429,4 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 		},
 	})
 	return enemies
-}
-
-func buildEnemies() []enemy.Enemy {
-	// Create enemies
-	enemies := []enemy.Enemy{}
-	enemySprites := map[string]*pixel.Sprite{
-		"downA":  sprites["turtleNoShellDownA"],
-		"downB":  sprites["turtleNoShellDownB"],
-		"upA":    sprites["turtleNoShellUpA"],
-		"upB":    sprites["turtleNoShellUpB"],
-		"rightA": sprites["turtleNoShellRightA"],
-		"rightB": sprites["turtleNoShellRightB"],
-		"leftA":  sprites["turtleNoShellLeftA"],
-		"leftB":  sprites["turtleNoShellLeftB"],
-	}
-	for i := 0; i < 5; i++ {
-		x := float64(r.Intn(int(mapW-spriteSize))) + mapX
-		y := float64(r.Intn(int(mapH-spriteSize))) + mapY
-		var enemy = enemy.New(win, spriteSize, float64(x), float64(y), 1, 1, 1, enemySprites)
-		enemies = append(enemies, enemy)
-	}
-	return enemies
-}
-
-func buildSword() equipment.Sword {
-	return equipment.NewSword(win, spriteSize, sprites["sword"])
 }
