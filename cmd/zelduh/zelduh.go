@@ -402,33 +402,36 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 	x := float64(r.Intn(int(mapW-spriteSize))) + mapX
 	y := mapY
 
-	enemies = append(enemies, entities.Enemy{
-		ID: w.NewEntityID(),
-		AppearanceComponent: &systems.AppearanceComponent{
-			Color: colornames.Red,
-		},
-		SpatialComponent: &components.SpatialComponent{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect: pixel.R(
-				x,
-				y,
-				x+spriteSize,
-				y+spriteSize,
-			),
-			BoundsRect: pixel.R(
-				mapX,
-				mapY,
-				mapX+mapW,
-				mapY+mapH,
-			),
-			Shape: imdraw.New(nil),
-		},
-		MovementComponent: &components.MovementComponent{
-			Moving:    true,
-			Direction: direction.Down,
-			Speed:     1.0,
-		},
-	})
+	for i := 0; i < 5; i++ {
+		enemies = append(enemies, entities.Enemy{
+			ID: w.NewEntityID(),
+			AppearanceComponent: &systems.AppearanceComponent{
+				Color: colornames.Red,
+			},
+			SpatialComponent: &components.SpatialComponent{
+				Width:  spriteSize,
+				Height: spriteSize,
+				Rect: pixel.R(
+					x,
+					y+(float64(i)*spriteSize),
+					x+spriteSize,
+					y+(float64(i)*spriteSize)+spriteSize,
+				),
+				BoundsRect: pixel.R(
+					mapX,
+					mapY,
+					mapX+mapW,
+					mapY+mapH,
+				),
+				Shape: imdraw.New(nil),
+			},
+			MovementComponent: &components.MovementComponent{
+				Moving:    true,
+				Direction: direction.Down,
+				Speed:     1.0,
+			},
+		})
+	}
+
 	return enemies
 }
