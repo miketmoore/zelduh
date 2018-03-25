@@ -129,6 +129,15 @@ func run() {
 		},
 	}
 
+	findEnemy := func(id int) (entities.Enemy, bool) {
+		for _, e := range enemyEntities {
+			if e.ID == id {
+				return e, true
+			}
+		}
+		return entities.Enemy{}, false
+	}
+
 	// Create systems and add to game world
 	gameWorld.AddSystem(&playerinput.System{Win: win})
 	gameWorld.AddSystem(&spatial.System{
@@ -152,15 +161,10 @@ func run() {
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
 			// Undo rect
-			// enemy := gameWorld.Enemy(enemyID)
-			var enemy entities.Enemy
-			for _, e := range enemyEntities {
-				if e.ID == enemyID {
-					enemy = e
-					break
-				}
+			enemy, ok := findEnemy(enemyID)
+			if ok {
+				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
 			}
-			enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
 		},
 	})
 
