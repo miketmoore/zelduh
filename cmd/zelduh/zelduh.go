@@ -397,73 +397,73 @@ func buildPlayerEntity() entities.Player {
 }
 
 func buildCoinEntities() []entities.Coin {
-	coins := []entities.Coin{}
-	yInc := spriteSize
-	x := mapX
-	y := mapY
-	totalCoins := 12
-	for i := 0; i < totalCoins; i++ {
-		coins = append(coins, entities.Coin{
-			ID: gameWorld.NewEntityID(),
-			AppearanceComponent: &components.AppearanceComponent{
-				Color: colornames.Yellow,
-			},
-			SpatialComponent: &components.SpatialComponent{
-				Width:  spriteSize,
-				Height: spriteSize,
-				Rect: pixel.R(
-					x,
-					y,
-					x+spriteSize,
-					y+spriteSize,
-				),
-				Shape: imdraw.New(nil),
-			},
-		})
-		x = mapX + float64(r.Intn(totalCoins))*spriteSize
-		y += yInc
+	w := spriteSize
+	h := spriteSize
+	return []entities.Coin{
+		buildCoin(mapX+w, mapY+h),
+		buildCoin(mapX+w*10, mapY+h*7),
 	}
-	return coins
+}
+
+func buildCoin(x, y float64) entities.Coin {
+	w := spriteSize
+	h := spriteSize
+	return entities.Coin{
+		ID: gameWorld.NewEntityID(),
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Purple,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  w,
+			Height: h,
+			Rect: pixel.R(
+				x,
+				y,
+				x+w,
+				y+h,
+			),
+			Shape: imdraw.New(nil),
+		},
+	}
 }
 
 func buildEnemyEntities() []entities.Enemy {
-	enemies := []entities.Enemy{}
-
-	x := float64(r.Intn(int(mapW-spriteSize))) + mapX
-	y := mapY
-
-	for i := 0; i < 5; i++ {
-		yInc := float64(i) * spriteSize
-		enemies = append(enemies, entities.Enemy{
-			ID: gameWorld.NewEntityID(),
-			AppearanceComponent: &components.AppearanceComponent{
-				Color: colornames.Red,
-			},
-			PhysicsComponent: &components.PhysicsComponent{
-				ForceDown:  0,
-				ForceLeft:  0,
-				ForceRight: 0,
-				ForceUp:    0,
-			},
-			SpatialComponent: &components.SpatialComponent{
-				Width:  spriteSize,
-				Height: spriteSize,
-				Rect: pixel.R(
-					x,
-					y+yInc,
-					x+spriteSize,
-					y+yInc+spriteSize,
-				),
-				Shape: imdraw.New(nil),
-			},
-			MovementComponent: &components.MovementComponent{
-				Direction: direction.Down,
-				Speed:     1.0,
-			},
-		})
+	w := spriteSize
+	h := spriteSize
+	return []entities.Enemy{
+		buildEnemy(mapX+(w*2), mapY+(h*3)),
+		buildEnemy(mapX+(w*10), mapY+(h*3)),
 	}
+}
 
-	return enemies
+func buildEnemy(x, y float64) entities.Enemy {
+	return entities.Enemy{
+		ID: gameWorld.NewEntityID(),
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Red,
+		},
+		PhysicsComponent: &components.PhysicsComponent{
+			ForceDown:  0,
+			ForceLeft:  0,
+			ForceRight: 0,
+			ForceUp:    0,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect: pixel.R(
+				x,
+				y,
+				x+spriteSize,
+				y+spriteSize,
+			),
+			Shape: imdraw.New(nil),
+		},
+		MovementComponent: &components.MovementComponent{
+			Direction: direction.Down,
+			Speed:     1.0,
+		},
+	}
 }
 
 func buildLevelObstacles(level string) []entities.Obstacle {

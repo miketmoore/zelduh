@@ -3,6 +3,7 @@ package collision
 import (
 	"fmt"
 
+	"github.com/faiface/pixel"
 	"github.com/miketmoore/zelduh/components"
 )
 
@@ -74,7 +75,15 @@ func (s *System) Update() {
 		}
 	}
 	for _, coin := range s.coins {
-		intersection := coin.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
+		cr := coin.SpatialComponent.Rect
+		inset := 10.0
+		r := pixel.R(
+			cr.Min.X+inset,
+			cr.Min.Y+inset,
+			cr.Max.X-inset,
+			cr.Max.Y-inset,
+		)
+		intersection := r.Intersect(s.playerEntity.SpatialComponent.Rect)
 		if intersection.Area() > 0 {
 			s.PlayerCollisionWithCoin(coin.ID)
 		}

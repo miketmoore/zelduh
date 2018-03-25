@@ -79,15 +79,6 @@ func (s *System) Update() {
 	player.Shape.Rectangle(0)
 	player.Shape.Draw(s.Win)
 
-	for _, coin := range s.coins {
-		coin.Shape.Clear()
-		coin.Shape.Color = coin.AppearanceComponent.Color
-		mod := coin.SpatialComponent.Width / 2
-		coin.Shape.Push(coin.SpatialComponent.Rect.Moved(pixel.V(mod, mod)).Min)
-		coin.Shape.Circle(24, 0)
-		coin.Shape.Draw(s.Win)
-	}
-
 	for _, enemy := range s.enemies {
 		enemy.Shape.Clear()
 		enemy.Shape.Color = enemy.AppearanceComponent.Color
@@ -97,12 +88,21 @@ func (s *System) Update() {
 		enemy.Shape.Draw(s.Win)
 	}
 
+	for _, coin := range s.coins {
+		coin.Shape.Clear()
+		coin.Shape.Color = coin.AppearanceComponent.Color
+		mod := coin.SpatialComponent.Width / 2
+		coin.Shape.Push(coin.SpatialComponent.Rect.Moved(pixel.V(mod, mod)).Min)
+		coin.Shape.Circle(24, 0)
+		coin.Shape.Draw(s.Win)
+	}
+
 	for _, obstacle := range s.obstacles {
 		obstacle.Shape.Clear()
 		obstacle.Shape.Color = obstacle.AppearanceComponent.Color
 		obstacle.Shape.Push(obstacle.SpatialComponent.Rect.Min)
 		obstacle.Shape.Push(obstacle.SpatialComponent.Rect.Max)
-		obstacle.Shape.Rectangle(1)
+		obstacle.Shape.Rectangle(0)
 		obstacle.Shape.Draw(s.Win)
 	}
 }
