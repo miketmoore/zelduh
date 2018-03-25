@@ -41,8 +41,8 @@ const (
 )
 
 const (
-	mapW float64 = 640
-	mapH float64 = 576
+	mapW float64 = 672 // 48 * 14
+	mapH float64 = 576 // 48 * 12
 	mapX         = (winW - mapW) / 2
 	mapY         = (winH - mapH) / 2
 )
@@ -104,7 +104,7 @@ func run() {
 	coinEntities := buildCoinEntities()
 	enemyEntities := buildEnemyEntities()
 
-	obstacles := buildLevelObstacles("1.0")
+	obstacles := buildLevelObstacles("fourWalls")
 
 	findEnemy := func(id int) (entities.Enemy, bool) {
 		for _, e := range enemyEntities {
@@ -473,15 +473,15 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 	h := spriteSize
 
 	switch level {
-	case "1.0":
-		for i := 0.0; i < mapW/spriteSize; i++ {
+	case "fourWalls":
+		for i := 0.0; i < (mapW/w)-2; i++ {
 			// Build top wall
-			obstacles = append(obstacles, buildObstacle(mapX+(w*i), mapY))
+			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
 			// Build bottom wall
-			obstacles = append(obstacles, buildObstacle(mapX+(w*i), mapY+mapH-h))
+			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
 		}
 
-		for i := 0.0; i < mapH/spriteSize; i++ {
+		for i := 0.0; i < (mapH/h)-2; i++ {
 			// Build left wall
 			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
 			// Build right wall
@@ -497,7 +497,7 @@ func buildObstacle(x, y float64) entities.Obstacle {
 	return entities.Obstacle{
 		ID: gameWorld.NewEntityID(),
 		AppearanceComponent: &components.AppearanceComponent{
-			Color: colornames.Blue,
+			Color: colornames.Black,
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
