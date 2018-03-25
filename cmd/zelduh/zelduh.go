@@ -393,7 +393,6 @@ func buildPlayerEntity() entities.Player {
 			ForceLeft:  0,
 			ForceRight: 0,
 			ForceUp:    0,
-			Blocked:    false,
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
@@ -470,6 +469,12 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 			ID: w.NewEntityID(),
 			AppearanceComponent: &components.AppearanceComponent{
 				Color: colornames.Red,
+			},
+			PhysicsComponent: &components.PhysicsComponent{
+				ForceDown:  0,
+				ForceLeft:  0,
+				ForceRight: 0,
+				ForceUp:    0,
 			},
 			SpatialComponent: &components.SpatialComponent{
 				Width:  spriteSize,

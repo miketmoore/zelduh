@@ -6,5 +6,4 @@ type PhysicsComponent struct {
 	ForceRight float64
 	ForceUp    float64
 	ForceLeft  float64
-	Blocked    bool
 }

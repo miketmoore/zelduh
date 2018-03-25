@@ -98,20 +98,15 @@ func moveEnemy(s *System, enemy spatialEntity) {
 			moveVec := pixel.V(0, 0)
 			if enemy.SpatialComponent.BoundsRect.Contains(enemy.SpatialComponent.Rect.Min) &&
 				enemy.SpatialComponent.BoundsRect.Contains(enemy.SpatialComponent.Rect.Max) {
-				// speed := enemy.MovementComponent.Speed
 				speed := 1.0
 				switch enemy.SpatialComponent.LastDir {
 				case direction.Up:
-					// fmt.Printf("Up\n")
 					moveVec = pixel.V(0, speed)
 				case direction.Right:
-					// fmt.Printf("Right\n")
 					moveVec = pixel.V(speed, 0)
 				case direction.Down:
-					// fmt.Printf("Down\n")
 					moveVec = pixel.V(0, -speed)
 				case direction.Left:
-					// fmt.Printf("Left\n")
 					moveVec = pixel.V(-speed, 0)
 				}
 				enemy.SpatialComponent.PrevRect = enemy.SpatialComponent.Rect

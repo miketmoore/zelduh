@@ -67,7 +67,6 @@ func (s *System) RemoveCoin(id int) {
 
 // Update checks for collisions
 func (s *System) Update() {
-	// fmt.Println("collision.System Update")
 	for _, enemy := range s.enemies {
 		intersection := enemy.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
 		if intersection.Area() > 0 {
