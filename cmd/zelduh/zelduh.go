@@ -144,11 +144,23 @@ func run() {
 			gameWorld.RemoveCoin(coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
-			fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
+			// fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// Undo rect
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
+		},
+		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
+			// Undo rect
+			// enemy := gameWorld.Enemy(enemyID)
+			var enemy entities.Enemy
+			for _, e := range enemyEntities {
+				if e.ID == enemyID {
+					enemy = e
+					break
+				}
+			}
+			enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
 		},
 	})
 

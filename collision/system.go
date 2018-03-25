@@ -20,6 +20,7 @@ type System struct {
 	PlayerCollisionWithCoin     func(int)
 	PlayerCollisionWithEnemy    func(int)
 	PlayerCollisionWithObstacle func(int)
+	EnemyCollisionWithObstacle  func(int, int)
 }
 
 // AddPlayer adds the player to the system
@@ -70,24 +71,26 @@ func (s *System) Update() {
 	for _, enemy := range s.enemies {
 		intersection := enemy.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
 		if intersection.Area() > 0 {
-			fmt.Println("Player collision with enemy!")
 			s.PlayerCollisionWithEnemy(enemy.ID)
 		}
 	}
 	for _, coin := range s.coins {
 		intersection := coin.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
 		if intersection.Area() > 0 {
-			fmt.Println("Player collision with coin!")
 			s.PlayerCollisionWithCoin(coin.ID)
 		}
 	}
 	for _, obstacle := range s.obstacles {
-		intersection := obstacle.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
-		if intersection.Area() > 0 {
-			fmt.Println("Player collision with obstacle!")
-			// TODO prevent player movement... maybe messaging is a good idea, because we could send a message
-			// directly to the mailbox and a listener in another system could prevent movement.
+		intersectionWithPlayer := obstacle.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
+		if intersectionWithPlayer.Area() > 0 {
 			s.PlayerCollisionWithObstacle(obstacle.ID)
+		}
+
+		for _, enemy := range s.enemies {
+			intersectionWithEnemy := obstacle.SpatialComponent.Rect.Intersect(enemy.SpatialComponent.Rect)
+			if intersectionWithEnemy.Area() > 0 {
+				s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
+			}
 		}
 	}
 }

@@ -114,6 +114,7 @@ func moveEnemy(s *System, enemy spatialEntity) {
 					// fmt.Printf("Left\n")
 					moveVec = pixel.V(-speed, 0)
 				}
+				enemy.SpatialComponent.PrevRect = enemy.SpatialComponent.Rect
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.Rect.Moved(moveVec)
 				enemy.EnemySpatialComponent.MoveCounter--
 			}
