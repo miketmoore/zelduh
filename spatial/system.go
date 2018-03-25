@@ -63,6 +63,7 @@ func (s *System) Update() {
 		newRect := player.SpatialComponent.Rect.Moved(v)
 		if player.SpatialComponent.BoundsRect.Contains(newRect.Min) &&
 			player.SpatialComponent.BoundsRect.Contains(newRect.Max) {
+			player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
 			player.SpatialComponent.Rect = newRect
 		}
 	}

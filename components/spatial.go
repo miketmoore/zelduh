@@ -10,6 +10,7 @@ import (
 type SpatialComponent struct {
 	Width      float64
 	Height     float64
+	PrevRect   pixel.Rect
 	Rect       pixel.Rect
 	BoundsRect pixel.Rect
 	Shape      *imdraw.IMDraw

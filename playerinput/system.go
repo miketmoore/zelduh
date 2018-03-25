@@ -23,7 +23,7 @@ func (s *System) AddPlayer(physics *components.PhysicsComponent) {
 	}
 }
 
-// Update checks for collisions
+// Update checks for player input
 func (s *System) Update() {
 	win := s.Win
 	player := s.playerEntity
@@ -42,4 +42,5 @@ func (s *System) Update() {
 	} else if win.Pressed(pixelgl.KeyLeft) {
 		player.PhysicsComponent.ForceLeft = 1
 	}
+
 }

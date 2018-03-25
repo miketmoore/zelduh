@@ -114,10 +114,10 @@ func run() {
 			Width:  spriteSize,
 			Height: spriteSize,
 			Rect: pixel.R(
-				mapX,
-				mapY,
-				mapX+spriteSize,
-				mapY+spriteSize,
+				mapX+(48.0*5),
+				mapY+(48.0*5),
+				mapX+spriteSize+(48.0*5),
+				mapY+spriteSize+(48.0*5),
 			),
 			BoundsRect: pixel.R(
 				mapX,
@@ -147,14 +147,8 @@ func run() {
 			fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
-			// Player collided with obstacle
-			// I want the player to stop moving in this direction
-			// But movement is handled in the spatial system
-			// I think I need to switch to a physics engine and use forces
-			// When encountering an obstacle, a force will be put on the character
-			// Perhaps a wall would mean equal force in opposite direction of movement?
-			// I think that would "stop" the character.
-			fmt.Printf("PlayerCollisionWithObstacle")
+			// Undo rect
+			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 		},
 	})
 
@@ -378,6 +372,7 @@ func buildPlayerEntity() entities.Player {
 			ForceLeft:  0,
 			ForceRight: 0,
 			ForceUp:    0,
+			Blocked:    false,
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
