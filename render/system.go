@@ -101,7 +101,7 @@ func (s *System) Update() {
 		obstacle.Shape.Color = obstacle.AppearanceComponent.Color
 		obstacle.Shape.Push(obstacle.SpatialComponent.Rect.Min)
 		obstacle.Shape.Push(obstacle.SpatialComponent.Rect.Max)
-		obstacle.Shape.Rectangle(0)
+		obstacle.Shape.Rectangle(1)
 		obstacle.Shape.Draw(s.Win)
 	}
 }

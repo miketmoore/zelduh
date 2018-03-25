@@ -53,6 +53,7 @@ var (
 	t         i18n.TranslateFunc
 	currState state.State
 	pic       pixel.Picture
+	gameWorld world.World
 )
 
 const (
@@ -96,38 +97,14 @@ func run() {
 	pic = loadPicture(spritePlayerPath)
 	sprites = buildSpriteMap(pic, spriteMap)
 
-	gameWorld := world.New()
+	gameWorld = world.New()
 
 	// New entities
 	playerEntity := buildPlayerEntity()
-	coinEntities := buildCoinEntities(gameWorld)
-	enemyEntities := buildEnemyEntities(gameWorld)
+	coinEntities := buildCoinEntities()
+	enemyEntities := buildEnemyEntities()
 
-	// Obstacles are impassable tiles, that essentially make up the map.
-	// There could easily be other uses for them, such as preventing passing through a locked door.
-	obstacle := entities.Obstacle{
-		ID: gameWorld.NewEntityID(),
-		AppearanceComponent: &components.AppearanceComponent{
-			Color: colornames.Darkgray,
-		},
-		SpatialComponent: &components.SpatialComponent{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect: pixel.R(
-				mapX+(48.0*5),
-				mapY+(48.0*5),
-				mapX+spriteSize+(48.0*5),
-				mapY+spriteSize+(48.0*5),
-			),
-			BoundsRect: pixel.R(
-				mapX,
-				mapY,
-				mapX+mapW,
-				mapY+mapH,
-			),
-			Shape: imdraw.New(nil),
-		},
-	}
+	obstacles := buildLevelObstacles("1.0")
 
 	findEnemy := func(id int) (entities.Enemy, bool) {
 		for _, e := range enemyEntities {
@@ -193,7 +170,9 @@ func run() {
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
 			}
-			sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
+			for _, obstacle := range obstacles {
+				sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
+			}
 		case *physics.System:
 			sys.AddPlayer(playerEntity.PhysicsComponent, playerEntity.MovementComponent)
 		case *render.System:
@@ -204,7 +183,9 @@ func run() {
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
 			}
-			sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
+			for _, obstacle := range obstacles {
+				sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
+			}
 		}
 	}
 
@@ -421,7 +402,7 @@ func buildPlayerEntity() entities.Player {
 	}
 }
 
-func buildCoinEntities(w world.World) []entities.Coin {
+func buildCoinEntities() []entities.Coin {
 	coins := []entities.Coin{}
 	yInc := spriteSize
 	x := mapX
@@ -429,7 +410,7 @@ func buildCoinEntities(w world.World) []entities.Coin {
 	totalCoins := 12
 	for i := 0; i < totalCoins; i++ {
 		coins = append(coins, entities.Coin{
-			ID: w.NewEntityID(),
+			ID: gameWorld.NewEntityID(),
 			AppearanceComponent: &components.AppearanceComponent{
 				Color: colornames.Yellow,
 			},
@@ -457,7 +438,7 @@ func buildCoinEntities(w world.World) []entities.Coin {
 	return coins
 }
 
-func buildEnemyEntities(w world.World) []entities.Enemy {
+func buildEnemyEntities() []entities.Enemy {
 	enemies := []entities.Enemy{}
 
 	x := float64(r.Intn(int(mapW-spriteSize))) + mapX
@@ -466,7 +447,7 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 	for i := 0; i < 5; i++ {
 		yInc := float64(i) * spriteSize
 		enemies = append(enemies, entities.Enemy{
-			ID: w.NewEntityID(),
+			ID: gameWorld.NewEntityID(),
 			AppearanceComponent: &components.AppearanceComponent{
 				Color: colornames.Red,
 			},
@@ -501,4 +482,48 @@ func buildEnemyEntities(w world.World) []entities.Enemy {
 	}
 
 	return enemies
+}
+
+func buildLevelObstacles(level string) []entities.Obstacle {
+	obstacles := []entities.Obstacle{}
+
+	w := spriteSize
+	h := spriteSize
+
+	switch level {
+	case "1.0":
+		for i := 0.0; i < mapW/spriteSize; i++ {
+			// Build top wall
+			obstacles = append(obstacles, buildObstacle(mapX+(w*i), mapY))
+			// Build bottom wall
+			obstacles = append(obstacles, buildObstacle(mapX+(w*i), mapY+mapH-h))
+			// Build left wall
+			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
+			// Build right wall
+			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		}
+	}
+
+	return obstacles
+}
+
+func buildObstacle(x, y float64) entities.Obstacle {
+	return entities.Obstacle{
+		ID: gameWorld.NewEntityID(),
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Darkgray,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
+			BoundsRect: pixel.R(
+				mapX,
+				mapY,
+				mapX+mapW,
+				mapY+mapH,
+			),
+			Shape: imdraw.New(nil),
+		},
+	}
 }
