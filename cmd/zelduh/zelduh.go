@@ -154,6 +154,11 @@ func run() {
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
 			// fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
+			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
+			enemy, ok := findEnemy(enemyID)
+			if ok {
+				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
+			}
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
