@@ -3,6 +3,7 @@ package render
 import (
 	"fmt"
 
+	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 )
@@ -81,9 +82,8 @@ func (s *System) Update() {
 	for _, coin := range s.coins {
 		coin.Shape.Clear()
 		coin.Shape.Color = coin.AppearanceComponent.Color
-		coin.Shape.Push(coin.SpatialComponent.Rect.Min)
-		coin.Shape.Push(coin.SpatialComponent.Rect.Max)
-		coin.Shape.Rectangle(0)
+		coin.Shape.Push(coin.SpatialComponent.Rect.Moved(pixel.V(24, 24)).Min)
+		coin.Shape.Circle(24, 0)
 		coin.Shape.Draw(s.Win)
 	}
 
