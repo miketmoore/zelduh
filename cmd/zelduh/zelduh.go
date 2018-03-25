@@ -143,7 +143,6 @@ func run() {
 	gameWorld.AddSystem(&spatial.System{
 		Rand: r,
 	})
-	gameWorld.AddSystem(&render.System{Win: win})
 	gameWorld.AddSystem(&physics.System{})
 	gameWorld.AddSystem(&collision.System{
 		PlayerCollisionWithCoin: func(coinID int) {
@@ -172,6 +171,7 @@ func run() {
 			}
 		},
 	})
+	gameWorld.AddSystem(&render.System{Win: win})
 
 	currentState := gamestate.Start
 
