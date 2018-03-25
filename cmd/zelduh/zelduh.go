@@ -147,20 +147,20 @@ func run() {
 	gameWorld.AddSystem(&physics.System{})
 	gameWorld.AddSystem(&collision.System{
 		PlayerCollisionWithCoin: func(coinID int) {
-			fmt.Printf("Player collecting coin %d, before: %d\n", coinID, playerEntity.CoinsComponent.Coins)
+			// Player gets a coin!
 			playerEntity.CoinsComponent.Coins++
-			fmt.Printf("After: %d\n", playerEntity.CoinsComponent.Coins)
+			fmt.Printf("Player coins: %d\n", playerEntity.CoinsComponent.Coins)
 			gameWorld.RemoveCoin(coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
 			// fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
-			// Undo rect
+			// "Block" by undoing rect
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
-			// Undo rect
+			// "Block" by undoing rect
 			enemy, ok := findEnemy(enemyID)
 			if ok {
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
