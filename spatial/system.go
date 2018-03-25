@@ -47,9 +47,10 @@ func (s *System) AddEnemy(id int, spatial *components.SpatialComponent, movement
 // Update changes spatial data based on movement data
 func (s *System) Update() {
 	player := s.playerEntity
-	if player.MovementComponent.Speed > 0 {
+	speed := player.MovementComponent.Speed
+	if speed > 0 {
 		var v pixel.Vec
-		speed := player.MovementComponent.Speed
+
 		switch player.MovementComponent.Direction {
 		case direction.Up:
 			v = pixel.V(0, speed)
