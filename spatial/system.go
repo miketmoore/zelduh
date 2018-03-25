@@ -62,11 +62,8 @@ func (s *System) Update() {
 			v = pixel.V(-speed, 0)
 		}
 		newRect := player.SpatialComponent.Rect.Moved(v)
-		if player.SpatialComponent.BoundsRect.Contains(newRect.Min) &&
-			player.SpatialComponent.BoundsRect.Contains(newRect.Max) {
-			player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
-			player.SpatialComponent.Rect = newRect
-		}
+		player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
+		player.SpatialComponent.Rect = newRect
 	}
 
 	for _, enemy := range s.enemies {
@@ -97,23 +94,22 @@ func moveEnemy(s *System, enemy spatialEntity) {
 	} else {
 		if enemy.EnemySpatialComponent.MoveCounter > 0 {
 			moveVec := pixel.V(0, 0)
-			if enemy.SpatialComponent.BoundsRect.Contains(enemy.SpatialComponent.Rect.Min) &&
-				enemy.SpatialComponent.BoundsRect.Contains(enemy.SpatialComponent.Rect.Max) {
-				speed := 1.0
-				switch enemy.SpatialComponent.LastDir {
-				case direction.Up:
-					moveVec = pixel.V(0, speed)
-				case direction.Right:
-					moveVec = pixel.V(speed, 0)
-				case direction.Down:
-					moveVec = pixel.V(0, -speed)
-				case direction.Left:
-					moveVec = pixel.V(-speed, 0)
-				}
-				enemy.SpatialComponent.PrevRect = enemy.SpatialComponent.Rect
-				enemy.SpatialComponent.Rect = enemy.SpatialComponent.Rect.Moved(moveVec)
-				enemy.EnemySpatialComponent.MoveCounter--
+
+			speed := 1.0
+			switch enemy.SpatialComponent.LastDir {
+			case direction.Up:
+				moveVec = pixel.V(0, speed)
+			case direction.Right:
+				moveVec = pixel.V(speed, 0)
+			case direction.Down:
+				moveVec = pixel.V(0, -speed)
+			case direction.Left:
+				moveVec = pixel.V(-speed, 0)
 			}
+			enemy.SpatialComponent.PrevRect = enemy.SpatialComponent.Rect
+			enemy.SpatialComponent.Rect = enemy.SpatialComponent.Rect.Moved(moveVec)
+			enemy.EnemySpatialComponent.MoveCounter--
+
 		} else {
 			enemy.EnemySpatialComponent.TotalMoves--
 			enemy.EnemySpatialComponent.MoveCounter = int(enemy.SpatialComponent.Rect.W())

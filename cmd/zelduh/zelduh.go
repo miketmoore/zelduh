@@ -384,12 +384,6 @@ func buildPlayerEntity() entities.Player {
 				mapX+(mapW/2)+spriteSize,
 				mapY+(mapH/2)+spriteSize,
 			),
-			BoundsRect: pixel.R(
-				mapX,
-				mapY,
-				mapX+mapW,
-				mapY+mapH,
-			),
 			Shape: imdraw.New(nil),
 		},
 		MovementComponent: &components.MovementComponent{
@@ -422,12 +416,6 @@ func buildCoinEntities() []entities.Coin {
 					y,
 					x+spriteSize,
 					y+spriteSize,
-				),
-				BoundsRect: pixel.R(
-					mapX,
-					mapY,
-					mapX+mapW,
-					mapY+mapH,
 				),
 				Shape: imdraw.New(nil),
 			},
@@ -466,12 +454,6 @@ func buildEnemyEntities() []entities.Enemy {
 					x+spriteSize,
 					y+yInc+spriteSize,
 				),
-				BoundsRect: pixel.R(
-					mapX,
-					mapY,
-					mapX+mapW,
-					mapY+mapH,
-				),
 				Shape: imdraw.New(nil),
 			},
 			MovementComponent: &components.MovementComponent{
@@ -497,10 +479,14 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 			obstacles = append(obstacles, buildObstacle(mapX+(w*i), mapY))
 			// Build bottom wall
 			obstacles = append(obstacles, buildObstacle(mapX+(w*i), mapY+mapH-h))
+		}
+
+		for i := 0.0; i < mapH/spriteSize; i++ {
 			// Build left wall
 			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
 			// Build right wall
 			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+
 		}
 	}
 
@@ -511,19 +497,13 @@ func buildObstacle(x, y float64) entities.Obstacle {
 	return entities.Obstacle{
 		ID: gameWorld.NewEntityID(),
 		AppearanceComponent: &components.AppearanceComponent{
-			Color: colornames.Darkgray,
+			Color: colornames.Blue,
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
 			Height: spriteSize,
 			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
-			BoundsRect: pixel.R(
-				mapX,
-				mapY,
-				mapX+mapW,
-				mapY+mapH,
-			),
-			Shape: imdraw.New(nil),
+			Shape:  imdraw.New(nil),
 		},
 	}
 }
