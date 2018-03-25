@@ -82,7 +82,8 @@ func (s *System) Update() {
 	for _, coin := range s.coins {
 		coin.Shape.Clear()
 		coin.Shape.Color = coin.AppearanceComponent.Color
-		coin.Shape.Push(coin.SpatialComponent.Rect.Moved(pixel.V(24, 24)).Min)
+		mod := coin.SpatialComponent.Width / 2
+		coin.Shape.Push(coin.SpatialComponent.Rect.Moved(pixel.V(mod, mod)).Min)
 		coin.Shape.Circle(24, 0)
 		coin.Shape.Draw(s.Win)
 	}
