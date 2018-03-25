@@ -475,18 +475,16 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 	switch level {
 	case "fourWalls":
 		for i := 0.0; i < (mapW/w)-2; i++ {
-			// Build top wall
+			// top
 			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-			// Build bottom wall
+			// bottom
 			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
 		}
-
 		for i := 0.0; i < (mapH/h)-2; i++ {
-			// Build left wall
+			// left
 			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-			// Build right wall
+			// right
 			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
-
 		}
 	}
 
