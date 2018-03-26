@@ -19,7 +19,7 @@ import (
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
-	"github.com/miketmoore/zelduh/playerinput"
+	"github.com/miketmoore/zelduh/input"
 	"github.com/miketmoore/zelduh/render"
 	"github.com/miketmoore/zelduh/spatial"
 	"github.com/miketmoore/zelduh/world"
@@ -130,7 +130,7 @@ func run() {
 	}
 
 	// Create systems and add to game world
-	gameWorld.AddSystem(&playerinput.System{Win: win})
+	gameWorld.AddSystem(&input.System{Win: win})
 	gameWorld.AddSystem(&spatial.System{
 		Rand: r,
 	})
@@ -168,7 +168,7 @@ func run() {
 	// Add entity components to custom ECS systems
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
-		case *playerinput.System:
+		case *input.System:
 			sys.AddPlayer(playerEntity.MovementComponent)
 			// maybe sword is attacking simply if it is "out", so attacking is just implied by it's
 			// existence.

@@ -1,4 +1,4 @@
-package playerinput
+package input
 
 import (
 	"fmt"
