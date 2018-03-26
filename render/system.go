@@ -78,6 +78,16 @@ func (s *System) RemoveCoin(id int) {
 	}
 }
 
+// RemoveEnemy removes the specified enemy from the system
+func (s *System) RemoveEnemy(id int) {
+	for i := len(s.enemies) - 1; i >= 0; i-- {
+		enemy := s.enemies[i]
+		if enemy.ID == id {
+			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+		}
+	}
+}
+
 // Update changes spatial data based on movement data
 func (s *System) Update() {
 

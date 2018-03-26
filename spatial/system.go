@@ -55,6 +55,16 @@ func (s *System) AddEnemy(id int, spatial *components.SpatialComponent, movement
 	})
 }
 
+// RemoveEnemy removes the specified enemy from the system
+func (s *System) RemoveEnemy(id int) {
+	for i := len(s.enemies) - 1; i >= 0; i-- {
+		enemy := s.enemies[i]
+		if enemy.ID == id {
+			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+		}
+	}
+}
+
 // MovePlayerBack moves the player back
 func (s *System) MovePlayerBack() {
 	fmt.Println("Move back")

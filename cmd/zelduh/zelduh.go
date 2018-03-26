@@ -160,14 +160,14 @@ func run() {
 		SwordCollisionWithEnemy: func(enemyID int) {
 			fmt.Printf("sword hit enemy!\n")
 			spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
-			// enemy, ok := findEnemy(enemyID)
-			// if ok {
-			// 	enemy.Health.Total--
-			// 	if enemy.Health.Total == 0 {
-			// 		fmt.Printf("Enemy is dead!\n")
-			// 		// gameWorld.RemoveEnemy(enemy.ID)
-			// 	}
-			// }
+			enemy, ok := findEnemy(enemyID)
+			if ok {
+				enemy.Health.Total--
+				if enemy.Health.Total == 0 {
+					fmt.Printf("Enemy is dead!\n")
+					gameWorld.RemoveEnemy(enemy.ID)
+				}
+			}
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect

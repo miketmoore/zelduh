@@ -3,6 +3,7 @@ package world
 import (
 	"github.com/miketmoore/zelduh/collision"
 	"github.com/miketmoore/zelduh/render"
+	"github.com/miketmoore/zelduh/spatial"
 )
 
 // System is an interface
@@ -54,6 +55,19 @@ func (w *World) RemoveCoin(id int) {
 			sys.RemoveCoin(id)
 		case *render.System:
 			sys.RemoveCoin(id)
+		}
+	}
+}
+
+func (w *World) RemoveEnemy(id int) {
+	for _, sys := range w.systems {
+		switch sys := sys.(type) {
+		case *spatial.System:
+			sys.RemoveEnemy(id)
+		case *collision.System:
+			sys.RemoveEnemy(id)
+		case *render.System:
+			sys.RemoveEnemy(id)
 		}
 	}
 }
