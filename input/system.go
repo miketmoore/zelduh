@@ -1,8 +1,6 @@
 package input
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -55,7 +53,6 @@ func (s *System) Update() {
 	}
 
 	if win.Pressed(pixelgl.KeySpace) {
-		fmt.Println("Attack with sword!")
 		s.sword.MovementComponent.Direction = player.MovementComponent.Direction
 		s.sword.MovementComponent.Speed = player.MovementComponent.Speed
 	} else {
