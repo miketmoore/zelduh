@@ -16,12 +16,13 @@ type renderEntity struct {
 
 // System is a custom system
 type System struct {
-	Win          *pixelgl.Window
-	playerEntity renderEntity
-	sword        renderEntity
-	coins        []renderEntity
-	enemies      []renderEntity
-	obstacles    []renderEntity
+	Win               *pixelgl.Window
+	playerEntity      renderEntity
+	sword             renderEntity
+	coins             []renderEntity
+	enemies           []renderEntity
+	obstacles         []renderEntity
+	moveableObstacles []renderEntity
 }
 
 // AddPlayer adds the player to the system
@@ -43,6 +44,15 @@ func (s *System) AddSword(appearance *components.AppearanceComponent, spatial *c
 // AddObstacle adds an enemy to the system
 func (s *System) AddObstacle(id int, appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.obstacles = append(s.obstacles, renderEntity{
+		ID:                  id,
+		AppearanceComponent: appearance,
+		SpatialComponent:    spatial,
+	})
+}
+
+// AddMoveableObstacle adds a moveable obstacle to the system
+func (s *System) AddMoveableObstacle(id int, appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
+	s.moveableObstacles = append(s.moveableObstacles, renderEntity{
 		ID:                  id,
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,

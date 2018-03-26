@@ -23,10 +23,11 @@ type spatialEntity struct {
 
 // System is a custom system
 type System struct {
-	Rand         *rand.Rand
-	playerEntity spatialEntity
-	sword        spatialEntity
-	enemies      []spatialEntity
+	Rand              *rand.Rand
+	playerEntity      spatialEntity
+	sword             spatialEntity
+	enemies           []spatialEntity
+	moveableObstacles []spatialEntity
 }
 
 // AddPlayer adds the player to the system
@@ -52,6 +53,15 @@ func (s *System) AddEnemy(id int, spatial *components.SpatialComponent, movement
 		SpatialComponent:      spatial,
 		MovementComponent:     movement,
 		EnemySpatialComponent: &enemySpatialComponent{},
+	})
+}
+
+// AddMoveableObstacle adds a moveable obstacle to the system
+func (s *System) AddMoveableObstacle(id int, spatial *components.SpatialComponent, movement *components.MovementComponent) {
+	s.moveableObstacles = append(s.moveableObstacles, spatialEntity{
+		ID:                id,
+		SpatialComponent:  spatial,
+		MovementComponent: movement,
 	})
 }
 
@@ -155,6 +165,7 @@ func (s *System) Update() {
 		case direction.Left:
 			v = pixel.V(-speed-swordW, 0)
 		}
+		player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
 		sword.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
 	} else {
 		sword.SpatialComponent.Rect = player.SpatialComponent.Rect

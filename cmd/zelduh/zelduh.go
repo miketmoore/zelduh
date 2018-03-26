@@ -124,6 +124,9 @@ func run() {
 	block := buildObstacle(mapX+(spriteSize*4), mapY+(spriteSize*5))
 	block.AppearanceComponent.Color = colornames.Midnightblue
 	obstacles = append(obstacles, block)
+	moveableObstacles := []entities.MoveableObstacle{
+		buildMoveableObstacle(mapW+(spriteSize*5), mapH+(spriteSize*5)),
+	}
 
 	findEnemy := func(id int) (entities.Enemy, bool) {
 		for _, e := range enemyEntities {
@@ -170,6 +173,7 @@ func run() {
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
+			sword.SpatialComponent.Rect = sword.SpatialComponent.PrevRect
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
 			// "Block" by undoing rect
@@ -192,6 +196,9 @@ func run() {
 			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
+			}
+			for _, moveable := range moveableObstacles {
+				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent, moveable.MovementComponent)
 			}
 		case *collision.System:
 			sys.AddPlayer(playerEntity.SpatialComponent)
@@ -216,6 +223,9 @@ func run() {
 			}
 			for _, obstacle := range obstacles {
 				sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
+			}
+			for _, moveable := range moveableObstacles {
+				sys.AddMoveableObstacle(moveable.ID, moveable.AppearanceComponent, moveable.SpatialComponent)
 			}
 		}
 	}
@@ -525,6 +535,25 @@ func buildObstacle(x, y float64) entities.Obstacle {
 			Height: spriteSize,
 			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
 			Shape:  imdraw.New(nil),
+		},
+	}
+}
+
+func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
+	return entities.MoveableObstacle{
+		ID: gameWorld.NewEntityID(),
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Black,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
+			Shape:  imdraw.New(nil),
+		},
+		MovementComponent: &components.MovementComponent{
+			Direction: direction.Down,
+			Speed:     1.0,
 		},
 	}
 }
