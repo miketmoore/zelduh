@@ -144,6 +144,7 @@ func (s *System) Update() {
 	if speed > 0 {
 		var v pixel.Vec
 
+		fmt.Printf("spatial sword direction: %s\n", sword.MovementComponent.Direction)
 		switch sword.MovementComponent.Direction {
 		case direction.Up:
 			v = pixel.V(0, speed+swordH)
