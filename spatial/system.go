@@ -70,9 +70,8 @@ func (s *System) Update() {
 		case direction.Left:
 			v = pixel.V(-speed, 0)
 		}
-		newRect := player.SpatialComponent.Rect.Moved(v)
 		player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
-		player.SpatialComponent.Rect = newRect
+		player.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
 	}
 
 	sword := s.sword
@@ -92,8 +91,7 @@ func (s *System) Update() {
 		case direction.Left:
 			v = pixel.V(-speed-swordW, 0)
 		}
-		newRect := player.SpatialComponent.Rect.Moved(v)
-		sword.SpatialComponent.Rect = newRect
+		sword.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
 	} else {
 		sword.SpatialComponent.Rect = player.SpatialComponent.Rect
 	}

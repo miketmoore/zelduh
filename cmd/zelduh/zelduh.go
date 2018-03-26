@@ -142,12 +142,14 @@ func run() {
 			gameWorld.RemoveCoin(coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
-			// fmt.Printf("Player collided with enemy ID:%d\n", enemyID)
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 			enemy, ok := findEnemy(enemyID)
 			if ok {
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
 			}
+		},
+		SwordCollisionWithEnemy: func(enemyID int) {
+			fmt.Printf("hit!\n")
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
@@ -181,6 +183,7 @@ func run() {
 			}
 		case *collision.System:
 			sys.AddPlayer(playerEntity.SpatialComponent)
+			sys.AddSword(sword.SpatialComponent)
 			for _, coin := range coinEntities {
 				sys.AddCoin(coin.ID, coin.SpatialComponent)
 			}

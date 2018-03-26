@@ -80,13 +80,6 @@ func (s *System) RemoveCoin(id int) {
 
 // Update changes spatial data based on movement data
 func (s *System) Update() {
-	player := s.playerEntity
-	player.Shape.Clear()
-	player.Shape.Color = player.AppearanceComponent.Color
-	player.Shape.Push(player.SpatialComponent.Rect.Min)
-	player.Shape.Push(player.SpatialComponent.Rect.Max)
-	player.Shape.Rectangle(0)
-	player.Shape.Draw(s.Win)
 
 	sword := s.sword
 	sword.Shape.Clear()
@@ -95,6 +88,14 @@ func (s *System) Update() {
 	sword.Shape.Push(sword.SpatialComponent.Rect.Max)
 	sword.Shape.Rectangle(0)
 	sword.Shape.Draw(s.Win)
+
+	player := s.playerEntity
+	player.Shape.Clear()
+	player.Shape.Color = player.AppearanceComponent.Color
+	player.Shape.Push(player.SpatialComponent.Rect.Min)
+	player.Shape.Push(player.SpatialComponent.Rect.Max)
+	player.Shape.Rectangle(0)
+	player.Shape.Draw(s.Win)
 
 	for _, enemy := range s.enemies {
 		enemy.Shape.Clear()

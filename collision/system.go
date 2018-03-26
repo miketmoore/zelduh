@@ -15,18 +15,29 @@ type collisionEntity struct {
 // System is a custom system for detecting collisions and what to do when they occur
 type System struct {
 	playerEntity                collisionEntity
+	sword                       collisionEntity
 	enemies                     []collisionEntity
 	coins                       []collisionEntity
 	obstacles                   []collisionEntity
 	PlayerCollisionWithCoin     func(int)
 	PlayerCollisionWithEnemy    func(int)
+	SwordCollisionWithEnemy     func(int)
 	PlayerCollisionWithObstacle func(int)
 	EnemyCollisionWithObstacle  func(int, int)
+	playerwithenemy             int
+	swordhitenemy               int
 }
 
 // AddPlayer adds the player to the system
 func (s *System) AddPlayer(spatial *components.SpatialComponent) {
 	s.playerEntity = collisionEntity{
+		SpatialComponent: spatial,
+	}
+}
+
+// AddSword adds the player to the system
+func (s *System) AddSword(spatial *components.SpatialComponent) {
+	s.sword = collisionEntity{
 		SpatialComponent: spatial,
 	}
 }
@@ -66,37 +77,37 @@ func (s *System) RemoveCoin(id int) {
 	}
 }
 
+func isColliding(r1, r2 pixel.Rect) bool {
+	return r1.Min.X < r2.Max.X &&
+		r1.Max.X > r2.Min.X &&
+		r1.Min.Y < r2.Max.Y &&
+		r1.Max.Y > r2.Min.Y
+}
+
 // Update checks for collisions
 func (s *System) Update() {
 	for _, enemy := range s.enemies {
-		intersection := enemy.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
-		if intersection.Area() > 0 {
+		enemyR := enemy.SpatialComponent.Rect
+		if isColliding(enemyR, s.playerEntity.SpatialComponent.Rect) {
+			s.playerwithenemy++
 			s.PlayerCollisionWithEnemy(enemy.ID)
+		}
+		if isColliding(enemyR, s.sword.SpatialComponent.Rect) {
+			s.SwordCollisionWithEnemy(enemy.ID)
 		}
 	}
 	for _, coin := range s.coins {
-		cr := coin.SpatialComponent.Rect
-		inset := 10.0
-		r := pixel.R(
-			cr.Min.X+inset,
-			cr.Min.Y+inset,
-			cr.Max.X-inset,
-			cr.Max.Y-inset,
-		)
-		intersection := r.Intersect(s.playerEntity.SpatialComponent.Rect)
-		if intersection.Area() > 0 {
+		if isColliding(coin.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
 			s.PlayerCollisionWithCoin(coin.ID)
 		}
 	}
 	for _, obstacle := range s.obstacles {
-		intersectionWithPlayer := obstacle.SpatialComponent.Rect.Intersect(s.playerEntity.SpatialComponent.Rect)
-		if intersectionWithPlayer.Area() > 0 {
+		if isColliding(obstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
 			s.PlayerCollisionWithObstacle(obstacle.ID)
 		}
 
 		for _, enemy := range s.enemies {
-			intersectionWithEnemy := obstacle.SpatialComponent.Rect.Intersect(enemy.SpatialComponent.Rect)
-			if intersectionWithEnemy.Area() > 0 {
+			if isColliding(obstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
 				s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
 			}
 		}
