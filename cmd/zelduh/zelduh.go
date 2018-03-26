@@ -131,9 +131,10 @@ func run() {
 
 	// Create systems and add to game world
 	gameWorld.AddSystem(&input.System{Win: win})
-	gameWorld.AddSystem(&spatial.System{
+	spatialSystem := &spatial.System{
 		Rand: r,
-	})
+	}
+	gameWorld.AddSystem(spatialSystem)
 	gameWorld.AddSystem(&collision.System{
 		PlayerCollisionWithCoin: func(coinID int) {
 			// Player gets a coin!
@@ -142,6 +143,9 @@ func run() {
 			gameWorld.RemoveCoin(coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
+			// Move player back 2-3 tiles from previous location (have not rendered new rect yet).
+			spatialSystem.MovePlayerBack()
+
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 			enemy, ok := findEnemy(enemyID)
 			if ok {

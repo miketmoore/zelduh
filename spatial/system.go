@@ -1,6 +1,7 @@
 package spatial
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/faiface/pixel"
@@ -51,6 +52,27 @@ func (s *System) AddEnemy(id int, spatial *components.SpatialComponent, movement
 		MovementComponent:     movement,
 		EnemySpatialComponent: &enemySpatialComponent{},
 	})
+}
+
+// MovePlayerBack moves the player back one tile
+func (s *System) MovePlayerBack() {
+	fmt.Println("Move back")
+	player := s.playerEntity
+	pr := player.SpatialComponent.PrevRect
+	var v pixel.Vec
+	// speed := player.MovementComponent.Speed
+	switch player.MovementComponent.Direction {
+	case direction.Up:
+		v = pixel.V(0, -48)
+	case direction.Right:
+		v = pixel.V(-48, 0)
+	case direction.Down:
+		v = pixel.V(0, 48)
+	case direction.Left:
+		v = pixel.V(48, 0)
+	}
+	player.SpatialComponent.Rect = pr.Moved(v)
+	player.SpatialComponent.PrevRect = pr.Moved(v)
 }
 
 // Update changes spatial data based on movement data
