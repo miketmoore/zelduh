@@ -139,23 +139,16 @@ func run() {
 	gameWorld.AddSystem(spatialSystem)
 	gameWorld.AddSystem(&collision.System{
 		PlayerCollisionWithCoin: func(coinID int) {
-			// Player gets a coin!
 			playerEntity.CoinsComponent.Coins++
 			fmt.Printf("Player coins: %d\n", playerEntity.CoinsComponent.Coins)
 			gameWorld.RemoveCoin(coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
-			// Move player back 2-3 tiles from previous location (have not rendered new rect yet).
 			spatialSystem.MovePlayerBack()
 			playerEntity.Health.Total--
 			if playerEntity.Health.Total == 0 {
 				currentState = gamestate.Over
 			}
-
-			// enemy, ok := findEnemy(enemyID)
-			// if ok {
-			// 	enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
-			// }
 		},
 		SwordCollisionWithEnemy: func(enemyID int) {
 			fmt.Printf("sword hit enemy!\n")
@@ -188,8 +181,6 @@ func run() {
 		switch sys := system.(type) {
 		case *input.System:
 			sys.AddPlayer(playerEntity.MovementComponent)
-			// maybe sword is attacking simply if it is "out", so attacking is just implied by it's
-			// existence.
 			sys.AddSword(sword.MovementComponent)
 		case *spatial.System:
 			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
