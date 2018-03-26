@@ -120,6 +120,11 @@ func run() {
 
 	obstacles := buildLevelObstacles("fourWalls")
 
+	// Create a "pushable" obstacle
+	block := buildObstacle(mapX+(spriteSize*4), mapY+(spriteSize*5))
+	block.AppearanceComponent.Color = colornames.Midnightblue
+	obstacles = append(obstacles, block)
+
 	findEnemy := func(id int) (entities.Enemy, bool) {
 		for _, e := range enemyEntities {
 			if e.ID == id {
