@@ -129,6 +129,8 @@ func run() {
 		return entities.Enemy{}, false
 	}
 
+	currentState := gamestate.Start
+
 	// Create systems and add to game world
 	gameWorld.AddSystem(&input.System{Win: win})
 	spatialSystem := &spatial.System{
@@ -145,8 +147,11 @@ func run() {
 		PlayerCollisionWithEnemy: func(enemyID int) {
 			// Move player back 2-3 tiles from previous location (have not rendered new rect yet).
 			spatialSystem.MovePlayerBack()
+			playerEntity.Health.Total--
+			if playerEntity.Health.Total == 0 {
+				currentState = gamestate.Over
+			}
 
-			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 			enemy, ok := findEnemy(enemyID)
 			if ok {
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
@@ -168,8 +173,6 @@ func run() {
 		},
 	})
 	gameWorld.AddSystem(&render.System{Win: win})
-
-	currentState := gamestate.Start
 
 	// Add entity components to custom ECS systems
 	for _, system := range gameWorld.Systems() {
@@ -389,6 +392,9 @@ func loadPicture(path string) pixel.Picture {
 
 func buildPlayerEntity() entities.Player {
 	return entities.Player{
+		Health: &components.Health{
+			Total: 3,
+		},
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Green,
 		},
