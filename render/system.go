@@ -18,6 +18,7 @@ type renderEntity struct {
 type System struct {
 	Win          *pixelgl.Window
 	playerEntity renderEntity
+	sword        renderEntity
 	coins        []renderEntity
 	enemies      []renderEntity
 	obstacles    []renderEntity
@@ -26,6 +27,14 @@ type System struct {
 // AddPlayer adds the player to the system
 func (s *System) AddPlayer(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.playerEntity = renderEntity{
+		AppearanceComponent: appearance,
+		SpatialComponent:    spatial,
+	}
+}
+
+// AddSword adds the sword to the system
+func (s *System) AddSword(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
+	s.sword = renderEntity{
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
 	}
@@ -78,6 +87,14 @@ func (s *System) Update() {
 	player.Shape.Push(player.SpatialComponent.Rect.Max)
 	player.Shape.Rectangle(0)
 	player.Shape.Draw(s.Win)
+
+	sword := s.sword
+	sword.Shape.Clear()
+	sword.Shape.Color = sword.AppearanceComponent.Color
+	sword.Shape.Push(sword.SpatialComponent.Rect.Min)
+	sword.Shape.Push(sword.SpatialComponent.Rect.Max)
+	sword.Shape.Rectangle(0)
+	sword.Shape.Draw(s.Win)
 
 	for _, enemy := range s.enemies {
 		enemy.Shape.Clear()

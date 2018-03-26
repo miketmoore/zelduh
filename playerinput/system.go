@@ -1,25 +1,35 @@
 package playerinput
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/direction"
 )
 
-type playerInputEntity struct {
-	ID int
-	*components.PhysicsComponent
+type inputEntity struct {
+	*components.MovementComponent
 }
 
 // System is a custom system for detecting collisions and what to do when they occur
 type System struct {
 	Win          *pixelgl.Window
-	playerEntity playerInputEntity
+	playerEntity inputEntity
+	sword        inputEntity
 }
 
 // AddPlayer adds the player to the system
-func (s *System) AddPlayer(physics *components.PhysicsComponent) {
-	s.playerEntity = playerInputEntity{
-		PhysicsComponent: physics,
+func (s *System) AddPlayer(movement *components.MovementComponent) {
+	s.playerEntity = inputEntity{
+		MovementComponent: movement,
+	}
+}
+
+// AddSword adds the sword entity to the sytem
+func (s *System) AddSword(movement *components.MovementComponent) {
+	s.sword = inputEntity{
+		MovementComponent: movement,
 	}
 }
 
@@ -28,19 +38,28 @@ func (s *System) Update() {
 	win := s.Win
 	player := s.playerEntity
 
-	player.PhysicsComponent.ForceUp = 0
-	player.PhysicsComponent.ForceRight = 0
-	player.PhysicsComponent.ForceDown = 0
-	player.PhysicsComponent.ForceLeft = 0
-
 	if win.Pressed(pixelgl.KeyUp) {
-		player.PhysicsComponent.ForceUp = 1
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Up
 	} else if win.Pressed(pixelgl.KeyRight) {
-		player.PhysicsComponent.ForceRight = 1
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Right
 	} else if win.Pressed(pixelgl.KeyDown) {
-		player.PhysicsComponent.ForceDown = 1
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Down
 	} else if win.Pressed(pixelgl.KeyLeft) {
-		player.PhysicsComponent.ForceLeft = 1
+		player.MovementComponent.Speed = 1
+		player.MovementComponent.Direction = direction.Left
+	} else {
+		player.MovementComponent.Speed = 0
 	}
 
+	if win.Pressed(pixelgl.KeySpace) {
+		fmt.Println("Attack with sword!")
+		s.sword.MovementComponent.Direction = player.MovementComponent.Direction
+		s.sword.MovementComponent.Speed = player.MovementComponent.Speed
+	} else {
+		s.sword.MovementComponent.Direction = player.MovementComponent.Direction
+		s.sword.MovementComponent.Speed = 0
+	}
 }

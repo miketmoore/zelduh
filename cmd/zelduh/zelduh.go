@@ -19,7 +19,6 @@ import (
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
-	"github.com/miketmoore/zelduh/physics"
 	"github.com/miketmoore/zelduh/playerinput"
 	"github.com/miketmoore/zelduh/render"
 	"github.com/miketmoore/zelduh/spatial"
@@ -101,6 +100,21 @@ func run() {
 
 	// New entities
 	playerEntity := buildPlayerEntity()
+	sword := entities.Sword{
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Deeppink,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(0, 0, 0, 0),
+			Shape:  imdraw.New(nil),
+		},
+		MovementComponent: &components.MovementComponent{
+			Direction: playerEntity.MovementComponent.Direction,
+			Speed:     0.0,
+		},
+	}
 	coinEntities := buildCoinEntities()
 	enemyEntities := buildEnemyEntities()
 
@@ -120,7 +134,6 @@ func run() {
 	gameWorld.AddSystem(&spatial.System{
 		Rand: r,
 	})
-	gameWorld.AddSystem(&physics.System{})
 	gameWorld.AddSystem(&collision.System{
 		PlayerCollisionWithCoin: func(coinID int) {
 			// Player gets a coin!
@@ -156,9 +169,13 @@ func run() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *playerinput.System:
-			sys.AddPlayer(playerEntity.PhysicsComponent)
+			sys.AddPlayer(playerEntity.MovementComponent)
+			// maybe sword is attacking simply if it is "out", so attacking is just implied by it's
+			// existence.
+			sys.AddSword(sword.MovementComponent)
 		case *spatial.System:
 			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
+			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
 			}
@@ -173,10 +190,9 @@ func run() {
 			for _, obstacle := range obstacles {
 				sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
 			}
-		case *physics.System:
-			sys.AddPlayer(playerEntity.PhysicsComponent, playerEntity.MovementComponent)
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
+			sys.AddSword(sword.AppearanceComponent, sword.SpatialComponent)
 			for _, coin := range coinEntities {
 				sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
 			}
@@ -369,12 +385,6 @@ func buildPlayerEntity() entities.Player {
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Green,
 		},
-		PhysicsComponent: &components.PhysicsComponent{
-			ForceDown:  0,
-			ForceLeft:  0,
-			ForceRight: 0,
-			ForceUp:    0,
-		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
 			Height: spriteSize,
@@ -441,12 +451,6 @@ func buildEnemy(x, y float64) entities.Enemy {
 		ID: gameWorld.NewEntityID(),
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Red,
-		},
-		PhysicsComponent: &components.PhysicsComponent{
-			ForceDown:  0,
-			ForceLeft:  0,
-			ForceRight: 0,
-			ForceUp:    0,
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,

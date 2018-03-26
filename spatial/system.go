@@ -24,12 +24,21 @@ type spatialEntity struct {
 type System struct {
 	Rand         *rand.Rand
 	playerEntity spatialEntity
+	sword        spatialEntity
 	enemies      []spatialEntity
 }
 
 // AddPlayer adds the player to the system
 func (s *System) AddPlayer(spatial *components.SpatialComponent, movement *components.MovementComponent) {
 	s.playerEntity = spatialEntity{
+		SpatialComponent:  spatial,
+		MovementComponent: movement,
+	}
+}
+
+// AddSword adds the player to the system
+func (s *System) AddSword(spatial *components.SpatialComponent, movement *components.MovementComponent) {
+	s.sword = spatialEntity{
 		SpatialComponent:  spatial,
 		MovementComponent: movement,
 	}
@@ -64,6 +73,29 @@ func (s *System) Update() {
 		newRect := player.SpatialComponent.Rect.Moved(v)
 		player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
 		player.SpatialComponent.Rect = newRect
+	}
+
+	sword := s.sword
+	speed = sword.MovementComponent.Speed
+	swordW := sword.SpatialComponent.Width
+	swordH := sword.SpatialComponent.Height
+	if speed > 0 {
+		var v pixel.Vec
+
+		switch sword.MovementComponent.Direction {
+		case direction.Up:
+			v = pixel.V(0, speed+swordH)
+		case direction.Right:
+			v = pixel.V(speed+swordW, 0)
+		case direction.Down:
+			v = pixel.V(0, -speed-swordH)
+		case direction.Left:
+			v = pixel.V(-speed-swordW, 0)
+		}
+		newRect := player.SpatialComponent.Rect.Moved(v)
+		sword.SpatialComponent.Rect = newRect
+	} else {
+		sword.SpatialComponent.Rect = player.SpatialComponent.Rect
 	}
 
 	for _, enemy := range s.enemies {
