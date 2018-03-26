@@ -48,19 +48,18 @@ func (s *System) AddSword(spatial *components.SpatialComponent, movement *compon
 // AddEnemy adds an enemy to the system
 func (s *System) AddEnemy(id int, spatial *components.SpatialComponent, movement *components.MovementComponent) {
 	s.enemies = append(s.enemies, spatialEntity{
+		ID:                    id,
 		SpatialComponent:      spatial,
 		MovementComponent:     movement,
 		EnemySpatialComponent: &enemySpatialComponent{},
 	})
 }
 
-// MovePlayerBack moves the player back one tile
+// MovePlayerBack moves the player back
 func (s *System) MovePlayerBack() {
 	fmt.Println("Move back")
 	player := s.playerEntity
-	pr := player.SpatialComponent.PrevRect
 	var v pixel.Vec
-	// speed := player.MovementComponent.Speed
 	switch player.MovementComponent.Direction {
 	case direction.Up:
 		v = pixel.V(0, -48)
@@ -71,8 +70,40 @@ func (s *System) MovePlayerBack() {
 	case direction.Left:
 		v = pixel.V(48, 0)
 	}
-	player.SpatialComponent.Rect = pr.Moved(v)
-	player.SpatialComponent.PrevRect = pr.Moved(v)
+	player.SpatialComponent.Rect = player.SpatialComponent.PrevRect.Moved(v)
+	player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
+}
+
+func (s *System) enemy(id int) (spatialEntity, bool) {
+	for _, e := range s.enemies {
+		if e.ID == id {
+			return e, true
+		}
+	}
+	return spatialEntity{}, false
+}
+
+// MoveEnemyBack moves the enemy back
+func (s *System) MoveEnemyBack(enemyID int, directionHit direction.Name) {
+	fmt.Printf("spatial MoveEnemyBack called enemyID: %d\n", enemyID)
+	enemy, ok := s.enemy(enemyID)
+	if ok {
+		fmt.Printf("spatial MoveEnemyBack OK, found enemy.ID: %d\n", enemy.ID)
+		var v pixel.Vec
+		fmt.Printf("spatial MoveEnemyBack direction: %v\n", enemy.MovementComponent.Direction)
+		switch directionHit {
+		case direction.Up:
+			v = pixel.V(0, 48)
+		case direction.Right:
+			v = pixel.V(48, 0)
+		case direction.Down:
+			v = pixel.V(0, -48)
+		case direction.Left:
+			v = pixel.V(-48, 0)
+		}
+		enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect.Moved(v)
+		enemy.SpatialComponent.PrevRect = enemy.SpatialComponent.Rect
+	}
 }
 
 // Update changes spatial data based on movement data
@@ -135,20 +166,20 @@ func moveEnemy(s *System, enemy spatialEntity) {
 		directionIndex := s.Rand.Intn(4)
 		switch directionIndex {
 		case 0:
-			enemy.SpatialComponent.LastDir = direction.Up
+			enemy.MovementComponent.Direction = direction.Up
 		case 1:
-			enemy.SpatialComponent.LastDir = direction.Right
+			enemy.MovementComponent.Direction = direction.Right
 		case 2:
-			enemy.SpatialComponent.LastDir = direction.Down
+			enemy.MovementComponent.Direction = direction.Down
 		case 3:
-			enemy.SpatialComponent.LastDir = direction.Left
+			enemy.MovementComponent.Direction = direction.Left
 		}
 	} else {
 		if enemy.EnemySpatialComponent.MoveCounter > 0 {
 			moveVec := pixel.V(0, 0)
 
 			speed := 1.0
-			switch enemy.SpatialComponent.LastDir {
+			switch enemy.MovementComponent.Direction {
 			case direction.Up:
 				moveVec = pixel.V(0, speed)
 			case direction.Right:
@@ -158,6 +189,8 @@ func moveEnemy(s *System, enemy spatialEntity) {
 			case direction.Left:
 				moveVec = pixel.V(-speed, 0)
 			}
+			// player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
+			// player.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
 			enemy.SpatialComponent.PrevRect = enemy.SpatialComponent.Rect
 			enemy.SpatialComponent.Rect = enemy.SpatialComponent.Rect.Moved(moveVec)
 			enemy.EnemySpatialComponent.MoveCounter--

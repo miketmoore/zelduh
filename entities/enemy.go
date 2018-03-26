@@ -10,4 +10,5 @@ type Enemy struct {
 	*components.AppearanceComponent
 	*components.SpatialComponent
 	*components.MovementComponent
+	*components.Health
 }

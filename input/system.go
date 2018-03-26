@@ -36,17 +36,19 @@ func (s *System) Update() {
 	win := s.Win
 	player := s.playerEntity
 
+	movingSpeed := 3.0
+
 	if win.Pressed(pixelgl.KeyUp) {
-		player.MovementComponent.Speed = 1
+		player.MovementComponent.Speed = movingSpeed
 		player.MovementComponent.Direction = direction.Up
 	} else if win.Pressed(pixelgl.KeyRight) {
-		player.MovementComponent.Speed = 1
+		player.MovementComponent.Speed = movingSpeed
 		player.MovementComponent.Direction = direction.Right
 	} else if win.Pressed(pixelgl.KeyDown) {
-		player.MovementComponent.Speed = 1
+		player.MovementComponent.Speed = movingSpeed
 		player.MovementComponent.Direction = direction.Down
 	} else if win.Pressed(pixelgl.KeyLeft) {
-		player.MovementComponent.Speed = 1
+		player.MovementComponent.Speed = movingSpeed
 		player.MovementComponent.Direction = direction.Left
 	} else {
 		player.MovementComponent.Speed = 0

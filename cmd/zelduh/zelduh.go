@@ -152,13 +152,22 @@ func run() {
 				currentState = gamestate.Over
 			}
 
-			enemy, ok := findEnemy(enemyID)
-			if ok {
-				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
-			}
+			// enemy, ok := findEnemy(enemyID)
+			// if ok {
+			// 	enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
+			// }
 		},
 		SwordCollisionWithEnemy: func(enemyID int) {
-			fmt.Printf("hit!\n")
+			fmt.Printf("sword hit enemy!\n")
+			spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
+			// enemy, ok := findEnemy(enemyID)
+			// if ok {
+			// 	enemy.Health.Total--
+			// 	if enemy.Health.Total == 0 {
+			// 		fmt.Printf("Enemy is dead!\n")
+			// 		// gameWorld.RemoveEnemy(enemy.ID)
+			// 	}
+			// }
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
@@ -461,7 +470,8 @@ func buildEnemyEntities() []entities.Enemy {
 
 func buildEnemy(x, y float64) entities.Enemy {
 	return entities.Enemy{
-		ID: gameWorld.NewEntityID(),
+		ID:     gameWorld.NewEntityID(),
+		Health: &components.Health{Total: 1},
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Red,
 		},
