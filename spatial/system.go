@@ -223,11 +223,7 @@ func (s *System) Update() {
 	arrow := s.arrow
 	speed = arrow.MovementComponent.Speed
 	if arrow.MovementComponent.MoveCount > 0 {
-		arrow.MovementComponent.MoveCount--
 		var v pixel.Vec
-
-		fmt.Printf("spatial arrow direction: %d %s\n",
-			arrow.MovementComponent.MoveCount, arrow.MovementComponent.Direction)
 
 		switch arrow.MovementComponent.Direction {
 		case direction.Up:

@@ -79,7 +79,6 @@ func (s *System) Update() {
 		s.sword.Ignore.Value = true
 	}
 
-	// player.MovementComponent.LastDirection = player.MovementComponent.Direction
 	if s.arrow.MovementComponent.MoveCount == 0 {
 		s.arrow.MovementComponent.Direction = player.MovementComponent.Direction
 		if win.Pressed(pixelgl.KeyG) {
@@ -93,7 +92,7 @@ func (s *System) Update() {
 			s.arrow.Ignore.Value = true
 		}
 	} else {
-		// s.arrow.MovementComponent.MoveCount--
+		s.arrow.MovementComponent.MoveCount--
 	}
 
 	if win.Pressed(pixelgl.KeySpace) {
