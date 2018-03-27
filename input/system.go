@@ -95,9 +95,14 @@ func (s *System) Update() {
 	}
 
 	// dashing
-	if win.Pressed(pixelgl.KeySpace) {
+	if !win.Pressed(pixelgl.KeyF) && win.Pressed(pixelgl.KeySpace) {
 		if s.playerEntity.Dash.Charge < s.playerEntity.Dash.MaxCharge {
 			s.playerEntity.Dash.Charge++
+			s.sword.MovementComponent.Speed = 0
+			s.sword.Ignore.Value = true
+		} else {
+			s.sword.MovementComponent.Speed = 1.0
+			s.sword.Ignore.Value = false
 		}
 	} else {
 		s.playerEntity.Dash.Charge = 0
