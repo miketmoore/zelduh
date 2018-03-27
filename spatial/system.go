@@ -237,7 +237,6 @@ func (s *System) Update() {
 		}
 		arrow.SpatialComponent.PrevRect = arrow.SpatialComponent.Rect
 		arrow.SpatialComponent.Rect = arrow.SpatialComponent.Rect.Moved(v)
-		fmt.Printf("%v\n", arrow.SpatialComponent.Rect.String())
 	} else {
 		arrow.SpatialComponent.Rect = player.SpatialComponent.Rect
 	}

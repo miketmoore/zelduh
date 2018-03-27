@@ -1,8 +1,6 @@
 package input
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -70,6 +68,7 @@ func (s *System) Update() {
 		player.MovementComponent.Speed = 0
 	}
 
+	// attack with sword
 	s.sword.MovementComponent.Direction = player.MovementComponent.Direction
 	if win.Pressed(pixelgl.KeyF) {
 		s.sword.MovementComponent.Speed = 1.0
@@ -79,10 +78,10 @@ func (s *System) Update() {
 		s.sword.Ignore.Value = true
 	}
 
+	// fire arrow
 	if s.arrow.MovementComponent.MoveCount == 0 {
 		s.arrow.MovementComponent.Direction = player.MovementComponent.Direction
 		if win.Pressed(pixelgl.KeyG) {
-			fmt.Printf("Arrow firing...\n")
 			s.arrow.MovementComponent.Speed = 7.0
 			s.arrow.MovementComponent.MoveCount = 100
 			s.arrow.Ignore.Value = false
@@ -95,8 +94,8 @@ func (s *System) Update() {
 		s.arrow.MovementComponent.MoveCount--
 	}
 
+	// dashing
 	if win.Pressed(pixelgl.KeySpace) {
-		// start charging dash attack
 		if s.playerEntity.Dash.Charge < s.playerEntity.Dash.MaxCharge {
 			s.playerEntity.Dash.Charge++
 		}

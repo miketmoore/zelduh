@@ -150,7 +150,6 @@ func (s *System) Update() {
 	}
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
-			fmt.Printf("COLLIDING\n")
 			s.PlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 		}
 

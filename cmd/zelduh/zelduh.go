@@ -141,11 +141,6 @@ func run() {
 
 	obstacles := buildLevelObstacles("fourWalls")
 
-	// Create a "pushable" obstacle
-	// block := buildObstacle(mapX+(spriteSize*4), mapY+(spriteSize*5))
-	// block.AppearanceComponent.Color = colornames.Midnightblue
-	// obstacles = append(obstacles, block)
-
 	moveableObstacles := []entities.MoveableObstacle{
 		buildMoveableObstacle(mapX+(spriteSize*5), mapY+(spriteSize*5)),
 	}
