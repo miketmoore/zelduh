@@ -8,6 +8,7 @@ import (
 
 type inputEntity struct {
 	*components.MovementComponent
+	*components.Ignore
 }
 
 // System is a custom system for detecting collisions and what to do when they occur
@@ -25,9 +26,10 @@ func (s *System) AddPlayer(movement *components.MovementComponent) {
 }
 
 // AddSword adds the sword entity to the sytem
-func (s *System) AddSword(movement *components.MovementComponent) {
+func (s *System) AddSword(movement *components.MovementComponent, ignore *components.Ignore) {
 	s.sword = inputEntity{
 		MovementComponent: movement,
+		Ignore:            ignore,
 	}
 }
 
@@ -57,7 +59,9 @@ func (s *System) Update() {
 	s.sword.MovementComponent.Direction = player.MovementComponent.Direction
 	if win.Pressed(pixelgl.KeySpace) {
 		s.sword.MovementComponent.Speed = 1.0
+		s.sword.Ignore.Value = false
 	} else {
 		s.sword.MovementComponent.Speed = 0
+		s.sword.Ignore.Value = true
 	}
 }

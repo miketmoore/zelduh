@@ -101,6 +101,9 @@ func run() {
 	// New entities
 	playerEntity := buildPlayerEntity()
 	sword := entities.Sword{
+		Ignore: &components.Ignore{
+			Value: true,
+		},
 		AppearanceComponent: &components.AppearanceComponent{
 			Color: colornames.Deeppink,
 		},
@@ -169,14 +172,14 @@ func run() {
 			}
 		},
 		SwordCollisionWithEnemy: func(enemyID int) {
-			fmt.Printf("sword hit enemy!\n")
-			spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
-			enemy, ok := findEnemy(enemyID)
-			if ok {
-				enemy.Health.Total--
-				if enemy.Health.Total == 0 {
-					fmt.Printf("Enemy is dead!\n")
-					gameWorld.RemoveEnemy(enemy.ID)
+			if !sword.Ignore.Value {
+				spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
+				enemy, ok := findEnemy(enemyID)
+				if ok {
+					enemy.Health.Total--
+					if enemy.Health.Total == 0 {
+						gameWorld.RemoveEnemy(enemy.ID)
+					}
 				}
 			}
 		},
@@ -216,7 +219,7 @@ func run() {
 		switch sys := system.(type) {
 		case *input.System:
 			sys.AddPlayer(playerEntity.MovementComponent)
-			sys.AddSword(sword.MovementComponent)
+			sys.AddSword(sword.MovementComponent, sword.Ignore)
 		case *spatial.System:
 			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
 			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
