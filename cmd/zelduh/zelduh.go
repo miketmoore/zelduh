@@ -145,6 +145,8 @@ func run() {
 		buildMoveableObstacle(mapX+(spriteSize*5), mapY+(spriteSize*5)),
 	}
 
+	collisionSwitches := buildCollisionSwitches()
+
 	findEnemy := func(id int) (entities.Enemy, bool) {
 		for _, e := range enemyEntities {
 			if e.ID == id {
@@ -161,6 +163,15 @@ func run() {
 			}
 		}
 		return entities.MoveableObstacle{}, false
+	}
+
+	findCollisionSwitchIndex := func(id int) int {
+		for i, e := range collisionSwitches {
+			if e.ID == id {
+				return i
+			}
+		}
+		return -1
 	}
 
 	currentState := gamestate.Start
@@ -239,6 +250,24 @@ func run() {
 				obstacle.SpatialComponent.Rect = obstacle.SpatialComponent.PrevRect
 			}
 		},
+		PlayerCollisionWithSwitch: func(switchID int) {
+			i := findCollisionSwitchIndex(switchID)
+			if i != -1 {
+				if !collisionSwitches[i].Enabled {
+					fmt.Printf("Enabled!\n")
+					collisionSwitches[i].Enabled = true
+				}
+			}
+		},
+		PlayerNoCollisionWithSwitch: func(switchID int) {
+			i := findCollisionSwitchIndex(switchID)
+			if i != -1 {
+				if collisionSwitches[i].Enabled {
+					fmt.Printf("Disabled!\n")
+					collisionSwitches[i].Enabled = false
+				}
+			}
+		},
 	})
 	gameWorld.AddSystem(&render.System{Win: win})
 
@@ -275,6 +304,9 @@ func run() {
 			for _, moveable := range moveableObstacles {
 				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent)
 			}
+			for _, collisionSwitch := range collisionSwitches {
+				sys.AddCollisionSwitch(collisionSwitch.ID, collisionSwitch.SpatialComponent)
+			}
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			sys.AddSword(sword.AppearanceComponent, sword.SpatialComponent)
@@ -290,6 +322,9 @@ func run() {
 			}
 			for _, moveable := range moveableObstacles {
 				sys.AddMoveableObstacle(moveable.ID, moveable.AppearanceComponent, moveable.SpatialComponent)
+			}
+			for _, collisionSwitch := range collisionSwitches {
+				sys.AddCollisionSwitch(collisionSwitch.AppearanceComponent, collisionSwitch.SpatialComponent)
 			}
 		}
 	}
@@ -623,6 +658,30 @@ func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
 		MovementComponent: &components.MovementComponent{
 			Direction: direction.Down,
 			Speed:     1.0,
+		},
+	}
+}
+
+func buildCollisionSwitches() []entities.CollisionSwitch {
+	switches := []entities.CollisionSwitch{}
+	x := mapX + (spriteSize * 3)
+	y := mapY + (spriteSize * 3)
+	switches = append(switches, buildCollisionSwitch(x, y))
+	return switches
+}
+
+func buildCollisionSwitch(x, y float64) entities.CollisionSwitch {
+	return entities.CollisionSwitch{
+		ID:      gameWorld.NewEntityID(),
+		Enabled: false,
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Sandybrown,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
+			Shape:  imdraw.New(nil),
 		},
 	}
 }

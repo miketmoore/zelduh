@@ -21,6 +21,7 @@ type System struct {
 	coins                                 []collisionEntity
 	obstacles                             []collisionEntity
 	moveableObstacles                     []collisionEntity
+	collisionSwitches                     []collisionEntity
 	PlayerCollisionWithCoin               func(int)
 	PlayerCollisionWithEnemy              func(int)
 	SwordCollisionWithEnemy               func(int)
@@ -31,6 +32,8 @@ type System struct {
 	EnemyCollisionWithObstacle            func(int, int)
 	EnemyCollisionWithMoveableObstacle    func(int)
 	MoveableObstacleCollisionWithObstacle func(int)
+	PlayerCollisionWithSwitch             func(int)
+	PlayerNoCollisionWithSwitch           func(int)
 }
 
 // AddPlayer adds the player to the system
@@ -73,6 +76,14 @@ func (s *System) AddObstacle(id int, spatial *components.SpatialComponent) {
 // AddMoveableObstacle adds an obstacle entity to the system
 func (s *System) AddMoveableObstacle(id int, spatial *components.SpatialComponent) {
 	s.moveableObstacles = append(s.moveableObstacles, collisionEntity{
+		ID:               id,
+		SpatialComponent: spatial,
+	})
+}
+
+// AddCollisionSwitch adds a collision switch entity to the system
+func (s *System) AddCollisionSwitch(id int, spatial *components.SpatialComponent) {
+	s.collisionSwitches = append(s.collisionSwitches, collisionEntity{
 		ID:               id,
 		SpatialComponent: spatial,
 	})
@@ -167,6 +178,16 @@ func (s *System) Update() {
 
 		if isColliding(moveableObstacle.SpatialComponent.Rect, s.arrow.SpatialComponent.Rect) {
 			s.ArrowCollisionWithObstacle()
+		}
+	}
+
+	for _, collisionSwitch := range s.collisionSwitches {
+		csr := collisionSwitch.SpatialComponent.Rect
+		pr := s.playerEntity.SpatialComponent.Rect
+		if isColliding(csr, pr) {
+			s.PlayerCollisionWithSwitch(collisionSwitch.ID)
+		} else {
+			s.PlayerNoCollisionWithSwitch(collisionSwitch.ID)
 		}
 	}
 }

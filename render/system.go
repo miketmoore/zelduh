@@ -24,6 +24,7 @@ type System struct {
 	enemies           []renderEntity
 	obstacles         []renderEntity
 	moveableObstacles []renderEntity
+	collisionSwitches []renderEntity
 }
 
 // AddPlayer adds the player to the system
@@ -63,6 +64,14 @@ func (s *System) AddObstacle(id int, appearance *components.AppearanceComponent,
 func (s *System) AddMoveableObstacle(id int, appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.moveableObstacles = append(s.moveableObstacles, renderEntity{
 		ID:                  id,
+		AppearanceComponent: appearance,
+		SpatialComponent:    spatial,
+	})
+}
+
+// AddCollisionSwitch adds a moveable obstacle to the system
+func (s *System) AddCollisionSwitch(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
+	s.collisionSwitches = append(s.collisionSwitches, renderEntity{
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
 	})
@@ -109,6 +118,15 @@ func (s *System) RemoveEnemy(id int) {
 
 // Update changes spatial data based on movement data
 func (s *System) Update() {
+
+	for _, collisionSwitch := range s.collisionSwitches {
+		collisionSwitch.Shape.Clear()
+		collisionSwitch.Shape.Color = collisionSwitch.AppearanceComponent.Color
+		collisionSwitch.Shape.Push(collisionSwitch.SpatialComponent.Rect.Min)
+		collisionSwitch.Shape.Push(collisionSwitch.SpatialComponent.Rect.Max)
+		collisionSwitch.Shape.Rectangle(0)
+		collisionSwitch.Shape.Draw(s.Win)
+	}
 
 	sword := s.sword
 	sword.Shape.Clear()
@@ -169,4 +187,5 @@ func (s *System) Update() {
 		obstacle.Shape.Rectangle(0)
 		obstacle.Shape.Draw(s.Win)
 	}
+
 }
