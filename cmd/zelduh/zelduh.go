@@ -253,18 +253,20 @@ func run() {
 		PlayerCollisionWithSwitch: func(switchID int) {
 			i := findCollisionSwitchIndex(switchID)
 			if i != -1 {
-				if !collisionSwitches[i].Enabled {
-					fmt.Printf("Enabled!\n")
-					collisionSwitches[i].Enabled = true
+				s := &collisionSwitches[i]
+				if !s.Enabled {
+					fmt.Printf("Enabled switch %d!\n", switchID)
+					s.Enabled = true
 				}
 			}
 		},
 		PlayerNoCollisionWithSwitch: func(switchID int) {
 			i := findCollisionSwitchIndex(switchID)
 			if i != -1 {
-				if collisionSwitches[i].Enabled {
-					fmt.Printf("Disabled!\n")
-					collisionSwitches[i].Enabled = false
+				s := &collisionSwitches[i]
+				if s.Enabled {
+					fmt.Printf("Disabled switch %d!\n", switchID)
+					s.Enabled = false
 				}
 			}
 		},
