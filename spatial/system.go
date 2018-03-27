@@ -96,7 +96,6 @@ func (s *System) MovePlayerBack() {
 
 // MoveMoveableObstacle moves a moveable obstacle :P
 func (s *System) MoveMoveableObstacle(obstacleID int, dir direction.Name) {
-	fmt.Printf("moving obstacle in direction %s\n", dir)
 	obstacle, ok := s.moveableObstacle(obstacleID)
 	if ok {
 		w := obstacle.SpatialComponent.Width

@@ -173,14 +173,10 @@ func run() {
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
-			fmt.Printf("PlayerCollisionWithObstacle heard\n")
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 			sword.SpatialComponent.Rect = sword.SpatialComponent.PrevRect
 		},
 		PlayerCollisionWithMoveableObstacle: func(obstacleID int) {
-			// TODO determine if blocked and pushing or just blocked
-			// maybe just push for now
-			fmt.Printf("PlayerCollisionWithMoveableObstacle heard\n")
 			spatialSystem.MoveMoveableObstacle(obstacleID, playerEntity.MovementComponent.Direction)
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
