@@ -218,10 +218,10 @@ func run() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *input.System:
-			sys.AddPlayer(playerEntity.MovementComponent)
+			sys.AddPlayer(playerEntity.MovementComponent, playerEntity.Dash)
 			sys.AddSword(sword.MovementComponent, sword.Ignore)
 		case *spatial.System:
-			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent)
+			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent, playerEntity.Dash)
 			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
@@ -462,6 +462,11 @@ func buildPlayerEntity() entities.Player {
 		},
 		CoinsComponent: &components.CoinsComponent{
 			Coins: 0,
+		},
+		Dash: &components.Dash{
+			Charge:    0,
+			MaxCharge: 50,
+			SpeedMod:  7,
 		},
 	}
 }

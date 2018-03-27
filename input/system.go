@@ -9,6 +9,7 @@ import (
 type inputEntity struct {
 	*components.MovementComponent
 	*components.Ignore
+	*components.Dash
 }
 
 // System is a custom system for detecting collisions and what to do when they occur
@@ -19,9 +20,10 @@ type System struct {
 }
 
 // AddPlayer adds the player to the system
-func (s *System) AddPlayer(movement *components.MovementComponent) {
+func (s *System) AddPlayer(movement *components.MovementComponent, dash *components.Dash) {
 	s.playerEntity = inputEntity{
 		MovementComponent: movement,
+		Dash:              dash,
 	}
 }
 
@@ -63,5 +65,14 @@ func (s *System) Update() {
 	} else {
 		s.sword.MovementComponent.Speed = 0
 		s.sword.Ignore.Value = true
+	}
+
+	if win.Pressed(pixelgl.KeySpace) {
+		// start charging dash attack
+		if s.playerEntity.Dash.Charge < s.playerEntity.Dash.MaxCharge {
+			s.playerEntity.Dash.Charge++
+		}
+	} else {
+		s.playerEntity.Dash.Charge = 0
 	}
 }

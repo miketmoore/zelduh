@@ -18,6 +18,7 @@ type spatialEntity struct {
 	ID int
 	*components.MovementComponent
 	*components.SpatialComponent
+	*components.Dash
 	EnemySpatialComponent *enemySpatialComponent
 }
 
@@ -31,10 +32,15 @@ type System struct {
 }
 
 // AddPlayer adds the player to the system
-func (s *System) AddPlayer(spatial *components.SpatialComponent, movement *components.MovementComponent) {
+func (s *System) AddPlayer(
+	spatial *components.SpatialComponent,
+	movement *components.MovementComponent,
+	dash *components.Dash,
+) {
 	s.playerEntity = spatialEntity{
 		SpatialComponent:  spatial,
 		MovementComponent: movement,
+		Dash:              dash,
 	}
 }
 
@@ -161,6 +167,9 @@ func (s *System) MoveEnemyBack(enemyID int, directionHit direction.Name) {
 func (s *System) Update() {
 	player := s.playerEntity
 	speed := player.MovementComponent.Speed
+	if player.Dash.Charge == player.Dash.MaxCharge {
+		speed += player.Dash.SpeedMod
+	}
 	if speed > 0 {
 		var v pixel.Vec
 
