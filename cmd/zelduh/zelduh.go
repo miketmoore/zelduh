@@ -118,6 +118,24 @@ func run() {
 			Speed:     0.0,
 		},
 	}
+	arrow := entities.Arrow{
+		Ignore: &components.Ignore{
+			Value: true,
+		},
+		AppearanceComponent: &components.AppearanceComponent{
+			Color: colornames.Deeppink,
+		},
+		SpatialComponent: &components.SpatialComponent{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(0, 0, 0, 0),
+			Shape:  imdraw.New(nil),
+		},
+		MovementComponent: &components.MovementComponent{
+			Direction: playerEntity.MovementComponent.Direction,
+			Speed:     0.0,
+		},
+	}
 	coinEntities := buildCoinEntities()
 	enemyEntities := buildEnemyEntities()
 
@@ -183,6 +201,18 @@ func run() {
 				}
 			}
 		},
+		ArrowCollisionWithEnemy: func(enemyID int) {
+			if !arrow.Ignore.Value {
+				spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
+				enemy, ok := findEnemy(enemyID)
+				if ok {
+					enemy.Health.Total--
+					if enemy.Health.Total == 0 {
+						gameWorld.RemoveEnemy(enemy.ID)
+					}
+				}
+			}
+		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
@@ -220,9 +250,11 @@ func run() {
 		case *input.System:
 			sys.AddPlayer(playerEntity.MovementComponent, playerEntity.Dash)
 			sys.AddSword(sword.MovementComponent, sword.Ignore)
+			sys.AddArrow(arrow.MovementComponent, arrow.Ignore)
 		case *spatial.System:
 			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent, playerEntity.Dash)
 			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
+			sys.AddArrow(arrow.SpatialComponent, arrow.MovementComponent)
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
 			}
@@ -232,6 +264,7 @@ func run() {
 		case *collision.System:
 			sys.AddPlayer(playerEntity.SpatialComponent)
 			sys.AddSword(sword.SpatialComponent)
+			sys.AddArrow(arrow.SpatialComponent)
 			for _, coin := range coinEntities {
 				sys.AddCoin(coin.ID, coin.SpatialComponent)
 			}
@@ -247,6 +280,7 @@ func run() {
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			sys.AddSword(sword.AppearanceComponent, sword.SpatialComponent)
+			sys.AddArrow(arrow.AppearanceComponent, arrow.SpatialComponent)
 			for _, coin := range coinEntities {
 				sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
 			}

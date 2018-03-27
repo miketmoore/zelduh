@@ -17,6 +17,7 @@ type System struct {
 	Win          *pixelgl.Window
 	playerEntity inputEntity
 	sword        inputEntity
+	arrow        inputEntity
 }
 
 // AddPlayer adds the player to the system
@@ -30,6 +31,14 @@ func (s *System) AddPlayer(movement *components.MovementComponent, dash *compone
 // AddSword adds the sword entity to the sytem
 func (s *System) AddSword(movement *components.MovementComponent, ignore *components.Ignore) {
 	s.sword = inputEntity{
+		MovementComponent: movement,
+		Ignore:            ignore,
+	}
+}
+
+// AddArrow adds the arrow entity to the sytem
+func (s *System) AddArrow(movement *components.MovementComponent, ignore *components.Ignore) {
+	s.arrow = inputEntity{
 		MovementComponent: movement,
 		Ignore:            ignore,
 	}
@@ -65,6 +74,15 @@ func (s *System) Update() {
 	} else {
 		s.sword.MovementComponent.Speed = 0
 		s.sword.Ignore.Value = true
+	}
+
+	s.arrow.MovementComponent.Direction = player.MovementComponent.Direction
+	if win.Pressed(pixelgl.KeyG) {
+		s.arrow.MovementComponent.Speed = 1.0
+		s.arrow.Ignore.Value = false
+	} else {
+		s.arrow.MovementComponent.Speed = 0
+		s.arrow.Ignore.Value = true
 	}
 
 	if win.Pressed(pixelgl.KeySpace) {

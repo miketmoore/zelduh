@@ -19,6 +19,7 @@ type System struct {
 	Win               *pixelgl.Window
 	playerEntity      renderEntity
 	sword             renderEntity
+	arrow             renderEntity
 	coins             []renderEntity
 	enemies           []renderEntity
 	obstacles         []renderEntity
@@ -36,6 +37,14 @@ func (s *System) AddPlayer(appearance *components.AppearanceComponent, spatial *
 // AddSword adds the sword to the system
 func (s *System) AddSword(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
 	s.sword = renderEntity{
+		AppearanceComponent: appearance,
+		SpatialComponent:    spatial,
+	}
+}
+
+// AddArrow adds the sword to the system
+func (s *System) AddArrow(appearance *components.AppearanceComponent, spatial *components.SpatialComponent) {
+	s.arrow = renderEntity{
 		AppearanceComponent: appearance,
 		SpatialComponent:    spatial,
 	}
@@ -108,6 +117,14 @@ func (s *System) Update() {
 	sword.Shape.Push(sword.SpatialComponent.Rect.Max)
 	sword.Shape.Rectangle(0)
 	sword.Shape.Draw(s.Win)
+
+	arrow := s.arrow
+	arrow.Shape.Clear()
+	arrow.Shape.Color = arrow.AppearanceComponent.Color
+	arrow.Shape.Push(arrow.SpatialComponent.Rect.Min)
+	arrow.Shape.Push(arrow.SpatialComponent.Rect.Max)
+	arrow.Shape.Rectangle(0)
+	arrow.Shape.Draw(s.Win)
 
 	player := s.playerEntity
 	player.Shape.Clear()

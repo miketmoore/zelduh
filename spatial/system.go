@@ -27,6 +27,7 @@ type System struct {
 	Rand              *rand.Rand
 	playerEntity      spatialEntity
 	sword             spatialEntity
+	arrow             spatialEntity
 	enemies           []spatialEntity
 	moveableObstacles []spatialEntity
 }
@@ -44,9 +45,17 @@ func (s *System) AddPlayer(
 	}
 }
 
-// AddSword adds the player to the system
+// AddSword adds the sword to the system
 func (s *System) AddSword(spatial *components.SpatialComponent, movement *components.MovementComponent) {
 	s.sword = spatialEntity{
+		SpatialComponent:  spatial,
+		MovementComponent: movement,
+	}
+}
+
+// AddArrow adds the arrow to the system
+func (s *System) AddArrow(spatial *components.SpatialComponent, movement *components.MovementComponent) {
+	s.arrow = spatialEntity{
 		SpatialComponent:  spatial,
 		MovementComponent: movement,
 	}
@@ -209,6 +218,30 @@ func (s *System) Update() {
 		sword.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
 	} else {
 		sword.SpatialComponent.Rect = player.SpatialComponent.Rect
+	}
+
+	arrow := s.arrow
+	speed = arrow.MovementComponent.Speed
+	arrowW := arrow.SpatialComponent.Width
+	arrowH := arrow.SpatialComponent.Height
+	if speed > 0 {
+		var v pixel.Vec
+
+		fmt.Printf("spatial arrow direction: %s\n", arrow.MovementComponent.Direction)
+		switch sword.MovementComponent.Direction {
+		case direction.Up:
+			v = pixel.V(0, speed+arrowH)
+		case direction.Right:
+			v = pixel.V(speed+arrowW, 0)
+		case direction.Down:
+			v = pixel.V(0, -speed-arrowH)
+		case direction.Left:
+			v = pixel.V(-speed-arrowW, 0)
+		}
+		player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
+		arrow.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
+	} else {
+		arrow.SpatialComponent.Rect = player.SpatialComponent.Rect
 	}
 
 	for _, enemy := range s.enemies {

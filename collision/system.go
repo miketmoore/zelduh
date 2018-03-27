@@ -16,6 +16,7 @@ type collisionEntity struct {
 type System struct {
 	playerEntity                          collisionEntity
 	sword                                 collisionEntity
+	arrow                                 collisionEntity
 	enemies                               []collisionEntity
 	coins                                 []collisionEntity
 	obstacles                             []collisionEntity
@@ -23,13 +24,12 @@ type System struct {
 	PlayerCollisionWithCoin               func(int)
 	PlayerCollisionWithEnemy              func(int)
 	SwordCollisionWithEnemy               func(int)
+	ArrowCollisionWithEnemy               func(int)
 	PlayerCollisionWithObstacle           func(int)
 	PlayerCollisionWithMoveableObstacle   func(int)
 	EnemyCollisionWithObstacle            func(int, int)
 	EnemyCollisionWithMoveableObstacle    func(int)
 	MoveableObstacleCollisionWithObstacle func(int)
-	playerwithenemy                       int
-	swordhitenemy                         int
 }
 
 // AddPlayer adds the player to the system
@@ -39,9 +39,16 @@ func (s *System) AddPlayer(spatial *components.SpatialComponent) {
 	}
 }
 
-// AddSword adds the player to the system
+// AddSword adds the sword to the system
 func (s *System) AddSword(spatial *components.SpatialComponent) {
 	s.sword = collisionEntity{
+		SpatialComponent: spatial,
+	}
+}
+
+// AddArrow adds the arrow to the system
+func (s *System) AddArrow(spatial *components.SpatialComponent) {
+	s.arrow = collisionEntity{
 		SpatialComponent: spatial,
 	}
 }
@@ -111,11 +118,13 @@ func (s *System) Update() {
 	for _, enemy := range s.enemies {
 		enemyR := enemy.SpatialComponent.Rect
 		if isColliding(enemyR, s.playerEntity.SpatialComponent.Rect) {
-			s.playerwithenemy++
 			s.PlayerCollisionWithEnemy(enemy.ID)
 		}
 		if isColliding(enemyR, s.sword.SpatialComponent.Rect) {
 			s.SwordCollisionWithEnemy(enemy.ID)
+		}
+		if isColliding(enemyR, s.arrow.SpatialComponent.Rect) {
+			s.ArrowCollisionWithEnemy(enemy.ID)
 		}
 	}
 	for _, coin := range s.coins {
