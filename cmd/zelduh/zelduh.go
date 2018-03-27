@@ -213,6 +213,9 @@ func run() {
 				}
 			}
 		},
+		ArrowCollisionWithObstacle: func() {
+			arrow.MovementComponent.MoveCount = 0
+		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect

@@ -25,6 +25,7 @@ type System struct {
 	PlayerCollisionWithEnemy              func(int)
 	SwordCollisionWithEnemy               func(int)
 	ArrowCollisionWithEnemy               func(int)
+	ArrowCollisionWithObstacle            func()
 	PlayerCollisionWithObstacle           func(int)
 	PlayerCollisionWithMoveableObstacle   func(int)
 	EnemyCollisionWithObstacle            func(int, int)
@@ -142,6 +143,10 @@ func (s *System) Update() {
 				s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
 			}
 		}
+
+		if isColliding(obstacle.SpatialComponent.Rect, s.arrow.SpatialComponent.Rect) {
+			s.ArrowCollisionWithObstacle()
+		}
 	}
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
@@ -159,6 +164,10 @@ func (s *System) Update() {
 			if isColliding(moveableObstacle.SpatialComponent.Rect, obstacle.SpatialComponent.Rect) {
 				s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
 			}
+		}
+
+		if isColliding(moveableObstacle.SpatialComponent.Rect, s.arrow.SpatialComponent.Rect) {
+			s.ArrowCollisionWithObstacle()
 		}
 	}
 }
