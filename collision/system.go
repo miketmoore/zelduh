@@ -26,6 +26,7 @@ type System struct {
 	PlayerCollisionWithObstacle         func(int)
 	PlayerCollisionWithMoveableObstacle func(int)
 	EnemyCollisionWithObstacle          func(int, int)
+	EnemyCollisionWithMoveableObstacle  func(int)
 	playerwithenemy                     int
 	swordhitenemy                       int
 }
@@ -121,27 +122,27 @@ func (s *System) Update() {
 			s.PlayerCollisionWithCoin(coin.ID)
 		}
 	}
-	// for _, obstacle := range s.obstacles {
-	// 	if isColliding(obstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
-	// 		s.PlayerCollisionWithObstacle(obstacle.ID)
-	// 	}
+	for _, obstacle := range s.obstacles {
+		if isColliding(obstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
+			s.PlayerCollisionWithObstacle(obstacle.ID)
+		}
 
-	// 	for _, enemy := range s.enemies {
-	// 		if isColliding(obstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
-	// 			s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
-	// 		}
-	// 	}
-	// }
+		for _, enemy := range s.enemies {
+			if isColliding(obstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
+				s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
+			}
+		}
+	}
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
 			fmt.Printf("COLLIDING\n")
 			s.PlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 		}
 
-		// for _, enemy := range s.enemies {
-		// 	if isColliding(moveableObstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
-		// 		s.EnemyCollisionWithObstacle(enemy.ID, moveableObstacle.ID)
-		// 	}
-		// }
+		for _, enemy := range s.enemies {
+			if isColliding(moveableObstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
+				s.EnemyCollisionWithMoveableObstacle(enemy.ID)
+			}
+		}
 	}
 }

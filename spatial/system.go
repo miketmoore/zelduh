@@ -99,16 +99,18 @@ func (s *System) MoveMoveableObstacle(obstacleID int, dir direction.Name) {
 	fmt.Printf("moving obstacle in direction %s\n", dir)
 	obstacle, ok := s.moveableObstacle(obstacleID)
 	if ok {
+		w := obstacle.SpatialComponent.Width
+		h := obstacle.SpatialComponent.Height
 		var v pixel.Vec
 		switch dir {
 		case direction.Up:
-			v = pixel.V(0, 48)
+			v = pixel.V(0, h)
 		case direction.Right:
-			v = pixel.V(48, 0)
+			v = pixel.V(w, 0)
 		case direction.Down:
-			v = pixel.V(0, -48)
+			v = pixel.V(0, -h)
 		case direction.Left:
-			v = pixel.V(-48, 0)
+			v = pixel.V(-w, 0)
 		}
 		obstacle.SpatialComponent.PrevRect = obstacle.SpatialComponent.Rect
 		obstacle.SpatialComponent.Rect = obstacle.SpatialComponent.Rect.Moved(v)

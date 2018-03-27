@@ -190,6 +190,13 @@ func run() {
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
 			}
 		},
+		EnemyCollisionWithMoveableObstacle: func(enemyID int) {
+			// "Block" by undoing rect
+			enemy, ok := findEnemy(enemyID)
+			if ok {
+				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
+			}
+		},
 	})
 	gameWorld.AddSystem(&render.System{Win: win})
 
