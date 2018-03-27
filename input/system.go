@@ -57,7 +57,7 @@ func (s *System) Update() {
 	}
 
 	s.sword.MovementComponent.Direction = player.MovementComponent.Direction
-	if win.Pressed(pixelgl.KeySpace) {
+	if win.Pressed(pixelgl.KeyF) {
 		s.sword.MovementComponent.Speed = 1.0
 		s.sword.Ignore.Value = false
 	} else {
