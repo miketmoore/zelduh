@@ -138,6 +138,15 @@ func run() {
 		return entities.Enemy{}, false
 	}
 
+	findMoveableObstacle := func(id int) (entities.MoveableObstacle, bool) {
+		for _, e := range moveableObstacles {
+			if e.ID == id {
+				return e, true
+			}
+		}
+		return entities.MoveableObstacle{}, false
+	}
+
 	currentState := gamestate.Start
 
 	// Create systems and add to game world
@@ -191,6 +200,12 @@ func run() {
 			enemy, ok := findEnemy(enemyID)
 			if ok {
 				enemy.SpatialComponent.Rect = enemy.SpatialComponent.PrevRect
+			}
+		},
+		MoveableObstacleCollisionWithObstacle: func(moveableObstacleID int) {
+			obstacle, ok := findMoveableObstacle(moveableObstacleID)
+			if ok {
+				obstacle.SpatialComponent.Rect = obstacle.SpatialComponent.PrevRect
 			}
 		},
 	})

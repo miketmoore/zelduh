@@ -14,21 +14,22 @@ type collisionEntity struct {
 
 // System is a custom system for detecting collisions and what to do when they occur
 type System struct {
-	playerEntity                        collisionEntity
-	sword                               collisionEntity
-	enemies                             []collisionEntity
-	coins                               []collisionEntity
-	obstacles                           []collisionEntity
-	moveableObstacles                   []collisionEntity
-	PlayerCollisionWithCoin             func(int)
-	PlayerCollisionWithEnemy            func(int)
-	SwordCollisionWithEnemy             func(int)
-	PlayerCollisionWithObstacle         func(int)
-	PlayerCollisionWithMoveableObstacle func(int)
-	EnemyCollisionWithObstacle          func(int, int)
-	EnemyCollisionWithMoveableObstacle  func(int)
-	playerwithenemy                     int
-	swordhitenemy                       int
+	playerEntity                          collisionEntity
+	sword                                 collisionEntity
+	enemies                               []collisionEntity
+	coins                                 []collisionEntity
+	obstacles                             []collisionEntity
+	moveableObstacles                     []collisionEntity
+	PlayerCollisionWithCoin               func(int)
+	PlayerCollisionWithEnemy              func(int)
+	SwordCollisionWithEnemy               func(int)
+	PlayerCollisionWithObstacle           func(int)
+	PlayerCollisionWithMoveableObstacle   func(int)
+	EnemyCollisionWithObstacle            func(int, int)
+	EnemyCollisionWithMoveableObstacle    func(int)
+	MoveableObstacleCollisionWithObstacle func(int)
+	playerwithenemy                       int
+	swordhitenemy                         int
 }
 
 // AddPlayer adds the player to the system
@@ -142,6 +143,12 @@ func (s *System) Update() {
 		for _, enemy := range s.enemies {
 			if isColliding(moveableObstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
 				s.EnemyCollisionWithMoveableObstacle(enemy.ID)
+			}
+		}
+
+		for _, obstacle := range s.obstacles {
+			if isColliding(moveableObstacle.SpatialComponent.Rect, obstacle.SpatialComponent.Rect) {
+				s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
 			}
 		}
 	}
