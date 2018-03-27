@@ -14,18 +14,20 @@ type collisionEntity struct {
 
 // System is a custom system for detecting collisions and what to do when they occur
 type System struct {
-	playerEntity                collisionEntity
-	sword                       collisionEntity
-	enemies                     []collisionEntity
-	coins                       []collisionEntity
-	obstacles                   []collisionEntity
-	PlayerCollisionWithCoin     func(int)
-	PlayerCollisionWithEnemy    func(int)
-	SwordCollisionWithEnemy     func(int)
-	PlayerCollisionWithObstacle func(int)
-	EnemyCollisionWithObstacle  func(int, int)
-	playerwithenemy             int
-	swordhitenemy               int
+	playerEntity                        collisionEntity
+	sword                               collisionEntity
+	enemies                             []collisionEntity
+	coins                               []collisionEntity
+	obstacles                           []collisionEntity
+	moveableObstacles                   []collisionEntity
+	PlayerCollisionWithCoin             func(int)
+	PlayerCollisionWithEnemy            func(int)
+	SwordCollisionWithEnemy             func(int)
+	PlayerCollisionWithObstacle         func(int)
+	PlayerCollisionWithMoveableObstacle func(int)
+	EnemyCollisionWithObstacle          func(int, int)
+	playerwithenemy                     int
+	swordhitenemy                       int
 }
 
 // AddPlayer adds the player to the system
@@ -53,6 +55,14 @@ func (s *System) AddEnemy(id int, spatial *components.SpatialComponent) {
 // AddObstacle adds an obstacle entity to the system
 func (s *System) AddObstacle(id int, spatial *components.SpatialComponent) {
 	s.obstacles = append(s.obstacles, collisionEntity{
+		ID:               id,
+		SpatialComponent: spatial,
+	})
+}
+
+// AddMoveableObstacle adds an obstacle entity to the system
+func (s *System) AddMoveableObstacle(id int, spatial *components.SpatialComponent) {
+	s.moveableObstacles = append(s.moveableObstacles, collisionEntity{
 		ID:               id,
 		SpatialComponent: spatial,
 	})
@@ -111,15 +121,27 @@ func (s *System) Update() {
 			s.PlayerCollisionWithCoin(coin.ID)
 		}
 	}
-	for _, obstacle := range s.obstacles {
-		if isColliding(obstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
-			s.PlayerCollisionWithObstacle(obstacle.ID)
+	// for _, obstacle := range s.obstacles {
+	// 	if isColliding(obstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
+	// 		s.PlayerCollisionWithObstacle(obstacle.ID)
+	// 	}
+
+	// 	for _, enemy := range s.enemies {
+	// 		if isColliding(obstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
+	// 			s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
+	// 		}
+	// 	}
+	// }
+	for _, moveableObstacle := range s.moveableObstacles {
+		if isColliding(moveableObstacle.SpatialComponent.Rect, s.playerEntity.SpatialComponent.Rect) {
+			fmt.Printf("COLLIDING\n")
+			s.PlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 		}
 
-		for _, enemy := range s.enemies {
-			if isColliding(obstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
-				s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
-			}
-		}
+		// for _, enemy := range s.enemies {
+		// 	if isColliding(moveableObstacle.SpatialComponent.Rect, enemy.SpatialComponent.Rect) {
+		// 		s.EnemyCollisionWithObstacle(enemy.ID, moveableObstacle.ID)
+		// 	}
+		// }
 	}
 }

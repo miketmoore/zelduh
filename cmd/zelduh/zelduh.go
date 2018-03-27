@@ -121,11 +121,12 @@ func run() {
 	obstacles := buildLevelObstacles("fourWalls")
 
 	// Create a "pushable" obstacle
-	block := buildObstacle(mapX+(spriteSize*4), mapY+(spriteSize*5))
-	block.AppearanceComponent.Color = colornames.Midnightblue
-	obstacles = append(obstacles, block)
+	// block := buildObstacle(mapX+(spriteSize*4), mapY+(spriteSize*5))
+	// block.AppearanceComponent.Color = colornames.Midnightblue
+	// obstacles = append(obstacles, block)
+
 	moveableObstacles := []entities.MoveableObstacle{
-		buildMoveableObstacle(mapW+(spriteSize*5), mapH+(spriteSize*5)),
+		buildMoveableObstacle(mapX+(spriteSize*5), mapY+(spriteSize*5)),
 	}
 
 	findEnemy := func(id int) (entities.Enemy, bool) {
@@ -172,8 +173,15 @@ func run() {
 		},
 		PlayerCollisionWithObstacle: func(obstacleID int) {
 			// "Block" by undoing rect
+			fmt.Printf("PlayerCollisionWithObstacle heard\n")
 			playerEntity.SpatialComponent.Rect = playerEntity.SpatialComponent.PrevRect
 			sword.SpatialComponent.Rect = sword.SpatialComponent.PrevRect
+		},
+		PlayerCollisionWithMoveableObstacle: func(obstacleID int) {
+			// TODO determine if blocked and pushing or just blocked
+			// maybe just push for now
+			fmt.Printf("PlayerCollisionWithMoveableObstacle heard\n")
+			spatialSystem.MoveMoveableObstacle(obstacleID, playerEntity.MovementComponent.Direction)
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
 			// "Block" by undoing rect
@@ -211,6 +219,9 @@ func run() {
 			}
 			for _, obstacle := range obstacles {
 				sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
+			}
+			for _, moveable := range moveableObstacles {
+				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent)
 			}
 		case *render.System:
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
@@ -543,7 +554,7 @@ func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
 	return entities.MoveableObstacle{
 		ID: gameWorld.NewEntityID(),
 		AppearanceComponent: &components.AppearanceComponent{
-			Color: colornames.Black,
+			Color: colornames.Purple,
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,

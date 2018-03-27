@@ -94,6 +94,36 @@ func (s *System) MovePlayerBack() {
 	player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
 }
 
+// MoveMoveableObstacle moves a moveable obstacle :P
+func (s *System) MoveMoveableObstacle(obstacleID int, dir direction.Name) {
+	fmt.Printf("moving obstacle in direction %s\n", dir)
+	obstacle, ok := s.moveableObstacle(obstacleID)
+	if ok {
+		var v pixel.Vec
+		switch dir {
+		case direction.Up:
+			v = pixel.V(0, 48)
+		case direction.Right:
+			v = pixel.V(48, 0)
+		case direction.Down:
+			v = pixel.V(0, -48)
+		case direction.Left:
+			v = pixel.V(-48, 0)
+		}
+		obstacle.SpatialComponent.PrevRect = obstacle.SpatialComponent.Rect
+		obstacle.SpatialComponent.Rect = obstacle.SpatialComponent.Rect.Moved(v)
+	}
+}
+
+func (s *System) moveableObstacle(id int) (spatialEntity, bool) {
+	for _, e := range s.moveableObstacles {
+		if e.ID == id {
+			return e, true
+		}
+	}
+	return spatialEntity{}, false
+}
+
 func (s *System) enemy(id int) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
