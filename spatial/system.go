@@ -222,24 +222,26 @@ func (s *System) Update() {
 
 	arrow := s.arrow
 	speed = arrow.MovementComponent.Speed
-	arrowW := arrow.SpatialComponent.Width
-	arrowH := arrow.SpatialComponent.Height
-	if speed > 0 {
+	if arrow.MovementComponent.MoveCount > 0 {
+		arrow.MovementComponent.MoveCount--
 		var v pixel.Vec
 
-		fmt.Printf("spatial arrow direction: %s\n", arrow.MovementComponent.Direction)
-		switch sword.MovementComponent.Direction {
+		fmt.Printf("spatial arrow direction: %d %s\n",
+			arrow.MovementComponent.MoveCount, arrow.MovementComponent.Direction)
+
+		switch arrow.MovementComponent.Direction {
 		case direction.Up:
-			v = pixel.V(0, speed+arrowH)
+			v = pixel.V(0, speed)
 		case direction.Right:
-			v = pixel.V(speed+arrowW, 0)
+			v = pixel.V(speed, 0)
 		case direction.Down:
-			v = pixel.V(0, -speed-arrowH)
+			v = pixel.V(0, -speed)
 		case direction.Left:
-			v = pixel.V(-speed-arrowW, 0)
+			v = pixel.V(-speed, 0)
 		}
-		player.SpatialComponent.PrevRect = player.SpatialComponent.Rect
-		arrow.SpatialComponent.Rect = player.SpatialComponent.Rect.Moved(v)
+		arrow.SpatialComponent.PrevRect = arrow.SpatialComponent.Rect
+		arrow.SpatialComponent.Rect = arrow.SpatialComponent.Rect.Moved(v)
+		fmt.Printf("%v\n", arrow.SpatialComponent.Rect.String())
 	} else {
 		arrow.SpatialComponent.Rect = player.SpatialComponent.Rect
 	}

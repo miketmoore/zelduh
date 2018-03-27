@@ -1,6 +1,8 @@
 package input
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -51,6 +53,7 @@ func (s *System) Update() {
 
 	movingSpeed := 3.0
 
+	player.MovementComponent.LastDirection = player.MovementComponent.Direction
 	if win.Pressed(pixelgl.KeyUp) {
 		player.MovementComponent.Speed = movingSpeed
 		player.MovementComponent.Direction = direction.Up
@@ -76,13 +79,21 @@ func (s *System) Update() {
 		s.sword.Ignore.Value = true
 	}
 
-	s.arrow.MovementComponent.Direction = player.MovementComponent.Direction
-	if win.Pressed(pixelgl.KeyG) {
-		s.arrow.MovementComponent.Speed = 1.0
-		s.arrow.Ignore.Value = false
+	// player.MovementComponent.LastDirection = player.MovementComponent.Direction
+	if s.arrow.MovementComponent.MoveCount == 0 {
+		s.arrow.MovementComponent.Direction = player.MovementComponent.Direction
+		if win.Pressed(pixelgl.KeyG) {
+			fmt.Printf("Arrow firing...\n")
+			s.arrow.MovementComponent.Speed = 7.0
+			s.arrow.MovementComponent.MoveCount = 100
+			s.arrow.Ignore.Value = false
+		} else {
+			s.arrow.MovementComponent.Speed = 0
+			s.arrow.MovementComponent.MoveCount = 0
+			s.arrow.Ignore.Value = true
+		}
 	} else {
-		s.arrow.MovementComponent.Speed = 0
-		s.arrow.Ignore.Value = true
+		// s.arrow.MovementComponent.MoveCount--
 	}
 
 	if win.Pressed(pixelgl.KeySpace) {

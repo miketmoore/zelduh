@@ -132,7 +132,7 @@ func run() {
 			Shape:  imdraw.New(nil),
 		},
 		MovementComponent: &components.MovementComponent{
-			Direction: playerEntity.MovementComponent.Direction,
+			Direction: direction.Down,
 			Speed:     0.0,
 		},
 	}
