@@ -136,7 +136,6 @@ func run() {
 			Speed:     0.0,
 		},
 	}
-	coinEntities := buildCoinEntities()
 	enemyEntities := buildEnemyEntities()
 
 	obstacles := buildLevelObstacles("fourWalls")
@@ -197,12 +196,16 @@ func run() {
 		},
 		SwordCollisionWithEnemy: func(enemyID int) {
 			if !sword.Ignore.Value {
-				spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
 				enemy, ok := findEnemy(enemyID)
 				if ok {
 					enemy.Health.Total--
 					if enemy.Health.Total == 0 {
 						gameWorld.RemoveEnemy(enemy.ID)
+						r := enemy.SpatialComponent.Rect
+						coin := buildCoin(r.Min.X, r.Min.Y)
+						addCoinToSystem(coin)
+					} else {
+						spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
 					}
 				}
 			}
@@ -294,9 +297,6 @@ func run() {
 			sys.AddPlayer(playerEntity.SpatialComponent)
 			sys.AddSword(sword.SpatialComponent)
 			sys.AddArrow(arrow.SpatialComponent)
-			for _, coin := range coinEntities {
-				sys.AddCoin(coin.ID, coin.SpatialComponent)
-			}
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
 			}
@@ -313,9 +313,6 @@ func run() {
 			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
 			sys.AddSword(sword.AppearanceComponent, sword.SpatialComponent)
 			sys.AddArrow(arrow.AppearanceComponent, arrow.SpatialComponent)
-			for _, coin := range coinEntities {
-				sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
-			}
 			for _, enemy := range enemyEntities {
 				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
 			}
@@ -685,5 +682,16 @@ func buildCollisionSwitch(x, y float64) entities.CollisionSwitch {
 			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
 			Shape:  imdraw.New(nil),
 		},
+	}
+}
+
+func addCoinToSystem(coin entities.Coin) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *collision.System:
+			sys.AddCoin(coin.ID, coin.SpatialComponent)
+		case *render.System:
+			sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
+		}
 	}
 }
