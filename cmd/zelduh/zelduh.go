@@ -212,12 +212,16 @@ func run() {
 		},
 		ArrowCollisionWithEnemy: func(enemyID int) {
 			if !arrow.Ignore.Value {
-				spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
 				enemy, ok := findEnemy(enemyID)
 				if ok {
 					enemy.Health.Total--
 					if enemy.Health.Total == 0 {
 						gameWorld.RemoveEnemy(enemy.ID)
+						r := enemy.SpatialComponent.Rect
+						coin := buildCoin(r.Min.X, r.Min.Y)
+						addCoinToSystem(coin)
+					} else {
+						spatialSystem.MoveEnemyBack(enemyID, playerEntity.MovementComponent.Direction)
 					}
 				}
 			}
