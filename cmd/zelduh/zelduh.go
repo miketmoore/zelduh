@@ -138,7 +138,7 @@ func run() {
 	}
 	enemyEntities := buildEnemyEntities()
 
-	obstacles := buildLevelObstacles("room001")
+	obstacles := buildLevelObstacles("fourWallsDoorBottom")
 
 	moveableObstacles := []entities.MoveableObstacle{
 		buildMoveableObstacle(mapX+(spriteSize*5), mapY+(spriteSize*5)),
@@ -562,47 +562,6 @@ func buildEnemy(x, y float64) entities.Enemy {
 	}
 }
 
-func buildLevelObstacles(level string) []entities.Obstacle {
-	obstacles := []entities.Obstacle{}
-
-	w := spriteSize
-	h := spriteSize
-
-	switch level {
-	case "fourWalls":
-		for i := 0.0; i < (mapW/w)-2; i++ {
-			// top
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-			// bottom
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
-		}
-		for i := 0.0; i < (mapH/h)-2; i++ {
-			// left
-			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-			// right
-			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
-		}
-	case "room001":
-		for i := 0.0; i < (mapW/w)-2; i++ {
-			if i != 5 && i != 6 {
-				// top
-				obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-
-			}
-			// bottom
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
-		}
-		for i := 0.0; i < (mapH/h)-2; i++ {
-			// left
-			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-			// right
-			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
-		}
-	}
-
-	return obstacles
-}
-
 func buildObstacle(x, y float64) entities.Obstacle {
 	return entities.Obstacle{
 		ID: gameWorld.NewEntityID(),
@@ -783,4 +742,61 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 			}
 		}
 	}
+}
+
+func buildLevelObstacles(level string) []entities.Obstacle {
+	obstacles := []entities.Obstacle{}
+
+	w := spriteSize
+	h := spriteSize
+
+	switch level {
+	case "fourWalls":
+		for i := 0.0; i < (mapW/w)-2; i++ {
+			// top
+			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
+			// bottom
+			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
+		}
+		for i := 0.0; i < (mapH/h)-2; i++ {
+			// left
+			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
+			// right
+			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		}
+	case "fourWallsDoorBottom":
+		for i := 0.0; i < (mapW/w)-2; i++ {
+			if i != 5 && i != 6 {
+				// top
+				obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
+
+			}
+			// bottom
+			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
+		}
+		for i := 0.0; i < (mapH/h)-2; i++ {
+			// left
+			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
+			// right
+			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		}
+	case "fourWallsDoorTop":
+		for i := 0.0; i < (mapW/w)-2; i++ {
+			// top
+			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
+			if i != 5 && i != 6 {
+				// bottom
+				obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
+			}
+
+		}
+		for i := 0.0; i < (mapH/h)-2; i++ {
+			// left
+			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
+			// right
+			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		}
+	}
+
+	return obstacles
 }
