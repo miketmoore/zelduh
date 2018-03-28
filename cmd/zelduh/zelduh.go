@@ -745,15 +745,12 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 }
 
 func buildLevelObstacles(level string) []entities.Obstacle {
-	obstacles := []entities.Obstacle{}
 
-	w := spriteSize
-	h := spriteSize
+	var layout [][]int
 
 	switch level {
 	case "fourWalls":
-		// 14 columns, 12 rows
-		layout := [][]int{
+		layout = [][]int{
 			[]int{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -767,69 +764,91 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 			[]int{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		}
-
-		y := mapY
-		for r := len(layout) - 1; r > 0; r-- {
-
-			row := layout[r]
-
-			for i, c := range row {
-				x := mapX + (float64(i) * spriteSize)
-				fmt.Printf("%f, %f %v %v\n", x, y, r, c)
-				o := buildObstacle(x, y)
-				if c == 0 {
-					o.AppearanceComponent.Color = colornames.Blue
-				}
-				obstacles = append(obstacles, o)
-			}
-
-			y += spriteSize
-		}
-		// for i := 0.0; i < (mapW/w)-2; i++ {
-		// 	// top
-		// 	obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-		// 	// bottom
-		// 	obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
-		// }
-		// for i := 0.0; i < (mapH/h)-2; i++ {
-		// 	// left
-		// 	obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-		// 	// right
-		// 	obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
-		// }
 	case "fourWallsDoorBottom":
-		for i := 0.0; i < (mapW/w)-2; i++ {
-			if i != 5 && i != 6 {
-				// top
-				obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-
-			}
-			// bottom
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
-		}
-		for i := 0.0; i < (mapH/h)-2; i++ {
-			// left
-			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-			// right
-			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		layout = [][]int{
+			[]int{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0},
 		}
 	case "fourWallsDoorTop":
-		for i := 0.0; i < (mapW/w)-2; i++ {
-			// top
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-			if i != 5 && i != 6 {
-				// bottom
-				obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
-			}
-
-		}
-		for i := 0.0; i < (mapH/h)-2; i++ {
-			// left
-			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-			// right
-			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		layout = [][]int{
+			[]int{0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0},
 		}
 	}
 
+	allCoords := buildCoordsSliceFromLayout(layout)
+	obstacles := []entities.Obstacle{}
+	for _, coords := range allCoords {
+		obstacles = append(obstacles, buildObstacle(coords[0], coords[1]))
+	}
 	return obstacles
+}
+
+func buildMapFromLayout(layout [][]int) []entities.Obstacle {
+	obstacles := []entities.Obstacle{}
+	y := mapY
+	s := ""
+	for r := len(layout) - 1; r >= 0; r-- {
+
+		row := layout[r]
+
+		for i, c := range row {
+			x := mapX + (float64(i) * spriteSize)
+			o := buildObstacle(x, y)
+			s = fmt.Sprintf("%s %d", s, c)
+			if c == 1 {
+				obstacles = append(obstacles, o)
+			}
+
+		}
+
+		s = fmt.Sprintf("%s\n", s)
+		y += spriteSize
+	}
+	fmt.Println(s)
+	return obstacles
+}
+
+func buildCoordsSliceFromLayout(layout [][]int) [][]float64 {
+	coords := [][]float64{}
+	y := mapY
+	s := ""
+	for r := len(layout) - 1; r >= 0; r-- {
+
+		row := layout[r]
+
+		for i, c := range row {
+			x := mapX + (float64(i) * spriteSize)
+			s = fmt.Sprintf("%s %d", s, c)
+			if c == 1 {
+				coords = append(coords, []float64{x, y})
+			}
+
+		}
+
+		s = fmt.Sprintf("%s\n", s)
+		y += spriteSize
+	}
+	fmt.Println(s)
+	return coords
 }
