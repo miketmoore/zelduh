@@ -280,57 +280,13 @@ func run() {
 	})
 	gameWorld.AddSystem(&render.System{Win: win})
 
-	// Add entity components to custom ECS systems
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *input.System:
-			sys.AddPlayer(playerEntity.MovementComponent, playerEntity.Dash)
-			sys.AddSword(sword.MovementComponent, sword.Ignore)
-			sys.AddArrow(arrow.MovementComponent, arrow.Ignore)
-		case *spatial.System:
-			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent, playerEntity.Dash)
-			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
-			sys.AddArrow(arrow.SpatialComponent, arrow.MovementComponent)
-			for _, enemy := range enemyEntities {
-				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
-			}
-			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent, moveable.MovementComponent)
-			}
-		case *collision.System:
-			sys.AddPlayer(playerEntity.SpatialComponent)
-			sys.AddSword(sword.SpatialComponent)
-			sys.AddArrow(arrow.SpatialComponent)
-			for _, enemy := range enemyEntities {
-				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
-			}
-			for _, obstacle := range obstacles {
-				sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
-			}
-			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent)
-			}
-			for _, collisionSwitch := range collisionSwitches {
-				sys.AddCollisionSwitch(collisionSwitch.ID, collisionSwitch.SpatialComponent)
-			}
-		case *render.System:
-			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
-			sys.AddSword(sword.AppearanceComponent, sword.SpatialComponent)
-			sys.AddArrow(arrow.AppearanceComponent, arrow.SpatialComponent)
-			for _, enemy := range enemyEntities {
-				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
-			}
-			for _, obstacle := range obstacles {
-				sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
-			}
-			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.AppearanceComponent, moveable.SpatialComponent)
-			}
-			for _, collisionSwitch := range collisionSwitches {
-				sys.AddCollisionSwitch(collisionSwitch.AppearanceComponent, collisionSwitch.SpatialComponent)
-			}
-		}
-	}
+	addPlayerToSystems(playerEntity)
+	addSwordToSystems(sword)
+	addArrowToSystems(arrow)
+	addEnemiesToSystem(enemyEntities)
+	addObstaclesToSystem(obstacles)
+	addMoveableObstaclesToSystem(moveableObstacles)
+	addCollisionSwitchesToSystem(collisionSwitches)
 
 	for !win.Closed() {
 
@@ -712,6 +668,119 @@ func addCoinToSystem(coin entities.Coin) {
 			sys.AddCoin(coin.ID, coin.SpatialComponent)
 		case *render.System:
 			sys.AddCoin(coin.ID, coin.AppearanceComponent, coin.SpatialComponent)
+		}
+	}
+}
+
+func addPlayerToSystems(playerEntity entities.Player) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *input.System:
+			sys.AddPlayer(playerEntity.MovementComponent, playerEntity.Dash)
+		case *spatial.System:
+			sys.AddPlayer(playerEntity.SpatialComponent, playerEntity.MovementComponent, playerEntity.Dash)
+		case *collision.System:
+			sys.AddPlayer(playerEntity.SpatialComponent)
+		case *render.System:
+			sys.AddPlayer(playerEntity.AppearanceComponent, playerEntity.SpatialComponent)
+		}
+	}
+}
+
+func addSwordToSystems(sword entities.Sword) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *input.System:
+			sys.AddSword(sword.MovementComponent, sword.Ignore)
+		case *spatial.System:
+			sys.AddSword(sword.SpatialComponent, sword.MovementComponent)
+		case *collision.System:
+			sys.AddSword(sword.SpatialComponent)
+		case *render.System:
+			sys.AddSword(sword.AppearanceComponent, sword.SpatialComponent)
+		}
+	}
+}
+
+func addArrowToSystems(arrow entities.Arrow) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *input.System:
+			sys.AddArrow(arrow.MovementComponent, arrow.Ignore)
+		case *spatial.System:
+			sys.AddArrow(arrow.SpatialComponent, arrow.MovementComponent)
+		case *collision.System:
+			sys.AddArrow(arrow.SpatialComponent)
+		case *render.System:
+			sys.AddArrow(arrow.AppearanceComponent, arrow.SpatialComponent)
+		}
+	}
+}
+
+func addEnemiesToSystem(enemyEntities []entities.Enemy) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *spatial.System:
+			for _, enemy := range enemyEntities {
+				sys.AddEnemy(enemy.ID, enemy.SpatialComponent, enemy.MovementComponent)
+			}
+		case *collision.System:
+			for _, enemy := range enemyEntities {
+				sys.AddEnemy(enemy.ID, enemy.SpatialComponent)
+			}
+		case *render.System:
+			for _, enemy := range enemyEntities {
+				sys.AddEnemy(enemy.ID, enemy.AppearanceComponent, enemy.SpatialComponent)
+			}
+		}
+	}
+}
+
+func addObstaclesToSystem(obstacles []entities.Obstacle) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *collision.System:
+			for _, obstacle := range obstacles {
+				sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
+			}
+		case *render.System:
+			for _, obstacle := range obstacles {
+				sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
+			}
+		}
+	}
+}
+
+func addMoveableObstaclesToSystem(moveableObstacles []entities.MoveableObstacle) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *spatial.System:
+			for _, moveable := range moveableObstacles {
+				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent, moveable.MovementComponent)
+			}
+		case *collision.System:
+			for _, moveable := range moveableObstacles {
+				sys.AddMoveableObstacle(moveable.ID, moveable.SpatialComponent)
+			}
+		case *render.System:
+			for _, moveable := range moveableObstacles {
+				sys.AddMoveableObstacle(moveable.ID, moveable.AppearanceComponent, moveable.SpatialComponent)
+			}
+		}
+	}
+}
+
+func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *collision.System:
+			for _, collisionSwitch := range collisionSwitches {
+				sys.AddCollisionSwitch(collisionSwitch.ID, collisionSwitch.SpatialComponent)
+			}
+		case *render.System:
+			for _, collisionSwitch := range collisionSwitches {
+				sys.AddCollisionSwitch(collisionSwitch.AppearanceComponent, collisionSwitch.SpatialComponent)
+			}
 		}
 	}
 }
