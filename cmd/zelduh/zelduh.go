@@ -138,7 +138,7 @@ func run() {
 	}
 	enemyEntities := buildEnemyEntities()
 
-	obstacles := buildLevelObstacles("fourWallsDoorBottom")
+	obstacles := buildLevelObstacles("fourWalls")
 
 	moveableObstacles := []entities.MoveableObstacle{
 		buildMoveableObstacle(mapX+(spriteSize*5), mapY+(spriteSize*5)),
@@ -752,18 +752,51 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 
 	switch level {
 	case "fourWalls":
-		for i := 0.0; i < (mapW/w)-2; i++ {
-			// top
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
-			// bottom
-			obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
+		// 14 columns, 12 rows
+		layout := [][]int{
+			[]int{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+			[]int{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		}
-		for i := 0.0; i < (mapH/h)-2; i++ {
-			// left
-			obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
-			// right
-			obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+
+		y := mapY
+		for r := len(layout) - 1; r > 0; r-- {
+
+			row := layout[r]
+
+			for i, c := range row {
+				x := mapX + (float64(i) * spriteSize)
+				fmt.Printf("%f, %f %v %v\n", x, y, r, c)
+				o := buildObstacle(x, y)
+				if c == 0 {
+					o.AppearanceComponent.Color = colornames.Blue
+				}
+				obstacles = append(obstacles, o)
+			}
+
+			y += spriteSize
 		}
+		// for i := 0.0; i < (mapW/w)-2; i++ {
+		// 	// top
+		// 	obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY))
+		// 	// bottom
+		// 	obstacles = append(obstacles, buildObstacle(mapX+w+(w*i), mapY+mapH-h))
+		// }
+		// for i := 0.0; i < (mapH/h)-2; i++ {
+		// 	// left
+		// 	obstacles = append(obstacles, buildObstacle(mapX, (mapY+h)+(h*i)))
+		// 	// right
+		// 	obstacles = append(obstacles, buildObstacle(mapX+mapW-w, (mapY+h)+(h*i)))
+		// }
 	case "fourWallsDoorBottom":
 		for i := 0.0; i < (mapW/w)-2; i++ {
 			if i != 5 && i != 6 {
