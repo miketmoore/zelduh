@@ -5,10 +5,12 @@ import (
 	"image"
 	"image/color"
 	_ "image/png"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"time"
 
+	"github.com/deanobob/tmxreader"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -61,6 +63,13 @@ const (
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+var tilemapDir = "assets/tilemaps/"
+var tilemapFiles = []string{
+	"overworldFourWallsDoorBottom",
+}
+
+var tmxMapData map[string]tmxreader.TmxMap
 
 var spriteMap = map[string]float64{
 	"playerDownA":         361,
@@ -138,6 +147,7 @@ func run() {
 	}
 	enemyEntities := buildEnemyEntities()
 
+	loadTmxData()
 	obstacles := buildLevelObstacles("fourWalls")
 
 	moveableObstacles := []entities.MoveableObstacle{
@@ -742,6 +752,29 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 			}
 		}
 	}
+}
+
+func loadTmxData() {
+	tmxMapData = map[string]tmxreader.TmxMap{}
+	for i, name := range tilemapFiles {
+		path := fmt.Sprintf("%s%s.tmx", tilemapDir, name)
+		fmt.Printf("Loading TMX tile map %d/%d %s: %s\n", i+1, len(tilemapFiles), name, path)
+		tmxMapData[name] = parseTmxFile(path)
+	}
+}
+
+func parseTmxFile(filename string) tmxreader.TmxMap {
+	raw, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	tmxMap, err := tmxreader.Parse(raw)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmxMap
 }
 
 func buildLevelObstacles(level string) []entities.Obstacle {
