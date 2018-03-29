@@ -75,30 +75,6 @@ var tilemapFiles = []string{
 
 var tmxMapData map[string]tmxreader.TmxMap
 
-var spriteMap = map[string]float64{
-	"playerDownA":         361,
-	"playerDownB":         376,
-	"playerUpA":           362,
-	"playerUpB":           377,
-	"playerRightA":        363,
-	"playerRightB":        378,
-	"playerLeftA":         364,
-	"playerLeftB":         379,
-	"turtleNoShellDownA":  316,
-	"turtleNoShellDownB":  331,
-	"turtleNoShellUpA":    316,
-	"turtleNoShellUpB":    331,
-	"turtleNoShellRightA": 317,
-	"turtleNoShellRightB": 332,
-	"turtleNoShellLeftA":  317,
-	"turtleNoShellLeftB":  332,
-	"sword":               84,
-	"ground":              8,
-	"coinA":               365,
-	"coinB":               380,
-	"coinC":               395,
-}
-
 var sprites map[string]*pixel.Sprite
 
 func run() {
@@ -109,7 +85,6 @@ func run() {
 	pic = loadPicture(spritePlayerPath)
 	spritesheet := buildSpritesheet()
 	fmt.Printf("%v\n", spritesheet)
-	sprites = buildSpriteMap(pic, spriteMap)
 
 	gameWorld = world.New()
 
@@ -424,101 +399,6 @@ func drawMapBG(x, y, w, h float64, color color.Color) {
 	s.Draw(win)
 }
 
-/*
-	Build in the way that Tiled TMX files index sprites:
-
-	Referenced index + 1 in the TMX files.tmxMapData
-
-	 0  1  2  3  4  5  6
-	 7  8  9 10 11 12 13
-	14 15 16 17 18 19 20
-
-*/
-func buildSpritesheet() map[int]*pixel.Sprite {
-	cols := pic.Bounds().W() / spriteSize
-	rows := pic.Bounds().H() / spriteSize
-
-	// maxIndex is the actual slice index of the sprite
-	// it is referenced in the TMX file as maxIndex+1
-	maxIndex := (rows * cols) - 1.0
-	fmt.Printf("maxIndex: %d\n", int(maxIndex))
-
-	index := maxIndex
-	id := maxIndex + 1
-	spritesheet := map[int]*pixel.Sprite{}
-	for row := (rows - 1); row >= 0; row-- {
-		for col := (cols - 1); col >= 0; col-- {
-			x := col
-			y := math.Abs(rows-row) - 1
-			fmt.Printf("id:%3d index:%3d (x%d, y%d)\n", int(id), int(index), int(x), int(y))
-			// fmt.Printf("%v\n", index)
-			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
-				x*spriteSize,
-				y*spriteSize,
-				x*spriteSize+spriteSize,
-				y*spriteSize+spriteSize,
-			))
-			index--
-			id--
-		}
-	}
-	return spritesheet
-
-	// index := 0
-	// spritesheet := []*pixel.Sprite{}
-	// for row := 0.0; row < rows; row++ {
-	// 	// s := fmt.Sprintf("%3d: ", int(row))
-	// 	// for col := 0.0; col < cols; col++ {
-	// 	// 	s = fmt.Sprintf("%s %4d", s, index)
-	// 	// 	spritesheet = append(spritesheet, pixel.NewSprite(pic, pixel.Rect{
-	// 	// 		Min: pixel.V(col*spriteSize, row*spriteSize),
-	// 	// 		Max: pixel.V(col*spriteSize+spriteSize, row*spriteSize+spriteSize),
-	// 	// 	}))
-
-	// 	// 	index++
-	// 	// }
-	// 	// fmt.Println(s)
-	// }
-}
-
-func buildSpriteMap(pic pixel.Picture, config map[string]float64) map[string]*pixel.Sprite {
-	spriteMap := map[string]*pixel.Sprite{}
-	for k, v := range config {
-		spriteMap[k] = newSpriteIndexed(pic, v)
-	}
-	return spriteMap
-}
-
-func newSpriteIndexed(pic pixel.Picture, index float64) *pixel.Sprite {
-	totalRows := pic.Bounds().H() / spriteSize
-	totalCols := pic.Bounds().W() / spriteSize
-
-	find := func() (float64, float64) {
-		i := 0.0
-		var row = 0.0
-		var col = 0.0
-		for ; row < totalRows; row++ {
-			if i == index {
-				return row, col
-			}
-			for col = 0.0; col < totalCols; col++ {
-				i++
-				if i == index {
-					return row, col
-				}
-			}
-		}
-		return row, col
-	}
-
-	row, col := find()
-
-	return pixel.NewSprite(pic, pixel.Rect{
-		Min: pixel.V(col*spriteSize, row*spriteSize),
-		Max: pixel.V(col*spriteSize+spriteSize, row*spriteSize+spriteSize),
-	})
-}
-
 func loadPicture(path string) pixel.Picture {
 	file, err := os.Open(path)
 	if err != nil {
@@ -817,29 +697,6 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 	}
 }
 
-func loadTmxData() {
-	tmxMapData = map[string]tmxreader.TmxMap{}
-	for i, name := range tilemapFiles {
-		path := fmt.Sprintf("%s%s.tmx", tilemapDir, name)
-		fmt.Printf("Loading TMX tile map %d/%d %s: %s\n", i+1, len(tilemapFiles), name, path)
-		tmxMapData[name] = parseTmxFile(path)
-	}
-}
-
-func parseTmxFile(filename string) tmxreader.TmxMap {
-	raw, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	tmxMap, err := tmxreader.Parse(raw)
-	if err != nil {
-		panic(err)
-	}
-
-	return tmxMap
-}
-
 func buildLevelObstacles(level string) []entities.Obstacle {
 
 	var layout [][]int
@@ -947,4 +804,68 @@ func buildCoordsSliceFromLayout(layout [][]int) [][]float64 {
 	}
 	fmt.Println(s)
 	return coords
+}
+
+func loadTmxData() {
+	tmxMapData = map[string]tmxreader.TmxMap{}
+	for i, name := range tilemapFiles {
+		path := fmt.Sprintf("%s%s.tmx", tilemapDir, name)
+		fmt.Printf("Loading TMX tile map %d/%d %s: %s\n", i+1, len(tilemapFiles), name, path)
+		tmxMapData[name] = parseTmxFile(path)
+	}
+}
+
+func parseTmxFile(filename string) tmxreader.TmxMap {
+	raw, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	tmxMap, err := tmxreader.Parse(raw)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmxMap
+}
+
+/*
+	Build in the way that Tiled TMX files index sprites:
+
+	Referenced index + 1 in the TMX files.tmxMapData
+
+	 0  1  2  3  4  5  6
+	 7  8  9 10 11 12 13
+	14 15 16 17 18 19 20
+
+*/
+func buildSpritesheet() map[int]*pixel.Sprite {
+	cols := pic.Bounds().W() / spriteSize
+	rows := pic.Bounds().H() / spriteSize
+
+	// maxIndex is the actual slice index of the sprite
+	// it is referenced in the TMX file as maxIndex+1
+	maxIndex := (rows * cols) - 1.0
+	fmt.Printf("maxIndex: %d\n", int(maxIndex))
+
+	index := maxIndex
+	id := maxIndex + 1
+	spritesheet := map[int]*pixel.Sprite{}
+	for row := (rows - 1); row >= 0; row-- {
+		for col := (cols - 1); col >= 0; col-- {
+			x := col
+			y := math.Abs(rows-row) - 1
+			fmt.Printf("id:%3d index:%3d (x%d, y%d)\n", int(id), int(index), int(x), int(y))
+			// fmt.Printf("%v\n", index)
+			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
+				x*spriteSize,
+				y*spriteSize,
+				x*spriteSize+spriteSize,
+				y*spriteSize+spriteSize,
+			))
+			index--
+			id--
+		}
+	}
+	return spritesheet
 }
