@@ -59,8 +59,8 @@ var (
 )
 
 const (
-	spriteSize       float64 = 48
-	spritePlayerPath string  = "assets/spritesheet.png"
+	spriteSize      float64 = 48
+	spritesheetPath string  = "assets/spritesheet.png"
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -73,18 +73,32 @@ var tilemapFiles = []string{
 	"overworldFourWallsDoorTop",
 }
 
+var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
-
 var sprites map[string]*pixel.Sprite
+
+type mapDrawData struct {
+	Rect     pixel.Rect
+	SpriteID int
+}
+
+var allMapDrawData map[string]mapDrawData
 
 func run() {
 	// Initializations
 	t = initI18n()
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(t("title"), winX, winY, winW, winH)
-	pic = loadPicture(spritePlayerPath)
+
+	// load the spritesheet image
+	pic = loadPicture(spritesheetPath)
+	// build spritesheet
+	// this is a map of TMX IDs to sprite instances
 	spritesheet := buildSpritesheet()
+	// load all TMX file data for each map
+	tmxMapData = loadTmxData()
 	fmt.Printf("%v\n", spritesheet)
+	allMapDrawData = buildMapDrawData()
 
 	gameWorld = world.New()
 
@@ -128,7 +142,6 @@ func run() {
 	}
 	enemyEntities := buildEnemyEntities()
 
-	loadTmxData()
 	obstacles := buildLevelObstacles("fourWalls")
 
 	moveableObstacles := []entities.MoveableObstacle{
@@ -806,13 +819,18 @@ func buildCoordsSliceFromLayout(layout [][]int) [][]float64 {
 	return coords
 }
 
-func loadTmxData() {
-	tmxMapData = map[string]tmxreader.TmxMap{}
+/*
+New Tilemap Code
+*/
+
+func loadTmxData() map[string]tmxreader.TmxMap {
+	tmxMapData := map[string]tmxreader.TmxMap{}
 	for i, name := range tilemapFiles {
 		path := fmt.Sprintf("%s%s.tmx", tilemapDir, name)
 		fmt.Printf("Loading TMX tile map %d/%d %s: %s\n", i+1, len(tilemapFiles), name, path)
 		tmxMapData[name] = parseTmxFile(path)
 	}
+	return tmxMapData
 }
 
 func parseTmxFile(filename string) tmxreader.TmxMap {
@@ -837,6 +855,8 @@ func parseTmxFile(filename string) tmxreader.TmxMap {
 	 0  1  2  3  4  5  6
 	 7  8  9 10 11 12 13
 	14 15 16 17 18 19 20
+
+	map of sprites by their TMX id
 
 */
 func buildSpritesheet() map[int]*pixel.Sprite {
@@ -868,4 +888,19 @@ func buildSpritesheet() map[int]*pixel.Sprite {
 		}
 	}
 	return spritesheet
+}
+
+func buildMapDrawData() map[string]mapDrawData {
+	all := map[string]mapDrawData{}
+
+	for mapName, mapData := range tmxMapData {
+		fmt.Printf("Building map draw data for map %s\n", mapName)
+
+		layers := mapData.Layers
+		for layerIndex := len(layers); layerIndex >= 0; layerIndex-- {
+			fmt.Printf("Layer %d\n", layerIndex)
+		}
+	}
+
+	return all
 }
