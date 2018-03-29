@@ -107,7 +107,8 @@ func run() {
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(t("title"), winX, winY, winW, winH)
 	pic = loadPicture(spritePlayerPath)
-	buildSpritesheet()
+	spritesheet := buildSpritesheet()
+	fmt.Printf("%v\n", spritesheet)
 	sprites = buildSpriteMap(pic, spriteMap)
 
 	gameWorld = world.New()
@@ -325,7 +326,7 @@ func run() {
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
 			gameWorld.Update()
-
+			// spritesheet[68].Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 			if win.JustPressed(pixelgl.KeyP) {
 				currentState = gamestate.Pause
 			}
@@ -433,7 +434,7 @@ func drawMapBG(x, y, w, h float64, color color.Color) {
 	14 15 16 17 18 19 20
 
 */
-func buildSpritesheet() {
+func buildSpritesheet() map[int]*pixel.Sprite {
 	cols := pic.Bounds().W() / spriteSize
 	rows := pic.Bounds().H() / spriteSize
 
@@ -444,16 +445,24 @@ func buildSpritesheet() {
 
 	index := maxIndex
 	id := maxIndex + 1
+	spritesheet := map[int]*pixel.Sprite{}
 	for row := (rows - 1); row >= 0; row-- {
 		for col := (cols - 1); col >= 0; col-- {
 			x := col
 			y := math.Abs(rows-row) - 1
 			fmt.Printf("id:%3d index:%3d (x%d, y%d)\n", int(id), int(index), int(x), int(y))
 			// fmt.Printf("%v\n", index)
+			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
+				x*spriteSize,
+				y*spriteSize,
+				x*spriteSize+spriteSize,
+				y*spriteSize+spriteSize,
+			))
 			index--
 			id--
 		}
 	}
+	return spritesheet
 
 	// index := 0
 	// spritesheet := []*pixel.Sprite{}
