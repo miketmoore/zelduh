@@ -59,7 +59,7 @@ var (
 
 const (
 	spriteSize       float64 = 48
-	spritePlayerPath string  = "assets/bink-spritesheet-01.png"
+	spritePlayerPath string  = "assets/spritesheet.png"
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -67,6 +67,7 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 var tilemapDir = "assets/tilemaps/"
 var tilemapFiles = []string{
 	"overworldOpen",
+	"overworldOpenCircleOfTrees",
 	"overworldFourWallsDoorBottom",
 	"overworldFourWallsDoorTop",
 }
