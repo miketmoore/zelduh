@@ -66,6 +66,7 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 var tilemapDir = "assets/tilemaps/"
 var tilemapFiles = []string{
+	"overworldOpen",
 	"overworldFourWallsDoorBottom",
 	"overworldFourWallsDoorTop",
 }
