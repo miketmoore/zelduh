@@ -1,14 +1,18 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
+	"io"
 	"io/ioutil"
+	"log"
 	"math"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/deanobob/tmxreader"
@@ -890,17 +894,70 @@ func buildSpritesheet() map[int]*pixel.Sprite {
 	return spritesheet
 }
 
+type MapData struct {
+	Name   string
+	Layers [][][]mapDrawData
+}
+
 func buildMapDrawData() map[string]mapDrawData {
 	all := map[string]mapDrawData{}
 
 	for mapName, mapData := range tmxMapData {
 		fmt.Printf("Building map draw data for map %s\n", mapName)
 
+		md := MapData{
+			Name:   mapName,
+			Layers: [][][]mapDrawData{},
+		}
+
 		layers := mapData.Layers
-		for layerIndex := len(layers); layerIndex >= 0; layerIndex-- {
+		for layerIndex := len(layers) - 1; layerIndex >= 0; layerIndex-- {
 			fmt.Printf("Layer %d\n", layerIndex)
+
+			layer := mapData.Layers[layerIndex]
+			// layer data is csv of sprite IDs
+			// fmt.Printf("%v\n", strings.TrimSpace(layer.Data.Value))
+			records := parseCsv(strings.TrimSpace(layer.Data.Value) + ",")
+
+			fmt.Printf("%v\n", records)
+
+			// now we have the layer data - arrays of sprite IDs
+			// we need to be able to specify a map name
+			// and get an array of data:
+			// * sprite ID
+			// * x,y coordinates
+
+			for row := len(records) - 1; row >= 0; row-- {
+				for col := 0; col < len(records[row]); col++ {
+					// iterate through row of columns
+					fmt.Printf("row %d col %d\n", row, col)
+					y := float64(row) * spriteSize
+					x := float64(col) * spriteSize
+					fmt.Printf("x %f y %f\n", x, y)
+				}
+			}
 		}
 	}
 
 	return all
+}
+
+func parseCsv(in string) [][]string {
+	r := csv.NewReader(strings.NewReader(in))
+
+	records := [][]string{}
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(record)
+		records = append(records, record)
+	}
+
+	return records
 }
