@@ -6,6 +6,7 @@ import (
 	"image/color"
 	_ "image/png"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"os"
 	"time"
@@ -106,6 +107,7 @@ func run() {
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(t("title"), winX, winY, winW, winH)
 	pic = loadPicture(spritePlayerPath)
+	buildSpritesheet()
 	sprites = buildSpriteMap(pic, spriteMap)
 
 	gameWorld = world.New()
@@ -419,6 +421,55 @@ func drawMapBG(x, y, w, h float64, color color.Color) {
 	s.Push(pixel.V(x+w, y+h))
 	s.Rectangle(0)
 	s.Draw(win)
+}
+
+/*
+	Build in the way that Tiled TMX files index sprites:
+
+	Referenced index + 1 in the TMX files.tmxMapData
+
+	 0  1  2  3  4  5  6
+	 7  8  9 10 11 12 13
+	14 15 16 17 18 19 20
+
+*/
+func buildSpritesheet() {
+	cols := pic.Bounds().W() / spriteSize
+	rows := pic.Bounds().H() / spriteSize
+
+	// maxIndex is the actual slice index of the sprite
+	// it is referenced in the TMX file as maxIndex+1
+	maxIndex := (rows * cols) - 1.0
+	fmt.Printf("maxIndex: %d\n", int(maxIndex))
+
+	index := maxIndex
+	id := maxIndex + 1
+	for row := (rows - 1); row >= 0; row-- {
+		for col := (cols - 1); col >= 0; col-- {
+			x := col
+			y := math.Abs(rows-row) - 1
+			fmt.Printf("id:%3d index:%3d (x%d, y%d)\n", int(id), int(index), int(x), int(y))
+			// fmt.Printf("%v\n", index)
+			index--
+			id--
+		}
+	}
+
+	// index := 0
+	// spritesheet := []*pixel.Sprite{}
+	// for row := 0.0; row < rows; row++ {
+	// 	// s := fmt.Sprintf("%3d: ", int(row))
+	// 	// for col := 0.0; col < cols; col++ {
+	// 	// 	s = fmt.Sprintf("%s %4d", s, index)
+	// 	// 	spritesheet = append(spritesheet, pixel.NewSprite(pic, pixel.Rect{
+	// 	// 		Min: pixel.V(col*spriteSize, row*spriteSize),
+	// 	// 		Max: pixel.V(col*spriteSize+spriteSize, row*spriteSize+spriteSize),
+	// 	// 	}))
+
+	// 	// 	index++
+	// 	// }
+	// 	// fmt.Println(s)
+	// }
 }
 
 func buildSpriteMap(pic pixel.Picture, config map[string]float64) map[string]*pixel.Sprite {
