@@ -304,11 +304,8 @@ func run() {
 		switch currentState {
 		case gamestate.Start:
 			win.Clear(colornames.Darkgray)
-			txt.Clear()
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
-			txt.Color = colornames.Black
-			fmt.Fprintln(txt, t("title"))
-			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+			drawCenterText(t("title"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				currentState = gamestate.Game
@@ -331,7 +328,7 @@ func run() {
 			drawMapBGImage("overworldFourWallsDoorBottom")
 
 			gameWorld.Update()
-			// spritesheet[68].Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+
 			if win.JustPressed(pixelgl.KeyP) {
 				currentState = gamestate.Pause
 			}
@@ -342,10 +339,8 @@ func run() {
 
 		case gamestate.Pause:
 			win.Clear(colornames.Darkgray)
-			txt.Clear()
-			fmt.Fprintln(txt, t("paused"))
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
-			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+			drawCenterText(t("paused"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
 				currentState = gamestate.Game
@@ -355,11 +350,8 @@ func run() {
 			}
 		case gamestate.Over:
 			win.Clear(colornames.Darkgray)
-			txt.Clear()
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.Black)
-			txt.Color = colornames.White
-			fmt.Fprintln(txt, t("gameOver"))
-			txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+			drawCenterText(t("gameOver"), colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				currentState = gamestate.Start
@@ -415,6 +407,7 @@ func allowQuit() {
 }
 
 func drawCenterText(s string, c color.RGBA) {
+	txt.Clear()
 	txt.Color = c
 	fmt.Fprintln(txt, s)
 	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
@@ -480,14 +473,14 @@ func buildPlayerEntity() entities.Player {
 	}
 }
 
-func buildCoinEntities() []entities.Coin {
-	w := spriteSize
-	h := spriteSize
-	return []entities.Coin{
-		buildCoin(mapX+w, mapY+h),
-		buildCoin(mapX+w*10, mapY+h*7),
-	}
-}
+// func buildCoinEntities() []entities.Coin {
+// 	w := spriteSize
+// 	h := spriteSize
+// 	return []entities.Coin{
+// 		buildCoin(mapX+w, mapY+h),
+// 		buildCoin(mapX+w*10, mapY+h*7),
+// 	}
+// }
 
 func buildCoin(x, y float64) entities.Coin {
 	w := spriteSize
@@ -788,30 +781,30 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 	return obstacles
 }
 
-func buildMapFromLayout(layout [][]int) []entities.Obstacle {
-	obstacles := []entities.Obstacle{}
-	y := mapY
-	s := ""
-	for r := len(layout) - 1; r >= 0; r-- {
+// func buildMapFromLayout(layout [][]int) []entities.Obstacle {
+// 	obstacles := []entities.Obstacle{}
+// 	y := mapY
+// 	s := ""
+// 	for r := len(layout) - 1; r >= 0; r-- {
 
-		row := layout[r]
+// 		row := layout[r]
 
-		for i, c := range row {
-			x := mapX + (float64(i) * spriteSize)
-			o := buildObstacle(x, y)
-			s = fmt.Sprintf("%s %d", s, c)
-			if c == 1 {
-				obstacles = append(obstacles, o)
-			}
+// 		for i, c := range row {
+// 			x := mapX + (float64(i) * spriteSize)
+// 			o := buildObstacle(x, y)
+// 			s = fmt.Sprintf("%s %d", s, c)
+// 			if c == 1 {
+// 				obstacles = append(obstacles, o)
+// 			}
 
-		}
+// 		}
 
-		s = fmt.Sprintf("%s\n", s)
-		y += spriteSize
-	}
-	fmt.Println(s)
-	return obstacles
-}
+// 		s = fmt.Sprintf("%s\n", s)
+// 		y += spriteSize
+// 	}
+// 	fmt.Println(s)
+// 	return obstacles
+// }
 
 func buildCoordsSliceFromLayout(layout [][]int) [][]float64 {
 	coords := [][]float64{}
