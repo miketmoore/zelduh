@@ -12,6 +12,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -86,7 +87,7 @@ type mapDrawData struct {
 	SpriteID int
 }
 
-var allMapDrawData map[string]mapDrawData
+var allMapDrawData map[string]MapData
 
 func run() {
 	// Initializations
@@ -895,21 +896,23 @@ func buildSpritesheet() map[int]*pixel.Sprite {
 }
 
 type MapData struct {
-	Name   string
-	Layers [][][]mapDrawData
+	Name string
+	Data []mapDrawData
 }
 
-func buildMapDrawData() map[string]mapDrawData {
-	all := map[string]mapDrawData{}
+func buildMapDrawData() map[string]MapData {
+	all := map[string]MapData{}
 
+	// loop through list of TMX data (each iteration is a whole map)
 	for mapName, mapData := range tmxMapData {
 		fmt.Printf("Building map draw data for map %s\n", mapName)
 
 		md := MapData{
-			Name:   mapName,
-			Layers: [][][]mapDrawData{},
+			Name: mapName,
+			Data: []mapDrawData{},
 		}
 
+		// loop backwards through layers
 		layers := mapData.Layers
 		for layerIndex := len(layers) - 1; layerIndex >= 0; layerIndex-- {
 			fmt.Printf("Layer %d\n", layerIndex)
@@ -928,14 +931,29 @@ func buildMapDrawData() map[string]mapDrawData {
 			// * x,y coordinates
 
 			for row := len(records) - 1; row >= 0; row-- {
-				for col := 0; col < len(records[row]); col++ {
-					// iterate through row of columns
-					fmt.Printf("row %d col %d\n", row, col)
+				for col := 0; col < len(records[row])-1; col++ {
+
+					// build data for one sprite
+					// * sprite ID
+					// * coordinates
 					y := float64(row) * spriteSize
 					x := float64(col) * spriteSize
-					fmt.Printf("x %f y %f\n", x, y)
+
+					record := records[row][col]
+					spriteID, err := strconv.Atoi(record)
+					if err != nil {
+						panic(err)
+					}
+					mrd := mapDrawData{
+						Rect:     pixel.R(x, y, x+spriteSize, y+spriteSize),
+						SpriteID: spriteID,
+					}
+					fmt.Println(mrd)
+					md.Data = append(md.Data, mrd)
 				}
 			}
+			all[mapName] = md
+			fmt.Println()
 		}
 	}
 
