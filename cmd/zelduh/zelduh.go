@@ -317,15 +317,19 @@ func run() {
 
 			win.Clear(colornames.Darkgray)
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
-			d := allMapDrawData["overworldFourWallsDoorBottom"]
-			for _, x := range d.Data {
-				if x.SpriteID != 0 {
-					fmt.Println(x.SpriteID)
-					sprite := spritesheet[x.SpriteID]
-					sprite.Draw(win, pixel.IM.Moved(x.Rect.Moved(pixel.V(mapX+spriteSize/2, mapY+spriteSize/2)).Min))
-				}
 
+			drawMapBGImage := func(name string) {
+				d := allMapDrawData["overworldFourWallsDoorBottom"]
+				for _, x := range d.Data {
+					if x.SpriteID != 0 {
+						fmt.Println(x.SpriteID)
+						sprite := spritesheet[x.SpriteID]
+						sprite.Draw(win, pixel.IM.Moved(x.Rect.Moved(pixel.V(mapX+spriteSize/2, mapY+spriteSize/2)).Min))
+					}
+				}
 			}
+			drawMapBGImage("overworldFourWallsDoorBottom")
+
 			gameWorld.Update()
 			// spritesheet[68].Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 			if win.JustPressed(pixelgl.KeyP) {
@@ -545,7 +549,8 @@ func buildObstacle(x, y float64) entities.Obstacle {
 	return entities.Obstacle{
 		ID: gameWorld.NewEntityID(),
 		AppearanceComponent: &components.AppearanceComponent{
-			Color: colornames.Black,
+			// TODO transparency?
+			Color: color.RGBA{0xff, 0xff, 0xff, 00},
 		},
 		SpatialComponent: &components.SpatialComponent{
 			Width:  spriteSize,
