@@ -99,10 +99,11 @@ func run() {
 	pic = loadPicture(spritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
-	spritesheet := buildSpritesheet()
+	spritesheet = buildSpritesheet()
+
 	// load all TMX file data for each map
 	tmxMapData = loadTmxData()
-	fmt.Printf("%v\n", spritesheet)
+	// fmt.Printf("%v\n", spritesheet)
 	allMapDrawData = buildMapDrawData()
 
 	gameWorld = world.New()
@@ -315,16 +316,6 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
-			drawMapBGImage := func(name string) {
-				d := allMapDrawData["overworldFourWallsDoorBottom"]
-				for _, spriteData := range d.Data {
-					if spriteData.SpriteID != 0 {
-						// fmt.Println(spriteData.SpriteID)
-						sprite := spritesheet[spriteData.SpriteID]
-						sprite.Draw(win, pixel.IM.Moved(spriteData.Rect.Moved(pixel.V(mapX+spriteSize/2, mapY+spriteSize/2)).Min))
-					}
-				}
-			}
 			drawMapBGImage("overworldFourWallsDoorBottom")
 
 			gameWorld.Update()
@@ -781,58 +772,25 @@ func buildLevelObstacles(level string) []entities.Obstacle {
 	return obstacles
 }
 
-// func buildMapFromLayout(layout [][]int) []entities.Obstacle {
-// 	obstacles := []entities.Obstacle{}
-// 	y := mapY
-// 	s := ""
-// 	for r := len(layout) - 1; r >= 0; r-- {
-
-// 		row := layout[r]
-
-// 		for i, c := range row {
-// 			x := mapX + (float64(i) * spriteSize)
-// 			o := buildObstacle(x, y)
-// 			s = fmt.Sprintf("%s %d", s, c)
-// 			if c == 1 {
-// 				obstacles = append(obstacles, o)
-// 			}
-
-// 		}
-
-// 		s = fmt.Sprintf("%s\n", s)
-// 		y += spriteSize
-// 	}
-// 	fmt.Println(s)
-// 	return obstacles
-// }
-
 func buildCoordsSliceFromLayout(layout [][]int) [][]float64 {
 	coords := [][]float64{}
 	y := mapY
-	s := ""
 	for r := len(layout) - 1; r >= 0; r-- {
 
 		row := layout[r]
 
 		for i, c := range row {
 			x := mapX + (float64(i) * spriteSize)
-			s = fmt.Sprintf("%s %d", s, c)
 			if c == 1 {
 				coords = append(coords, []float64{x, y})
 			}
 
 		}
 
-		s = fmt.Sprintf("%s\n", s)
 		y += spriteSize
 	}
-	fmt.Println(s)
 	return coords
 }
-
-/*
-New Tilemap Code
-*/
 
 func loadTmxData() map[string]tmxreader.TmxMap {
 	tmxMapData := map[string]tmxreader.TmxMap{}
@@ -858,26 +816,11 @@ func parseTmxFile(filename string) tmxreader.TmxMap {
 	return tmxMap
 }
 
-/*
-	Build in the way that Tiled TMX files index sprites:
-
-	Referenced index + 1 in the TMX files.tmxMapData
-
-	 0  1  2  3  4  5  6
-	 7  8  9 10 11 12 13
-	14 15 16 17 18 19 20
-
-	map of sprites by their TMX id
-
-*/
 func buildSpritesheet() map[int]*pixel.Sprite {
 	cols := pic.Bounds().W() / spriteSize
 	rows := pic.Bounds().H() / spriteSize
 
-	// maxIndex is the actual slice index of the sprite
-	// it is referenced in the TMX file as maxIndex+1
 	maxIndex := (rows * cols) - 1.0
-	fmt.Printf("maxIndex: %d\n", int(maxIndex))
 
 	index := maxIndex
 	id := maxIndex + 1
@@ -886,8 +829,6 @@ func buildSpritesheet() map[int]*pixel.Sprite {
 		for col := (cols - 1); col >= 0; col-- {
 			x := col
 			y := math.Abs(rows-row) - 1
-			fmt.Printf("id:%3d index:%3d (x%d, y%d)\n", int(id), int(index), int(x), int(y))
-			// fmt.Printf("%v\n", index)
 			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
 				x*spriteSize,
 				y*spriteSize,
@@ -909,7 +850,6 @@ type MapData struct {
 func buildMapDrawData() map[string]MapData {
 	all := map[string]MapData{}
 
-	// loop through list of TMX data (each iteration is a whole map)
 	for mapName, mapData := range tmxMapData {
 		fmt.Printf("Building map draw data for map %s\n", mapName)
 
@@ -923,14 +863,9 @@ func buildMapDrawData() map[string]MapData {
 
 			records := parseCsv(strings.TrimSpace(layer.Data.Value) + ",")
 
-			// fmt.Printf("%v\n", records)
-
 			for row := len(records) - 1; row >= 0; row-- {
 				for col := 0; col < len(records[row])-1; col++ {
 
-					// build data for one sprite
-					// * sprite ID
-					// * coordinates
 					y := float64(row) * spriteSize
 					x := float64(col) * spriteSize
 
@@ -943,12 +878,10 @@ func buildMapDrawData() map[string]MapData {
 						Rect:     pixel.R(x, y, x+spriteSize, y+spriteSize),
 						SpriteID: spriteID,
 					}
-					fmt.Println(mrd)
 					md.Data = append(md.Data, mrd)
 				}
 			}
 			all[mapName] = md
-			fmt.Println()
 		}
 	}
 
@@ -968,9 +901,23 @@ func parseCsv(in string) [][]string {
 			log.Fatal(err)
 		}
 
-		fmt.Println(record)
 		records = append(records, record)
 	}
 
 	return records
+}
+
+func drawMapBGImage(name string) {
+	d := allMapDrawData["overworldFourWallsDoorBottom"]
+	for _, spriteData := range d.Data {
+		if spriteData.SpriteID != 0 {
+			sprite := spritesheet[spriteData.SpriteID]
+			x := mapX + spriteSize/2
+			y := mapY + spriteSize/2
+			vec := pixel.V(x, y)
+			movedVec := spriteData.Rect.Moved(vec).Min
+			matrix := pixel.IM.Moved(movedVec)
+			sprite.Draw(win, matrix)
+		}
+	}
 }
