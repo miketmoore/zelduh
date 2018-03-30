@@ -317,7 +317,15 @@ func run() {
 
 			win.Clear(colornames.Darkgray)
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+			d := allMapDrawData["overworldFourWallsDoorBottom"]
+			for _, x := range d.Data {
+				if x.SpriteID != 0 {
+					fmt.Println(x.SpriteID)
+					sprite := spritesheet[x.SpriteID]
+					sprite.Draw(win, pixel.IM.Moved(x.Rect.Moved(pixel.V(mapX+spriteSize/2, mapY+spriteSize/2)).Min))
+				}
 
+			}
 			gameWorld.Update()
 			// spritesheet[68].Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 			if win.JustPressed(pixelgl.KeyP) {
@@ -912,23 +920,12 @@ func buildMapDrawData() map[string]MapData {
 			Data: []mapDrawData{},
 		}
 
-		// loop backwards through layers
 		layers := mapData.Layers
-		for layerIndex := len(layers) - 1; layerIndex >= 0; layerIndex-- {
-			fmt.Printf("Layer %d\n", layerIndex)
+		for _, layer := range layers {
 
-			layer := mapData.Layers[layerIndex]
-			// layer data is csv of sprite IDs
-			// fmt.Printf("%v\n", strings.TrimSpace(layer.Data.Value))
 			records := parseCsv(strings.TrimSpace(layer.Data.Value) + ",")
 
-			fmt.Printf("%v\n", records)
-
-			// now we have the layer data - arrays of sprite IDs
-			// we need to be able to specify a map name
-			// and get an array of data:
-			// * sprite ID
-			// * x,y coordinates
+			// fmt.Printf("%v\n", records)
 
 			for row := len(records) - 1; row >= 0; row-- {
 				for col := 0; col < len(records[row])-1; col++ {
