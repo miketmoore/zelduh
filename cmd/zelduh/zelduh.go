@@ -320,11 +320,11 @@ func run() {
 
 			drawMapBGImage := func(name string) {
 				d := allMapDrawData["overworldFourWallsDoorBottom"]
-				for _, x := range d.Data {
-					if x.SpriteID != 0 {
-						fmt.Println(x.SpriteID)
-						sprite := spritesheet[x.SpriteID]
-						sprite.Draw(win, pixel.IM.Moved(x.Rect.Moved(pixel.V(mapX+spriteSize/2, mapY+spriteSize/2)).Min))
+				for _, spriteData := range d.Data {
+					if spriteData.SpriteID != 0 {
+						// fmt.Println(spriteData.SpriteID)
+						sprite := spritesheet[spriteData.SpriteID]
+						sprite.Draw(win, pixel.IM.Moved(spriteData.Rect.Moved(pixel.V(mapX+spriteSize/2, mapY+spriteSize/2)).Min))
 					}
 				}
 			}
