@@ -299,9 +299,7 @@ func run() {
 	addMoveableObstaclesToSystem(moveableObstacles)
 	addCollisionSwitchesToSystem(collisionSwitches)
 
-	// draw := true
-	add := true
-
+	flag := true
 	for !win.Closed() {
 
 		allowQuit()
@@ -317,30 +315,24 @@ func run() {
 			}
 		case gamestate.Game:
 
-			// if draw {
-			// draw = false
 			win.Clear(colornames.Darkgray)
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
 			obstacles := []entities.Obstacle{}
-			drawMapBGImage("overworldTreeClusterTopRight", func(spriteID int, x, y float64, matrix pixel.Matrix) {
+			drawMapBGImage("overworldOpenCircleOfTrees", func(spriteID int, x, y float64, matrix pixel.Matrix, frame pixel.Rect) {
+				if !flag {
+					return
+				}
 				if spriteID == 77 {
-					// fmt.Printf("Sprite match ID:%d x:%f y:%f\n", spriteID, x, y)
-					if add {
-						obstacle := buildObstacle(x, y)
-						movedVec := obstacle.Rect.Min
-						// matrix := pixel.IM.Moved(movedVec)
-						obstacle.Rect = obstacle.Rect.Moved(movedVec)
-						fmt.Printf("%v\n", obstacle.Rect)
-						// sprite.Draw(win, matrix)
-						obstacles = append(obstacles)
-					}
+					obstacle := buildObstacle(x-spriteSize/2, y-spriteSize/2)
+					obstacles = append(obstacles, obstacle)
 				}
 			})
-			if add {
-				add = false
+			if flag {
+				flag = false
 				addObstaclesToSystem(obstacles)
 			}
+
 			// }
 			// TODO I want to add entities when I draw the map
 			// create sprite-entity map: maps sprite IDs to entity types
@@ -699,10 +691,10 @@ func addObstaclesToSystem(obstacles []entities.Obstacle) {
 			for _, obstacle := range obstacles {
 				sys.AddObstacle(obstacle.ID, obstacle.SpatialComponent)
 			}
-		case *render.System:
-			for _, obstacle := range obstacles {
-				sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
-			}
+			// case *render.System:
+			// 	for _, obstacle := range obstacles {
+			// 		sys.AddObstacle(obstacle.ID, obstacle.AppearanceComponent, obstacle.SpatialComponent)
+			// 	}
 		}
 	}
 }
@@ -898,8 +890,6 @@ func buildMapDrawData() map[string]MapData {
 			for row := 0; row <= len(records); row++ {
 				// for row := len(records) - 1; row >= 0; row-- {
 				if len(records) > row {
-					fmt.Printf("ROW %v\n", len(records[row]))
-					fmt.Printf("%v\n", records[row])
 					for col := 0; col < len(records[row])-1; col++ {
 						// fmt.Printf("%v\n", records[row])
 						// for col := range records[row] {
@@ -948,19 +938,25 @@ func parseCsv(in string) [][]string {
 	return records
 }
 
-func drawMapBGImage(name string, cb func(int, float64, float64, pixel.Matrix)) {
+func drawMapBGImage(name string, cb func(int, float64, float64, pixel.Matrix, pixel.Rect)) {
 	d := allMapDrawData[name]
+
+	// loop through one-dimensional slice of map draw data
+	// the loop contains all tiles for every layer, bottom to top
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			sprite := spritesheet[spriteData.SpriteID]
-			x := mapX + spriteSize/2
-			y := mapY + spriteSize/2
-			vec := pixel.V(x, y)
-			movedVec := spriteData.Rect.Moved(vec).Min
-			// movedVec := spriteData.Rect.Min
+
+			vec := spriteData.Rect.Min
+
+			movedVec := pixel.V(
+				vec.X+mapX+spriteSize/2,
+				vec.Y+mapY+spriteSize/2,
+			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
-			cb(spriteData.SpriteID, x, y, matrix)
+
+			cb(spriteData.SpriteID, movedVec.X, movedVec.Y, matrix, sprite.Frame())
 		}
 	}
 }
