@@ -76,6 +76,8 @@ var tilemapFiles = []string{
 	"overworldOpenCircleOfTrees",
 	"overworldFourWallsDoorBottom",
 	"overworldFourWallsDoorTop",
+	"overworldFourWallsDoorRight",
+	"overworldTreeClusterTopRight",
 }
 
 var spritesheet map[int]*pixel.Sprite
@@ -103,7 +105,6 @@ func run() {
 
 	// load all TMX file data for each map
 	tmxMapData = loadTmxData()
-	// fmt.Printf("%v\n", spritesheet)
 	allMapDrawData = buildMapDrawData()
 
 	gameWorld = world.New()
@@ -148,7 +149,7 @@ func run() {
 	}
 	enemyEntities := buildEnemyEntities()
 
-	obstacles := buildLevelObstacles("fourWalls")
+	// obstacles := buildLevelObstacles("fourWalls")
 
 	moveableObstacles := []entities.MoveableObstacle{
 		buildMoveableObstacle(mapX+(spriteSize*5), mapY+(spriteSize*5)),
@@ -294,9 +295,12 @@ func run() {
 	addSwordToSystems(sword)
 	addArrowToSystems(arrow)
 	addEnemiesToSystem(enemyEntities)
-	addObstaclesToSystem(obstacles)
+	// addObstaclesToSystem(obstacles)
 	addMoveableObstaclesToSystem(moveableObstacles)
 	addCollisionSwitchesToSystem(collisionSwitches)
+
+	// draw := true
+	add := true
 
 	for !win.Closed() {
 
@@ -313,10 +317,35 @@ func run() {
 			}
 		case gamestate.Game:
 
+			// if draw {
+			// draw = false
 			win.Clear(colornames.Darkgray)
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
-			drawMapBGImage("overworldFourWallsDoorBottom")
+			obstacles := []entities.Obstacle{}
+			drawMapBGImage("overworldTreeClusterTopRight", func(spriteID int, x, y float64, matrix pixel.Matrix) {
+				if spriteID == 77 {
+					// fmt.Printf("Sprite match ID:%d x:%f y:%f\n", spriteID, x, y)
+					if add {
+						obstacle := buildObstacle(x, y)
+						movedVec := obstacle.Rect.Min
+						// matrix := pixel.IM.Moved(movedVec)
+						obstacle.Rect = obstacle.Rect.Moved(movedVec)
+						fmt.Printf("%v\n", obstacle.Rect)
+						// sprite.Draw(win, matrix)
+						obstacles = append(obstacles)
+					}
+				}
+			})
+			if add {
+				add = false
+				addObstaclesToSystem(obstacles)
+			}
+			// }
+			// TODO I want to add entities when I draw the map
+			// create sprite-entity map: maps sprite IDs to entity types
+
+			// obstacles := buildLevelObstacles("overworldFourWallsDoorBottom")
 
 			gameWorld.Update()
 
@@ -816,6 +845,7 @@ func parseTmxFile(filename string) tmxreader.TmxMap {
 	return tmxMap
 }
 
+// this is a map of pixel engine sprites
 func buildSpritesheet() map[int]*pixel.Sprite {
 	cols := pic.Bounds().W() / spriteSize
 	rows := pic.Bounds().H() / spriteSize
@@ -862,24 +892,35 @@ func buildMapDrawData() map[string]MapData {
 		for _, layer := range layers {
 
 			records := parseCsv(strings.TrimSpace(layer.Data.Value) + ",")
+			// for _, r := range records {
+			// 	fmt.Printf("%v\n", r)
+			// }
+			for row := 0; row <= len(records); row++ {
+				// for row := len(records) - 1; row >= 0; row-- {
+				if len(records) > row {
+					fmt.Printf("ROW %v\n", len(records[row]))
+					fmt.Printf("%v\n", records[row])
+					for col := 0; col < len(records[row])-1; col++ {
+						// fmt.Printf("%v\n", records[row])
+						// for col := range records[row] {
+						y := float64(11-row) * spriteSize
+						x := float64(col) * spriteSize
 
-			for row := len(records) - 1; row >= 0; row-- {
-				for col := 0; col < len(records[row])-1; col++ {
-
-					y := float64(row) * spriteSize
-					x := float64(col) * spriteSize
-
-					record := records[row][col]
-					spriteID, err := strconv.Atoi(record)
-					if err != nil {
-						panic(err)
+						// fmt.Printf("%v %v\n", row, col)
+						record := records[row][col]
+						// fmt.Printf("[%v]\n", record)
+						spriteID, err := strconv.Atoi(record)
+						if err != nil {
+							panic(err)
+						}
+						mrd := mapDrawData{
+							Rect:     pixel.R(x, y, x+spriteSize, y+spriteSize),
+							SpriteID: spriteID,
+						}
+						md.Data = append(md.Data, mrd)
 					}
-					mrd := mapDrawData{
-						Rect:     pixel.R(x, y, x+spriteSize, y+spriteSize),
-						SpriteID: spriteID,
-					}
-					md.Data = append(md.Data, mrd)
 				}
+
 			}
 			all[mapName] = md
 		}
@@ -907,8 +948,8 @@ func parseCsv(in string) [][]string {
 	return records
 }
 
-func drawMapBGImage(name string) {
-	d := allMapDrawData["overworldFourWallsDoorBottom"]
+func drawMapBGImage(name string, cb func(int, float64, float64, pixel.Matrix)) {
+	d := allMapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			sprite := spritesheet[spriteData.SpriteID]
@@ -916,8 +957,10 @@ func drawMapBGImage(name string) {
 			y := mapY + spriteSize/2
 			vec := pixel.V(x, y)
 			movedVec := spriteData.Rect.Moved(vec).Min
+			// movedVec := spriteData.Rect.Min
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
+			cb(spriteData.SpriteID, x, y, matrix)
 		}
 	}
 }
