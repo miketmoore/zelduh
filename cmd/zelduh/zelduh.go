@@ -297,8 +297,8 @@ func run() {
 	addArrowToSystems(arrow)
 	addEnemiesToSystem(enemyEntities)
 	// addObstaclesToSystem(obstacles)
-	addMoveableObstaclesToSystem(moveableObstacles)
-	addCollisionSwitchesToSystem(collisionSwitches)
+	// addMoveableObstaclesToSystem(moveableObstacles)
+	// addCollisionSwitchesToSystem(collisionSwitches)
 
 	flag := true
 	for !win.Closed() {
