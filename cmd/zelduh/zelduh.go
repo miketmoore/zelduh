@@ -78,6 +78,7 @@ var tilemapFiles = []string{
 	"overworldFourWallsDoorTop",
 	"overworldFourWallsDoorRight",
 	"overworldTreeClusterTopRight",
+	"overworldFourWallsClusterTrees",
 }
 
 var spritesheet map[int]*pixel.Sprite
@@ -319,11 +320,11 @@ func run() {
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
 			obstacles := []entities.Obstacle{}
-			drawMapBGImage("overworldOpenCircleOfTrees", func(spriteID int, x, y float64, matrix pixel.Matrix, frame pixel.Rect) {
+			drawMapBGImage("overworldFourWallsClusterTrees", func(spriteID int, x, y float64, matrix pixel.Matrix, frame pixel.Rect) {
 				if !flag {
 					return
 				}
-				if spriteID == 77 {
+				if spriteID == 77 || spriteID == 35 {
 					obstacle := buildObstacle(x-spriteSize/2, y-spriteSize/2)
 					obstacles = append(obstacles, obstacle)
 				}
