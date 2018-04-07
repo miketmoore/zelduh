@@ -176,6 +176,10 @@ func run() {
 	rooms = map[RoomID]Room{
 		1: Room{
 			MapName: "overworldFourWallsDoorBottomRight",
+			EnemyConfigs: []EnemyConfig{
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20},
+			},
 			WarpConfigs: []WarpConfig{
 				WarpConfig{
 					WarpToRoomID: 6,
@@ -195,7 +199,13 @@ func run() {
 				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20},
 			},
 		},
-		3: Room{MapName: "overworldFourWallsDoorRightTopBottom"},
+		3: Room{
+			MapName: "overworldFourWallsDoorRightTopBottom",
+			EnemyConfigs: []EnemyConfig{
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20},
+			},
+		},
 		5: Room{
 			MapName: "rockWithCaveEntrance",
 			WarpConfigs: []WarpConfig{
