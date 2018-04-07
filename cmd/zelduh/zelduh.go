@@ -116,12 +116,19 @@ type WarpConfig struct {
 	IsAnimated               bool
 }
 
+// MoveableObstacleConfig is used to build moveable obstacles
+type MoveableObstacleConfig struct {
+	W, H, X, Y float64
+	IsAnimated bool
+}
+
 // Room represents one map section
 type Room struct {
-	MapName        string
-	ConnectedRooms ConnectedRooms
-	EnemyConfigs   []EnemyConfig
-	WarpConfigs    []WarpConfig
+	MapName                 string
+	ConnectedRooms          ConnectedRooms
+	EnemyConfigs            []EnemyConfig
+	WarpConfigs             []WarpConfig
+	MoveableObstacleConfigs []MoveableObstacleConfig
 }
 
 var rooms map[RoomID]Room
@@ -228,7 +235,17 @@ func run() {
 			},
 		},
 		6: Room{MapName: "rockPathLeftRightEntrance"},
-		7: Room{MapName: "overworldFourWallsDoorLeftTop"},
+		7: Room{
+			MapName: "overworldFourWallsDoorLeftTop",
+			MoveableObstacleConfigs: []MoveableObstacleConfig{
+				MoveableObstacleConfig{
+					W: spriteSize,
+					H: spriteSize,
+					X: (spriteSize * 8) + spriteSize/2,
+					Y: (spriteSize * 9) + spriteSize/2,
+				},
+			},
+		},
 		8: Room{MapName: "overworldFourWallsDoorBottom"},
 		9: Room{MapName: "overworldFourWallsDoorTop"},
 		10: Room{
@@ -384,6 +401,7 @@ func run() {
 	addObstaclesPerTileMap := true
 	addEnemiesPerTileMap := true
 	addWarpsPerTileMap := true
+	addMoveableObstaclesPerTileMap := true
 	var currentRoomID RoomID = 1
 	var nextRoomID RoomID
 
@@ -438,6 +456,7 @@ func run() {
 				addObstaclesPerTileMap = true
 				addEnemiesPerTileMap = true
 				addWarpsPerTileMap = true
+				addMoveableObstaclesPerTileMap = true
 			}
 		},
 		PlayerCollisionWithCoin: func(coinID int) {
@@ -458,10 +477,6 @@ func run() {
 				if dead {
 					fmt.Printf("You killed an enemy with a sword\n")
 					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
-					// if ok {
-					// 	dropCoin(enemySpatial.Rect.Min)
-					// }
-					fmt.Printf(">>>> %v\n", explosion.ID)
 					explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
 					explosion.Spatial = &components.Spatial{
 						Width:  spriteSize,
@@ -483,10 +498,18 @@ func run() {
 				dead := healthSystem.Hit(enemyID, 1)
 				arrow.Ignore.Value = true
 				if dead {
-					enemySpatial, ok := spatialSystem.GetEnemySpatial(enemyID)
-					if ok {
-						dropCoin(enemySpatial.Rect.Min)
+					fmt.Printf("You killed an enemy with an arrow\n")
+					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
+					explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
+					explosion.Spatial = &components.Spatial{
+						Width:  spriteSize,
+						Height: spriteSize,
+						Rect:   enemySpatial.Rect,
 					}
+					explosion.OnExpiration = func() {
+						dropCoin(explosion.Spatial.Rect.Min)
+					}
+					addGenericToSystems(explosion.ID, explosion, enemySpatial.Rect.Min)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
@@ -524,6 +547,7 @@ func run() {
 					addObstaclesPerTileMap = true
 					addEnemiesPerTileMap = true
 					addWarpsPerTileMap = true
+					addMoveableObstaclesPerTileMap = true
 					nextRoomID = warpConfig.WarpToRoomID
 				}
 			}
@@ -622,6 +646,21 @@ func run() {
 				addObstaclesToSystem(obstacles)
 			}
 
+			if addMoveableObstaclesPerTileMap {
+				addMoveableObstaclesPerTileMap = false
+				for _, c := range rooms[currentRoomID].MoveableObstacleConfigs {
+					entity := entities.BuildMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+					entity.Animation = &components.Animation{
+						Default: &components.AnimationData{
+							Frames: []pixel.Sprite{
+								*spritesheet[63],
+							},
+							FrameRate: frameRate,
+						},
+					}
+					addMoveableObstaclesToSystem([]entities.MoveableObstacle{entity})
+				}
+			}
 			if addEnemiesPerTileMap {
 				fmt.Printf("addEnemiesPerTileMap\n")
 				addEnemiesPerTileMap = false
@@ -896,6 +935,21 @@ func buildObstacle(x, y float64) entities.Obstacle {
 	}
 }
 
+func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
+	return entities.MoveableObstacle{
+		ID: gameWorld.NewEntityID(),
+		Spatial: &components.Spatial{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
+			Shape:  imdraw.New(nil),
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Blueviolet,
+		},
+	}
+}
+
 func addCoinToSystem(coin entities.Coin) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
@@ -1012,7 +1066,7 @@ func addMoveableObstaclesToSystem(moveableObstacles []entities.MoveableObstacle)
 			}
 		case *systems.Render:
 			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.Appearance, moveable.Spatial)
+				sys.AddMoveableObstacle(moveable.ID, moveable.Appearance, moveable.Spatial, moveable.Animation)
 			}
 		}
 	}
@@ -1206,6 +1260,25 @@ func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Obst
 		}
 	}
 	return obstacles
+}
+
+func drawMoveableObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.MoveableObstacle {
+	d := allMapDrawData[rooms[roomID].MapName]
+	entities := []entities.MoveableObstacle{}
+	for _, spriteData := range d.Data {
+		if spriteData.SpriteID != 0 {
+			vec := spriteData.Rect.Min
+			movedVec := pixel.V(
+				vec.X+mapX+modX+spriteSize/2,
+				vec.Y+mapY+modY+spriteSize/2,
+			)
+			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
+				entity := buildMoveableObstacle(movedVec.X-spriteSize/2, movedVec.Y-spriteSize/2)
+				entities = append(entities, entity)
+			}
+		}
+	}
+	return entities
 }
 
 func indexRoom(a, b RoomID, dir direction.Name) {

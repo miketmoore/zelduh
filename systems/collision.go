@@ -220,13 +220,13 @@ func (s *Collision) Update() {
 
 		for _, enemy := range s.enemies {
 			if isColliding(moveableObstacle.Spatial.Rect, enemy.Spatial.Rect) {
-				s.EnemyCollisionWithMoveableObstacle(enemy.ID)
+				// s.EnemyCollisionWithMoveableObstacle(enemy.ID)
 			}
 		}
 
 		for _, obstacle := range s.obstacles {
 			if isColliding(moveableObstacle.Spatial.Rect, obstacle.Spatial.Rect) {
-				s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
+				// s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
 			}
 		}
 

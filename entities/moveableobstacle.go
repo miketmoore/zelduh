@@ -14,6 +14,7 @@ type MoveableObstacle struct {
 	*components.Appearance
 	*components.Spatial
 	*components.Movement
+	*components.Animation
 }
 
 // BuildMoveableObstacle builds a new moveable obstacle

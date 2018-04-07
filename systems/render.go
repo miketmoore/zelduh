@@ -95,11 +95,17 @@ func (s *Render) RemoveGeneric(id int) {
 }
 
 // AddMoveableObstacle adds a moveable obstacle to the system
-func (s *Render) AddMoveableObstacle(id int, appearance *components.Appearance, spatial *components.Spatial) {
+func (s *Render) AddMoveableObstacle(
+	id int,
+	appearance *components.Appearance,
+	spatial *components.Spatial,
+	animation *components.Animation,
+) {
 	s.moveableObstacles = append(s.moveableObstacles, renderEntity{
 		ID:         id,
 		Appearance: appearance,
 		Spatial:    spatial,
+		Animation:  animation,
 	})
 }
 
@@ -182,12 +188,12 @@ func (s *Render) Update() {
 		if collisionSwitch.Animation != nil {
 			s.animateDefault(collisionSwitch)
 		} else {
+			// Draw an invisible collision switch
 			collisionSwitch.Shape.Clear()
 			collisionSwitch.Shape.Color = collisionSwitch.Appearance.Color
 			collisionSwitch.Shape.Push(collisionSwitch.Spatial.Rect.Min)
 			collisionSwitch.Shape.Push(collisionSwitch.Spatial.Rect.Max)
 			collisionSwitch.Shape.Rectangle(0)
-			// collisionSwitch.Shape.Draw(s.Win)
 		}
 
 	}
@@ -224,13 +230,8 @@ func (s *Render) Update() {
 		s.animateDefault(coin)
 	}
 
-	for _, obstacle := range s.moveableObstacles {
-		obstacle.Shape.Clear()
-		obstacle.Shape.Color = obstacle.Appearance.Color
-		obstacle.Shape.Push(obstacle.Spatial.Rect.Min)
-		obstacle.Shape.Push(obstacle.Spatial.Rect.Max)
-		obstacle.Shape.Rectangle(0)
-		obstacle.Shape.Draw(s.Win)
+	for _, entity := range s.moveableObstacles {
+		s.animateDefault(entity)
 	}
 
 }
