@@ -489,7 +489,7 @@ func run() {
 					addGenericToSystems(explosion.ID, explosion, enemySpatial.Rect.Min)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
+					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
 				}
 			}
 		},
@@ -512,7 +512,7 @@ func run() {
 					addGenericToSystems(explosion.ID, explosion, enemySpatial.Rect.Min)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
+					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
 				}
 			}
 		},

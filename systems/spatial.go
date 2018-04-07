@@ -165,22 +165,23 @@ func (s *Spatial) UndoEnemyRect(enemyID int) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *Spatial) MoveEnemyBack(enemyID int, directionHit direction.Name) {
-	fmt.Printf("spatial MoveEnemyBack called enemyID: %d\n", enemyID)
+// TODO how to prevent entity from passing through obstacles, map boundaries?
+func (s *Spatial) MoveEnemyBack(enemyID int, directionHit direction.Name, distance float64) {
+	// fmt.Printf("spatial MoveEnemyBack called enemyID: %d\n", enemyID)
 	enemy, ok := s.enemy(enemyID)
 	if ok {
-		fmt.Printf("spatial MoveEnemyBack OK, found enemy.ID: %d\n", enemy.ID)
+		// fmt.Printf("spatial MoveEnemyBack OK, found enemy.ID: %d\n", enemy.ID)
 		var v pixel.Vec
-		fmt.Printf("spatial MoveEnemyBack direction: %v\n", enemy.Movement.Direction)
+		// fmt.Printf("spatial MoveEnemyBack direction: %v\n", enemy.Movement.Direction)
 		switch directionHit {
 		case direction.Up:
-			v = pixel.V(0, 48)
+			v = pixel.V(0, distance)
 		case direction.Right:
-			v = pixel.V(48, 0)
+			v = pixel.V(distance, 0)
 		case direction.Down:
-			v = pixel.V(0, -48)
+			v = pixel.V(0, -distance)
 		case direction.Left:
-			v = pixel.V(-48, 0)
+			v = pixel.V(-distance, 0)
 		}
 		enemy.Spatial.Rect = enemy.Spatial.PrevRect.Moved(v)
 		enemy.Spatial.PrevRect = enemy.Spatial.Rect
