@@ -181,6 +181,13 @@ func (s *Render) RemoveAllCollisionSwitches() {
 	}
 }
 
+// RemoveAllMoveableObstacles removes all moveable obstacles
+func (s *Render) RemoveAllMoveableObstacles() {
+	for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
+		s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
+	}
+}
+
 // Update changes spatial data based on movement data
 func (s *Render) Update() {
 

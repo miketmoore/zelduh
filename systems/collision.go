@@ -128,6 +128,13 @@ func (s *Collision) RemoveAllEnemies() {
 	}
 }
 
+// RemoveAllMoveableObstacles removes all moveable obstacles
+func (s *Collision) RemoveAllMoveableObstacles() {
+	for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
+		s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
+	}
+}
+
 // RemoveAllCollisionSwitches removes all collision switches
 func (s *Collision) RemoveAllCollisionSwitches() {
 	for i := len(s.collisionSwitches) - 1; i >= 0; i-- {

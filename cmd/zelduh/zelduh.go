@@ -742,6 +742,7 @@ func run() {
 				collisionSystem.RemoveObstacles()
 				removeAllEnemiesFromSystems()
 				removeAllCollisionSwitchesFromSystems()
+				removeAllMoveableObstaclesFromSystems()
 
 				inc := (transitionTimerStart - float64(transitionTimer))
 				incY := inc * (mapH / spriteSize)
@@ -1104,6 +1105,17 @@ func removeAllCollisionSwitchesFromSystems() {
 			sys.RemoveAllCollisionSwitches()
 		case *systems.Render:
 			sys.RemoveAllCollisionSwitches()
+		}
+	}
+}
+
+func removeAllMoveableObstaclesFromSystems() {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *systems.Collision:
+			sys.RemoveAllMoveableObstacles()
+		case *systems.Render:
+			sys.RemoveAllMoveableObstacles()
 		}
 	}
 }
