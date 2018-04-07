@@ -288,6 +288,18 @@ func run() {
 			Frames:    []pixel.Sprite{*spritesheet[2], *spritesheet[193]},
 			FrameRate: frameRate,
 		},
+		SwordAttackUp: &components.AnimationData{
+			Frames: []pixel.Sprite{*spritesheet[165]},
+		},
+		SwordAttackRight: &components.AnimationData{
+			Frames: []pixel.Sprite{*spritesheet[164]},
+		},
+		SwordAttackLeft: &components.AnimationData{
+			Frames: []pixel.Sprite{*spritesheet[179]},
+		},
+		SwordAttackDown: &components.AnimationData{
+			Frames: []pixel.Sprite{*spritesheet[180]},
+		},
 	}
 
 	sword := entities.BuildSword(spriteSize, spriteSize, player.Movement.Direction)

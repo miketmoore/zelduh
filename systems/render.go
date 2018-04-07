@@ -180,7 +180,11 @@ func (s *Render) Update() {
 		s.animateDirections(s.playerEntity.Movement.Direction, s.arrow)
 	}
 
-	s.animateDirections(s.playerEntity.Movement.Direction, s.playerEntity)
+	if s.sword.Ignore.Value && s.arrow.Ignore.Value {
+		s.animateDirections(s.playerEntity.Movement.Direction, s.playerEntity)
+	} else {
+		s.animateAttackDirection(s.playerEntity.Movement.Direction, s.playerEntity)
+	}
 
 	for _, enemy := range s.enemies {
 		s.animateDefault(enemy)
@@ -230,6 +234,50 @@ func (s *Render) animateDefault(entity renderEntity) {
 			)
 			frame.Draw(s.Win, pixel.IM.Moved(v))
 		}
+	}
+}
+
+func (s *Render) animateAttackDirection(dir direction.Name, entity renderEntity) {
+	if anim := entity.Animation; anim != nil {
+		var animData *components.AnimationData
+		switch dir {
+		case direction.Up:
+			animData = anim.SwordAttackUp
+		case direction.Right:
+			animData = anim.SwordAttackRight
+		case direction.Down:
+			animData = anim.SwordAttackDown
+		case direction.Left:
+			animData = anim.SwordAttackLeft
+		}
+
+		rate := animData.FrameRateCount
+		if rate < animData.FrameRate {
+			rate++
+		} else {
+			rate = 0
+		}
+		animData.FrameRateCount = rate
+
+		frameNum := animData.Frame
+		if rate == animData.FrameRate {
+			if frameNum < len(animData.Frames)-1 {
+				frameNum++
+			} else {
+				frameNum = 0
+			}
+			animData.Frame = frameNum
+		}
+
+		frame := animData.Frames[frameNum]
+
+		rect := entity.Spatial.Rect
+		v := pixel.V(
+			rect.Min.X+entity.Spatial.Width/2,
+			rect.Min.Y+entity.Spatial.Height/2,
+		)
+
+		frame.Draw(s.Win, pixel.IM.Moved(v))
 	}
 }
 

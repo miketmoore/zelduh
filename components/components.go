@@ -70,9 +70,13 @@ type AnimationData struct {
 
 // Animation contains everything necessary to animate basic characters (four directions)
 type Animation struct {
-	Default *AnimationData
-	Up      *AnimationData
-	Right   *AnimationData
-	Down    *AnimationData
-	Left    *AnimationData
+	Default          *AnimationData
+	SwordAttackDown  *AnimationData
+	SwordAttackUp    *AnimationData
+	SwordAttackRight *AnimationData
+	SwordAttackLeft  *AnimationData
+	Up               *AnimationData
+	Right            *AnimationData
+	Down             *AnimationData
+	Left             *AnimationData
 }
