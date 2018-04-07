@@ -70,6 +70,8 @@ type AnimationData struct {
 
 // Animation contains everything necessary to animate basic characters (four directions)
 type Animation struct {
+	Expiration       int
+	OnExpiration     func()
 	Default          *AnimationData
 	SwordAttackDown  *AnimationData
 	SwordAttackUp    *AnimationData

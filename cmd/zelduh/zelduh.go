@@ -302,6 +302,29 @@ func run() {
 		},
 	}
 
+	explosion := entities.Generic{
+		ID: gameWorld.NewEntityID(),
+		Animation: &components.Animation{
+			Expiration: 12,
+			Default: &components.AnimationData{
+				Frames: []pixel.Sprite{
+					*spritesheet[122],
+					*spritesheet[122],
+					*spritesheet[122],
+					*spritesheet[123],
+					*spritesheet[123],
+					*spritesheet[123],
+					*spritesheet[124],
+					*spritesheet[124],
+					*spritesheet[124],
+					*spritesheet[125],
+					*spritesheet[125],
+					*spritesheet[125],
+				},
+			},
+		},
+	}
+
 	sword := entities.BuildSword(spriteSize, spriteSize, player.Movement.Direction)
 	sword.Animation = &components.Animation{
 		Up: &components.AnimationData{
@@ -423,10 +446,22 @@ func run() {
 			if !sword.Ignore.Value {
 				dead := healthSystem.Hit(enemyID, 1)
 				if dead {
-					enemySpatial, ok := spatialSystem.GetEnemySpatial(enemyID)
-					if ok {
-						dropCoin(enemySpatial.Rect.Min)
+					fmt.Printf("You killed an enemy with a sword\n")
+					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
+					// if ok {
+					// 	dropCoin(enemySpatial.Rect.Min)
+					// }
+					fmt.Printf(">>>> %v\n", explosion.ID)
+					explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
+					explosion.Spatial = &components.Spatial{
+						Width:  spriteSize,
+						Height: spriteSize,
+						Rect:   enemySpatial.Rect,
 					}
+					explosion.OnExpiration = func() {
+						dropCoin(explosion.Spatial.Rect.Min)
+					}
+					addGenericToSystems(explosion.ID, explosion, enemySpatial.Rect.Min)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
@@ -984,6 +1019,16 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 			for _, collisionSwitch := range collisionSwitches {
 				sys.AddCollisionSwitch(collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation)
 			}
+		}
+	}
+}
+
+func addGenericToSystems(id int, generic entities.Generic, v pixel.Vec) {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *systems.Render:
+			sys.AddGeneric(id, generic.Spatial, generic.Animation)
+			// sys.AddCollisionSwitch(collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation)
 		}
 	}
 }

@@ -19,6 +19,7 @@ type renderEntity struct {
 // Render is a custom system
 type Render struct {
 	Win               *pixelgl.Window
+	generic           []renderEntity
 	playerEntity      renderEntity
 	sword             renderEntity
 	arrow             renderEntity
@@ -71,6 +72,25 @@ func (s *Render) AddArrow(
 		Spatial:    spatial,
 		Ignore:     ignore,
 		Animation:  animation,
+	}
+}
+
+// AddGeneric adds a generic entity to the system
+func (s *Render) AddGeneric(id int, spatial *components.Spatial, animation *components.Animation) {
+	s.generic = append(s.generic, renderEntity{
+		ID:        id,
+		Spatial:   spatial,
+		Animation: animation,
+	})
+}
+
+// RemoveGeneric removes a generic entity from the system
+func (s *Render) RemoveGeneric(id int) {
+	for i := len(s.generic) - 1; i >= 0; i-- {
+		generic := s.generic[i]
+		if generic.ID == id {
+			s.generic = append(s.generic[:i], s.generic[i+1:]...)
+		}
 	}
 }
 
@@ -170,6 +190,16 @@ func (s *Render) Update() {
 			// collisionSwitch.Shape.Draw(s.Win)
 		}
 
+	}
+
+	for _, generic := range s.generic {
+		s.animateDefault(generic)
+		if generic.Animation.Expiration == 0 {
+			generic.Animation.OnExpiration()
+			s.RemoveGeneric(generic.ID)
+		} else {
+			generic.Animation.Expiration--
+		}
 	}
 
 	if !s.sword.Ignore.Value {
