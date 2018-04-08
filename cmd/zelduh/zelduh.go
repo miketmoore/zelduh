@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miketmoore/zelduh/bounds"
+
 	"github.com/deanobob/tmxreader"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -394,7 +396,7 @@ func run() {
 	}
 
 	isTransitioning := false
-	var transitionSide string
+	var transitionSide bounds.Bound
 	var transitionTimerStart = float64(spriteSize)
 	var transitionTimer int
 	var transitionStyle transitionStyle
@@ -447,7 +449,7 @@ func run() {
 			mapX+mapW,
 			mapY+mapH,
 		),
-		PlayerCollisionWithBounds: func(side string) {
+		PlayerCollisionWithBounds: func(side bounds.Bound) {
 			if !isTransitioning {
 				isTransitioning = true
 				transitionSide = side

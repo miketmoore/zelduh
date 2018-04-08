@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 )
@@ -36,7 +37,7 @@ type Collision struct {
 	MoveableObstacleCollisionWithObstacle func(int)
 	PlayerCollisionWithSwitch             func(int)
 	PlayerNoCollisionWithSwitch           func(int)
-	PlayerCollisionWithBounds             func(string)
+	PlayerCollisionWithBounds             func(bounds.Bound)
 }
 
 // Add adds the entity to the system
@@ -140,13 +141,13 @@ func (s *Collision) Update() {
 
 	// is player at map edge?
 	if player.Spatial.Rect.Min.Y <= mapBounds.Min.Y {
-		s.PlayerCollisionWithBounds("bottom")
+		s.PlayerCollisionWithBounds(bounds.Bottom)
 	} else if player.Spatial.Rect.Min.X <= mapBounds.Min.X {
-		s.PlayerCollisionWithBounds("left")
+		s.PlayerCollisionWithBounds(bounds.Left)
 	} else if player.Spatial.Rect.Max.X >= mapBounds.Max.X {
-		s.PlayerCollisionWithBounds("right")
+		s.PlayerCollisionWithBounds(bounds.Right)
 	} else if player.Spatial.Rect.Max.Y >= mapBounds.Max.Y {
-		s.PlayerCollisionWithBounds("top")
+		s.PlayerCollisionWithBounds(bounds.Top)
 	}
 
 	w, h := player.Spatial.Width, player.Spatial.Height
