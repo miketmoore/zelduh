@@ -22,6 +22,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"github.com/miketmoore/go-pixel-game-template/state"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
@@ -462,7 +463,7 @@ func run() {
 		PlayerCollisionWithCoin: func(coinID int) {
 			player.Coins.Coins++
 			fmt.Printf("Player coins: %d\n", player.Coins.Coins)
-			gameWorld.RemoveCoin(coinID)
+			gameWorld.Remove(categories.Coin, coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID int) {
 			spatialSystem.MovePlayerBack()
@@ -486,7 +487,7 @@ func run() {
 					explosion.OnExpiration = func() {
 						dropCoin(explosion.Spatial.Rect.Min)
 					}
-					addGenericToSystems(explosion.ID, explosion, enemySpatial.Rect.Min)
+					addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					// TODO - instead of just moving back in the spatial system,
@@ -515,7 +516,7 @@ func run() {
 					explosion.OnExpiration = func() {
 						dropCoin(explosion.Spatial.Rect.Min)
 					}
-					addGenericToSystems(explosion.ID, explosion, enemySpatial.Rect.Min)
+					addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
@@ -745,7 +746,7 @@ func run() {
 				win.Clear(colornames.Darkgray)
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
-				collisionSystem.RemoveObstacles()
+				collisionSystem.RemoveAll(categories.Obstacle)
 				removeAllEnemiesFromSystems()
 				removeAllCollisionSwitchesFromSystems()
 				removeAllMoveableObstaclesFromSystems()
@@ -805,7 +806,7 @@ func run() {
 				win.Clear(colornames.Darkgray)
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
-				collisionSystem.RemoveObstacles()
+				collisionSystem.RemoveAll(categories.Obstacle)
 				removeAllEnemiesFromSystems()
 				removeAllCollisionSwitchesFromSystems()
 			} else {
@@ -912,7 +913,8 @@ func buildCoin(x, y float64) entities.Coin {
 	w := spriteSize
 	h := spriteSize
 	return entities.Coin{
-		ID: gameWorld.NewEntityID(),
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Coin,
 		Appearance: &components.Appearance{
 			Color: colornames.Purple,
 		},
@@ -932,7 +934,8 @@ func buildCoin(x, y float64) entities.Coin {
 
 func buildObstacle(x, y float64) entities.Obstacle {
 	return entities.Obstacle{
-		ID: gameWorld.NewEntityID(),
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Obstacle,
 		Spatial: &components.Spatial{
 			Width:  spriteSize,
 			Height: spriteSize,
@@ -961,9 +964,9 @@ func addCoinToSystem(coin entities.Coin) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
-			sys.AddCoin(coin.ID, coin.Spatial)
+			sys.Add(coin.Category, coin.ID, coin.Spatial)
 		case *systems.Render:
-			sys.AddCoin(coin.ID, coin.Appearance, coin.Spatial, coin.Animation)
+			sys.Add(coin.Category, coin.ID, coin.Appearance, coin.Spatial, coin.Animation, nil, nil)
 		}
 	}
 }
@@ -976,9 +979,9 @@ func addPlayerToSystems(player entities.Player) {
 		case *systems.Spatial:
 			sys.AddPlayer(player.Spatial, player.Movement, player.Dash)
 		case *systems.Collision:
-			sys.AddPlayer(player.Spatial)
+			sys.Add(player.Category, 0, player.Spatial)
 		case *systems.Render:
-			sys.AddPlayer(player.Appearance, player.Spatial, player.Animation, player.Movement)
+			sys.Add(player.Category, 0, player.Appearance, player.Spatial, player.Animation, player.Movement, nil)
 		}
 	}
 }
@@ -991,9 +994,9 @@ func addSwordToSystems(sword entities.Sword) {
 		case *systems.Spatial:
 			sys.AddSword(sword.Spatial, sword.Movement)
 		case *systems.Collision:
-			sys.AddSword(sword.Spatial)
+			sys.Add(sword.Category, 0, sword.Spatial)
 		case *systems.Render:
-			sys.AddSword(sword.Appearance, sword.Spatial, sword.Ignore, sword.Animation)
+			sys.Add(sword.Category, 0, sword.Appearance, sword.Spatial, sword.Animation, nil, sword.Ignore)
 		}
 	}
 }
@@ -1006,9 +1009,9 @@ func addArrowToSystems(arrow entities.Arrow) {
 		case *systems.Spatial:
 			sys.AddArrow(arrow.Spatial, arrow.Movement)
 		case *systems.Collision:
-			sys.AddArrow(arrow.Spatial)
+			sys.Add(arrow.Category, 0, arrow.Spatial)
 		case *systems.Render:
-			sys.AddArrow(arrow.Appearance, arrow.Spatial, arrow.Ignore, arrow.Animation)
+			sys.Add(arrow.Category, 0, arrow.Appearance, arrow.Spatial, arrow.Animation, nil, arrow.Ignore)
 		}
 	}
 }
@@ -1022,7 +1025,7 @@ func addEnemiesToSystem(enemies []entities.Enemy) {
 			}
 		case *systems.Collision:
 			for _, enemy := range enemies {
-				sys.AddEnemy(enemy.ID, enemy.Spatial)
+				sys.Add(enemy.Category, enemy.ID, enemy.Spatial)
 			}
 		case *systems.Health:
 			for _, enemy := range enemies {
@@ -1030,7 +1033,7 @@ func addEnemiesToSystem(enemies []entities.Enemy) {
 			}
 		case *systems.Render:
 			for _, enemy := range enemies {
-				sys.AddEnemy(enemy.ID, enemy.Appearance, enemy.Spatial, enemy.Animation)
+				sys.Add(enemy.Category, enemy.ID, enemy.Appearance, enemy.Spatial, enemy.Animation, enemy.Movement, nil)
 			}
 		}
 	}
@@ -1040,21 +1043,22 @@ func removeAllEnemiesFromSystems() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Spatial:
-			sys.RemoveAllEnemies()
+			sys.RemoveAll(categories.Enemy)
 		case *systems.Collision:
-			sys.RemoveAllEnemies()
+			sys.RemoveAll(categories.Enemy)
 		case *systems.Render:
-			sys.RemoveAllEnemies()
+			sys.RemoveAll(categories.Enemy)
 		}
 	}
 }
 
 func addObstaclesToSystem(obstacles []entities.Obstacle) {
-	for _, system := range gameWorld.Systems() {
+	for i, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
+			fmt.Printf("addObstaclesToSystem %d\n", i)
 			for _, obstacle := range obstacles {
-				sys.AddObstacle(obstacle.ID, obstacle.Spatial)
+				sys.Add(obstacle.Category, obstacle.ID, obstacle.Spatial)
 			}
 		}
 	}
@@ -1069,11 +1073,11 @@ func addMoveableObstaclesToSystem(moveableObstacles []entities.MoveableObstacle)
 			}
 		case *systems.Collision:
 			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.Spatial)
+				sys.Add(moveable.Category, moveable.ID, moveable.Spatial)
 			}
 		case *systems.Render:
 			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.Appearance, moveable.Spatial, moveable.Animation)
+				sys.Add(moveable.Category, moveable.ID, moveable.Appearance, moveable.Spatial, moveable.Animation, nil, nil)
 			}
 		}
 	}
@@ -1084,22 +1088,21 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 		switch sys := system.(type) {
 		case *systems.Collision:
 			for _, collisionSwitch := range collisionSwitches {
-				sys.AddCollisionSwitch(collisionSwitch.ID, collisionSwitch.Spatial)
+				sys.Add(collisionSwitch.Category, collisionSwitch.ID, collisionSwitch.Spatial)
 			}
 		case *systems.Render:
 			for _, collisionSwitch := range collisionSwitches {
-				sys.AddCollisionSwitch(collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation)
+				sys.Add(collisionSwitch.Category, 0, collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation, nil, nil)
 			}
 		}
 	}
 }
 
-func addGenericToSystems(id int, generic entities.Generic, v pixel.Vec) {
+func addGenericToSystems(category categories.Category, generic entities.Generic, v pixel.Vec) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Render:
-			sys.AddGeneric(id, generic.Spatial, generic.Animation)
-			// sys.AddCollisionSwitch(collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation)
+			sys.Add(category, 0, nil, generic.Spatial, generic.Animation, nil, nil)
 		}
 	}
 }
@@ -1108,9 +1111,9 @@ func removeAllCollisionSwitchesFromSystems() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
-			sys.RemoveAllCollisionSwitches()
+			sys.RemoveAll(categories.CollisionSwitch)
 		case *systems.Render:
-			sys.RemoveAllCollisionSwitches()
+			sys.RemoveAll(categories.CollisionSwitch)
 		}
 	}
 }
@@ -1119,9 +1122,9 @@ func removeAllMoveableObstaclesFromSystems() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
-			sys.RemoveAllMoveableObstacles()
+			sys.RemoveAll(categories.MovableObstacle)
 		case *systems.Render:
-			sys.RemoveAllMoveableObstacles()
+			sys.RemoveAll(categories.MovableObstacle)
 		}
 	}
 }

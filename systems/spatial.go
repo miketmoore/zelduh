@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 )
@@ -90,10 +91,13 @@ func (s *Spatial) RemoveEnemy(id int) {
 	}
 }
 
-// RemoveAllEnemies removes all enemy entities from the system
-func (s *Spatial) RemoveAllEnemies() {
-	for i := len(s.enemies) - 1; i >= 0; i-- {
-		s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+// RemoveAll removes all entities from one category
+func (s *Spatial) RemoveAll(category categories.Category) {
+	switch category {
+	case categories.Enemy:
+		for i := len(s.enemies) - 1; i >= 0; i-- {
+			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+		}
 	}
 }
 

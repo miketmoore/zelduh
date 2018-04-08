@@ -1,6 +1,9 @@
 package world
 
-import "github.com/miketmoore/zelduh/systems"
+import (
+	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh/systems"
+)
 
 // System is an interface
 type System interface {
@@ -43,27 +46,31 @@ func (w *World) NewEntityID() int {
 	return w.lastEntityID
 }
 
-// RemoveCoin removes the specified coin from all relevant systems
-func (w *World) RemoveCoin(id int) {
-	for _, sys := range w.systems {
-		switch sys := sys.(type) {
-		case *systems.Collision:
-			sys.RemoveCoin(id)
-		case *systems.Render:
-			sys.RemoveCoin(id)
+// Remove removes the specific entity from all systems
+func (w *World) Remove(category categories.Category, id int) {
+	switch category {
+	case categories.Coin:
+		for _, sys := range w.systems {
+			switch sys := sys.(type) {
+			case *systems.Collision:
+				sys.Remove(categories.Coin, id)
+			case *systems.Render:
+				sys.Remove(categories.Coin, id)
+			}
 		}
 	}
 }
 
+// RemoveEnemy removes the enemy from all system
 func (w *World) RemoveEnemy(id int) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *systems.Spatial:
 			sys.RemoveEnemy(id)
 		case *systems.Collision:
-			sys.RemoveEnemy(id)
+			sys.Remove(categories.Enemy, id)
 		case *systems.Render:
-			sys.RemoveEnemy(id)
+			sys.Remove(categories.Enemy, id)
 		}
 	}
 }

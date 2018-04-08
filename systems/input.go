@@ -58,7 +58,6 @@ func (s *Input) AddArrow(movement *components.Movement, ignore *components.Ignor
 
 // Update checks for player input
 func (s *Input) Update() {
-	// fmt.Printf("%v\n", s.playerEnabled)
 	if !s.playerEnabled {
 		return
 	}

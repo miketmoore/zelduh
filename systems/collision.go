@@ -1,10 +1,10 @@
 package systems
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 )
 
@@ -39,113 +39,88 @@ type Collision struct {
 	PlayerCollisionWithBounds             func(string)
 }
 
-// AddPlayer adds the player to the system
-func (s *Collision) AddPlayer(spatial *components.Spatial) {
-	s.player = collisionEntity{
-		Spatial: spatial,
+// Add adds the entity to the system
+func (s *Collision) Add(category categories.Category, id int, spatial *components.Spatial) {
+	switch category {
+	case categories.Player:
+		s.player = collisionEntity{
+			Spatial: spatial,
+		}
+	case categories.Sword:
+		s.sword = collisionEntity{
+			Spatial: spatial,
+		}
+	case categories.Arrow:
+		s.arrow = collisionEntity{
+			Spatial: spatial,
+		}
+	case categories.Enemy:
+		s.enemies = append(s.enemies, collisionEntity{
+			ID:      id,
+			Spatial: spatial,
+		})
+	case categories.Obstacle:
+		s.obstacles = append(s.obstacles, collisionEntity{
+			ID:      id,
+			Spatial: spatial,
+		})
+	case categories.MovableObstacle:
+		s.moveableObstacles = append(s.moveableObstacles, collisionEntity{
+			ID:      id,
+			Spatial: spatial,
+		})
+	case categories.CollisionSwitch:
+		s.collisionSwitches = append(s.collisionSwitches, collisionEntity{
+			ID:      id,
+			Spatial: spatial,
+		})
+	case categories.Coin:
+		s.coins = append(s.coins, collisionEntity{
+			ID:      id,
+			Spatial: spatial,
+		})
 	}
 }
 
-// AddSword adds the sword to the system
-func (s *Collision) AddSword(spatial *components.Spatial) {
-	s.sword = collisionEntity{
-		Spatial: spatial,
-	}
-}
-
-// AddArrow adds the arrow to the system
-func (s *Collision) AddArrow(spatial *components.Spatial) {
-	s.arrow = collisionEntity{
-		Spatial: spatial,
-	}
-}
-
-// AddEnemy adds an enemy to the system
-func (s *Collision) AddEnemy(id int, spatial *components.Spatial) {
-	s.enemies = append(s.enemies, collisionEntity{
-		ID:      id,
-		Spatial: spatial,
-	})
-}
-
-// AddObstacle adds an obstacle entity to the system
-func (s *Collision) AddObstacle(id int, spatial *components.Spatial) {
-	s.obstacles = append(s.obstacles, collisionEntity{
-		ID:      id,
-		Spatial: spatial,
-	})
-}
-
-// AddMoveableObstacle adds an obstacle entity to the system
-func (s *Collision) AddMoveableObstacle(id int, spatial *components.Spatial) {
-	s.moveableObstacles = append(s.moveableObstacles, collisionEntity{
-		ID:      id,
-		Spatial: spatial,
-	})
-}
-
-// AddCollisionSwitch adds a collision switch entity to the system
-func (s *Collision) AddCollisionSwitch(id int, spatial *components.Spatial) {
-	s.collisionSwitches = append(s.collisionSwitches, collisionEntity{
-		ID:      id,
-		Spatial: spatial,
-	})
-}
-
-// AddCoin adds a coin to the system
-func (s *Collision) AddCoin(id int, spatial *components.Spatial) {
-	fmt.Printf("collision.Collision.AddCoin() id %d\n", id)
-	s.coins = append(s.coins, collisionEntity{
-		ID:      id,
-		Spatial: spatial,
-	})
-}
-
-// RemoveCoin removes the specified coin from the system
-func (s *Collision) RemoveCoin(id int) {
-	for i := len(s.coins) - 1; i >= 0; i-- {
-		coin := s.coins[i]
-		if coin.ID == id {
-			s.coins = append(s.coins[:i], s.coins[i+1:]...)
+// Remove removes the entity from the system
+func (s *Collision) Remove(category categories.Category, id int) {
+	switch category {
+	case categories.Coin:
+		for i := len(s.coins) - 1; i >= 0; i-- {
+			coin := s.coins[i]
+			if coin.ID == id {
+				s.coins = append(s.coins[:i], s.coins[i+1:]...)
+			}
+		}
+	case categories.Enemy:
+		for i := len(s.enemies) - 1; i >= 0; i-- {
+			enemy := s.enemies[i]
+			if enemy.ID == id {
+				s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+			}
 		}
 	}
 }
 
-// RemoveEnemy removes the specified enemy from the system
-func (s *Collision) RemoveEnemy(id int) {
-	for i := len(s.enemies) - 1; i >= 0; i-- {
-		enemy := s.enemies[i]
-		if enemy.ID == id {
+// RemoveAll removes all entities from one category
+func (s *Collision) RemoveAll(category categories.Category) {
+	switch category {
+	case categories.Enemy:
+		for i := len(s.enemies) - 1; i >= 0; i-- {
 			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
 		}
-	}
-}
-
-// RemoveAllEnemies removes all enemy entities from the system
-func (s *Collision) RemoveAllEnemies() {
-	for i := len(s.enemies) - 1; i >= 0; i-- {
-		s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
-	}
-}
-
-// RemoveAllMoveableObstacles removes all moveable obstacles
-func (s *Collision) RemoveAllMoveableObstacles() {
-	for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
-		s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
-	}
-}
-
-// RemoveAllCollisionSwitches removes all collision switches
-func (s *Collision) RemoveAllCollisionSwitches() {
-	for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
-		s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
-	}
-}
-
-// RemoveObstacles removes all obstacles from the system
-func (s *Collision) RemoveObstacles() {
-	for i := len(s.obstacles) - 1; i >= 0; i-- {
-		s.obstacles = append(s.obstacles[:i], s.obstacles[i+1:]...)
+	case categories.CollisionSwitch:
+		for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
+			s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
+		}
+	case categories.MovableObstacle:
+		for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
+			s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
+		}
+	case categories.Obstacle:
+		for i := len(s.obstacles) - 1; i >= 0; i-- {
+			s.obstacles = append(s.obstacles[:i], s.obstacles[i+1:]...)
+		}
 	}
 }
 
@@ -204,7 +179,7 @@ func (s *Collision) Update() {
 			s.PlayerCollisionWithCoin(coin.ID)
 		}
 	}
-	// fmt.Printf("Total obstacles in collision system %d\n", len(s.obstacles))
+
 	for _, obstacle := range s.obstacles {
 		if isColliding(obstacle.Spatial.Rect, s.player.Spatial.Rect) {
 			s.PlayerCollisionWithObstacle(obstacle.ID)

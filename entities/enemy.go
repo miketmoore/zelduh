@@ -3,6 +3,7 @@ package entities
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 	"golang.org/x/image/colornames"
@@ -10,7 +11,8 @@ import (
 
 // Enemy is an entity made up of components
 type Enemy struct {
-	ID int
+	ID       int
+	Category categories.Category
 	*components.Appearance
 	*components.Spatial
 	*components.Movement
@@ -21,8 +23,9 @@ type Enemy struct {
 // BuildEnemy builds an enemy entity
 func BuildEnemy(id int, w, h, x, y, hitRadius float64) Enemy {
 	return Enemy{
-		ID:     id,
-		Health: &components.Health{Total: 2},
+		ID:       id,
+		Category: categories.Enemy,
+		Health:   &components.Health{Total: 2},
 		Appearance: &components.Appearance{
 			Color: colornames.Red,
 		},

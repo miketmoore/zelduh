@@ -3,6 +3,7 @@ package entities
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 	"golang.org/x/image/colornames"
@@ -10,6 +11,7 @@ import (
 
 // Player is an entity made up of components
 type Player struct {
+	Category categories.Category
 	*components.Animation
 	*components.Appearance
 	*components.Spatial
@@ -22,6 +24,7 @@ type Player struct {
 // BuildPlayer builds a player entity
 func BuildPlayer(w, h, x, y float64) Player {
 	return Player{
+		Category: categories.Player,
 		Health: &components.Health{
 			Total: 3,
 		},

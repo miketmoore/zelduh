@@ -3,6 +3,7 @@ package entities
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 	"golang.org/x/image/colornames"
@@ -10,6 +11,7 @@ import (
 
 // Sword is an entity
 type Sword struct {
+	Category categories.Category
 	*components.Ignore
 	*components.Appearance
 	*components.Spatial
@@ -20,6 +22,7 @@ type Sword struct {
 // BuildSword builds a sword entity
 func BuildSword(w, h float64, dir direction.Name) Sword {
 	return Sword{
+		Category: categories.Sword,
 		Ignore: &components.Ignore{
 			Value: true,
 		},

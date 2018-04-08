@@ -3,12 +3,14 @@ package systems
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 )
 
 type renderEntity struct {
-	ID int
+	ID       int
+	Category categories.Category
 	*components.Spatial
 	*components.Appearance
 	*components.Animation
@@ -18,173 +20,98 @@ type renderEntity struct {
 
 // Render is a custom system
 type Render struct {
-	Win               *pixelgl.Window
+	Win *pixelgl.Window
+
+	player renderEntity
+	sword  renderEntity
+
+	defaultEntities []renderEntity
+
 	generic           []renderEntity
-	playerEntity      renderEntity
-	sword             renderEntity
 	arrow             renderEntity
-	coins             []renderEntity
-	enemies           []renderEntity
 	obstacles         []renderEntity
-	moveableObstacles []renderEntity
 	collisionSwitches []renderEntity
 }
 
-// AddPlayer adds the player to the system
-func (s *Render) AddPlayer(
+// Add adds one entity to the system
+func (s *Render) Add(
+	category categories.Category,
+	id int,
 	appearance *components.Appearance,
 	spatial *components.Spatial,
 	animation *components.Animation,
 	movement *components.Movement,
+	ignore *components.Ignore,
 ) {
-	s.playerEntity = renderEntity{
+	entity := renderEntity{
+		ID:         id,
+		Category:   category,
 		Appearance: appearance,
 		Spatial:    spatial,
 		Animation:  animation,
 		Movement:   movement,
-	}
-}
-
-// AddSword adds the sword to the system
-func (s *Render) AddSword(
-	appearance *components.Appearance,
-	spatial *components.Spatial,
-	ignore *components.Ignore,
-	animation *components.Animation,
-) {
-	s.sword = renderEntity{
-		Appearance: appearance,
-		Spatial:    spatial,
 		Ignore:     ignore,
-		Animation:  animation,
+	}
+
+	switch category {
+	case categories.Player:
+		s.player = entity
+	case categories.Sword:
+		s.sword = entity
+	case categories.Arrow:
+		s.arrow = entity
+
+	case categories.Enemy:
+		fallthrough
+	case categories.Coin:
+		fallthrough
+	case categories.MovableObstacle:
+		s.defaultEntities = append(s.defaultEntities, entity)
+
+	case categories.Explosion:
+		s.generic = append(s.generic, entity)
+	case categories.CollisionSwitch:
+		s.collisionSwitches = append(s.collisionSwitches, entity)
 	}
 }
 
-// AddArrow adds the sword to the system
-func (s *Render) AddArrow(
-	appearance *components.Appearance,
-	spatial *components.Spatial,
-	ignore *components.Ignore,
-	animation *components.Animation,
-) {
-	s.arrow = renderEntity{
-		Appearance: appearance,
-		Spatial:    spatial,
-		Ignore:     ignore,
-		Animation:  animation,
-	}
-}
-
-// AddGeneric adds a generic entity to the system
-func (s *Render) AddGeneric(id int, spatial *components.Spatial, animation *components.Animation) {
-	s.generic = append(s.generic, renderEntity{
-		ID:        id,
-		Spatial:   spatial,
-		Animation: animation,
-	})
-}
-
-// RemoveGeneric removes a generic entity from the system
-func (s *Render) RemoveGeneric(id int) {
-	for i := len(s.generic) - 1; i >= 0; i-- {
-		generic := s.generic[i]
-		if generic.ID == id {
-			s.generic = append(s.generic[:i], s.generic[i+1:]...)
+// Remove removes the entity from the system
+func (s *Render) Remove(category categories.Category, id int) {
+	switch category {
+	case categories.Explosion:
+		for i := len(s.generic) - 1; i >= 0; i-- {
+			generic := s.generic[i]
+			if generic.ID == id {
+				s.generic = append(s.generic[:i], s.generic[i+1:]...)
+			}
+		}
+	case categories.Coin:
+		fallthrough
+	case categories.Enemy:
+		for i := len(s.defaultEntities) - 1; i >= 0; i-- {
+			entity := s.defaultEntities[i]
+			if entity.ID == id {
+				s.defaultEntities = append(s.defaultEntities[:i], s.defaultEntities[i+1:]...)
+			}
 		}
 	}
 }
 
-// AddMoveableObstacle adds a moveable obstacle to the system
-func (s *Render) AddMoveableObstacle(
-	id int,
-	appearance *components.Appearance,
-	spatial *components.Spatial,
-	animation *components.Animation,
-) {
-	s.moveableObstacles = append(s.moveableObstacles, renderEntity{
-		ID:         id,
-		Appearance: appearance,
-		Spatial:    spatial,
-		Animation:  animation,
-	})
-}
-
-// AddCollisionSwitch adds a collision switch to the system
-func (s *Render) AddCollisionSwitch(
-	appearance *components.Appearance,
-	spatial *components.Spatial,
-	animation *components.Animation,
-) {
-	s.collisionSwitches = append(s.collisionSwitches, renderEntity{
-		Appearance: appearance,
-		Spatial:    spatial,
-		Animation:  animation,
-	})
-}
-
-// AddCoin adds the player to the system
-func (s *Render) AddCoin(
-	id int,
-	appearance *components.Appearance,
-	spatial *components.Spatial,
-	animation *components.Animation,
-) {
-	s.coins = append(s.coins, renderEntity{
-		ID:         id,
-		Appearance: appearance,
-		Spatial:    spatial,
-		Animation:  animation,
-	})
-}
-
-// AddEnemy adds an enemy to the system
-func (s *Render) AddEnemy(id int, appearance *components.Appearance, spatial *components.Spatial, animation *components.Animation) {
-	s.enemies = append(s.enemies, renderEntity{
-		ID:         id,
-		Appearance: appearance,
-		Spatial:    spatial,
-		Animation:  animation,
-	})
-}
-
-// RemoveCoin removes the specified coin from the system
-func (s *Render) RemoveCoin(id int) {
-	for i := len(s.coins) - 1; i >= 0; i-- {
-		coin := s.coins[i]
-		if coin.ID == id {
-			s.coins = append(s.coins[:i], s.coins[i+1:]...)
+// RemoveAll removes all entities from one category
+func (s *Render) RemoveAll(category categories.Category) {
+	switch category {
+	case categories.Enemy:
+		for i := len(s.defaultEntities) - 1; i >= 0; i-- {
+			s.defaultEntities = append(s.defaultEntities[:i], s.defaultEntities[i+1:]...)
 		}
-	}
-}
-
-// RemoveEnemy removes the specified enemy from the system
-func (s *Render) RemoveEnemy(id int) {
-	for i := len(s.enemies) - 1; i >= 0; i-- {
-		enemy := s.enemies[i]
-		if enemy.ID == id {
-			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+	case categories.CollisionSwitch:
+		for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
+			s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
 		}
-	}
-}
-
-// RemoveAllEnemies removes all enemy entities from the system
-func (s *Render) RemoveAllEnemies() {
-	for i := len(s.enemies) - 1; i >= 0; i-- {
-		s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
-	}
-}
-
-// RemoveAllCollisionSwitches removes all collision switches
-func (s *Render) RemoveAllCollisionSwitches() {
-	for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
-		s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
-	}
-}
-
-// RemoveAllMoveableObstacles removes all moveable obstacles
-func (s *Render) RemoveAllMoveableObstacles() {
-	for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
-		s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
+	case categories.MovableObstacle:
+		for i := len(s.defaultEntities) - 1; i >= 0; i-- {
+			s.defaultEntities = append(s.defaultEntities[:i], s.defaultEntities[i+1:]...)
+		}
 	}
 }
 
@@ -209,35 +136,29 @@ func (s *Render) Update() {
 		s.animateDefault(generic)
 		if generic.Animation.Expiration == 0 {
 			generic.Animation.OnExpiration()
-			s.RemoveGeneric(generic.ID)
+			s.Remove(generic.Category, generic.ID)
 		} else {
 			generic.Animation.Expiration--
 		}
 	}
 
+	player := s.player
+
 	if !s.sword.Ignore.Value {
-		s.animateDirections(s.playerEntity.Movement.Direction, s.sword)
+		s.animateDirections(player.Movement.Direction, s.sword)
 	}
 
 	if !s.arrow.Ignore.Value {
-		s.animateDirections(s.playerEntity.Movement.Direction, s.arrow)
+		s.animateDirections(player.Movement.Direction, s.arrow)
 	}
 
 	if s.sword.Ignore.Value && s.arrow.Ignore.Value {
-		s.animateDirections(s.playerEntity.Movement.Direction, s.playerEntity)
+		s.animateDirections(player.Movement.Direction, player)
 	} else {
-		s.animateAttackDirection(s.playerEntity.Movement.Direction, s.playerEntity)
+		s.animateAttackDirection(player.Movement.Direction, player)
 	}
 
-	for _, enemy := range s.enemies {
-		s.animateDefault(enemy)
-	}
-
-	for _, coin := range s.coins {
-		s.animateDefault(coin)
-	}
-
-	for _, entity := range s.moveableObstacles {
+	for _, entity := range s.defaultEntities {
 		s.animateDefault(entity)
 	}
 
