@@ -8,6 +8,7 @@ import (
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
+	"github.com/miketmoore/zelduh/entities"
 )
 
 type enemySpatialComponent struct {
@@ -16,7 +17,7 @@ type enemySpatialComponent struct {
 }
 
 type spatialEntity struct {
-	ID int
+	ID entities.EntityID
 	*components.Movement
 	*components.Spatial
 	*components.Dash
@@ -63,7 +64,7 @@ func (s *Spatial) AddArrow(spatial *components.Spatial, movement *components.Mov
 }
 
 // AddEnemy adds an enemy to the system
-func (s *Spatial) AddEnemy(id int, spatial *components.Spatial, movement *components.Movement) {
+func (s *Spatial) AddEnemy(id entities.EntityID, spatial *components.Spatial, movement *components.Movement) {
 	s.enemies = append(s.enemies, spatialEntity{
 		ID:                    id,
 		Spatial:               spatial,
@@ -73,7 +74,7 @@ func (s *Spatial) AddEnemy(id int, spatial *components.Spatial, movement *compon
 }
 
 // AddMoveableObstacle adds a moveable obstacle to the system
-func (s *Spatial) AddMoveableObstacle(id int, spatial *components.Spatial, movement *components.Movement) {
+func (s *Spatial) AddMoveableObstacle(id entities.EntityID, spatial *components.Spatial, movement *components.Movement) {
 	s.moveableObstacles = append(s.moveableObstacles, spatialEntity{
 		ID:       id,
 		Spatial:  spatial,
@@ -82,7 +83,7 @@ func (s *Spatial) AddMoveableObstacle(id int, spatial *components.Spatial, movem
 }
 
 // RemoveEnemy removes the specified enemy from the system
-func (s *Spatial) RemoveEnemy(id int) {
+func (s *Spatial) RemoveEnemy(id entities.EntityID) {
 	for i := len(s.enemies) - 1; i >= 0; i-- {
 		enemy := s.enemies[i]
 		if enemy.ID == id {
@@ -121,7 +122,7 @@ func (s *Spatial) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle :P
-func (s *Spatial) MoveMoveableObstacle(obstacleID int, dir direction.Name) {
+func (s *Spatial) MoveMoveableObstacle(obstacleID entities.EntityID, dir direction.Name) {
 	obstacle, ok := s.moveableObstacle(obstacleID)
 	if ok {
 		w := obstacle.Spatial.Width
@@ -142,7 +143,7 @@ func (s *Spatial) MoveMoveableObstacle(obstacleID int, dir direction.Name) {
 	}
 }
 
-func (s *Spatial) moveableObstacle(id int) (spatialEntity, bool) {
+func (s *Spatial) moveableObstacle(id entities.EntityID) (spatialEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
 			return e, true
@@ -151,7 +152,7 @@ func (s *Spatial) moveableObstacle(id int) (spatialEntity, bool) {
 	return spatialEntity{}, false
 }
 
-func (s *Spatial) enemy(id int) (spatialEntity, bool) {
+func (s *Spatial) enemy(id entities.EntityID) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
 			return e, true
@@ -161,7 +162,7 @@ func (s *Spatial) enemy(id int) (spatialEntity, bool) {
 }
 
 // UndoEnemyRect resets current rect to previous rect
-func (s *Spatial) UndoEnemyRect(enemyID int) {
+func (s *Spatial) UndoEnemyRect(enemyID entities.EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		enemy.Spatial.Rect = enemy.Spatial.PrevRect
@@ -170,7 +171,7 @@ func (s *Spatial) UndoEnemyRect(enemyID int) {
 
 // MoveEnemyBack moves the enemy back
 // TODO how to prevent entity from passing through obstacles, map boundaries?
-func (s *Spatial) MoveEnemyBack(enemyID int, directionHit direction.Name, distance float64) {
+func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit direction.Name, distance float64) {
 	// fmt.Printf("spatial MoveEnemyBack called enemyID: %d\n", enemyID)
 	enemy, ok := s.enemy(enemyID)
 	if ok {
@@ -314,7 +315,7 @@ func moveEnemy(s *Spatial, enemy spatialEntity) {
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *Spatial) GetEnemySpatial(enemyID int) (*components.Spatial, bool) {
+func (s *Spatial) GetEnemySpatial(enemyID entities.EntityID) (*components.Spatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
 			return enemy.Spatial, true

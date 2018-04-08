@@ -4,7 +4,7 @@ import "github.com/miketmoore/zelduh/components"
 
 // Generic is a generic entity
 type Generic struct {
-	ID int
+	ID EntityID
 	*components.Spatial
 	*components.Animation
 }

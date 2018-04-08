@@ -8,10 +8,11 @@ import (
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
+	"github.com/miketmoore/zelduh/entities"
 )
 
 type renderEntity struct {
-	ID       int
+	ID       entities.EntityID
 	Category categories.Category
 	*components.Spatial
 	*components.Appearance
@@ -38,7 +39,7 @@ type Render struct {
 // Add adds one entity to the system
 func (s *Render) Add(
 	category categories.Category,
-	id int,
+	id entities.EntityID,
 	appearance *components.Appearance,
 	spatial *components.Spatial,
 	animation *components.Animation,
@@ -78,7 +79,7 @@ func (s *Render) Add(
 }
 
 // Remove removes the entity from the system
-func (s *Render) Remove(category categories.Category, id int) {
+func (s *Render) Remove(category categories.Category, id entities.EntityID) {
 	switch category {
 	case categories.Explosion:
 		for i := len(s.generic) - 1; i >= 0; i-- {

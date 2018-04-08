@@ -2,6 +2,7 @@ package world
 
 import (
 	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
 )
 
@@ -13,7 +14,7 @@ type System interface {
 // World is a world struct
 type World struct {
 	systems      []System
-	lastEntityID int
+	lastEntityID entities.EntityID
 }
 
 // New returns a new World
@@ -41,13 +42,13 @@ func (w *World) Systems() []System {
 }
 
 // NewEntityID generates and returns a new Entity ID
-func (w *World) NewEntityID() int {
+func (w *World) NewEntityID() entities.EntityID {
 	w.lastEntityID++
 	return w.lastEntityID
 }
 
 // Remove removes the specific entity from all systems
-func (w *World) Remove(category categories.Category, id int) {
+func (w *World) Remove(category categories.Category, id entities.EntityID) {
 	switch category {
 	case categories.Coin:
 		for _, sys := range w.systems {
@@ -62,7 +63,7 @@ func (w *World) Remove(category categories.Category, id int) {
 }
 
 // RemoveEnemy removes the enemy from all system
-func (w *World) RemoveEnemy(id int) {
+func (w *World) RemoveEnemy(id entities.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *systems.Spatial:

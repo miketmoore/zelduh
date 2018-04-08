@@ -7,7 +7,7 @@ import (
 
 // Coin is a collectible item entity
 type Coin struct {
-	ID       int
+	ID       EntityID
 	Category categories.Category
 	*components.Appearance
 	*components.Spatial

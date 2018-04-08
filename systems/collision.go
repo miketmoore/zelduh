@@ -7,10 +7,11 @@ import (
 	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/entities"
 )
 
 type collisionEntity struct {
-	ID int
+	ID entities.EntityID
 	*components.Spatial
 }
 
@@ -25,23 +26,23 @@ type Collision struct {
 	obstacles                             []collisionEntity
 	moveableObstacles                     []collisionEntity
 	collisionSwitches                     []collisionEntity
-	PlayerCollisionWithCoin               func(int)
-	PlayerCollisionWithEnemy              func(int)
-	SwordCollisionWithEnemy               func(int)
-	ArrowCollisionWithEnemy               func(int)
+	PlayerCollisionWithCoin               func(entities.EntityID)
+	PlayerCollisionWithEnemy              func(entities.EntityID)
+	SwordCollisionWithEnemy               func(entities.EntityID)
+	ArrowCollisionWithEnemy               func(entities.EntityID)
 	ArrowCollisionWithObstacle            func()
-	PlayerCollisionWithObstacle           func(int)
-	PlayerCollisionWithMoveableObstacle   func(int)
-	EnemyCollisionWithObstacle            func(int, int)
-	EnemyCollisionWithMoveableObstacle    func(int)
-	MoveableObstacleCollisionWithObstacle func(int)
-	PlayerCollisionWithSwitch             func(int)
-	PlayerNoCollisionWithSwitch           func(int)
+	PlayerCollisionWithObstacle           func(entities.EntityID)
+	PlayerCollisionWithMoveableObstacle   func(entities.EntityID)
+	EnemyCollisionWithObstacle            func(entities.EntityID, entities.EntityID)
+	EnemyCollisionWithMoveableObstacle    func(entities.EntityID)
+	MoveableObstacleCollisionWithObstacle func(entities.EntityID)
+	PlayerCollisionWithSwitch             func(entities.EntityID)
+	PlayerNoCollisionWithSwitch           func(entities.EntityID)
 	PlayerCollisionWithBounds             func(bounds.Bound)
 }
 
 // Add adds the entity to the system
-func (s *Collision) Add(category categories.Category, id int, spatial *components.Spatial) {
+func (s *Collision) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial) {
 	switch category {
 	case categories.Player:
 		s.player = collisionEntity{
@@ -84,7 +85,7 @@ func (s *Collision) Add(category categories.Category, id int, spatial *component
 }
 
 // Remove removes the entity from the system
-func (s *Collision) Remove(category categories.Category, id int) {
+func (s *Collision) Remove(category categories.Category, id entities.EntityID) {
 	switch category {
 	case categories.Coin:
 		for i := len(s.coins) - 1; i >= 0; i-- {

@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/entities"
 )
 
 type healthEntity struct {
-	ID int
+	ID entities.EntityID
 	*components.Health
 }
 
@@ -17,7 +18,7 @@ type Health struct {
 }
 
 // AddEntity adds the health entity to the system
-func (s *Health) AddEntity(id int, health *components.Health) {
+func (s *Health) AddEntity(id entities.EntityID, health *components.Health) {
 	s.entities = append(s.entities, healthEntity{
 		ID:     id,
 		Health: health,
@@ -25,7 +26,7 @@ func (s *Health) AddEntity(id int, health *components.Health) {
 }
 
 // Hit reduces entity health by d
-func (s *Health) Hit(entityID, d int) bool {
+func (s *Health) Hit(entityID entities.EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {

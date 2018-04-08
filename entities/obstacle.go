@@ -7,7 +7,7 @@ import (
 
 // Obstacle represents an impassable object/tile
 type Obstacle struct {
-	ID       int
+	ID       EntityID
 	Category categories.Category
 	*components.Appearance
 	*components.Spatial

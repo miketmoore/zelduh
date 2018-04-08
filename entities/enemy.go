@@ -11,7 +11,7 @@ import (
 
 // Enemy is an entity made up of components
 type Enemy struct {
-	ID       int
+	ID       EntityID
 	Category categories.Category
 	*components.Appearance
 	*components.Spatial
@@ -21,7 +21,7 @@ type Enemy struct {
 }
 
 // BuildEnemy builds an enemy entity
-func BuildEnemy(id int, w, h, x, y, hitRadius float64) Enemy {
+func BuildEnemy(id EntityID, w, h, x, y, hitRadius float64) Enemy {
 	return Enemy{
 		ID:       id,
 		Category: categories.Enemy,
@@ -38,10 +38,9 @@ func BuildEnemy(id int, w, h, x, y, hitRadius float64) Enemy {
 				x+w,
 				y+h,
 			),
-			Shape:                imdraw.New(nil),
-			HitBox:               imdraw.New(nil),
-			HitBoxRadius:         hitRadius,
-			CollisionWithRectMod: 5,
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: hitRadius,
 		},
 		Movement: &components.Movement{
 			Direction: direction.Down,

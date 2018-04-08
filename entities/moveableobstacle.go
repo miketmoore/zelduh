@@ -11,7 +11,7 @@ import (
 
 // MoveableObstacle represents an impassable, but moveable object/tile
 type MoveableObstacle struct {
-	ID       int
+	ID       EntityID
 	Category categories.Category
 	*components.Appearance
 	*components.Spatial
@@ -20,7 +20,7 @@ type MoveableObstacle struct {
 }
 
 // BuildMoveableObstacle builds a new moveable obstacle
-func BuildMoveableObstacle(id int, w, h, x, y float64) MoveableObstacle {
+func BuildMoveableObstacle(id EntityID, w, h, x, y float64) MoveableObstacle {
 	return MoveableObstacle{
 		ID:       id,
 		Category: categories.MovableObstacle,

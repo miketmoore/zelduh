@@ -10,7 +10,7 @@ import (
 
 // CollisionSwitch is a switch that is trigger by collision
 type CollisionSwitch struct {
-	ID       int
+	ID       EntityID
 	Category categories.Category
 	Enabled  bool
 	*components.Appearance
@@ -19,7 +19,7 @@ type CollisionSwitch struct {
 }
 
 // BuildCollisionSwitch builds a collision switch entity
-func BuildCollisionSwitch(id int, w, h, x, y float64) CollisionSwitch {
+func BuildCollisionSwitch(id EntityID, w, h, x, y float64) CollisionSwitch {
 	return CollisionSwitch{
 		ID:       id,
 		Category: categories.CollisionSwitch,

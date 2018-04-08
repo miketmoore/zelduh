@@ -408,7 +408,7 @@ func run() {
 	var currentRoomID RoomID = 1
 	var nextRoomID RoomID
 
-	var roomWarps map[int]WarpConfig
+	var roomWarps map[entities.EntityID]WarpConfig
 
 	heartSprite := spritesheet[106]
 
@@ -462,19 +462,19 @@ func run() {
 				addMoveableObstaclesPerTileMap = true
 			}
 		},
-		PlayerCollisionWithCoin: func(coinID int) {
+		PlayerCollisionWithCoin: func(coinID entities.EntityID) {
 			player.Coins.Coins++
 			fmt.Printf("Player coins: %d\n", player.Coins.Coins)
 			gameWorld.Remove(categories.Coin, coinID)
 		},
-		PlayerCollisionWithEnemy: func(enemyID int) {
+		PlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
 			spatialSystem.MovePlayerBack()
 			player.Health.Total--
 			if player.Health.Total == 0 {
 				currentState = gamestate.Over
 			}
 		},
-		SwordCollisionWithEnemy: func(enemyID int) {
+		SwordCollisionWithEnemy: func(enemyID entities.EntityID) {
 			if !sword.Ignore.Value {
 				dead := healthSystem.Hit(enemyID, 1)
 				if dead {
@@ -502,7 +502,7 @@ func run() {
 				}
 			}
 		},
-		ArrowCollisionWithEnemy: func(enemyID int) {
+		ArrowCollisionWithEnemy: func(enemyID entities.EntityID) {
 			if !arrow.Ignore.Value {
 				dead := healthSystem.Hit(enemyID, 1)
 				arrow.Ignore.Value = true
@@ -528,19 +528,19 @@ func run() {
 		ArrowCollisionWithObstacle: func() {
 			arrow.Movement.MoveCount = 0
 		},
-		PlayerCollisionWithObstacle: func(obstacleID int) {
+		PlayerCollisionWithObstacle: func(obstacleID entities.EntityID) {
 			// "Block" by undoing rect
 			player.Spatial.Rect = player.Spatial.PrevRect
 			sword.Spatial.Rect = sword.Spatial.PrevRect
 		},
-		PlayerCollisionWithMoveableObstacle: func(obstacleID int) {
+		PlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
 			spatialSystem.MoveMoveableObstacle(obstacleID, player.Movement.Direction)
 		},
-		EnemyCollisionWithObstacle: func(enemyID, obstacleID int) {
+		EnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
 			// Block enemy within the spatial system by reseting current rect to previous rect
 			spatialSystem.UndoEnemyRect(enemyID)
 		},
-		PlayerCollisionWithSwitch: func(collisionSwitchID int) {
+		PlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			fmt.Printf("PlayerCollisionWithSwitch %d\n", collisionSwitchID)
 			warpConfig, ok := roomWarps[collisionSwitchID]
 			if ok {
@@ -561,7 +561,7 @@ func run() {
 				}
 			}
 		},
-		PlayerNoCollisionWithSwitch: func(collisionSwitchID int) {
+		PlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			// fmt.Printf("PlayerNoCollisionWithSwitch\n")
 		},
 	}
@@ -691,7 +691,7 @@ func run() {
 			}
 
 			if addWarpsPerTileMap {
-				roomWarps = map[int]WarpConfig{}
+				roomWarps = map[entities.EntityID]WarpConfig{}
 				addWarpsPerTileMap = false
 				for _, c := range rooms[currentRoomID].WarpConfigs {
 					warp := entities.BuildCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
