@@ -546,11 +546,9 @@ func run() {
 			if ok {
 				fmt.Printf("Warp Config: %v\n", warpConfig)
 				fmt.Printf("Warp to room ID %v\n", warpConfig.WarpToRoomID)
-				// currentRoomID =
 				if !isTransitioning {
 					isTransitioning = true
 					transitionStyle = transitionWarp
-					// transitionTimer = int(transitionTimerStart)
 					transitionTimer = 1
 					currentState = gamestate.MapTransition
 					addObstaclesPerTileMap = true
