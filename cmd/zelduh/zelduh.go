@@ -571,8 +571,6 @@ func run() {
 	addPlayerToSystems(player)
 	addSwordToSystems(sword)
 	addArrowToSystems(arrow)
-	// addMoveableObstaclesToSystem(moveableObstacles)
-	// addCollisionSwitchesToSystem(collisionSwitches)
 
 	drawHeart := func(offsetX, offsetY float64) {
 		v := pixel.V(
