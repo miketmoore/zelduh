@@ -900,15 +900,6 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-// func buildCoinEntities() []entities.Coin {
-// 	w := spriteSize
-// 	h := spriteSize
-// 	return []entities.Coin{
-// 		buildCoin(mapX+w, mapY+h),
-// 		buildCoin(mapX+w*10, mapY+h*7),
-// 	}
-// }
-
 func buildCoin(x, y float64) entities.Coin {
 	w := spriteSize
 	h := spriteSize
