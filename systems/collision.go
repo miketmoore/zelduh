@@ -181,12 +181,24 @@ func (s *Collision) Update() {
 	}
 
 	for _, obstacle := range s.obstacles {
-		if isColliding(obstacle.Spatial.Rect, s.player.Spatial.Rect) {
+		mod := player.Spatial.CollisionWithRectMod
+		if isColliding(obstacle.Spatial.Rect, pixel.R(
+			s.player.Spatial.Rect.Min.X+mod,
+			s.player.Spatial.Rect.Min.Y+mod,
+			s.player.Spatial.Rect.Max.X-mod,
+			s.player.Spatial.Rect.Max.Y-mod,
+		)) {
 			s.PlayerCollisionWithObstacle(obstacle.ID)
 		}
 
 		for _, enemy := range s.enemies {
-			if isColliding(obstacle.Spatial.Rect, enemy.Spatial.Rect) {
+			mod = enemy.Spatial.CollisionWithRectMod
+			if isColliding(obstacle.Spatial.Rect, pixel.R(
+				enemy.Spatial.Rect.Min.X+mod,
+				enemy.Spatial.Rect.Min.Y+mod,
+				enemy.Spatial.Rect.Max.X-mod,
+				enemy.Spatial.Rect.Max.Y-mod,
+			)) {
 				s.EnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
 			}
 		}

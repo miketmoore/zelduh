@@ -51,13 +51,14 @@ type Movement struct {
 
 // Spatial contains spatial data
 type Spatial struct {
-	Width        float64
-	Height       float64
-	PrevRect     pixel.Rect
-	Rect         pixel.Rect
-	Shape        *imdraw.IMDraw
-	HitBox       *imdraw.IMDraw
-	HitBoxRadius float64
+	Width                float64
+	Height               float64
+	PrevRect             pixel.Rect
+	Rect                 pixel.Rect
+	Shape                *imdraw.IMDraw
+	HitBox               *imdraw.IMDraw
+	HitBoxRadius         float64
+	CollisionWithRectMod float64
 }
 
 // AnimationData contains data about animating one sequence of sprites

@@ -40,9 +40,10 @@ func BuildPlayer(w, h, x, y float64) Player {
 				x+w,
 				y+h,
 			),
-			Shape:        imdraw.New(nil),
-			HitBox:       imdraw.New(nil),
-			HitBoxRadius: 15,
+			Shape:                imdraw.New(nil),
+			HitBox:               imdraw.New(nil),
+			HitBoxRadius:         15,
+			CollisionWithRectMod: 5,
 		},
 		Movement: &components.Movement{
 			Direction: direction.Down,

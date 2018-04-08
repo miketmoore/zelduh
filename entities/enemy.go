@@ -38,9 +38,10 @@ func BuildEnemy(id int, w, h, x, y, hitRadius float64) Enemy {
 				x+w,
 				y+h,
 			),
-			Shape:        imdraw.New(nil),
-			HitBox:       imdraw.New(nil),
-			HitBoxRadius: hitRadius,
+			Shape:                imdraw.New(nil),
+			HitBox:               imdraw.New(nil),
+			HitBoxRadius:         hitRadius,
+			CollisionWithRectMod: 5,
 		},
 		Movement: &components.Movement{
 			Direction: direction.Down,

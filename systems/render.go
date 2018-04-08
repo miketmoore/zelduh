@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"golang.org/x/image/colornames"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/categories"
@@ -241,6 +243,18 @@ func (s *Render) animateAttackDirection(dir direction.Name, entity renderEntity)
 }
 
 func (s *Render) animateDirections(dir direction.Name, entity renderEntity) {
+	if entity.Spatial.HitBoxRadius > 0 {
+		shape := entity.Spatial.Shape
+		shape.Clear()
+		shape.Color = colornames.Yellow
+		shape.Push(pixel.V(
+			entity.Spatial.Rect.Min.X+entity.Spatial.Width/2,
+			entity.Spatial.Rect.Min.Y+entity.Spatial.Height/2,
+		))
+		// s.Push(entity.Spatial.Rect.Max)
+		shape.Circle(entity.Spatial.HitBoxRadius, 0)
+		shape.Draw(s.Win)
+	}
 	if anim := entity.Animation; anim != nil {
 		var animData *components.AnimationData
 		switch dir {
