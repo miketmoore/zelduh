@@ -393,10 +393,7 @@ func run() {
 	var transitionTimer int
 	var transitionStyle transitionStyle
 	currentState := gamestate.Start
-	addObstaclesPerTileMap := true
-	addEnemiesPerTileMap := true
-	addWarpsPerTileMap := true
-	addMoveableObstaclesPerTileMap := true
+	addEntities := true
 	var currentRoomID RoomID = 1
 	var nextRoomID RoomID
 
@@ -452,10 +449,7 @@ func run() {
 				transitionStyle = transitionSlide
 				transitionTimer = int(transitionTimerStart)
 				currentState = gamestate.MapTransition
-				addObstaclesPerTileMap = true
-				addEnemiesPerTileMap = true
-				addWarpsPerTileMap = true
-				addMoveableObstaclesPerTileMap = true
+				addEntities = true
 			}
 		},
 		PlayerCollisionWithCoin: func(coinID entities.EntityID) {
@@ -547,10 +541,7 @@ func run() {
 					transitionStyle = transitionWarp
 					transitionTimer = 1
 					currentState = gamestate.MapTransition
-					addObstaclesPerTileMap = true
-					addEnemiesPerTileMap = true
-					addWarpsPerTileMap = true
-					addMoveableObstaclesPerTileMap = true
+					addEntities = true
 					nextRoomID = warpConfig.WarpToRoomID
 				}
 			}
@@ -645,14 +636,11 @@ func run() {
 
 			drawMapBGImage(rooms[currentRoomID].MapName, 0, 0)
 
-			if addObstaclesPerTileMap {
-				addObstaclesPerTileMap = false
+			if addEntities {
+				addEntities = false
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
 				addObstaclesToSystem(obstacles)
-			}
 
-			if addMoveableObstaclesPerTileMap {
-				addMoveableObstaclesPerTileMap = false
 				for _, c := range rooms[currentRoomID].MoveableObstacleConfigs {
 					entity := entities.BuildMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					entity.Animation = &components.Animation{
@@ -663,10 +651,7 @@ func run() {
 					}
 					addMoveableObstaclesToSystem([]entities.MoveableObstacle{entity})
 				}
-			}
-			if addEnemiesPerTileMap {
-				fmt.Printf("addEnemiesPerTileMap\n")
-				addEnemiesPerTileMap = false
+
 				for _, c := range rooms[currentRoomID].EnemyConfigs {
 					enemy := entities.BuildEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius)
 					enemy.Animation = &components.Animation{
@@ -677,11 +662,8 @@ func run() {
 					}
 					addEnemiesToSystem([]entities.Enemy{enemy})
 				}
-			}
 
-			if addWarpsPerTileMap {
 				roomWarps = map[entities.EntityID]WarpConfig{}
-				addWarpsPerTileMap = false
 				for _, c := range rooms[currentRoomID].WarpConfigs {
 					warp := entities.BuildCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					if c.IsAnimated {
