@@ -67,7 +67,7 @@ func (w *World) RemoveEnemy(id entities.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *systems.Spatial:
-			sys.RemoveEnemy(id)
+			sys.Remove(categories.Enemy, id)
 		case *systems.Collision:
 			sys.Remove(categories.Enemy, id)
 		case *systems.Render:

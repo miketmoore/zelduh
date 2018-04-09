@@ -488,6 +488,7 @@ func run() {
 					// collision system will handle ... collisions!
 					// Currently, just moving from A to B without any in-between movement allows
 					// the entity to pass through obstacles.
+
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
 				}
 			}
@@ -941,7 +942,7 @@ func addPlayerToSystems(player entities.Player) {
 		case *systems.Input:
 			sys.AddPlayer(player.Movement, player.Dash)
 		case *systems.Spatial:
-			sys.AddPlayer(player.Spatial, player.Movement, player.Dash)
+			sys.Add(categories.Player, 0, player.Spatial, player.Movement, player.Dash)
 		case *systems.Collision:
 			sys.Add(player.Category, 0, player.Spatial)
 		case *systems.Render:
@@ -956,7 +957,7 @@ func addSwordToSystems(sword entities.Sword) {
 		case *systems.Input:
 			sys.AddSword(sword.Movement, sword.Ignore)
 		case *systems.Spatial:
-			sys.AddSword(sword.Spatial, sword.Movement)
+			sys.Add(categories.Sword, 0, sword.Spatial, sword.Movement, nil)
 		case *systems.Collision:
 			sys.Add(sword.Category, 0, sword.Spatial)
 		case *systems.Render:
@@ -971,7 +972,7 @@ func addArrowToSystems(arrow entities.Arrow) {
 		case *systems.Input:
 			sys.AddArrow(arrow.Movement, arrow.Ignore)
 		case *systems.Spatial:
-			sys.AddArrow(arrow.Spatial, arrow.Movement)
+			sys.Add(categories.Arrow, 0, arrow.Spatial, arrow.Movement, nil)
 		case *systems.Collision:
 			sys.Add(arrow.Category, 0, arrow.Spatial)
 		case *systems.Render:
@@ -985,7 +986,7 @@ func addEnemiesToSystem(enemies []entities.Enemy) {
 		switch sys := system.(type) {
 		case *systems.Spatial:
 			for _, enemy := range enemies {
-				sys.AddEnemy(enemy.ID, enemy.Spatial, enemy.Movement)
+				sys.Add(categories.Enemy, enemy.ID, enemy.Spatial, enemy.Movement, nil)
 			}
 		case *systems.Collision:
 			for _, enemy := range enemies {
@@ -1033,7 +1034,7 @@ func addMoveableObstaclesToSystem(moveableObstacles []entities.MoveableObstacle)
 		switch sys := system.(type) {
 		case *systems.Spatial:
 			for _, moveable := range moveableObstacles {
-				sys.AddMoveableObstacle(moveable.ID, moveable.Spatial, moveable.Movement)
+				sys.Add(categories.MovableObstacle, moveable.ID, moveable.Spatial, moveable.Movement, nil)
 			}
 		case *systems.Collision:
 			for _, moveable := range moveableObstacles {

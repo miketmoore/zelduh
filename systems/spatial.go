@@ -34,60 +34,50 @@ type Spatial struct {
 	moveableObstacles []spatialEntity
 }
 
-// AddPlayer adds the player to the system
-func (s *Spatial) AddPlayer(
-	spatial *components.Spatial,
-	movement *components.Movement,
-	dash *components.Dash,
-) {
-	s.playerEntity = spatialEntity{
-		Spatial:  spatial,
-		Movement: movement,
-		Dash:     dash,
+// Add adds an entity to the system
+func (s *Spatial) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial, movement *components.Movement, dash *components.Dash) {
+	switch category {
+	case categories.Player:
+		s.playerEntity = spatialEntity{
+			Spatial:  spatial,
+			Movement: movement,
+			Dash:     dash,
+		}
+	case categories.Sword:
+		s.sword = spatialEntity{
+			Spatial:  spatial,
+			Movement: movement,
+		}
+	case categories.Arrow:
+		s.arrow = spatialEntity{
+			Spatial:  spatial,
+			Movement: movement,
+		}
+	case categories.Enemy:
+		s.enemies = append(s.enemies, spatialEntity{
+			ID:                    id,
+			Spatial:               spatial,
+			Movement:              movement,
+			EnemySpatialComponent: &enemySpatialComponent{},
+		})
+	case categories.MovableObstacle:
+		s.moveableObstacles = append(s.moveableObstacles, spatialEntity{
+			ID:       id,
+			Spatial:  spatial,
+			Movement: movement,
+		})
 	}
 }
 
-// AddSword adds the sword to the system
-func (s *Spatial) AddSword(spatial *components.Spatial, movement *components.Movement) {
-	s.sword = spatialEntity{
-		Spatial:  spatial,
-		Movement: movement,
-	}
-}
-
-// AddArrow adds the arrow to the system
-func (s *Spatial) AddArrow(spatial *components.Spatial, movement *components.Movement) {
-	s.arrow = spatialEntity{
-		Spatial:  spatial,
-		Movement: movement,
-	}
-}
-
-// AddEnemy adds an enemy to the system
-func (s *Spatial) AddEnemy(id entities.EntityID, spatial *components.Spatial, movement *components.Movement) {
-	s.enemies = append(s.enemies, spatialEntity{
-		ID:                    id,
-		Spatial:               spatial,
-		Movement:              movement,
-		EnemySpatialComponent: &enemySpatialComponent{},
-	})
-}
-
-// AddMoveableObstacle adds a moveable obstacle to the system
-func (s *Spatial) AddMoveableObstacle(id entities.EntityID, spatial *components.Spatial, movement *components.Movement) {
-	s.moveableObstacles = append(s.moveableObstacles, spatialEntity{
-		ID:       id,
-		Spatial:  spatial,
-		Movement: movement,
-	})
-}
-
-// RemoveEnemy removes the specified enemy from the system
-func (s *Spatial) RemoveEnemy(id entities.EntityID) {
-	for i := len(s.enemies) - 1; i >= 0; i-- {
-		enemy := s.enemies[i]
-		if enemy.ID == id {
-			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+// Remove removes the entity from the system
+func (s *Spatial) Remove(category categories.Category, id entities.EntityID) {
+	switch category {
+	case categories.Enemy:
+		for i := len(s.enemies) - 1; i >= 0; i-- {
+			enemy := s.enemies[i]
+			if enemy.ID == id {
+				s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+			}
 		}
 	}
 }
