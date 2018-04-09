@@ -23,7 +23,8 @@ type renderEntity struct {
 
 // Render is a custom system
 type Render struct {
-	Win *pixelgl.Window
+	Win         *pixelgl.Window
+	Spritesheet map[int]*pixel.Sprite
 
 	player renderEntity
 	sword  renderEntity
@@ -188,7 +189,8 @@ func (s *Render) animateDefault(entity renderEntity) {
 				animData.Frame = frameNum
 			}
 
-			frame := animData.Frames[frameNum]
+			frameIndex := animData.Frames[frameNum]
+			frame := s.Spritesheet[frameIndex]
 
 			v := pixel.V(
 				entity.Spatial.Rect.Min.X+entity.Spatial.Width/2,
@@ -231,7 +233,8 @@ func (s *Render) animateAttackDirection(dir direction.Name, entity renderEntity)
 			animData.Frame = frameNum
 		}
 
-		frame := animData.Frames[frameNum]
+		frameIndex := animData.Frames[frameNum]
+		frame := s.Spritesheet[frameIndex]
 
 		rect := entity.Spatial.Rect
 		v := pixel.V(
@@ -287,7 +290,8 @@ func (s *Render) animateDirections(dir direction.Name, entity renderEntity) {
 			animData.Frame = frameNum
 		}
 
-		frame := animData.Frames[frameNum]
+		frameIndex := animData.Frames[frameNum]
+		frame := s.Spritesheet[frameIndex]
 
 		rect := entity.Spatial.Rect
 		v := pixel.V(

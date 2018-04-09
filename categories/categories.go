@@ -9,6 +9,7 @@ const (
 	Arrow
 	Enemy
 	Explosion
+	UI
 	Coin
 	Obstacle
 	MovableObstacle

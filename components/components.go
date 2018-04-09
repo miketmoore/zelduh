@@ -63,7 +63,7 @@ type Spatial struct {
 
 // AnimationData contains data about animating one sequence of sprites
 type AnimationData struct {
-	Frames         []pixel.Sprite
+	Frames         []int
 	Frame          int
 	FrameRate      int
 	FrameRateCount int

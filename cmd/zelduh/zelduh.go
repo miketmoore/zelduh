@@ -303,32 +303,32 @@ func run() {
 	player := entities.BuildPlayer(spriteSize, spriteSize, mapW/2, mapH/2)
 	player.Animation = &components.Animation{
 		Up: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[4], *spritesheet[195]},
+			Frames:    []int{4, 195},
 			FrameRate: frameRate,
 		},
 		Right: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[3], *spritesheet[194]},
+			Frames:    []int{3, 194},
 			FrameRate: frameRate,
 		},
 		Down: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[1], *spritesheet[192]},
+			Frames:    []int{1, 192},
 			FrameRate: frameRate,
 		},
 		Left: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[2], *spritesheet[193]},
+			Frames:    []int{2, 193},
 			FrameRate: frameRate,
 		},
 		SwordAttackUp: &components.AnimationData{
-			Frames: []pixel.Sprite{*spritesheet[165]},
+			Frames: []int{165},
 		},
 		SwordAttackRight: &components.AnimationData{
-			Frames: []pixel.Sprite{*spritesheet[164]},
+			Frames: []int{164},
 		},
 		SwordAttackLeft: &components.AnimationData{
-			Frames: []pixel.Sprite{*spritesheet[179]},
+			Frames: []int{179},
 		},
 		SwordAttackDown: &components.AnimationData{
-			Frames: []pixel.Sprite{*spritesheet[180]},
+			Frames: []int{180},
 		},
 	}
 
@@ -337,19 +337,19 @@ func run() {
 		Animation: &components.Animation{
 			Expiration: 12,
 			Default: &components.AnimationData{
-				Frames: []pixel.Sprite{
-					*spritesheet[122],
-					*spritesheet[122],
-					*spritesheet[122],
-					*spritesheet[123],
-					*spritesheet[123],
-					*spritesheet[123],
-					*spritesheet[124],
-					*spritesheet[124],
-					*spritesheet[124],
-					*spritesheet[125],
-					*spritesheet[125],
-					*spritesheet[125],
+				Frames: []int{
+					122,
+					122,
+					122,
+					123,
+					123,
+					123,
+					124,
+					124,
+					124,
+					125,
+					125,
+					125,
 				},
 			},
 		},
@@ -358,19 +358,19 @@ func run() {
 	sword := entities.BuildSword(spriteSize, spriteSize, player.Movement.Direction)
 	sword.Animation = &components.Animation{
 		Up: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[70]},
+			Frames:    []int{70},
 			FrameRate: frameRate,
 		},
 		Right: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[67]},
+			Frames:    []int{67},
 			FrameRate: frameRate,
 		},
 		Down: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[68]},
+			Frames:    []int{68},
 			FrameRate: frameRate,
 		},
 		Left: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[69]},
+			Frames:    []int{69},
 			FrameRate: frameRate,
 		},
 	}
@@ -378,19 +378,19 @@ func run() {
 	arrow := entities.BuildArrow(spriteSize, spriteSize, 0.0, 0.0, player.Movement.Direction)
 	arrow.Animation = &components.Animation{
 		Up: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[101]},
+			Frames:    []int{101},
 			FrameRate: frameRate,
 		},
 		Right: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[100]},
+			Frames:    []int{100},
 			FrameRate: frameRate,
 		},
 		Down: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[103]},
+			Frames:    []int{103},
 			FrameRate: frameRate,
 		},
 		Left: &components.AnimationData{
-			Frames:    []pixel.Sprite{*spritesheet[102]},
+			Frames:    []int{102},
 			FrameRate: frameRate,
 		},
 	}
@@ -412,6 +412,17 @@ func run() {
 
 	heartSprite := spritesheet[106]
 
+	// heart := entities.Generic{
+	// 	Category: categories.UI,
+	// 	Animation: &components.Animation{
+	// 		Default: &components.AnimationData{
+	// 			Frames: []int{106},
+	// 		},
+	// 	},
+	// }
+
+	// addHeartToSystems(heart)
+
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
 	gameWorld.AddSystem(inputSystem)
@@ -423,13 +434,13 @@ func run() {
 	appendCoinAnimation := func(coin *entities.Coin) {
 		coin.Animation = &components.Animation{
 			Default: &components.AnimationData{
-				Frames: []pixel.Sprite{
-					*spritesheet[5],
-					*spritesheet[5],
-					*spritesheet[6],
-					*spritesheet[6],
-					*spritesheet[21],
-					*spritesheet[21],
+				Frames: []int{
+					5,
+					5,
+					6,
+					6,
+					21,
+					21,
 				},
 				FrameRate: frameRate,
 			},
@@ -564,12 +575,16 @@ func run() {
 		},
 	}
 	gameWorld.AddSystem(collisionSystem)
-	gameWorld.AddSystem(&systems.Render{Win: win})
+	gameWorld.AddSystem(&systems.Render{
+		Win:         win,
+		Spritesheet: spritesheet,
+	})
 
 	addPlayerToSystems(player)
 	addSwordToSystems(sword)
 	addArrowToSystems(arrow)
 
+	// TODO move
 	drawHeart := func(offsetX, offsetY float64) {
 		v := pixel.V(
 			mapX+offsetX,
@@ -657,9 +672,7 @@ func run() {
 					entity := entities.BuildMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					entity.Animation = &components.Animation{
 						Default: &components.AnimationData{
-							Frames: []pixel.Sprite{
-								*spritesheet[63],
-							},
+							Frames:    []int{63},
 							FrameRate: frameRate,
 						},
 					}
@@ -673,12 +686,7 @@ func run() {
 					enemy := entities.BuildEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius)
 					enemy.Animation = &components.Animation{
 						Default: &components.AnimationData{
-							Frames: []pixel.Sprite{
-								*spritesheet[36],
-								*spritesheet[37],
-								*spritesheet[38],
-								*spritesheet[39],
-							},
+							Frames:    []int{36, 37, 38, 39},
 							FrameRate: frameRate,
 						},
 					}
@@ -694,7 +702,7 @@ func run() {
 					if c.IsAnimated {
 						warp.Animation = &components.Animation{
 							Default: &components.AnimationData{
-								Frames:    []pixel.Sprite{*spritesheet[61]},
+								Frames:    []int{61},
 								FrameRate: frameRate,
 							},
 						}
