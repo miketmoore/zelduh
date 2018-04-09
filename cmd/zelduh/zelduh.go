@@ -338,18 +338,10 @@ func run() {
 			Expiration: 12,
 			Default: &components.AnimationData{
 				Frames: []int{
-					122,
-					122,
-					122,
-					123,
-					123,
-					123,
-					124,
-					124,
-					124,
-					125,
-					125,
-					125,
+					122, 122, 122,
+					123, 123, 123,
+					124, 124, 124,
+					125, 125, 125,
 				},
 			},
 		},
@@ -434,14 +426,7 @@ func run() {
 	appendCoinAnimation := func(coin *entities.Coin) {
 		coin.Animation = &components.Animation{
 			Default: &components.AnimationData{
-				Frames: []int{
-					5,
-					5,
-					6,
-					6,
-					21,
-					21,
-				},
+				Frames:    []int{5, 5, 6, 6, 21, 21},
 				FrameRate: frameRate,
 			},
 		}
