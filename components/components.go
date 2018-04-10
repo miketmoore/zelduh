@@ -42,11 +42,12 @@ type Ignore struct {
 
 // Movement contains data about movement
 type Movement struct {
-	LastDirection direction.Name
-	Direction     direction.Name
-	MaxSpeed      float64
-	Speed         float64
-	MoveCount     int
+	LastDirection  direction.Name
+	Direction      direction.Name
+	MaxSpeed       float64
+	Speed          float64
+	Moving         bool
+	RemainingMoves int
 }
 
 // Spatial contains spatial data

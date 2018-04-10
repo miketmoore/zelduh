@@ -220,7 +220,7 @@ func (s *Spatial) moveSword() {
 func (s *Spatial) moveArrow() {
 	arrow := s.arrow
 	speed := arrow.Movement.Speed
-	if arrow.Movement.MoveCount > 0 {
+	if arrow.Movement.Moving {
 		arrow.Spatial.PrevRect = arrow.Spatial.Rect
 		v := delta(arrow.Movement.Direction, speed, speed)
 		arrow.Spatial.Rect = arrow.Spatial.Rect.Moved(v)

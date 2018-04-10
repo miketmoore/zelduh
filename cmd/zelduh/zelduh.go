@@ -517,7 +517,7 @@ func run() {
 			}
 		},
 		ArrowCollisionWithObstacle: func() {
-			arrow.Movement.MoveCount = 0
+			arrow.Movement.Moving = false
 		},
 		PlayerCollisionWithObstacle: func(obstacleID entities.EntityID) {
 			// "Block" by undoing rect

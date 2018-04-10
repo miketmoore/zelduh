@@ -95,19 +95,19 @@ func (s *Input) Update() {
 	}
 
 	// fire arrow
-	if s.arrow.Movement.MoveCount == 0 {
+	if !s.arrow.Movement.Moving {
 		s.arrow.Movement.Direction = player.Movement.Direction
 		if win.Pressed(pixelgl.KeyG) {
 			s.arrow.Movement.Speed = 7.0
-			s.arrow.Movement.MoveCount = 100
+			s.arrow.Movement.RemainingMoves = 100
 			s.arrow.Ignore.Value = false
 		} else {
 			s.arrow.Movement.Speed = 0
-			s.arrow.Movement.MoveCount = 0
+			s.arrow.Movement.RemainingMoves = 0
 			s.arrow.Ignore.Value = true
 		}
 	} else {
-		s.arrow.Movement.MoveCount--
+		s.arrow.Movement.RemainingMoves--
 	}
 
 	// dashing
