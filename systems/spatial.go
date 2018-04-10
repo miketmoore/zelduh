@@ -11,17 +11,13 @@ import (
 	"github.com/miketmoore/zelduh/entities"
 )
 
-type enemySpatialComponent struct {
-	TotalMoves  int
-	MoveCounter int
-}
-
 type spatialEntity struct {
 	ID entities.EntityID
 	*components.Movement
 	*components.Spatial
 	*components.Dash
-	EnemySpatialComponent *enemySpatialComponent
+	TotalMoves  int
+	MoveCounter int
 }
 
 // Spatial is a custom system
@@ -30,7 +26,7 @@ type Spatial struct {
 	playerEntity      spatialEntity
 	sword             spatialEntity
 	arrow             spatialEntity
-	enemies           []spatialEntity
+	enemies           []*spatialEntity
 	moveableObstacles []spatialEntity
 }
 
@@ -54,11 +50,12 @@ func (s *Spatial) Add(category categories.Category, id entities.EntityID, spatia
 			Movement: movement,
 		}
 	case categories.Enemy:
-		s.enemies = append(s.enemies, spatialEntity{
-			ID:                    id,
-			Spatial:               spatial,
-			Movement:              movement,
-			EnemySpatialComponent: &enemySpatialComponent{},
+		s.enemies = append(s.enemies, &spatialEntity{
+			ID:          id,
+			Spatial:     spatial,
+			Movement:    movement,
+			TotalMoves:  0,
+			MoveCounter: 0,
 		})
 	case categories.MovableObstacle:
 		s.moveableObstacles = append(s.moveableObstacles, spatialEntity{
@@ -145,7 +142,7 @@ func (s *Spatial) moveableObstacle(id entities.EntityID) (spatialEntity, bool) {
 func (s *Spatial) enemy(id entities.EntityID) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
-			return e, true
+			return *e, true
 		}
 	}
 	return spatialEntity{}, false
@@ -251,7 +248,8 @@ func (s *Spatial) Update() {
 		arrow.Spatial.Rect = player.Spatial.Rect
 	}
 
-	for _, enemy := range s.enemies {
+	for i := 0; i < len(s.enemies); i++ {
+		enemy := s.enemies[i]
 		moveEnemy(s, enemy)
 	}
 
@@ -259,11 +257,11 @@ func (s *Spatial) Update() {
 
 // Enemy moves constantly, never stopping.
 // Quick orientation changes.
-func moveEnemy(s *Spatial, enemy spatialEntity) {
+func moveEnemy(s *Spatial, enemy *spatialEntity) {
 
-	if enemy.EnemySpatialComponent.TotalMoves == 0 {
+	if enemy.TotalMoves == 0 {
 		maxMoves := 5
-		enemy.EnemySpatialComponent.TotalMoves = s.Rand.Intn(maxMoves)
+		enemy.TotalMoves = s.Rand.Intn(maxMoves)
 
 		directionIndex := s.Rand.Intn(4)
 		switch directionIndex {
@@ -277,7 +275,7 @@ func moveEnemy(s *Spatial, enemy spatialEntity) {
 			enemy.Movement.Direction = direction.Left
 		}
 	} else {
-		if enemy.EnemySpatialComponent.MoveCounter > 0 {
+		if enemy.MoveCounter > 0 {
 			moveVec := pixel.V(0, 0)
 
 			speed := 1.0
@@ -291,15 +289,13 @@ func moveEnemy(s *Spatial, enemy spatialEntity) {
 			case direction.Left:
 				moveVec = pixel.V(-speed, 0)
 			}
-			// player.Spatial.PrevRect = player.Spatial.Rect
-			// player.Spatial.Rect = player.Spatial.Rect.Moved(v)
 			enemy.Spatial.PrevRect = enemy.Spatial.Rect
 			enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
-			enemy.EnemySpatialComponent.MoveCounter--
+			enemy.MoveCounter = enemy.MoveCounter - 1
 
 		} else {
-			enemy.EnemySpatialComponent.TotalMoves--
-			enemy.EnemySpatialComponent.MoveCounter = int(enemy.Spatial.Rect.W())
+			enemy.TotalMoves = enemy.TotalMoves - 1
+			enemy.MoveCounter = int(enemy.Spatial.Rect.W())
 		}
 	}
 }
