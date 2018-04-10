@@ -458,6 +458,7 @@ func run() {
 			gameWorld.Remove(categories.Coin, coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
+			// TODO repeat what I did with the enemies
 			spatialSystem.MovePlayerBack()
 			player.Health.Total--
 			if player.Health.Total == 0 {
