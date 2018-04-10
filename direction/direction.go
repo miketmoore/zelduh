@@ -37,3 +37,19 @@ func Rand() Name {
 		return Up
 	}
 }
+
+// Opposite returns the opposite direction
+func Opposite(d Name) Name {
+	switch d {
+	case Up:
+		return Down
+	case Down:
+		return Up
+	case Left:
+		return Right
+	case Right:
+		return Left
+	default:
+		return Up
+	}
+}

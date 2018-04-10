@@ -141,10 +141,16 @@ func (s *Spatial) UndoEnemyRect(enemyID entities.EntityID) {
 // MoveEnemyBack moves the enemy back
 func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit direction.Name, distance float64) {
 	enemy, ok := s.enemy(enemyID)
-	if ok {
-		v := delta(directionHit, distance, distance)
-		enemy.Spatial.Rect = enemy.Spatial.PrevRect.Moved(v)
-		enemy.Spatial.PrevRect = enemy.Spatial.Rect
+	if ok && !enemy.Movement.MovingFromHit {
+
+		// v := delta(directionHit, distance, distance)
+		// enemy.Spatial.Rect = enemy.Spatial.PrevRect.Moved(v)
+		// enemy.Spatial.PrevRect = enemy.Spatial.Rect
+		enemy.Movement.MovingFromHit = true
+		enemy.Movement.RemainingMoves = enemy.Movement.HitBackMoves
+		enemy.Movement.Direction = directionHit
+
+		fmt.Printf("MoveEnemyBack %d %s\n", enemy.Movement.RemainingMoves, enemy.Movement.Direction)
 	}
 }
 
@@ -156,6 +162,17 @@ func (s *Spatial) GetEnemySpatial(enemyID entities.EntityID) (*components.Spatia
 		}
 	}
 	return &components.Spatial{}, false
+}
+
+// EnemyMovingFromHit indicates if the enemy is moving after being hit
+func (s *Spatial) EnemyMovingFromHit(enemyID entities.EntityID) bool {
+	enemy, ok := s.enemy(enemyID)
+	if ok {
+		if enemy.ID == enemyID {
+			return enemy.Movement.MovingFromHit == true
+		}
+	}
+	return false
 }
 
 // Update changes spatial data based on movement data
@@ -244,15 +261,22 @@ func (s *Spatial) movePlayer() {
 
 func moveEnemy(s *Spatial, enemy *spatialEntity) {
 	if enemy.Movement.RemainingMoves == 0 {
+		enemy.Movement.MovingFromHit = false
 		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
 		enemy.Movement.Direction = direction.Rand()
 	} else if enemy.Movement.RemainingMoves > 0 {
+		var speed float64
+		if enemy.Movement.MovingFromHit {
+			speed = enemy.Movement.HitSpeed
+		} else {
+			speed = enemy.Movement.MaxSpeed
+		}
 		enemy.Spatial.PrevRect = enemy.Spatial.Rect
-		speed := enemy.Movement.MaxSpeed
 		moveVec := delta(enemy.Movement.Direction, speed, speed)
 		enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
 		enemy.Movement.RemainingMoves--
 	} else {
+		enemy.Movement.MovingFromHit = false
 		enemy.Movement.RemainingMoves = int(enemy.Spatial.Rect.W())
 	}
 }

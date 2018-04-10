@@ -466,31 +466,35 @@ func run() {
 		},
 		SwordCollisionWithEnemy: func(enemyID entities.EntityID) {
 			if !sword.Ignore.Value {
-				dead := healthSystem.Hit(enemyID, 1)
-				if dead {
-					fmt.Printf("You killed an enemy with a sword\n")
-					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
-					explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
-					explosion.Spatial = &components.Spatial{
-						Width:  spriteSize,
-						Height: spriteSize,
-						Rect:   enemySpatial.Rect,
+				dead := false
+				if !spatialSystem.EnemyMovingFromHit(enemyID) {
+					fmt.Printf("HIT!\n")
+					dead = healthSystem.Hit(enemyID, 1)
+					if dead {
+						fmt.Printf("You killed an enemy with a sword\n")
+						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
+						explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
+						explosion.Spatial = &components.Spatial{
+							Width:  spriteSize,
+							Height: spriteSize,
+							Rect:   enemySpatial.Rect,
+						}
+						explosion.OnExpiration = func() {
+							dropCoin(explosion.Spatial.Rect.Min)
+						}
+						addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
+						gameWorld.RemoveEnemy(enemyID)
+					} else {
+						// TODO - instead of just moving back in the spatial system,
+						// what about setting a velocity (direction * speed)
+						// decrease speed over time
+						// collision system will handle ... collisions!
+						// Currently, just moving from A to B without any in-between movement allows
+						// the entity to pass through obstacles.
+						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
 					}
-					explosion.OnExpiration = func() {
-						dropCoin(explosion.Spatial.Rect.Min)
-					}
-					addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
-					gameWorld.RemoveEnemy(enemyID)
-				} else {
-					// TODO - instead of just moving back in the spatial system,
-					// what about setting a velocity (direction * speed)
-					// decrease speed over time
-					// collision system will handle ... collisions!
-					// Currently, just moving from A to B without any in-between movement allows
-					// the entity to pass through obstacles.
-
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
 				}
+
 			}
 		},
 		ArrowCollisionWithEnemy: func(enemyID entities.EntityID) {

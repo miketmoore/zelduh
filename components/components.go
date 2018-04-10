@@ -48,6 +48,9 @@ type Movement struct {
 	Speed          float64
 	MaxMoves       int
 	RemainingMoves int
+	HitSpeed       float64
+	MovingFromHit  bool
+	HitBackMoves   int
 }
 
 // Spatial contains spatial data

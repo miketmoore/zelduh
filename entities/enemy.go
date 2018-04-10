@@ -43,10 +43,12 @@ func BuildEnemy(id EntityID, w, h, x, y, hitRadius float64) Enemy {
 			HitBoxRadius: hitRadius,
 		},
 		Movement: &components.Movement{
-			Direction: direction.Down,
-			Speed:     1.0,
-			MaxSpeed:  1.0,
-			MaxMoves:  100,
+			Direction:    direction.Down,
+			Speed:        1.0,
+			MaxSpeed:     1.0,
+			HitSpeed:     10.0,
+			HitBackMoves: 10,
+			MaxMoves:     100,
 		},
 	}
 }
