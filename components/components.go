@@ -47,6 +47,7 @@ type Movement struct {
 	MaxSpeed       float64
 	Speed          float64
 	Moving         bool
+	MaxMoves       int
 	RemainingMoves int
 }
 

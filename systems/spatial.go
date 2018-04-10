@@ -243,19 +243,16 @@ func (s *Spatial) movePlayer() {
 }
 
 func moveEnemy(s *Spatial, enemy *spatialEntity) {
-	if enemy.TotalMoves == 0 {
-		enemy.TotalMoves = s.Rand.Intn(5)
+	if enemy.Movement.RemainingMoves == 0 {
+		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
 		enemy.Movement.Direction = direction.Rand()
+	} else if enemy.Movement.RemainingMoves > 0 {
+		enemy.Spatial.PrevRect = enemy.Spatial.Rect
+		speed := 1.0
+		moveVec := delta(enemy.Movement.Direction, speed, speed)
+		enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
+		enemy.Movement.RemainingMoves--
 	} else {
-		if enemy.MoveCounter > 0 {
-			enemy.Spatial.PrevRect = enemy.Spatial.Rect
-			speed := 1.0
-			moveVec := delta(enemy.Movement.Direction, speed, speed)
-			enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
-			enemy.MoveCounter = enemy.MoveCounter - 1
-		} else {
-			enemy.TotalMoves = enemy.TotalMoves - 1
-			enemy.MoveCounter = int(enemy.Spatial.Rect.W())
-		}
+		enemy.Movement.RemainingMoves = int(enemy.Spatial.Rect.W())
 	}
 }
