@@ -46,7 +46,6 @@ type Movement struct {
 	Direction      direction.Name
 	MaxSpeed       float64
 	Speed          float64
-	Moving         bool
 	MaxMoves       int
 	RemainingMoves int
 }

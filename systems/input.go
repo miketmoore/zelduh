@@ -95,7 +95,7 @@ func (s *Input) Update() {
 	}
 
 	// fire arrow
-	if !s.arrow.Movement.Moving {
+	if s.arrow.Movement.RemainingMoves == 0 {
 		s.arrow.Movement.Direction = player.Movement.Direction
 		if win.Pressed(pixelgl.KeyG) {
 			s.arrow.Movement.Speed = 7.0
