@@ -489,7 +489,7 @@ func run() {
 					// Currently, just moving from A to B without any in-between movement allows
 					// the entity to pass through obstacles.
 
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
+					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
 				}
 			}
 		},
