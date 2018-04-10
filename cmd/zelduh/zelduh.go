@@ -485,12 +485,6 @@ func run() {
 						addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
-						// TODO - instead of just moving back in the spatial system,
-						// what about setting a velocity (direction * speed)
-						// decrease speed over time
-						// collision system will handle ... collisions!
-						// Currently, just moving from A to B without any in-between movement allows
-						// the entity to pass through obstacles.
 						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
 					}
 				}
