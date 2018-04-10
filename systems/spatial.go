@@ -248,7 +248,7 @@ func moveEnemy(s *Spatial, enemy *spatialEntity) {
 		enemy.Movement.Direction = direction.Rand()
 	} else if enemy.Movement.RemainingMoves > 0 {
 		enemy.Spatial.PrevRect = enemy.Spatial.Rect
-		speed := 1.0
+		speed := enemy.Movement.MaxSpeed
 		moveVec := delta(enemy.Movement.Direction, speed, speed)
 		enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
 		enemy.Movement.RemainingMoves--

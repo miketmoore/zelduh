@@ -45,6 +45,7 @@ func BuildEnemy(id EntityID, w, h, x, y, hitRadius float64) Enemy {
 		Movement: &components.Movement{
 			Direction: direction.Down,
 			Speed:     1.0,
+			MaxSpeed:  1.0,
 			MaxMoves:  100,
 		},
 	}
