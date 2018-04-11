@@ -25,14 +25,6 @@ func (s *Health) AddEntity(entity entities.Entity) {
 	})
 }
 
-// Add adds the health entity to the system
-func (s *Health) Add(id entities.EntityID, health *components.Health) {
-	s.entities = append(s.entities, healthEntity{
-		ID:     id,
-		Health: health,
-	})
-}
-
 // Hit reduces entity health by d
 func (s *Health) Hit(entityID entities.EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {

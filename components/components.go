@@ -73,7 +73,7 @@ type AnimationData struct {
 	FrameRateCount int
 }
 
-// Animation contains everything necessary to animate basic characters (four directions)
+// Animation contains everything necessary to animate basic characters
 type Animation struct {
 	Expiration       int
 	OnExpiration     func()
