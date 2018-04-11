@@ -330,19 +330,10 @@ func run() {
 	spatialSystem := &systems.Spatial{
 		Rand: r,
 	}
-	appendCoinAnimation := func(coin *entities.Coin) {
-		coin.Animation = &components.Animation{
-			Default: &components.AnimationData{
-				Frames:    []int{5, 5, 6, 6, 21, 21},
-				FrameRate: frameRate,
-			},
-		}
-	}
 	dropCoin := func(v pixel.Vec) {
 		fmt.Printf("Drop coin\n")
-		coin := buildCoin(v.X, v.Y)
-		appendCoinAnimation(&coin)
-		addCoinToSystem(coin)
+		coin := NewCoin(gameWorld.NewEntityID(), v.X, v.Y, spriteSize, spriteSize)
+		addEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
 	collisionSystem := &systems.Collision{
@@ -783,29 +774,6 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-func buildCoin(x, y float64) entities.Coin {
-	w := spriteSize
-	h := spriteSize
-	return entities.Coin{
-		ID:       gameWorld.NewEntityID(),
-		Category: categories.Coin,
-		Appearance: &components.Appearance{
-			Color: colornames.Purple,
-		},
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect: pixel.R(
-				x,
-				y,
-				x+w,
-				y+h,
-			),
-			Shape: imdraw.New(nil),
-		},
-	}
-}
-
 func buildObstacle(x, y float64) entities.Obstacle {
 	return entities.Obstacle{
 		ID:       gameWorld.NewEntityID(),
@@ -1021,14 +989,31 @@ func NewMoveableObstacle(id entities.EntityID, w, h, x, y float64) entities.Enti
 	}
 }
 
-func addCoinToSystem(coin entities.Coin) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Collision:
-			sys.Add(coin.Category, coin.ID, coin.Spatial)
-		case *systems.Render:
-			sys.Add(coin.Category, coin.ID, coin.Appearance, coin.Spatial, coin.Animation, nil, nil)
-		}
+// NewCoin builds a coin entity
+func NewCoin(id entities.EntityID, x, y, w, h float64) entities.Entity {
+	return entities.Entity{
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Coin,
+		Appearance: &components.Appearance{
+			Color: colornames.Purple,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect: pixel.R(
+				x,
+				y,
+				x+w,
+				y+h,
+			),
+			Shape: imdraw.New(nil),
+		},
+		Animation: &components.Animation{
+			Default: &components.AnimationData{
+				Frames:    []int{5, 5, 6, 6, 21, 21},
+				FrameRate: frameRate,
+			},
+		},
 	}
 }
 
