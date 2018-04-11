@@ -304,6 +304,7 @@ func run() {
 	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
 	sword := NewSword(gameWorld.NewEntityID(), spriteSize, spriteSize, player.Movement.Direction)
 	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize, player.Movement.Direction)
+	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize)
 	explosion := NewExplosion(gameWorld.NewEntityID())
 
 	hearts := []entities.Entity{
@@ -464,6 +465,7 @@ func run() {
 	addEntityToSystem(player)
 	addEntityToSystem(sword)
 	addEntityToSystem(arrow)
+	addEntityToSystem(bomb)
 	for _, entity := range hearts {
 		addEntityToSystem(entity)
 	}
@@ -927,6 +929,34 @@ func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) enti
 			},
 			Left: &components.AnimationData{
 				Frames:    []int{102},
+				FrameRate: frameRate,
+			},
+		},
+	}
+}
+
+// NewBomb builds a bomb entity
+func NewBomb(id entities.EntityID, x, y, w, h float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Bomb,
+		Ignore: &components.Ignore{
+			Value: true,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Deeppink,
+		},
+		Spatial: &components.Spatial{
+			Width:        w,
+			Height:       h,
+			Rect:         pixel.R(x, y, x+w, y+h),
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: 5,
+		},
+		Animation: &components.Animation{
+			Default: &components.AnimationData{
+				Frames:    []int{138, 139, 140, 141},
 				FrameRate: frameRate,
 			},
 		},
