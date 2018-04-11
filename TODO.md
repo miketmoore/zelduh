@@ -10,3 +10,4 @@
 * Add "appear" animations for all items and enemies
 * Add "hit" animation when entity is not dead
 * Currently, the total moves when hit serves as a counter until the next hit will register. What about when an enemy collides with an obstacle and is still very close to the player, then the player hits again? Maybe there should be a mechanism that prevents hits from working.
+* Add/remove heart entities when player health changes
