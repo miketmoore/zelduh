@@ -303,6 +303,7 @@ func run() {
 	// Build entities
 	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
 	sword := NewSword(gameWorld.NewEntityID(), spriteSize, spriteSize, player.Movement.Direction)
+	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize, player.Movement.Direction)
 
 	explosion := entities.Generic{
 		ID: gameWorld.NewEntityID(),
@@ -316,26 +317,6 @@ func run() {
 					125, 125, 125,
 				},
 			},
-		},
-	}
-
-	arrow := entities.BuildArrow(spriteSize, spriteSize, 0.0, 0.0, player.Movement.Direction)
-	arrow.Animation = &components.Animation{
-		Up: &components.AnimationData{
-			Frames:    []int{101},
-			FrameRate: frameRate,
-		},
-		Right: &components.AnimationData{
-			Frames:    []int{100},
-			FrameRate: frameRate,
-		},
-		Down: &components.AnimationData{
-			Frames:    []int{103},
-			FrameRate: frameRate,
-		},
-		Left: &components.AnimationData{
-			Frames:    []int{102},
-			FrameRate: frameRate,
 		},
 	}
 
@@ -512,7 +493,7 @@ func run() {
 
 	addEntityToSystem(player)
 	addEntityToSystem(sword)
-	addArrowToSystems(arrow)
+	addEntityToSystem(arrow)
 
 	// TODO move
 	drawHeart := func(offsetX, offsetY float64) {
@@ -952,7 +933,7 @@ func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 	}
 }
 
-// NewSword builds a new Entity as a Player
+// NewSword builds a sword entity
 func NewSword(id entities.EntityID, w, h float64, dir direction.Name) entities.Entity {
 	return entities.Entity{
 		ID:       id,
@@ -996,6 +977,50 @@ func NewSword(id entities.EntityID, w, h float64, dir direction.Name) entities.E
 	}
 }
 
+// NewArrow builds an arrow entity
+func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Arrow,
+		Ignore: &components.Ignore{
+			Value: true,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Deeppink,
+		},
+		Spatial: &components.Spatial{
+			Width:        w,
+			Height:       h,
+			Rect:         pixel.R(x, y, x+w, y+h),
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: 5,
+		},
+		Movement: &components.Movement{
+			Direction: dir,
+			Speed:     0.0,
+		},
+		Animation: &components.Animation{
+			Up: &components.AnimationData{
+				Frames:    []int{101},
+				FrameRate: frameRate,
+			},
+			Right: &components.AnimationData{
+				Frames:    []int{100},
+				FrameRate: frameRate,
+			},
+			Down: &components.AnimationData{
+				Frames:    []int{103},
+				FrameRate: frameRate,
+			},
+			Left: &components.AnimationData{
+				Frames:    []int{102},
+				FrameRate: frameRate,
+			},
+		},
+	}
+}
+
 func addCoinToSystem(coin entities.Coin) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
@@ -1010,21 +1035,6 @@ func addCoinToSystem(coin entities.Coin) {
 func addEntityToSystem(entity entities.Entity) {
 	for _, system := range gameWorld.Systems() {
 		system.AddEntity(entity)
-	}
-}
-
-func addArrowToSystems(arrow entities.Arrow) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Input:
-			sys.Add(arrow.Category, arrow.Movement, arrow.Ignore, nil)
-		case *systems.Spatial:
-			sys.Add(categories.Arrow, 0, arrow.Spatial, arrow.Movement, nil)
-		case *systems.Collision:
-			sys.Add(arrow.Category, 0, arrow.Spatial)
-		case *systems.Render:
-			sys.Add(arrow.Category, 0, arrow.Appearance, arrow.Spatial, arrow.Animation, nil, arrow.Ignore)
-		}
 	}
 }
 

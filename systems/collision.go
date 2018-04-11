@@ -43,25 +43,23 @@ type Collision struct {
 
 // AddEntity adds an entity to the system
 func (s *Collision) AddEntity(entity entities.Entity) {
+	r := collisionEntity{
+		Spatial: entity.Spatial,
+	}
 	switch entity.Category {
 	case categories.Player:
-		s.player = collisionEntity{
-			Spatial: entity.Spatial,
-		}
+		s.player = r
 	case categories.Sword:
-		s.sword = collisionEntity{
-			Spatial: entity.Spatial,
-		}
+		s.sword = r
+	case categories.Arrow:
+		s.arrow = r
 	}
 }
 
 // Add adds the entity to the system
 func (s *Collision) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial) {
 	switch category {
-	case categories.Arrow:
-		s.arrow = collisionEntity{
-			Spatial: spatial,
-		}
+
 	case categories.Enemy:
 		s.enemies = append(s.enemies, collisionEntity{
 			ID:      id,

@@ -46,16 +46,10 @@ func (s *Input) AddEntity(entity entities.Entity) {
 			Movement: entity.Movement,
 			Ignore:   entity.Ignore,
 		}
-	}
-}
-
-// Add adds an entity to the system
-func (s *Input) Add(category categories.Category, movement *components.Movement, ignore *components.Ignore, dash *components.Dash) {
-	switch category {
 	case categories.Arrow:
 		s.arrow = inputEntity{
-			Movement: movement,
-			Ignore:   ignore,
+			Movement: entity.Movement,
+			Ignore:   entity.Ignore,
 		}
 	}
 }

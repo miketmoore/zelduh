@@ -53,6 +53,8 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		s.player = r
 	case categories.Sword:
 		s.sword = r
+	case categories.Arrow:
+		s.arrow = r
 	}
 }
 
@@ -77,8 +79,6 @@ func (s *Render) Add(
 	}
 
 	switch category {
-	case categories.Arrow:
-		s.arrow = entity
 
 	case categories.Enemy:
 		fallthrough
