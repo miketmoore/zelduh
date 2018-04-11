@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"fmt"
+
 	"golang.org/x/image/colornames"
 
 	"github.com/faiface/pixel"
@@ -35,6 +37,7 @@ type Render struct {
 	arrow             renderEntity
 	obstacles         []renderEntity
 	collisionSwitches []renderEntity
+	hearts            []renderEntity
 }
 
 // AddEntity adds an entity to the system
@@ -65,6 +68,8 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		s.defaultEntities = append(s.defaultEntities, r)
 	case categories.Enemy:
 		s.defaultEntities = append(s.defaultEntities, r)
+	case categories.Heart:
+		s.hearts = append(s.hearts, r)
 	}
 }
 
@@ -152,6 +157,11 @@ func (s *Render) Update() {
 	}
 
 	for _, entity := range s.defaultEntities {
+		s.animateDefault(entity)
+	}
+
+	for _, entity := range s.hearts {
+		fmt.Printf("Heart: %v\n", entity)
 		s.animateDefault(entity)
 	}
 

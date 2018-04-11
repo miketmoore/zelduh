@@ -306,6 +306,12 @@ func run() {
 	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize, player.Movement.Direction)
 	explosion := NewExplosion(gameWorld.NewEntityID())
 
+	hearts := []entities.Entity{
+		NewHeart(gameWorld.NewEntityID(), mapX+16, mapY+mapH, spriteSize, spriteSize),
+		NewHeart(gameWorld.NewEntityID(), mapX+48, mapY+mapH, spriteSize, spriteSize),
+		NewHeart(gameWorld.NewEntityID(), mapX+80, mapY+mapH, spriteSize, spriteSize),
+	}
+
 	isTransitioning := false
 	var transitionSide bounds.Bound
 	var transitionTimerStart = float64(spriteSize)
@@ -317,8 +323,6 @@ func run() {
 	var nextRoomID RoomID
 
 	var roomWarps map[entities.EntityID]WarpConfig
-
-	heartSprite := spritesheet[106]
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
@@ -460,28 +464,10 @@ func run() {
 	addEntityToSystem(player)
 	addEntityToSystem(sword)
 	addEntityToSystem(arrow)
+	for _, entity := range hearts {
+		addEntityToSystem(entity)
+	}
 
-	// TODO move
-	drawHeart := func(offsetX, offsetY float64) {
-		v := pixel.V(
-			mapX+offsetX,
-			mapY+mapH+offsetY,
-		)
-		matrix := pixel.IM.Moved(v)
-		heartSprite.Draw(win, matrix)
-	}
-	drawHearts := func(health int) {
-		switch health {
-		case 3:
-			drawHeart(96, 16)
-			fallthrough
-		case 2:
-			drawHeart(64, 16)
-			fallthrough
-		case 1:
-			drawHeart(32, 16)
-		}
-	}
 	drawMask := func() {
 		// top
 		s := imdraw.New(nil)
@@ -584,7 +570,6 @@ func run() {
 			}
 
 			drawMask()
-			drawHearts(player.Health.Total)
 
 			gameWorld.Update()
 
@@ -666,7 +651,6 @@ func run() {
 				drawMapBGImage(rooms[currentRoomID].MapName, modX, modY)
 				drawMapBGImage(rooms[nextRoomID].MapName, modXNext, modYNext)
 				drawMask()
-				drawHearts(player.Health.Total)
 
 				// Move player with map transition
 				player.Spatial.Rect = pixel.R(
@@ -944,6 +928,27 @@ func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) enti
 			Left: &components.AnimationData{
 				Frames:    []int{102},
 				FrameRate: frameRate,
+			},
+		},
+	}
+}
+
+// NewHeart builds a heart entity
+func NewHeart(id entities.EntityID, x, y, w, h float64) entities.Entity {
+	fmt.Printf("NewHeart %d\n", id)
+	return entities.Entity{
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Heart,
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect:   pixel.R(x, y, x+w, y+h),
+			Shape:  imdraw.New(nil),
+			HitBox: imdraw.New(nil),
+		},
+		Animation: &components.Animation{
+			Default: &components.AnimationData{
+				Frames: []int{106},
 			},
 		},
 	}

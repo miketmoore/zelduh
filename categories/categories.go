@@ -10,7 +10,7 @@ const (
 	Bomb
 	Enemy
 	Explosion
-	UI
+	Heart
 	Coin
 	Obstacle
 	MovableObstacle
