@@ -44,6 +44,7 @@ type Collision struct {
 // AddEntity adds an entity to the system
 func (s *Collision) AddEntity(entity entities.Entity) {
 	r := collisionEntity{
+		ID:      entity.ID,
 		Spatial: entity.Spatial,
 	}
 	switch entity.Category {
@@ -53,6 +54,8 @@ func (s *Collision) AddEntity(entity entities.Entity) {
 		s.sword = r
 	case categories.Arrow:
 		s.arrow = r
+	case categories.MovableObstacle:
+		s.moveableObstacles = append(s.moveableObstacles, r)
 	}
 }
 
@@ -70,11 +73,7 @@ func (s *Collision) Add(category categories.Category, id entities.EntityID, spat
 			ID:      id,
 			Spatial: spatial,
 		})
-	case categories.MovableObstacle:
-		s.moveableObstacles = append(s.moveableObstacles, collisionEntity{
-			ID:      id,
-			Spatial: spatial,
-		})
+
 	case categories.CollisionSwitch:
 		s.collisionSwitches = append(s.collisionSwitches, collisionEntity{
 			ID:      id,

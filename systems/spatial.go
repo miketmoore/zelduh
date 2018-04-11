@@ -33,6 +33,7 @@ type Spatial struct {
 // AddEntity adds an entity to the system
 func (s *Spatial) AddEntity(entity entities.Entity) {
 	r := spatialEntity{
+		ID:       entity.ID,
 		Spatial:  entity.Spatial,
 		Movement: entity.Movement,
 	}
@@ -44,6 +45,8 @@ func (s *Spatial) AddEntity(entity entities.Entity) {
 		s.sword = r
 	case categories.Arrow:
 		s.arrow = r
+	case categories.MovableObstacle:
+		s.moveableObstacles = append(s.moveableObstacles, r)
 	}
 }
 
@@ -59,12 +62,7 @@ func (s *Spatial) Add(category categories.Category, id entities.EntityID, spatia
 			TotalMoves:  0,
 			MoveCounter: 0,
 		})
-	case categories.MovableObstacle:
-		s.moveableObstacles = append(s.moveableObstacles, spatialEntity{
-			ID:       id,
-			Spatial:  spatial,
-			Movement: movement,
-		})
+
 	}
 }
 

@@ -552,14 +552,14 @@ func run() {
 				addObstaclesToSystem(obstacles)
 
 				for _, c := range rooms[currentRoomID].MoveableObstacleConfigs {
-					entity := entities.BuildMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+					entity := NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					entity.Animation = &components.Animation{
 						Default: &components.AnimationData{
 							Frames:    []int{63},
 							FrameRate: frameRate,
 						},
 					}
-					addMoveableObstaclesToSystem([]entities.MoveableObstacle{entity})
+					addEntityToSystem(entity)
 				}
 
 				for _, c := range rooms[currentRoomID].EnemyConfigs {
@@ -819,21 +819,6 @@ func buildObstacle(x, y float64) entities.Obstacle {
 	}
 }
 
-func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
-	return entities.MoveableObstacle{
-		ID: gameWorld.NewEntityID(),
-		Spatial: &components.Spatial{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
-			Shape:  imdraw.New(nil),
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Blueviolet,
-		},
-	}
-}
-
 // NewPlayer builds a new Entity as a Player
 func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 	return entities.Entity{
@@ -1015,6 +1000,27 @@ func NewExplosion(id entities.EntityID) entities.Entity {
 	}
 }
 
+// NewMoveableObstacle builds a moveable obstacle
+func NewMoveableObstacle(id entities.EntityID, w, h, x, y float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.MovableObstacle,
+		Appearance: &components.Appearance{
+			Color: colornames.Purple,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect:   pixel.R(x, y, x+w, y+h),
+			Shape:  imdraw.New(nil),
+		},
+		Movement: &components.Movement{
+			Direction: direction.Down,
+			Speed:     1.0,
+		},
+	}
+}
+
 func addCoinToSystem(coin entities.Coin) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
@@ -1075,25 +1081,6 @@ func addObstaclesToSystem(obstacles []entities.Obstacle) {
 			fmt.Printf("addObstaclesToSystem %d\n", i)
 			for _, obstacle := range obstacles {
 				sys.Add(obstacle.Category, obstacle.ID, obstacle.Spatial)
-			}
-		}
-	}
-}
-
-func addMoveableObstaclesToSystem(moveableObstacles []entities.MoveableObstacle) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Spatial:
-			for _, moveable := range moveableObstacles {
-				sys.Add(categories.MovableObstacle, moveable.ID, moveable.Spatial, moveable.Movement, nil)
-			}
-		case *systems.Collision:
-			for _, moveable := range moveableObstacles {
-				sys.Add(moveable.Category, moveable.ID, moveable.Spatial)
-			}
-		case *systems.Render:
-			for _, moveable := range moveableObstacles {
-				sys.Add(moveable.Category, moveable.ID, moveable.Appearance, moveable.Spatial, moveable.Animation, nil, nil)
 			}
 		}
 	}
@@ -1288,25 +1275,6 @@ func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Obst
 		}
 	}
 	return obstacles
-}
-
-func drawMoveableObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.MoveableObstacle {
-	d := allMapDrawData[rooms[roomID].MapName]
-	entities := []entities.MoveableObstacle{}
-	for _, spriteData := range d.Data {
-		if spriteData.SpriteID != 0 {
-			vec := spriteData.Rect.Min
-			movedVec := pixel.V(
-				vec.X+mapX+modX+spriteSize/2,
-				vec.Y+mapY+modY+spriteSize/2,
-			)
-			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				entity := buildMoveableObstacle(movedVec.X-spriteSize/2, movedVec.Y-spriteSize/2)
-				entities = append(entities, entity)
-			}
-		}
-	}
-	return entities
 }
 
 func indexRoom(a, b RoomID, dir direction.Name) {
