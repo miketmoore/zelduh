@@ -1013,21 +1013,6 @@ func addEntityToSystem(entity entities.Entity) {
 	}
 }
 
-func addSwordToSystems(sword entities.Sword) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Input:
-			sys.Add(sword.Category, sword.Movement, sword.Ignore, nil)
-		case *systems.Spatial:
-			sys.Add(categories.Sword, 0, sword.Spatial, sword.Movement, nil)
-		case *systems.Collision:
-			sys.Add(sword.Category, 0, sword.Spatial)
-		case *systems.Render:
-			sys.Add(sword.Category, 0, sword.Appearance, sword.Spatial, sword.Animation, nil, sword.Ignore)
-		}
-	}
-}
-
 func addArrowToSystems(arrow entities.Arrow) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
