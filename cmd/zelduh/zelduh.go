@@ -939,7 +939,7 @@ func addPlayerToSystems(player entities.Player) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Input:
-			sys.AddPlayer(player.Movement, player.Dash)
+			sys.Add(categories.Player, player.Movement, nil, player.Dash)
 		case *systems.Spatial:
 			sys.Add(categories.Player, 0, player.Spatial, player.Movement, player.Dash)
 		case *systems.Collision:
@@ -954,7 +954,7 @@ func addSwordToSystems(sword entities.Sword) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Input:
-			sys.AddSword(sword.Movement, sword.Ignore)
+			sys.Add(sword.Category, sword.Movement, sword.Ignore, nil)
 		case *systems.Spatial:
 			sys.Add(categories.Sword, 0, sword.Spatial, sword.Movement, nil)
 		case *systems.Collision:
@@ -969,7 +969,7 @@ func addArrowToSystems(arrow entities.Arrow) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Input:
-			sys.AddArrow(arrow.Movement, arrow.Ignore)
+			sys.Add(arrow.Category, arrow.Movement, arrow.Ignore, nil)
 		case *systems.Spatial:
 			sys.Add(categories.Arrow, 0, arrow.Spatial, arrow.Movement, nil)
 		case *systems.Collision:
@@ -993,7 +993,7 @@ func addEnemiesToSystem(enemies []entities.Enemy) {
 			}
 		case *systems.Health:
 			for _, enemy := range enemies {
-				sys.AddEntity(enemy.ID, enemy.Health)
+				sys.Add(enemy.ID, enemy.Health)
 			}
 		case *systems.Render:
 			for _, enemy := range enemies {

@@ -2,6 +2,7 @@ package systems
 
 import (
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
 )
@@ -21,15 +22,6 @@ type Input struct {
 	arrow         inputEntity
 }
 
-// AddPlayer adds the player to the system
-func (s *Input) AddPlayer(movement *components.Movement, dash *components.Dash) {
-	s.playerEntity = inputEntity{
-		Movement: movement,
-		Dash:     dash,
-	}
-	s.playerEnabled = true
-}
-
 // DisablePlayer disables player input
 func (s *Input) DisablePlayer() {
 	s.playerEnabled = false
@@ -40,19 +32,25 @@ func (s *Input) EnablePlayer() {
 	s.playerEnabled = true
 }
 
-// AddSword adds the sword entity to the sytem
-func (s *Input) AddSword(movement *components.Movement, ignore *components.Ignore) {
-	s.sword = inputEntity{
-		Movement: movement,
-		Ignore:   ignore,
-	}
-}
-
-// AddArrow adds the arrow entity to the sytem
-func (s *Input) AddArrow(movement *components.Movement, ignore *components.Ignore) {
-	s.arrow = inputEntity{
-		Movement: movement,
-		Ignore:   ignore,
+// Add adds an entity to the system
+func (s *Input) Add(category categories.Category, movement *components.Movement, ignore *components.Ignore, dash *components.Dash) {
+	switch category {
+	case categories.Player:
+		s.playerEntity = inputEntity{
+			Movement: movement,
+			Dash:     dash,
+		}
+		s.playerEnabled = true
+	case categories.Sword:
+		s.sword = inputEntity{
+			Movement: movement,
+			Ignore:   ignore,
+		}
+	case categories.Arrow:
+		s.arrow = inputEntity{
+			Movement: movement,
+			Ignore:   ignore,
+		}
 	}
 }
 

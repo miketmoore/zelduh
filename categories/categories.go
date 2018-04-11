@@ -7,6 +7,7 @@ const (
 	Player = Category(1 << iota)
 	Sword
 	Arrow
+	Bomb
 	Enemy
 	Explosion
 	UI
