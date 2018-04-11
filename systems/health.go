@@ -17,6 +17,14 @@ type Health struct {
 	entities []healthEntity
 }
 
+// AddEntity adds the entity to the system
+func (s *Health) AddEntity(entity entities.Entity) {
+	s.entities = append(s.entities, healthEntity{
+		ID:     entity.ID,
+		Health: entity.Health,
+	})
+}
+
 // Add adds the health entity to the system
 func (s *Health) Add(id entities.EntityID, health *components.Health) {
 	s.entities = append(s.entities, healthEntity{

@@ -41,46 +41,29 @@ type Collision struct {
 	PlayerCollisionWithBounds             func(bounds.Bound)
 }
 
-// Add adds the entity to the system
-func (s *Collision) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial) {
-	switch category {
+// AddEntity adds an entity to the system
+func (s *Collision) AddEntity(entity entities.Entity) {
+	r := collisionEntity{
+		ID:      entity.ID,
+		Spatial: entity.Spatial,
+	}
+	switch entity.Category {
 	case categories.Player:
-		s.player = collisionEntity{
-			Spatial: spatial,
-		}
+		s.player = r
 	case categories.Sword:
-		s.sword = collisionEntity{
-			Spatial: spatial,
-		}
+		s.sword = r
 	case categories.Arrow:
-		s.arrow = collisionEntity{
-			Spatial: spatial,
-		}
-	case categories.Enemy:
-		s.enemies = append(s.enemies, collisionEntity{
-			ID:      id,
-			Spatial: spatial,
-		})
-	case categories.Obstacle:
-		s.obstacles = append(s.obstacles, collisionEntity{
-			ID:      id,
-			Spatial: spatial,
-		})
+		s.arrow = r
 	case categories.MovableObstacle:
-		s.moveableObstacles = append(s.moveableObstacles, collisionEntity{
-			ID:      id,
-			Spatial: spatial,
-		})
+		s.moveableObstacles = append(s.moveableObstacles, r)
 	case categories.CollisionSwitch:
-		s.collisionSwitches = append(s.collisionSwitches, collisionEntity{
-			ID:      id,
-			Spatial: spatial,
-		})
+		s.collisionSwitches = append(s.collisionSwitches, r)
+	case categories.Enemy:
+		s.enemies = append(s.enemies, r)
 	case categories.Coin:
-		s.coins = append(s.coins, collisionEntity{
-			ID:      id,
-			Spatial: spatial,
-		})
+		s.coins = append(s.coins, r)
+	case categories.Obstacle:
+		s.obstacles = append(s.obstacles, r)
 	}
 }
 

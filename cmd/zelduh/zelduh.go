@@ -178,6 +178,8 @@ const (
 	transitionWarp  transitionStyle = "warp"
 )
 
+const frameRate int = 5
+
 func run() {
 
 	gameWorld = world.New()
@@ -299,93 +301,10 @@ func run() {
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
-	frameRate := 5
-	player := entities.BuildPlayer(spriteSize, spriteSize, mapW/2, mapH/2)
-	player.Animation = &components.Animation{
-		Up: &components.AnimationData{
-			Frames:    []int{4, 195},
-			FrameRate: frameRate,
-		},
-		Right: &components.AnimationData{
-			Frames:    []int{3, 194},
-			FrameRate: frameRate,
-		},
-		Down: &components.AnimationData{
-			Frames:    []int{1, 192},
-			FrameRate: frameRate,
-		},
-		Left: &components.AnimationData{
-			Frames:    []int{2, 193},
-			FrameRate: frameRate,
-		},
-		SwordAttackUp: &components.AnimationData{
-			Frames: []int{165},
-		},
-		SwordAttackRight: &components.AnimationData{
-			Frames: []int{164},
-		},
-		SwordAttackLeft: &components.AnimationData{
-			Frames: []int{179},
-		},
-		SwordAttackDown: &components.AnimationData{
-			Frames: []int{180},
-		},
-	}
-
-	explosion := entities.Generic{
-		ID: gameWorld.NewEntityID(),
-		Animation: &components.Animation{
-			Expiration: 12,
-			Default: &components.AnimationData{
-				Frames: []int{
-					122, 122, 122,
-					123, 123, 123,
-					124, 124, 124,
-					125, 125, 125,
-				},
-			},
-		},
-	}
-
-	sword := entities.BuildSword(spriteSize, spriteSize, player.Movement.Direction)
-	sword.Animation = &components.Animation{
-		Up: &components.AnimationData{
-			Frames:    []int{70},
-			FrameRate: frameRate,
-		},
-		Right: &components.AnimationData{
-			Frames:    []int{67},
-			FrameRate: frameRate,
-		},
-		Down: &components.AnimationData{
-			Frames:    []int{68},
-			FrameRate: frameRate,
-		},
-		Left: &components.AnimationData{
-			Frames:    []int{69},
-			FrameRate: frameRate,
-		},
-	}
-
-	arrow := entities.BuildArrow(spriteSize, spriteSize, 0.0, 0.0, player.Movement.Direction)
-	arrow.Animation = &components.Animation{
-		Up: &components.AnimationData{
-			Frames:    []int{101},
-			FrameRate: frameRate,
-		},
-		Right: &components.AnimationData{
-			Frames:    []int{100},
-			FrameRate: frameRate,
-		},
-		Down: &components.AnimationData{
-			Frames:    []int{103},
-			FrameRate: frameRate,
-		},
-		Left: &components.AnimationData{
-			Frames:    []int{102},
-			FrameRate: frameRate,
-		},
-	}
+	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
+	sword := NewSword(gameWorld.NewEntityID(), spriteSize, spriteSize, player.Movement.Direction)
+	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize, player.Movement.Direction)
+	explosion := NewExplosion(gameWorld.NewEntityID())
 
 	isTransitioning := false
 	var transitionSide bounds.Bound
@@ -401,38 +320,20 @@ func run() {
 
 	heartSprite := spritesheet[106]
 
-	// heart := entities.Generic{
-	// 	Category: categories.UI,
-	// 	Animation: &components.Animation{
-	// 		Default: &components.AnimationData{
-	// 			Frames: []int{106},
-	// 		},
-	// 	},
-	// }
-
-	// addHeartToSystems(heart)
-
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
+	// gameWorld.SystemsMap["input"] = inputSystem
 	gameWorld.AddSystem(inputSystem)
 	healthSystem := &systems.Health{}
+	// gameWorld.SystemsMap["health"] = healthSystem
 	gameWorld.AddSystem(healthSystem)
 	spatialSystem := &systems.Spatial{
 		Rand: r,
 	}
-	appendCoinAnimation := func(coin *entities.Coin) {
-		coin.Animation = &components.Animation{
-			Default: &components.AnimationData{
-				Frames:    []int{5, 5, 6, 6, 21, 21},
-				FrameRate: frameRate,
-			},
-		}
-	}
 	dropCoin := func(v pixel.Vec) {
 		fmt.Printf("Drop coin\n")
-		coin := buildCoin(v.X, v.Y)
-		appendCoinAnimation(&coin)
-		addCoinToSystem(coin)
+		coin := NewCoin(gameWorld.NewEntityID(), v.X, v.Y, spriteSize, spriteSize)
+		addEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
 	collisionSystem := &systems.Collision{
@@ -483,7 +384,7 @@ func run() {
 						explosion.OnExpiration = func() {
 							dropCoin(explosion.Spatial.Rect.Min)
 						}
-						addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
+						addEntityToSystem(explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
 						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
@@ -508,7 +409,7 @@ func run() {
 					explosion.OnExpiration = func() {
 						dropCoin(explosion.Spatial.Rect.Min)
 					}
-					addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
+					addEntityToSystem(explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
@@ -556,9 +457,9 @@ func run() {
 		Spritesheet: spritesheet,
 	})
 
-	addPlayerToSystems(player)
-	addSwordToSystems(sword)
-	addArrowToSystems(arrow)
+	addEntityToSystem(player)
+	addEntityToSystem(sword)
+	addEntityToSystem(arrow)
 
 	// TODO move
 	drawHeart := func(offsetX, offsetY float64) {
@@ -639,33 +540,35 @@ func run() {
 			if addEntities {
 				addEntities = false
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
-				addObstaclesToSystem(obstacles)
+				for _, entity := range obstacles {
+					addEntityToSystem(entity)
+				}
 
 				for _, c := range rooms[currentRoomID].MoveableObstacleConfigs {
-					entity := entities.BuildMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+					entity := NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					entity.Animation = &components.Animation{
 						Default: &components.AnimationData{
 							Frames:    []int{63},
 							FrameRate: frameRate,
 						},
 					}
-					addMoveableObstaclesToSystem([]entities.MoveableObstacle{entity})
+					addEntityToSystem(entity)
 				}
 
 				for _, c := range rooms[currentRoomID].EnemyConfigs {
-					enemy := entities.BuildEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius)
+					enemy := NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius)
 					enemy.Animation = &components.Animation{
 						Default: &components.AnimationData{
 							Frames:    []int{36, 37, 38, 39},
 							FrameRate: frameRate,
 						},
 					}
-					addEnemiesToSystem([]entities.Enemy{enemy})
+					addEntityToSystem(enemy)
 				}
 
 				roomWarps = map[entities.EntityID]WarpConfig{}
 				for _, c := range rooms[currentRoomID].WarpConfigs {
-					warp := entities.BuildCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+					warp := NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					if c.IsAnimated {
 						warp.Animation = &components.Animation{
 							Default: &components.AnimationData{
@@ -675,7 +578,7 @@ func run() {
 						}
 					}
 					warp.Spatial.HitBoxRadius = c.HitBoxRadius
-					addCollisionSwitchesToSystem([]entities.CollisionSwitch{warp})
+					addEntityToSystem(warp)
 					roomWarps[warp.ID] = c
 				}
 			}
@@ -873,10 +776,275 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-func buildCoin(x, y float64) entities.Coin {
-	w := spriteSize
-	h := spriteSize
-	return entities.Coin{
+// NewObstacle builds a new obstacle
+func NewObstacle(id entities.EntityID, x, y float64) entities.Entity {
+	return entities.Entity{
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Obstacle,
+		Spatial: &components.Spatial{
+			Width:  spriteSize,
+			Height: spriteSize,
+			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
+			Shape:  imdraw.New(nil),
+		},
+	}
+}
+
+// NewPlayer builds a new Entity as a Player
+func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Player,
+		Health: &components.Health{
+			Total: 3,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Green,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect: pixel.R(
+				x,
+				y,
+				x+w,
+				y+h,
+			),
+			Shape:                imdraw.New(nil),
+			HitBox:               imdraw.New(nil),
+			HitBoxRadius:         15,
+			CollisionWithRectMod: 5,
+		},
+		Movement: &components.Movement{
+			Direction: direction.Down,
+			MaxSpeed:  7.0,
+			Speed:     0.0,
+		},
+		Coins: &components.Coins{
+			Coins: 0,
+		},
+		Dash: &components.Dash{
+			Charge:    0,
+			MaxCharge: 50,
+			SpeedMod:  7,
+		},
+		Animation: &components.Animation{
+			Up: &components.AnimationData{
+				Frames:    []int{4, 195},
+				FrameRate: frameRate,
+			},
+			Right: &components.AnimationData{
+				Frames:    []int{3, 194},
+				FrameRate: frameRate,
+			},
+			Down: &components.AnimationData{
+				Frames:    []int{1, 192},
+				FrameRate: frameRate,
+			},
+			Left: &components.AnimationData{
+				Frames:    []int{2, 193},
+				FrameRate: frameRate,
+			},
+			SwordAttackUp: &components.AnimationData{
+				Frames: []int{165},
+			},
+			SwordAttackRight: &components.AnimationData{
+				Frames: []int{164},
+			},
+			SwordAttackLeft: &components.AnimationData{
+				Frames: []int{179},
+			},
+			SwordAttackDown: &components.AnimationData{
+				Frames: []int{180},
+			},
+		},
+	}
+}
+
+// NewSword builds a sword entity
+func NewSword(id entities.EntityID, w, h float64, dir direction.Name) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Sword,
+		Ignore: &components.Ignore{
+			Value: true,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Deeppink,
+		},
+		Spatial: &components.Spatial{
+			Width:        w,
+			Height:       h,
+			Rect:         pixel.R(0, 0, 0, 0),
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: 20,
+		},
+		Movement: &components.Movement{
+			Direction: dir,
+			Speed:     0.0,
+		},
+		Animation: &components.Animation{
+			Up: &components.AnimationData{
+				Frames:    []int{70},
+				FrameRate: frameRate,
+			},
+			Right: &components.AnimationData{
+				Frames:    []int{67},
+				FrameRate: frameRate,
+			},
+			Down: &components.AnimationData{
+				Frames:    []int{68},
+				FrameRate: frameRate,
+			},
+			Left: &components.AnimationData{
+				Frames:    []int{69},
+				FrameRate: frameRate,
+			},
+		},
+	}
+}
+
+// NewArrow builds an arrow entity
+func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Arrow,
+		Ignore: &components.Ignore{
+			Value: true,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Deeppink,
+		},
+		Spatial: &components.Spatial{
+			Width:        w,
+			Height:       h,
+			Rect:         pixel.R(x, y, x+w, y+h),
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: 5,
+		},
+		Movement: &components.Movement{
+			Direction: dir,
+			Speed:     0.0,
+		},
+		Animation: &components.Animation{
+			Up: &components.AnimationData{
+				Frames:    []int{101},
+				FrameRate: frameRate,
+			},
+			Right: &components.AnimationData{
+				Frames:    []int{100},
+				FrameRate: frameRate,
+			},
+			Down: &components.AnimationData{
+				Frames:    []int{103},
+				FrameRate: frameRate,
+			},
+			Left: &components.AnimationData{
+				Frames:    []int{102},
+				FrameRate: frameRate,
+			},
+		},
+	}
+}
+
+// NewExplosion builds an explosion entity
+func NewExplosion(id entities.EntityID) entities.Entity {
+	return entities.Entity{
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Explosion,
+		Animation: &components.Animation{
+			Expiration: 12,
+			Default: &components.AnimationData{
+				Frames: []int{
+					122, 122, 122,
+					123, 123, 123,
+					124, 124, 124,
+					125, 125, 125,
+				},
+			},
+		},
+	}
+}
+
+// NewMoveableObstacle builds a moveable obstacle
+func NewMoveableObstacle(id entities.EntityID, w, h, x, y float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.MovableObstacle,
+		Appearance: &components.Appearance{
+			Color: colornames.Purple,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect:   pixel.R(x, y, x+w, y+h),
+			Shape:  imdraw.New(nil),
+		},
+		Movement: &components.Movement{
+			Direction: direction.Down,
+			Speed:     1.0,
+		},
+	}
+}
+
+// NewCollisionSwitch builds a new collision switch
+func NewCollisionSwitch(id entities.EntityID, w, h, x, y float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.CollisionSwitch,
+		Enabled: &components.Enabled{
+			Value: false,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Sandybrown,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect:   pixel.R(x, y, x+w, y+h),
+			Shape:  imdraw.New(nil),
+		},
+	}
+}
+
+// NewEnemy builds a new enemy
+func NewEnemy(id entities.EntityID, w, h, x, y, hitRadius float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Enemy,
+		Health:   &components.Health{Total: 2},
+		Appearance: &components.Appearance{
+			Color: colornames.Red,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect: pixel.R(
+				x,
+				y,
+				x+w,
+				y+h,
+			),
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: hitRadius,
+		},
+		Movement: &components.Movement{
+			Direction:    direction.Down,
+			Speed:        1.0,
+			MaxSpeed:     1.0,
+			HitSpeed:     10.0,
+			HitBackMoves: 10,
+			MaxMoves:     100,
+		},
+	}
+}
+
+// NewCoin builds a coin entity
+func NewCoin(id entities.EntityID, x, y, w, h float64) entities.Entity {
+	return entities.Entity{
 		ID:       gameWorld.NewEntityID(),
 		Category: categories.Coin,
 		Appearance: &components.Appearance{
@@ -893,113 +1061,18 @@ func buildCoin(x, y float64) entities.Coin {
 			),
 			Shape: imdraw.New(nil),
 		},
-	}
-}
-
-func buildObstacle(x, y float64) entities.Obstacle {
-	return entities.Obstacle{
-		ID:       gameWorld.NewEntityID(),
-		Category: categories.Obstacle,
-		Spatial: &components.Spatial{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
-			Shape:  imdraw.New(nil),
+		Animation: &components.Animation{
+			Default: &components.AnimationData{
+				Frames:    []int{5, 5, 6, 6, 21, 21},
+				FrameRate: frameRate,
+			},
 		},
 	}
 }
 
-func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
-	return entities.MoveableObstacle{
-		ID: gameWorld.NewEntityID(),
-		Spatial: &components.Spatial{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
-			Shape:  imdraw.New(nil),
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Blueviolet,
-		},
-	}
-}
-
-func addCoinToSystem(coin entities.Coin) {
+func addEntityToSystem(entity entities.Entity) {
 	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Collision:
-			sys.Add(coin.Category, coin.ID, coin.Spatial)
-		case *systems.Render:
-			sys.Add(coin.Category, coin.ID, coin.Appearance, coin.Spatial, coin.Animation, nil, nil)
-		}
-	}
-}
-
-func addPlayerToSystems(player entities.Player) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Input:
-			sys.Add(categories.Player, player.Movement, nil, player.Dash)
-		case *systems.Spatial:
-			sys.Add(categories.Player, 0, player.Spatial, player.Movement, player.Dash)
-		case *systems.Collision:
-			sys.Add(player.Category, 0, player.Spatial)
-		case *systems.Render:
-			sys.Add(player.Category, 0, player.Appearance, player.Spatial, player.Animation, player.Movement, nil)
-		}
-	}
-}
-
-func addSwordToSystems(sword entities.Sword) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Input:
-			sys.Add(sword.Category, sword.Movement, sword.Ignore, nil)
-		case *systems.Spatial:
-			sys.Add(categories.Sword, 0, sword.Spatial, sword.Movement, nil)
-		case *systems.Collision:
-			sys.Add(sword.Category, 0, sword.Spatial)
-		case *systems.Render:
-			sys.Add(sword.Category, 0, sword.Appearance, sword.Spatial, sword.Animation, nil, sword.Ignore)
-		}
-	}
-}
-
-func addArrowToSystems(arrow entities.Arrow) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Input:
-			sys.Add(arrow.Category, arrow.Movement, arrow.Ignore, nil)
-		case *systems.Spatial:
-			sys.Add(categories.Arrow, 0, arrow.Spatial, arrow.Movement, nil)
-		case *systems.Collision:
-			sys.Add(arrow.Category, 0, arrow.Spatial)
-		case *systems.Render:
-			sys.Add(arrow.Category, 0, arrow.Appearance, arrow.Spatial, arrow.Animation, nil, arrow.Ignore)
-		}
-	}
-}
-
-func addEnemiesToSystem(enemies []entities.Enemy) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Spatial:
-			for _, enemy := range enemies {
-				sys.Add(categories.Enemy, enemy.ID, enemy.Spatial, enemy.Movement, nil)
-			}
-		case *systems.Collision:
-			for _, enemy := range enemies {
-				sys.Add(enemy.Category, enemy.ID, enemy.Spatial)
-			}
-		case *systems.Health:
-			for _, enemy := range enemies {
-				sys.Add(enemy.ID, enemy.Health)
-			}
-		case *systems.Render:
-			for _, enemy := range enemies {
-				sys.Add(enemy.Category, enemy.ID, enemy.Appearance, enemy.Spatial, enemy.Animation, enemy.Movement, nil)
-			}
-		}
+		system.AddEntity(entity)
 	}
 }
 
@@ -1012,61 +1085,6 @@ func removeAllEnemiesFromSystems() {
 			sys.RemoveAll(categories.Enemy)
 		case *systems.Render:
 			sys.RemoveAll(categories.Enemy)
-		}
-	}
-}
-
-func addObstaclesToSystem(obstacles []entities.Obstacle) {
-	for i, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Collision:
-			fmt.Printf("addObstaclesToSystem %d\n", i)
-			for _, obstacle := range obstacles {
-				sys.Add(obstacle.Category, obstacle.ID, obstacle.Spatial)
-			}
-		}
-	}
-}
-
-func addMoveableObstaclesToSystem(moveableObstacles []entities.MoveableObstacle) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Spatial:
-			for _, moveable := range moveableObstacles {
-				sys.Add(categories.MovableObstacle, moveable.ID, moveable.Spatial, moveable.Movement, nil)
-			}
-		case *systems.Collision:
-			for _, moveable := range moveableObstacles {
-				sys.Add(moveable.Category, moveable.ID, moveable.Spatial)
-			}
-		case *systems.Render:
-			for _, moveable := range moveableObstacles {
-				sys.Add(moveable.Category, moveable.ID, moveable.Appearance, moveable.Spatial, moveable.Animation, nil, nil)
-			}
-		}
-	}
-}
-
-func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Collision:
-			for _, collisionSwitch := range collisionSwitches {
-				sys.Add(collisionSwitch.Category, collisionSwitch.ID, collisionSwitch.Spatial)
-			}
-		case *systems.Render:
-			for _, collisionSwitch := range collisionSwitches {
-				sys.Add(collisionSwitch.Category, 0, collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation, nil, nil)
-			}
-		}
-	}
-}
-
-func addGenericToSystems(category categories.Category, generic entities.Generic, v pixel.Vec) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Render:
-			sys.Add(category, 0, nil, generic.Spatial, generic.Animation, nil, nil)
 		}
 	}
 }
@@ -1228,9 +1246,9 @@ func drawMapBGImage(name string, modX, modY float64) {
 	}
 }
 
-func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Obstacle {
+func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Entity {
 	d := allMapDrawData[rooms[roomID].MapName]
-	obstacles := []entities.Obstacle{}
+	obstacles := []entities.Entity{}
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
@@ -1239,31 +1257,12 @@ func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Obst
 				vec.Y+mapY+modY+spriteSize/2,
 			)
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				obstacle := buildObstacle(movedVec.X-spriteSize/2, movedVec.Y-spriteSize/2)
+				obstacle := NewObstacle(gameWorld.NewEntityID(), movedVec.X-spriteSize/2, movedVec.Y-spriteSize/2)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
 	}
 	return obstacles
-}
-
-func drawMoveableObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.MoveableObstacle {
-	d := allMapDrawData[rooms[roomID].MapName]
-	entities := []entities.MoveableObstacle{}
-	for _, spriteData := range d.Data {
-		if spriteData.SpriteID != 0 {
-			vec := spriteData.Rect.Min
-			movedVec := pixel.V(
-				vec.X+mapX+modX+spriteSize/2,
-				vec.Y+mapY+modY+spriteSize/2,
-			)
-			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				entity := buildMoveableObstacle(movedVec.X-spriteSize/2, movedVec.Y-spriteSize/2)
-				entities = append(entities, entity)
-			}
-		}
-	}
-	return entities
 }
 
 func indexRoom(a, b RoomID, dir direction.Name) {

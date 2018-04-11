@@ -37,45 +37,34 @@ type Render struct {
 	collisionSwitches []renderEntity
 }
 
-// Add adds one entity to the system
-func (s *Render) Add(
-	category categories.Category,
-	id entities.EntityID,
-	appearance *components.Appearance,
-	spatial *components.Spatial,
-	animation *components.Animation,
-	movement *components.Movement,
-	ignore *components.Ignore,
-) {
-	entity := renderEntity{
-		ID:         id,
-		Category:   category,
-		Appearance: appearance,
-		Spatial:    spatial,
-		Animation:  animation,
-		Movement:   movement,
-		Ignore:     ignore,
+// AddEntity adds an entity to the system
+func (s *Render) AddEntity(entity entities.Entity) {
+	r := renderEntity{
+		entity.ID,
+		entity.Category,
+		entity.Spatial,
+		entity.Appearance,
+		entity.Animation,
+		entity.Movement,
+		entity.Ignore,
 	}
-
-	switch category {
+	switch entity.Category {
 	case categories.Player:
-		s.player = entity
+		s.player = r
 	case categories.Sword:
-		s.sword = entity
+		s.sword = r
 	case categories.Arrow:
-		s.arrow = entity
-
-	case categories.Enemy:
-		fallthrough
-	case categories.Coin:
-		fallthrough
-	case categories.MovableObstacle:
-		s.defaultEntities = append(s.defaultEntities, entity)
-
+		s.arrow = r
 	case categories.Explosion:
-		s.generic = append(s.generic, entity)
+		s.generic = append(s.generic, r)
+	case categories.MovableObstacle:
+		s.defaultEntities = append(s.defaultEntities, r)
 	case categories.CollisionSwitch:
-		s.collisionSwitches = append(s.collisionSwitches, entity)
+		s.collisionSwitches = append(s.collisionSwitches, r)
+	case categories.Coin:
+		s.defaultEntities = append(s.defaultEntities, r)
+	case categories.Enemy:
+		s.defaultEntities = append(s.defaultEntities, r)
 	}
 }
 
