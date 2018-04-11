@@ -39,23 +39,17 @@ func (s *Spatial) AddEntity(entity entities.Entity) {
 			Movement: entity.Movement,
 			Dash:     entity.Dash,
 		}
+	case categories.Sword:
+		s.sword = spatialEntity{
+			Spatial:  entity.Spatial,
+			Movement: entity.Movement,
+		}
 	}
 }
 
 // Add adds an entity to the system
 func (s *Spatial) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial, movement *components.Movement, dash *components.Dash) {
 	switch category {
-	case categories.Player:
-		s.player = spatialEntity{
-			Spatial:  spatial,
-			Movement: movement,
-			Dash:     dash,
-		}
-	case categories.Sword:
-		s.sword = spatialEntity{
-			Spatial:  spatial,
-			Movement: movement,
-		}
 	case categories.Arrow:
 		s.arrow = spatialEntity{
 			Spatial:  spatial,

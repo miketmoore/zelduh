@@ -41,23 +41,17 @@ func (s *Input) AddEntity(entity entities.Entity) {
 			Movement: entity.Movement,
 			Dash:     entity.Dash,
 		}
+	case categories.Sword:
+		s.sword = inputEntity{
+			Movement: entity.Movement,
+			Ignore:   entity.Ignore,
+		}
 	}
 }
 
 // Add adds an entity to the system
 func (s *Input) Add(category categories.Category, movement *components.Movement, ignore *components.Ignore, dash *components.Dash) {
 	switch category {
-	case categories.Player:
-		s.playerEntity = inputEntity{
-			Movement: movement,
-			Dash:     dash,
-		}
-		s.playerEnabled = true
-	case categories.Sword:
-		s.sword = inputEntity{
-			Movement: movement,
-			Ignore:   ignore,
-		}
 	case categories.Arrow:
 		s.arrow = inputEntity{
 			Movement: movement,

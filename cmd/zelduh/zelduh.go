@@ -302,6 +302,7 @@ func run() {
 
 	// Build entities
 	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
+	sword := NewSword(gameWorld.NewEntityID(), spriteSize, spriteSize, player.Movement.Direction)
 
 	explosion := entities.Generic{
 		ID: gameWorld.NewEntityID(),
@@ -315,26 +316,6 @@ func run() {
 					125, 125, 125,
 				},
 			},
-		},
-	}
-
-	sword := entities.BuildSword(spriteSize, spriteSize, player.Movement.Direction)
-	sword.Animation = &components.Animation{
-		Up: &components.AnimationData{
-			Frames:    []int{70},
-			FrameRate: frameRate,
-		},
-		Right: &components.AnimationData{
-			Frames:    []int{67},
-			FrameRate: frameRate,
-		},
-		Down: &components.AnimationData{
-			Frames:    []int{68},
-			FrameRate: frameRate,
-		},
-		Left: &components.AnimationData{
-			Frames:    []int{69},
-			FrameRate: frameRate,
 		},
 	}
 
@@ -530,7 +511,7 @@ func run() {
 	})
 
 	addEntityToSystem(player)
-	addSwordToSystems(sword)
+	addEntityToSystem(sword)
 	addArrowToSystems(arrow)
 
 	// TODO move
@@ -966,6 +947,50 @@ func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 			},
 			SwordAttackDown: &components.AnimationData{
 				Frames: []int{180},
+			},
+		},
+	}
+}
+
+// NewSword builds a new Entity as a Player
+func NewSword(id entities.EntityID, w, h float64, dir direction.Name) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Sword,
+		Ignore: &components.Ignore{
+			Value: true,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Deeppink,
+		},
+		Spatial: &components.Spatial{
+			Width:        w,
+			Height:       h,
+			Rect:         pixel.R(0, 0, 0, 0),
+			Shape:        imdraw.New(nil),
+			HitBox:       imdraw.New(nil),
+			HitBoxRadius: 20,
+		},
+		Movement: &components.Movement{
+			Direction: dir,
+			Speed:     0.0,
+		},
+		Animation: &components.Animation{
+			Up: &components.AnimationData{
+				Frames:    []int{70},
+				FrameRate: frameRate,
+			},
+			Right: &components.AnimationData{
+				Frames:    []int{67},
+				FrameRate: frameRate,
+			},
+			Down: &components.AnimationData{
+				Frames:    []int{68},
+				FrameRate: frameRate,
+			},
+			Left: &components.AnimationData{
+				Frames:    []int{69},
+				FrameRate: frameRate,
 			},
 		},
 	}
