@@ -178,6 +178,8 @@ const (
 	transitionWarp  transitionStyle = "warp"
 )
 
+const frameRate int = 5
+
 func run() {
 
 	gameWorld = world.New()
@@ -299,38 +301,7 @@ func run() {
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
-	frameRate := 5
-	player := entities.BuildPlayer(spriteSize, spriteSize, mapW/2, mapH/2)
-	player.Animation = &components.Animation{
-		Up: &components.AnimationData{
-			Frames:    []int{4, 195},
-			FrameRate: frameRate,
-		},
-		Right: &components.AnimationData{
-			Frames:    []int{3, 194},
-			FrameRate: frameRate,
-		},
-		Down: &components.AnimationData{
-			Frames:    []int{1, 192},
-			FrameRate: frameRate,
-		},
-		Left: &components.AnimationData{
-			Frames:    []int{2, 193},
-			FrameRate: frameRate,
-		},
-		SwordAttackUp: &components.AnimationData{
-			Frames: []int{165},
-		},
-		SwordAttackRight: &components.AnimationData{
-			Frames: []int{164},
-		},
-		SwordAttackLeft: &components.AnimationData{
-			Frames: []int{179},
-		},
-		SwordAttackDown: &components.AnimationData{
-			Frames: []int{180},
-		},
-	}
+	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
 
 	explosion := entities.Generic{
 		ID: gameWorld.NewEntityID(),
@@ -414,8 +385,10 @@ func run() {
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
+	// gameWorld.SystemsMap["input"] = inputSystem
 	gameWorld.AddSystem(inputSystem)
 	healthSystem := &systems.Health{}
+	// gameWorld.SystemsMap["health"] = healthSystem
 	gameWorld.AddSystem(healthSystem)
 	spatialSystem := &systems.Spatial{
 		Rand: r,
@@ -556,7 +529,7 @@ func run() {
 		Spritesheet: spritesheet,
 	})
 
-	addPlayerToSystems(player)
+	addEntityToSystem(player)
 	addSwordToSystems(sword)
 	addArrowToSystems(arrow)
 
@@ -924,6 +897,80 @@ func buildMoveableObstacle(x, y float64) entities.MoveableObstacle {
 	}
 }
 
+// NewPlayer builds a new Entity as a Player
+func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
+	return entities.Entity{
+		ID:       id,
+		Category: categories.Player,
+		ValidSystems: map[string]bool{
+			"input": true,
+		},
+		Health: &components.Health{
+			Total: 3,
+		},
+		Appearance: &components.Appearance{
+			Color: colornames.Green,
+		},
+		Spatial: &components.Spatial{
+			Width:  w,
+			Height: h,
+			Rect: pixel.R(
+				x,
+				y,
+				x+w,
+				y+h,
+			),
+			Shape:                imdraw.New(nil),
+			HitBox:               imdraw.New(nil),
+			HitBoxRadius:         15,
+			CollisionWithRectMod: 5,
+		},
+		Movement: &components.Movement{
+			Direction: direction.Down,
+			MaxSpeed:  7.0,
+			Speed:     0.0,
+		},
+		Coins: &components.Coins{
+			Coins: 0,
+		},
+		Dash: &components.Dash{
+			Charge:    0,
+			MaxCharge: 50,
+			SpeedMod:  7,
+		},
+		Animation: &components.Animation{
+			Up: &components.AnimationData{
+				Frames:    []int{4, 195},
+				FrameRate: frameRate,
+			},
+			Right: &components.AnimationData{
+				Frames:    []int{3, 194},
+				FrameRate: frameRate,
+			},
+			Down: &components.AnimationData{
+				Frames:    []int{1, 192},
+				FrameRate: frameRate,
+			},
+			Left: &components.AnimationData{
+				Frames:    []int{2, 193},
+				FrameRate: frameRate,
+			},
+			SwordAttackUp: &components.AnimationData{
+				Frames: []int{165},
+			},
+			SwordAttackRight: &components.AnimationData{
+				Frames: []int{164},
+			},
+			SwordAttackLeft: &components.AnimationData{
+				Frames: []int{179},
+			},
+			SwordAttackDown: &components.AnimationData{
+				Frames: []int{180},
+			},
+		},
+	}
+}
+
 func addCoinToSystem(coin entities.Coin) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
@@ -935,18 +982,9 @@ func addCoinToSystem(coin entities.Coin) {
 	}
 }
 
-func addPlayerToSystems(player entities.Player) {
+func addEntityToSystem(entity entities.Entity) {
 	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Input:
-			sys.Add(categories.Player, player.Movement, nil, player.Dash)
-		case *systems.Spatial:
-			sys.Add(categories.Player, 0, player.Spatial, player.Movement, player.Dash)
-		case *systems.Collision:
-			sys.Add(player.Category, 0, player.Spatial)
-		case *systems.Render:
-			sys.Add(player.Category, 0, player.Appearance, player.Spatial, player.Animation, player.Movement, nil)
-		}
+		system.AddEntity(entity)
 	}
 }
 

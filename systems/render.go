@@ -37,6 +37,23 @@ type Render struct {
 	collisionSwitches []renderEntity
 }
 
+// AddEntity adds an entity to the system
+func (s *Render) AddEntity(entity entities.Entity) {
+	r := renderEntity{
+		entity.ID,
+		entity.Category,
+		entity.Spatial,
+		entity.Appearance,
+		entity.Animation,
+		entity.Movement,
+		entity.Ignore,
+	}
+	switch entity.Category {
+	case categories.Player:
+		s.player = r
+	}
+}
+
 // Add adds one entity to the system
 func (s *Render) Add(
 	category categories.Category,

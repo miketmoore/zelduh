@@ -5,6 +5,7 @@ import (
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
+	"github.com/miketmoore/zelduh/entities"
 )
 
 type inputEntity struct {
@@ -32,6 +33,17 @@ func (s *Input) EnablePlayer() {
 	s.playerEnabled = true
 }
 
+// AddEntity adds an entity to the system
+func (s *Input) AddEntity(entity entities.Entity) {
+	switch entity.Category {
+	case categories.Player:
+		s.playerEntity = inputEntity{
+			Movement: entity.Movement,
+			Dash:     entity.Dash,
+		}
+	}
+}
+
 // Add adds an entity to the system
 func (s *Input) Add(category categories.Category, movement *components.Movement, ignore *components.Ignore, dash *components.Dash) {
 	switch category {
@@ -55,7 +67,7 @@ func (s *Input) Add(category categories.Category, movement *components.Movement,
 }
 
 // Update checks for player input
-func (s *Input) Update() {
+func (s Input) Update() {
 	if !s.playerEnabled {
 		return
 	}

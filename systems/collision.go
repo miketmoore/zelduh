@@ -41,6 +41,16 @@ type Collision struct {
 	PlayerCollisionWithBounds             func(bounds.Bound)
 }
 
+// AddEntity adds an entity to the system
+func (s *Collision) AddEntity(entity entities.Entity) {
+	switch entity.Category {
+	case categories.Player:
+		s.player = collisionEntity{
+			Spatial: entity.Spatial,
+		}
+	}
+}
+
 // Add adds the entity to the system
 func (s *Collision) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial) {
 	switch category {

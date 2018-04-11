@@ -30,6 +30,18 @@ type Spatial struct {
 	moveableObstacles []spatialEntity
 }
 
+// AddEntity adds an entity to the system
+func (s *Spatial) AddEntity(entity entities.Entity) {
+	switch entity.Category {
+	case categories.Player:
+		s.player = spatialEntity{
+			Spatial:  entity.Spatial,
+			Movement: entity.Movement,
+			Dash:     entity.Dash,
+		}
+	}
+}
+
 // Add adds an entity to the system
 func (s *Spatial) Add(category categories.Category, id entities.EntityID, spatial *components.Spatial, movement *components.Movement, dash *components.Dash) {
 	switch category {

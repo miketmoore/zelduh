@@ -9,11 +9,13 @@ import (
 // System is an interface
 type System interface {
 	Update()
+	AddEntity(entities.Entity)
 }
 
 // World is a world struct
 type World struct {
 	systems      []System
+	SystemsMap   map[string]System
 	lastEntityID entities.EntityID
 }
 
@@ -21,6 +23,7 @@ type World struct {
 func New() World {
 	return World{
 		lastEntityID: 0,
+		SystemsMap:   map[string]System{},
 	}
 }
 
