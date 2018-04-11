@@ -304,21 +304,7 @@ func run() {
 	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
 	sword := NewSword(gameWorld.NewEntityID(), spriteSize, spriteSize, player.Movement.Direction)
 	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize, player.Movement.Direction)
-
-	explosion := entities.Generic{
-		ID: gameWorld.NewEntityID(),
-		Animation: &components.Animation{
-			Expiration: 12,
-			Default: &components.AnimationData{
-				Frames: []int{
-					122, 122, 122,
-					123, 123, 123,
-					124, 124, 124,
-					125, 125, 125,
-				},
-			},
-		},
-	}
+	explosion := NewExplosion(gameWorld.NewEntityID())
 
 	isTransitioning := false
 	var transitionSide bounds.Bound
@@ -333,17 +319,6 @@ func run() {
 	var roomWarps map[entities.EntityID]WarpConfig
 
 	heartSprite := spritesheet[106]
-
-	// heart := entities.Generic{
-	// 	Category: categories.UI,
-	// 	Animation: &components.Animation{
-	// 		Default: &components.AnimationData{
-	// 			Frames: []int{106},
-	// 		},
-	// 	},
-	// }
-
-	// addHeartToSystems(heart)
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
@@ -418,7 +393,7 @@ func run() {
 						explosion.OnExpiration = func() {
 							dropCoin(explosion.Spatial.Rect.Min)
 						}
-						addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
+						addEntityToSystem(explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
 						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
@@ -443,7 +418,7 @@ func run() {
 					explosion.OnExpiration = func() {
 						dropCoin(explosion.Spatial.Rect.Min)
 					}
-					addGenericToSystems(categories.Explosion, explosion, enemySpatial.Rect.Min)
+					addEntityToSystem(explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
@@ -1021,6 +996,25 @@ func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) enti
 	}
 }
 
+// NewExplosion builds an explosion entity
+func NewExplosion(id entities.EntityID) entities.Entity {
+	return entities.Entity{
+		ID:       gameWorld.NewEntityID(),
+		Category: categories.Explosion,
+		Animation: &components.Animation{
+			Expiration: 12,
+			Default: &components.AnimationData{
+				Frames: []int{
+					122, 122, 122,
+					123, 123, 123,
+					124, 124, 124,
+					125, 125, 125,
+				},
+			},
+		},
+	}
+}
+
 func addCoinToSystem(coin entities.Coin) {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
@@ -1116,15 +1110,6 @@ func addCollisionSwitchesToSystem(collisionSwitches []entities.CollisionSwitch) 
 			for _, collisionSwitch := range collisionSwitches {
 				sys.Add(collisionSwitch.Category, 0, collisionSwitch.Appearance, collisionSwitch.Spatial, collisionSwitch.Animation, nil, nil)
 			}
-		}
-	}
-}
-
-func addGenericToSystems(category categories.Category, generic entities.Generic, v pixel.Vec) {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Render:
-			sys.Add(category, 0, nil, generic.Spatial, generic.Animation, nil, nil)
 		}
 	}
 }

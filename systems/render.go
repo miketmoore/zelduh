@@ -55,6 +55,8 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		s.sword = r
 	case categories.Arrow:
 		s.arrow = r
+	case categories.Explosion:
+		s.generic = append(s.generic, r)
 	}
 }
 
@@ -79,16 +81,12 @@ func (s *Render) Add(
 	}
 
 	switch category {
-
 	case categories.Enemy:
 		fallthrough
 	case categories.Coin:
 		fallthrough
 	case categories.MovableObstacle:
 		s.defaultEntities = append(s.defaultEntities, entity)
-
-	case categories.Explosion:
-		s.generic = append(s.generic, entity)
 	case categories.CollisionSwitch:
 		s.collisionSwitches = append(s.collisionSwitches, entity)
 	}
