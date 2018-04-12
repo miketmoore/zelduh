@@ -12,6 +12,7 @@ type EntityID int
 type Entity struct {
 	ID       EntityID
 	Category categories.Category
+	*components.Invincible
 	*components.Animation
 	*components.Appearance
 	*components.Coins

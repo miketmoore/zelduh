@@ -110,6 +110,8 @@ type ConnectedRooms struct {
 // EnemyConfig is used to build enemies
 type EnemyConfig struct {
 	W, H, X, Y, HitBoxRadius float64
+	Frames                   []int
+	Invincible               bool
 }
 
 // WarpConfig is used to build warps
@@ -189,8 +191,10 @@ func run() {
 		1: Room{
 			MapName: "overworldFourWallsDoorBottomRight",
 			EnemyConfigs: []EnemyConfig{
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20},
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20, []int{36, 37, 38, 39}, false},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20, []int{31, 32}, false},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 7, spriteSize * 9, 20, []int{51, 52}, true},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 8, spriteSize * 9, 20, []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92}, false},
 			},
 			WarpConfigs: []WarpConfig{
 				WarpConfig{
@@ -207,15 +211,15 @@ func run() {
 		2: Room{
 			MapName: "overworldFourWallsDoorTopBottom",
 			EnemyConfigs: []EnemyConfig{
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20},
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20, []int{36, 37, 38, 39}, false},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20, []int{36, 37, 38, 39}, false},
 			},
 		},
 		3: Room{
 			MapName: "overworldFourWallsDoorRightTopBottom",
 			EnemyConfigs: []EnemyConfig{
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20},
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 5, 20, []int{36, 37, 38, 39}, false},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 11, spriteSize * 9, 20, []int{36, 37, 38, 39}, false},
 			},
 		},
 		5: Room{
@@ -256,7 +260,7 @@ func run() {
 		10: Room{
 			MapName: "overworldFourWallsDoorLeft",
 			EnemyConfigs: []EnemyConfig{
-				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 9, 20},
+				EnemyConfig{spriteSize, spriteSize, spriteSize * 5, spriteSize * 9, 20, []int{36, 37, 38, 39}, false},
 			},
 		},
 		11: Room{
@@ -544,13 +548,7 @@ func run() {
 				}
 
 				for _, c := range rooms[currentRoomID].EnemyConfigs {
-					enemy := NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius)
-					enemy.Animation = &components.Animation{
-						Default: &components.AnimationData{
-							Frames:    []int{36, 37, 38, 39},
-							FrameRate: frameRate,
-						},
-					}
+					enemy := NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius, c.Frames, c.Invincible)
 					addEntityToSystem(enemy)
 				}
 
@@ -1045,11 +1043,14 @@ func NewCollisionSwitch(id entities.EntityID, w, h, x, y float64) entities.Entit
 }
 
 // NewEnemy builds a new enemy
-func NewEnemy(id entities.EntityID, w, h, x, y, hitRadius float64) entities.Entity {
+func NewEnemy(id entities.EntityID, w, h, x, y, hitRadius float64, frames []int, invincible bool) entities.Entity {
 	return entities.Entity{
 		ID:       id,
 		Category: categories.Enemy,
 		Health:   &components.Health{Total: 2},
+		Invincible: &components.Invincible{
+			Enabled: invincible,
+		},
 		Appearance: &components.Appearance{
 			Color: colornames.Red,
 		},
@@ -1073,6 +1074,12 @@ func NewEnemy(id entities.EntityID, w, h, x, y, hitRadius float64) entities.Enti
 			HitSpeed:     10.0,
 			HitBackMoves: 10,
 			MaxMoves:     100,
+		},
+		Animation: &components.Animation{
+			Default: &components.AnimationData{
+				Frames:    frames,
+				FrameRate: frameRate,
+			},
 		},
 	}
 }

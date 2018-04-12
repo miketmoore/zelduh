@@ -13,6 +13,7 @@ import (
 type collisionEntity struct {
 	ID entities.EntityID
 	*components.Spatial
+	*components.Invincible
 }
 
 // Collision is a custom system for detecting collisions and what to do when they occur
@@ -59,6 +60,7 @@ func (s *Collision) AddEntity(entity entities.Entity) {
 	case categories.CollisionSwitch:
 		s.collisionSwitches = append(s.collisionSwitches, r)
 	case categories.Enemy:
+		r.Invincible = entity.Invincible
 		s.enemies = append(s.enemies, r)
 	case categories.Coin:
 		s.coins = append(s.coins, r)
@@ -145,18 +147,20 @@ func (s *Collision) Update() {
 			s.PlayerCollisionWithEnemy(enemy.ID)
 		}
 
-		if isCircleCollision(
-			s.sword.Spatial.HitBoxRadius,
-			enemy.Spatial.HitBoxRadius,
-			w, h, s.sword.Spatial.Rect, enemyR) {
-			s.SwordCollisionWithEnemy(enemy.ID)
-		}
+		if !enemy.Invincible.Enabled {
+			if isCircleCollision(
+				s.sword.Spatial.HitBoxRadius,
+				enemy.Spatial.HitBoxRadius,
+				w, h, s.sword.Spatial.Rect, enemyR) {
+				s.SwordCollisionWithEnemy(enemy.ID)
+			}
 
-		if isCircleCollision(
-			s.arrow.Spatial.HitBoxRadius,
-			enemy.Spatial.HitBoxRadius,
-			w, h, s.arrow.Spatial.Rect, enemyR) {
-			s.ArrowCollisionWithEnemy(enemy.ID)
+			if isCircleCollision(
+				s.arrow.Spatial.HitBoxRadius,
+				enemy.Spatial.HitBoxRadius,
+				w, h, s.arrow.Spatial.Rect, enemyR) {
+				s.ArrowCollisionWithEnemy(enemy.ID)
+			}
 		}
 	}
 	for _, coin := range s.coins {

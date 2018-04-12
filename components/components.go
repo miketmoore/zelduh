@@ -40,6 +40,10 @@ type Ignore struct {
 	Value bool
 }
 
+type Invincible struct {
+	Enabled bool
+}
+
 // Movement contains data about movement
 type Movement struct {
 	LastDirection  direction.Name
