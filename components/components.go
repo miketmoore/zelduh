@@ -40,6 +40,7 @@ type Ignore struct {
 	Value bool
 }
 
+// Invincible is used to track if an enemy is immune to damage of all kinds
 type Invincible struct {
 	Enabled bool
 }
@@ -55,6 +56,7 @@ type Movement struct {
 	HitSpeed       float64
 	MovingFromHit  bool
 	HitBackMoves   int
+	PatternName    string
 }
 
 // Spatial contains spatial data

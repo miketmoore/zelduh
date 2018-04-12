@@ -169,7 +169,12 @@ func (s *Spatial) Update() {
 
 	for i := 0; i < len(s.enemies); i++ {
 		enemy := s.enemies[i]
-		moveEnemy(s, enemy)
+		switch enemy.Movement.PatternName {
+		case "random":
+			s.moveEnemyRandom(enemy)
+		case "left-right":
+			s.moveEnemyLeftRight(enemy)
+		}
 	}
 }
 
@@ -245,7 +250,30 @@ func (s *Spatial) movePlayer() {
 	}
 }
 
-func moveEnemy(s *Spatial, enemy *spatialEntity) {
+func (s *Spatial) moveEnemyRandom(enemy *spatialEntity) {
+	if enemy.Movement.RemainingMoves == 0 {
+		enemy.Movement.MovingFromHit = false
+		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
+		enemy.Movement.Direction = direction.Rand()
+	} else if enemy.Movement.RemainingMoves > 0 {
+		var speed float64
+		if enemy.Movement.MovingFromHit {
+			speed = enemy.Movement.HitSpeed
+		} else {
+			speed = enemy.Movement.MaxSpeed
+		}
+		enemy.Spatial.PrevRect = enemy.Spatial.Rect
+		moveVec := delta(enemy.Movement.Direction, speed, speed)
+		enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
+		enemy.Movement.RemainingMoves--
+	} else {
+		enemy.Movement.MovingFromHit = false
+		enemy.Movement.RemainingMoves = int(enemy.Spatial.Rect.W())
+	}
+}
+
+// TODO
+func (s *Spatial) moveEnemyLeftRight(enemy *spatialEntity) {
 	if enemy.Movement.RemainingMoves == 0 {
 		enemy.Movement.MovingFromHit = false
 		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
