@@ -64,7 +64,6 @@ var (
 )
 
 const (
-	spriteSize      float64 = 48
 	s               float64 = 48
 	spritesheetPath string  = "assets/spritesheet.png"
 )
@@ -259,10 +258,10 @@ func run() {
 			WarpConfigs: []WarpConfig{
 				WarpConfig{
 					WarpToRoomID: 6,
-					W:            spriteSize,
-					H:            spriteSize,
-					X:            spriteSize * 3,
-					Y:            spriteSize * 7,
+					W:            s,
+					H:            s,
+					X:            s * 3,
+					Y:            s * 7,
 					IsAnimated:   true,
 					HitBoxRadius: 5,
 				},
@@ -279,18 +278,18 @@ func run() {
 			WarpConfigs: []WarpConfig{
 				WarpConfig{
 					WarpToRoomID: 11,
-					W:            spriteSize,
-					H:            spriteSize,
-					X:            (spriteSize * 7) + spriteSize/2,
-					Y:            (spriteSize * 9) + spriteSize/2,
+					W:            s,
+					H:            s,
+					X:            (s * 7) + s/2,
+					Y:            (s * 9) + s/2,
 					HitBoxRadius: 30,
 				},
 				WarpConfig{
 					WarpToRoomID: 11,
-					W:            spriteSize,
-					H:            spriteSize,
-					X:            (spriteSize * 8) + spriteSize/2,
-					Y:            (spriteSize * 9) + spriteSize/2,
+					W:            s,
+					H:            s,
+					X:            (s * 8) + s/2,
+					Y:            (s * 9) + s/2,
 					HitBoxRadius: 30,
 				},
 			},
@@ -300,10 +299,10 @@ func run() {
 			MapName: "overworldFourWallsDoorLeftTop",
 			MoveableObstacleConfigs: []MoveableObstacleConfig{
 				MoveableObstacleConfig{
-					W: spriteSize,
-					H: spriteSize,
-					X: (spriteSize * 8) + spriteSize/2,
-					Y: (spriteSize * 9) + spriteSize/2,
+					W: s,
+					H: s,
+					X: (s * 8) + s/2,
+					Y: (s * 9) + s/2,
 				},
 			},
 		},
@@ -318,18 +317,18 @@ func run() {
 				// South door of cave - warp to cave entrance
 				WarpConfig{
 					WarpToRoomID: 5,
-					W:            spriteSize,
-					H:            spriteSize,
-					X:            (spriteSize * 6) + spriteSize + (spriteSize / 2.5),
-					Y:            (spriteSize * 1) + spriteSize + (spriteSize / 2.5),
+					W:            s,
+					H:            s,
+					X:            (s * 6) + s + (s / 2.5),
+					Y:            (s * 1) + s + (s / 2.5),
 					HitBoxRadius: 15,
 				},
 				WarpConfig{
 					WarpToRoomID: 5,
-					W:            spriteSize,
-					H:            spriteSize,
-					X:            (spriteSize * 7) + spriteSize + (spriteSize / 2.5),
-					Y:            (spriteSize * 1) + spriteSize + (spriteSize / 2.5),
+					W:            s,
+					H:            s,
+					X:            (s * 7) + s + (s / 2.5),
+					Y:            (s * 1) + s + (s / 2.5),
 					HitBoxRadius: 15,
 				},
 			},
@@ -354,21 +353,21 @@ func run() {
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
-	player := NewPlayer(gameWorld.NewEntityID(), spriteSize, spriteSize, mapW/2, mapH/2)
-	sword := NewSword(gameWorld.NewEntityID(), spriteSize, spriteSize, player.Movement.Direction)
-	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize, player.Movement.Direction)
-	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, spriteSize, spriteSize)
+	player := NewPlayer(gameWorld.NewEntityID(), s, s, mapW/2, mapH/2)
+	sword := NewSword(gameWorld.NewEntityID(), s, s, player.Movement.Direction)
+	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, s, s, player.Movement.Direction)
+	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, s, s)
 	explosion := NewExplosion(gameWorld.NewEntityID())
 
 	hearts := []entities.Entity{
-		NewHeart(gameWorld.NewEntityID(), mapX+16, mapY+mapH, spriteSize, spriteSize),
-		NewHeart(gameWorld.NewEntityID(), mapX+48, mapY+mapH, spriteSize, spriteSize),
-		NewHeart(gameWorld.NewEntityID(), mapX+80, mapY+mapH, spriteSize, spriteSize),
+		NewHeart(gameWorld.NewEntityID(), mapX+16, mapY+mapH, s, s),
+		NewHeart(gameWorld.NewEntityID(), mapX+48, mapY+mapH, s, s),
+		NewHeart(gameWorld.NewEntityID(), mapX+80, mapY+mapH, s, s),
 	}
 
 	isTransitioning := false
 	var transitionSide bounds.Bound
-	var transitionTimerStart = float64(spriteSize)
+	var transitionTimerStart = float64(s)
 	var transitionTimer int
 	var transitionStyle transitionStyle
 	currentState := gamestate.Start
@@ -390,7 +389,7 @@ func run() {
 	}
 	dropCoin := func(v pixel.Vec) {
 		fmt.Printf("Drop coin\n")
-		coin := NewCoin(gameWorld.NewEntityID(), v.X, v.Y, spriteSize, spriteSize)
+		coin := NewCoin(gameWorld.NewEntityID(), v.X, v.Y, s, s)
 		addEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
@@ -435,8 +434,8 @@ func run() {
 						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
 						explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
 						explosion.Spatial = &components.Spatial{
-							Width:  spriteSize,
-							Height: spriteSize,
+							Width:  s,
+							Height: s,
 							Rect:   enemySpatial.Rect,
 						}
 						explosion.OnExpiration = func() {
@@ -445,7 +444,7 @@ func run() {
 						addEntityToSystem(explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
-						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize)
+						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, s)
 					}
 				}
 
@@ -460,8 +459,8 @@ func run() {
 					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
 					explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
 					explosion.Spatial = &components.Spatial{
-						Width:  spriteSize,
-						Height: spriteSize,
+						Width:  s,
+						Height: s,
 						Rect:   enemySpatial.Rect,
 					}
 					explosion.OnExpiration = func() {
@@ -470,7 +469,7 @@ func run() {
 					addEntityToSystem(explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, spriteSize*3)
+					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, s*3)
 				}
 			}
 		},
@@ -662,16 +661,16 @@ func run() {
 				removeAllMoveableObstaclesFromSystems()
 
 				inc := (transitionTimerStart - float64(transitionTimer))
-				incY := inc * (mapH / spriteSize)
-				incX := inc * (mapW / spriteSize)
+				incY := inc * (mapH / s)
+				incX := inc * (mapW / s)
 				modY := 0.0
 				modYNext := 0.0
 				modX := 0.0
 				modXNext := 0.0
 				playerModX := 0.0
 				playerModY := 0.0
-				playerIncY := ((mapH / spriteSize) - 1) + 7
-				playerIncX := ((mapW / spriteSize) - 1) + 7
+				playerIncY := ((mapH / s) - 1) + 7
+				playerIncX := ((mapW / s) - 1) + 7
 				if transitionSide == "bottom" && rooms[currentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - mapH
@@ -705,8 +704,8 @@ func run() {
 				player.Spatial.Rect = pixel.R(
 					player.Spatial.Rect.Min.X+playerModX,
 					player.Spatial.Rect.Min.Y+playerModY,
-					player.Spatial.Rect.Min.X+playerModX+spriteSize,
-					player.Spatial.Rect.Min.Y+playerModY+spriteSize,
+					player.Spatial.Rect.Min.X+playerModX+s,
+					player.Spatial.Rect.Min.Y+playerModY+s,
 				)
 
 				gameWorld.Update()
@@ -815,9 +814,9 @@ func NewObstacle(id entities.EntityID, x, y float64) entities.Entity {
 		ID:       gameWorld.NewEntityID(),
 		Category: categories.Obstacle,
 		Spatial: &components.Spatial{
-			Width:  spriteSize,
-			Height: spriteSize,
-			Rect:   pixel.R(x, y, x+spriteSize, y+spriteSize),
+			Width:  s,
+			Height: s,
+			Rect:   pixel.R(x, y, x+s, y+s),
 			Shape:  imdraw.New(nil),
 		},
 	}
@@ -1228,8 +1227,8 @@ func parseTmxFile(filename string) tmxreader.TmxMap {
 
 // this is a map of pixel engine sprites
 func buildSpritesheet() map[int]*pixel.Sprite {
-	cols := pic.Bounds().W() / spriteSize
-	rows := pic.Bounds().H() / spriteSize
+	cols := pic.Bounds().W() / s
+	rows := pic.Bounds().H() / s
 
 	maxIndex := (rows * cols) - 1.0
 
@@ -1241,10 +1240,10 @@ func buildSpritesheet() map[int]*pixel.Sprite {
 			x := col
 			y := math.Abs(rows-row) - 1
 			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
-				x*spriteSize,
-				y*spriteSize,
-				x*spriteSize+spriteSize,
-				y*spriteSize+spriteSize,
+				x*s,
+				y*s,
+				x*s+s,
+				y*s+s,
 			))
 			index--
 			id--
@@ -1277,8 +1276,8 @@ func buildMapDrawData() map[string]MapData {
 			for row := 0; row <= len(records); row++ {
 				if len(records) > row {
 					for col := 0; col < len(records[row])-1; col++ {
-						y := float64(11-row) * spriteSize
-						x := float64(col) * spriteSize
+						y := float64(11-row) * s
+						x := float64(col) * s
 
 						record := records[row][col]
 						spriteID, err := strconv.Atoi(record)
@@ -1286,7 +1285,7 @@ func buildMapDrawData() map[string]MapData {
 							panic(err)
 						}
 						mrd := mapDrawData{
-							Rect:     pixel.R(x, y, x+spriteSize, y+spriteSize),
+							Rect:     pixel.R(x, y, x+s, y+s),
 							SpriteID: spriteID,
 						}
 						md.Data = append(md.Data, mrd)
@@ -1329,8 +1328,8 @@ func drawMapBGImage(name string, modX, modY float64) {
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+mapX+modX+spriteSize/2,
-				vec.Y+mapY+modY+spriteSize/2,
+				vec.X+mapX+modX+s/2,
+				vec.Y+mapY+modY+s/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -1345,11 +1344,11 @@ func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Enti
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+mapX+modX+spriteSize/2,
-				vec.Y+mapY+modY+spriteSize/2,
+				vec.X+mapX+modX+s/2,
+				vec.Y+mapY+modY+s/2,
 			)
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				obstacle := NewObstacle(gameWorld.NewEntityID(), movedVec.X-spriteSize/2, movedVec.Y-spriteSize/2)
+				obstacle := NewObstacle(gameWorld.NewEntityID(), movedVec.X-s/2, movedVec.Y-s/2)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
