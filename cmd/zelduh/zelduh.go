@@ -254,6 +254,13 @@ var entityPresets = map[string]enemyPresetFn{
 	},
 }
 
+func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
+	e := entityPresets["warpstone"](X, Y)
+	e.WarpToRoomID = 6
+	e.HitBoxRadius = 5
+	return e
+}
+
 func run() {
 
 	gameWorld = world.New()
@@ -263,13 +270,7 @@ func run() {
 		1: Room{
 			MapName: "overworldFourWallsDoorBottomRight",
 			EntityConfigs: []EntityConfig{
-				// warp stone
-				(func() EntityConfig {
-					e := entityPresets["warpstone"](3, 7)
-					e.WarpToRoomID = 6
-					e.HitBoxRadius = 5
-					return e
-				})(),
+				presetWarpStone(3, 7, 6, 5),
 				entityPresets["skull"](5, 5),
 				entityPresets["skeleton"](11, 9),
 				entityPresets["spinner"](7, 9),
