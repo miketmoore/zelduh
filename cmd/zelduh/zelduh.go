@@ -242,6 +242,16 @@ var entityPresets = map[string]enemyPresetFn{
 			Direction:    direction.Right,
 		}
 	},
+	"warpstone": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category:     categories.Warp,
+			X:            s * xTiles,
+			Y:            s * yTiles,
+			W:            s,
+			H:            s,
+			SpriteFrames: spriteSets["warpStone"],
+		}
+	},
 }
 
 func run() {
@@ -254,16 +264,12 @@ func run() {
 			MapName: "overworldFourWallsDoorBottomRight",
 			EntityConfigs: []EntityConfig{
 				// warp stone
-				EntityConfig{
-					Category:     categories.Warp,
-					X:            s * 3,
-					Y:            s * 7,
-					W:            s,
-					H:            s,
-					WarpToRoomID: 6,
-					HitBoxRadius: 5,
-					SpriteFrames: spriteSets["warpStone"],
-				},
+				(func() EntityConfig {
+					e := entityPresets["warpstone"](3, 7)
+					e.WarpToRoomID = 6
+					e.HitBoxRadius = 5
+					return e
+				})(),
 				entityPresets["skull"](5, 5),
 				entityPresets["skeleton"](11, 9),
 				entityPresets["spinner"](7, 9),
