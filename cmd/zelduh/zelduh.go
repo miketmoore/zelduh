@@ -107,35 +107,29 @@ type ConnectedRooms struct {
 	Left   RoomID
 }
 
-// EnemyConfig is used to build enemies
-type EnemyConfig struct {
-	W, H, X, Y, HitBoxRadius float64
-	Frames                   []int
-	Invincible               bool
-	PatternName              string
-	Direction                direction.Name
-}
-
-// WarpConfig is used to build warps
-type WarpConfig struct {
-	W, H, X, Y, HitBoxRadius float64
-	WarpToRoomID             RoomID
-	IsAnimated               bool
-}
-
 // MoveableObstacleConfig is used to build moveable obstacles
 type MoveableObstacleConfig struct {
 	W, H, X, Y float64
 	IsAnimated bool
 }
 
+// EntityConfig is used to simplify building entities
+type EntityConfig struct {
+	Category                 categories.Category
+	X, Y, W, H, HitBoxRadius float64
+	SpriteFrames             []int
+	WarpToRoomID             RoomID
+	Invincible               bool
+	PatternName              string
+	Direction                direction.Name
+}
+
 // Room represents one map section
 type Room struct {
 	MapName                 string
 	ConnectedRooms          ConnectedRooms
-	EnemyConfigs            []EnemyConfig
-	WarpConfigs             []WarpConfig
 	MoveableObstacleConfigs []MoveableObstacleConfig
+	EntityConfigs           []EntityConfig
 }
 
 var rooms map[RoomID]Room
@@ -184,7 +178,7 @@ const (
 
 const frameRate int = 5
 
-type enemyPresetFn = func(xTiles, yTiles float64) EnemyConfig
+type enemyPresetFn = func(xTiles, yTiles float64) EntityConfig
 
 var spriteSets = map[string][]int{
 	"eyeburrower":      []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
@@ -203,42 +197,46 @@ var spriteSets = map[string][]int{
 	"playerSwordDown":  []int{180},
 }
 
-var enemyPresets = map[string]enemyPresetFn{
-	"eyeburrower": func(xTiles, yTiles float64) EnemyConfig {
-		return EnemyConfig{
-			W: s, H: s, X: s * xTiles, Y: s * yTiles,
+var entityPresets = map[string]enemyPresetFn{
+	"eyeburrower": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category: categories.Enemy,
+			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       spriteSets["eyeburrower"],
+			SpriteFrames: spriteSets["eyeburrower"],
 			Invincible:   false,
 			PatternName:  "random",
 			Direction:    direction.Down,
 		}
 	},
-	"skeleton": func(xTiles, yTiles float64) EnemyConfig {
-		return EnemyConfig{
-			W: s, H: s, X: s * xTiles, Y: s * yTiles,
+	"skeleton": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category: categories.Enemy,
+			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       spriteSets["skeleton"],
+			SpriteFrames: spriteSets["skeleton"],
 			Invincible:   false,
 			PatternName:  "random",
 			Direction:    direction.Down,
 		}
 	},
-	"skull": func(xTiles, yTiles float64) EnemyConfig {
-		return EnemyConfig{
-			W: s, H: s, X: s * xTiles, Y: s * yTiles,
+	"skull": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category: categories.Enemy,
+			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       spriteSets["skull"],
+			SpriteFrames: spriteSets["skull"],
 			Invincible:   false,
 			PatternName:  "random",
 			Direction:    direction.Down,
 		}
 	},
-	"spinner": func(xTiles, yTiles float64) EnemyConfig {
-		return EnemyConfig{
-			W: s, H: s, X: s * xTiles, Y: s * yTiles,
+	"spinner": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category: categories.Enemy,
+			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       spriteSets["spinner"],
+			SpriteFrames: spriteSets["spinner"],
 			Invincible:   true,
 			PatternName:  "left-right",
 			Direction:    direction.Right,
@@ -254,22 +252,22 @@ func run() {
 	rooms = map[RoomID]Room{
 		1: Room{
 			MapName: "overworldFourWallsDoorBottomRight",
-			EnemyConfigs: []EnemyConfig{
-				enemyPresets["skull"](5, 5),
-				enemyPresets["skeleton"](11, 9),
-				enemyPresets["spinner"](7, 9),
-				enemyPresets["eyeburrower"](8, 9),
-			},
-			WarpConfigs: []WarpConfig{
-				WarpConfig{
-					WarpToRoomID: 6,
-					W:            s,
-					H:            s,
+			EntityConfigs: []EntityConfig{
+				// warp stone
+				EntityConfig{
+					Category:     categories.Warp,
 					X:            s * 3,
 					Y:            s * 7,
-					IsAnimated:   true,
+					W:            s,
+					H:            s,
+					WarpToRoomID: 6,
 					HitBoxRadius: 5,
+					SpriteFrames: spriteSets["warpStone"],
 				},
+				entityPresets["skull"](5, 5),
+				entityPresets["skeleton"](11, 9),
+				entityPresets["spinner"](7, 9),
+				entityPresets["eyeburrower"](8, 9),
 			},
 		},
 		2: Room{
@@ -280,8 +278,9 @@ func run() {
 		},
 		5: Room{
 			MapName: "rockWithCaveEntrance",
-			WarpConfigs: []WarpConfig{
-				WarpConfig{
+			EntityConfigs: []EntityConfig{
+				EntityConfig{
+					Category:     categories.Warp,
 					WarpToRoomID: 11,
 					W:            s,
 					H:            s,
@@ -289,7 +288,8 @@ func run() {
 					Y:            (s * 9) + s/2,
 					HitBoxRadius: 30,
 				},
-				WarpConfig{
+				EntityConfig{
+					Category:     categories.Warp,
 					WarpToRoomID: 11,
 					W:            s,
 					H:            s,
@@ -318,9 +318,10 @@ func run() {
 		},
 		11: Room{
 			MapName: "dungeonFourDoors",
-			WarpConfigs: []WarpConfig{
+			EntityConfigs: []EntityConfig{
 				// South door of cave - warp to cave entrance
-				WarpConfig{
+				EntityConfig{
+					Category:     categories.Warp,
 					WarpToRoomID: 5,
 					W:            s,
 					H:            s,
@@ -328,7 +329,8 @@ func run() {
 					Y:            (s * 1) + s + (s / 2.5),
 					HitBoxRadius: 15,
 				},
-				WarpConfig{
+				EntityConfig{
+					Category:     categories.Warp,
 					WarpToRoomID: 5,
 					W:            s,
 					H:            s,
@@ -380,7 +382,7 @@ func run() {
 	var currentRoomID RoomID = 1
 	var nextRoomID RoomID
 
-	var roomWarps map[entities.EntityID]WarpConfig
+	var roomWarps map[entities.EntityID]EntityConfig
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
@@ -495,17 +497,17 @@ func run() {
 		},
 		PlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			fmt.Printf("PlayerCollisionWithSwitch %d\n", collisionSwitchID)
-			warpConfig, ok := roomWarps[collisionSwitchID]
+			entityConfig, ok := roomWarps[collisionSwitchID]
 			if ok {
-				fmt.Printf("Warp Config: %v\n", warpConfig)
-				fmt.Printf("Warp to room ID %v\n", warpConfig.WarpToRoomID)
+				fmt.Printf("Warp Config: %v\n", entityConfig)
+				fmt.Printf("Warp to room ID %v\n", entityConfig.WarpToRoomID)
 				if !isTransitioning {
 					isTransitioning = true
 					transitionStyle = transitionWarp
 					transitionTimer = 1
 					currentState = gamestate.MapTransition
 					addEntities = true
-					nextRoomID = warpConfig.WarpToRoomID
+					nextRoomID = entityConfig.WarpToRoomID
 				}
 			}
 		},
@@ -600,25 +602,43 @@ func run() {
 					addEntityToSystem(entity)
 				}
 
-				for _, c := range rooms[currentRoomID].EnemyConfigs {
-					enemy := NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius, c.Frames, c.Invincible, c.PatternName, c.Direction)
-					addEntityToSystem(enemy)
-				}
+				roomWarps = map[entities.EntityID]EntityConfig{}
 
-				roomWarps = map[entities.EntityID]WarpConfig{}
-				for _, c := range rooms[currentRoomID].WarpConfigs {
-					warp := NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
-					if c.IsAnimated {
-						warp.Animation = &components.Animation{
-							Default: &components.AnimationData{
-								Frames:    spriteSets["warpStone"],
-								FrameRate: frameRate,
-							},
+				for _, c := range rooms[currentRoomID].EntityConfigs {
+					var entity entities.Entity
+					switch c.Category {
+					case categories.MovableObstacle:
+						entity = NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+						if len(c.SpriteFrames) > 0 {
+							entity.Animation = &components.Animation{
+								Default: &components.AnimationData{
+									Frames:    c.SpriteFrames,
+									FrameRate: frameRate,
+								},
+							}
 						}
+					case categories.Warp:
+						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+						if len(c.SpriteFrames) > 0 {
+							entity.Animation = &components.Animation{
+								Default: &components.AnimationData{
+									Frames:    c.SpriteFrames,
+									FrameRate: frameRate,
+								},
+							}
+						}
+						entity.Spatial.HitBoxRadius = c.HitBoxRadius
+					case categories.Enemy:
+						fmt.Printf("Add enemy to room...\n")
+						entity = NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius, c.SpriteFrames, c.Invincible, c.PatternName, c.Direction)
 					}
-					warp.Spatial.HitBoxRadius = c.HitBoxRadius
-					addEntityToSystem(warp)
-					roomWarps[warp.ID] = c
+
+					addEntityToSystem(entity)
+
+					switch c.Category {
+					case categories.Warp:
+						roomWarps[entity.ID] = c
+					}
 				}
 			}
 
