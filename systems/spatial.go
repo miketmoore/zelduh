@@ -272,12 +272,16 @@ func (s *Spatial) moveEnemyRandom(enemy *spatialEntity) {
 	}
 }
 
-// TODO
 func (s *Spatial) moveEnemyLeftRight(enemy *spatialEntity) {
 	if enemy.Movement.RemainingMoves == 0 {
 		enemy.Movement.MovingFromHit = false
-		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
-		enemy.Movement.Direction = direction.Rand()
+		enemy.Movement.RemainingMoves = enemy.Movement.MaxMoves
+		switch enemy.Movement.Direction {
+		case direction.Left:
+			enemy.Movement.Direction = direction.Right
+		case direction.Right:
+			enemy.Movement.Direction = direction.Left
+		}
 	} else if enemy.Movement.RemainingMoves > 0 {
 		var speed float64
 		if enemy.Movement.MovingFromHit {
