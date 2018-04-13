@@ -186,7 +186,7 @@ const frameRate int = 5
 
 type enemyPresetFn = func(xTiles, yTiles float64) EnemyConfig
 
-var animationFrameSets = map[string][]int{
+var spriteSets = map[string][]int{
 	"eyeburrower":      []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
 	"skeleton":         []int{31, 32},
 	"skull":            []int{36, 37, 38, 39},
@@ -208,7 +208,7 @@ var enemyPresets = map[string]enemyPresetFn{
 		return EnemyConfig{
 			W: s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       animationFrameSets["eyeburrower"],
+			Frames:       spriteSets["eyeburrower"],
 			Invincible:   false,
 			PatternName:  "random",
 			Direction:    direction.Down,
@@ -218,7 +218,7 @@ var enemyPresets = map[string]enemyPresetFn{
 		return EnemyConfig{
 			W: s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       animationFrameSets["skeleton"],
+			Frames:       spriteSets["skeleton"],
 			Invincible:   false,
 			PatternName:  "random",
 			Direction:    direction.Down,
@@ -228,7 +228,7 @@ var enemyPresets = map[string]enemyPresetFn{
 		return EnemyConfig{
 			W: s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       animationFrameSets["skull"],
+			Frames:       spriteSets["skull"],
 			Invincible:   false,
 			PatternName:  "random",
 			Direction:    direction.Down,
@@ -238,7 +238,7 @@ var enemyPresets = map[string]enemyPresetFn{
 		return EnemyConfig{
 			W: s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
-			Frames:       animationFrameSets["spinner"],
+			Frames:       spriteSets["spinner"],
 			Invincible:   true,
 			PatternName:  "left-right",
 			Direction:    direction.Right,
@@ -593,7 +593,7 @@ func run() {
 					entity := NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					entity.Animation = &components.Animation{
 						Default: &components.AnimationData{
-							Frames:    animationFrameSets["puzzleBox"],
+							Frames:    spriteSets["puzzleBox"],
 							FrameRate: frameRate,
 						},
 					}
@@ -611,7 +611,7 @@ func run() {
 					if c.IsAnimated {
 						warp.Animation = &components.Animation{
 							Default: &components.AnimationData{
-								Frames:    animationFrameSets["warpStone"],
+								Frames:    spriteSets["warpStone"],
 								FrameRate: frameRate,
 							},
 						}
@@ -867,32 +867,32 @@ func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 		},
 		Animation: &components.Animation{
 			Up: &components.AnimationData{
-				Frames:    animationFrameSets["playerUp"],
+				Frames:    spriteSets["playerUp"],
 				FrameRate: frameRate,
 			},
 			Right: &components.AnimationData{
-				Frames:    animationFrameSets["playerRight"],
+				Frames:    spriteSets["playerRight"],
 				FrameRate: frameRate,
 			},
 			Down: &components.AnimationData{
-				Frames:    animationFrameSets["playerDown"],
+				Frames:    spriteSets["playerDown"],
 				FrameRate: frameRate,
 			},
 			Left: &components.AnimationData{
-				Frames:    animationFrameSets["playerLeft"],
+				Frames:    spriteSets["playerLeft"],
 				FrameRate: frameRate,
 			},
 			SwordAttackUp: &components.AnimationData{
-				Frames: animationFrameSets["playerSwordUp"],
+				Frames: spriteSets["playerSwordUp"],
 			},
 			SwordAttackRight: &components.AnimationData{
-				Frames: animationFrameSets["playerSwordRight"],
+				Frames: spriteSets["playerSwordRight"],
 			},
 			SwordAttackLeft: &components.AnimationData{
-				Frames: animationFrameSets["playerSwordLeft"],
+				Frames: spriteSets["playerSwordLeft"],
 			},
 			SwordAttackDown: &components.AnimationData{
-				Frames: animationFrameSets["playerSwordDown"],
+				Frames: spriteSets["playerSwordDown"],
 			},
 		},
 	}
