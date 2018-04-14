@@ -282,6 +282,14 @@ func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
 	return e
 }
 
+type RoomTransition struct {
+	Active bool
+	Side   bounds.Bound
+	Start  float64
+	Timer  int
+	Style  transitionStyle
+}
+
 func run() {
 
 	gameWorld = world.New()
@@ -404,11 +412,9 @@ func run() {
 		NewHeart(gameWorld.NewEntityID(), mapX+80, mapY+mapH, s, s),
 	}
 
-	isTransitioning := false
-	var transitionSide bounds.Bound
-	var transitionTimerStart = float64(s)
-	var transitionTimer int
-	var transitionStyle transitionStyle
+	roomTransition := RoomTransition{}
+	roomTransition.Start = float64(s)
+
 	currentState := gamestate.Start
 	addEntities := true
 	var currentRoomID RoomID = 1
@@ -440,11 +446,11 @@ func run() {
 			mapY+mapH,
 		),
 		PlayerCollisionWithBounds: func(side bounds.Bound) {
-			if !isTransitioning {
-				isTransitioning = true
-				transitionSide = side
-				transitionStyle = transitionSlide
-				transitionTimer = int(transitionTimerStart)
+			if !roomTransition.Active {
+				roomTransition.Active = true
+				roomTransition.Side = side
+				roomTransition.Style = transitionSlide
+				roomTransition.Timer = int(roomTransition.Start)
 				currentState = gamestate.MapTransition
 				addEntities = true
 			}
@@ -533,10 +539,10 @@ func run() {
 			if ok {
 				fmt.Printf("Warp Config: %v\n", entityConfig)
 				fmt.Printf("Warp to room ID %v\n", entityConfig.WarpToRoomID)
-				if !isTransitioning {
-					isTransitioning = true
-					transitionStyle = transitionWarp
-					transitionTimer = 1
+				if !roomTransition.Active {
+					roomTransition.Active = true
+					roomTransition.Style = transitionWarp
+					roomTransition.Timer = 1
 					currentState = gamestate.MapTransition
 					addEntities = true
 					nextRoomID = entityConfig.WarpToRoomID
@@ -694,8 +700,8 @@ func run() {
 			}
 		case gamestate.MapTransition:
 			inputSystem.DisablePlayer()
-			if transitionStyle == transitionSlide && transitionTimer > 0 {
-				transitionTimer--
+			if roomTransition.Style == transitionSlide && roomTransition.Timer > 0 {
+				roomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
@@ -704,7 +710,7 @@ func run() {
 				removeAllCollisionSwitchesFromSystems()
 				removeAllMoveableObstaclesFromSystems()
 
-				inc := (transitionTimerStart - float64(transitionTimer))
+				inc := (roomTransition.Start - float64(roomTransition.Timer))
 				incY := inc * (mapH / s)
 				incX := inc * (mapW / s)
 				modY := 0.0
@@ -715,23 +721,23 @@ func run() {
 				playerModY := 0.0
 				playerIncY := ((mapH / s) - 1) + 7
 				playerIncX := ((mapW / s) - 1) + 7
-				if transitionSide == "bottom" && rooms[currentRoomID].ConnectedRooms.Bottom != 0 {
+				if roomTransition.Side == "bottom" && rooms[currentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - mapH
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Bottom
 
 					playerModY += playerIncY
-				} else if transitionSide == "top" && rooms[currentRoomID].ConnectedRooms.Top != 0 {
+				} else if roomTransition.Side == "top" && rooms[currentRoomID].ConnectedRooms.Top != 0 {
 					modY = -incY
 					modYNext = -incY + mapH
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Top
 					playerModY -= playerIncY
-				} else if transitionSide == "left" && rooms[currentRoomID].ConnectedRooms.Left != 0 {
+				} else if roomTransition.Side == "left" && rooms[currentRoomID].ConnectedRooms.Left != 0 {
 					modX = incX
 					modXNext = incX - mapW
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Left
 					playerModX += playerIncX
-				} else if transitionSide == "right" && rooms[currentRoomID].ConnectedRooms.Right != 0 {
+				} else if roomTransition.Side == "right" && rooms[currentRoomID].ConnectedRooms.Right != 0 {
 					modX = -incX
 					modXNext = -incX + mapW
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Right
@@ -753,8 +759,8 @@ func run() {
 				)
 
 				gameWorld.Update()
-			} else if transitionStyle == transitionWarp && transitionTimer > 0 {
-				transitionTimer--
+			} else if roomTransition.Style == transitionWarp && roomTransition.Timer > 0 {
+				roomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
@@ -766,7 +772,7 @@ func run() {
 				if nextRoomID != 0 {
 					currentRoomID = nextRoomID
 				}
-				isTransitioning = false
+				roomTransition.Active = false
 			}
 
 		}
