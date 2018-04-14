@@ -252,6 +252,16 @@ var entityPresets = map[string]enemyPresetFn{
 			SpriteFrames: spriteSets["warpStone"],
 		}
 	},
+	"puzzleBox": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category:     categories.MovableObstacle,
+			X:            s * xTiles,
+			Y:            s * yTiles,
+			W:            s,
+			H:            s,
+			SpriteFrames: spriteSets["puzzleBox"],
+		}
+	},
 }
 
 func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
@@ -279,6 +289,9 @@ func run() {
 		},
 		2: Room{
 			MapName: "overworldFourWallsDoorTopBottom",
+			EntityConfigs: []EntityConfig{
+				entityPresets["puzzleBox"](5, 5),
+			},
 		},
 		3: Room{
 			MapName: "overworldFourWallsDoorRightTopBottom",
@@ -593,24 +606,16 @@ func run() {
 
 			if addEntities {
 				addEntities = false
+
+				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
 				for _, entity := range obstacles {
 					addEntityToSystem(entity)
 				}
 
-				for _, c := range rooms[currentRoomID].MoveableObstacleConfigs {
-					entity := NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
-					entity.Animation = &components.Animation{
-						Default: &components.AnimationData{
-							Frames:    spriteSets["puzzleBox"],
-							FrameRate: frameRate,
-						},
-					}
-					addEntityToSystem(entity)
-				}
-
 				roomWarps = map[entities.EntityID]EntityConfig{}
 
+				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range rooms[currentRoomID].EntityConfigs {
 					var entity entities.Entity
 					switch c.Category {
