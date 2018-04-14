@@ -195,6 +195,7 @@ var spriteSets = map[string][]int{
 	"playerSwordRight": []int{164},
 	"playerSwordLeft":  []int{179},
 	"playerSwordDown":  []int{180},
+	"floorSwitch":      []int{112, 127},
 }
 
 var entityPresets = map[string]enemyPresetFn{
@@ -262,6 +263,16 @@ var entityPresets = map[string]enemyPresetFn{
 			SpriteFrames: spriteSets["puzzleBox"],
 		}
 	},
+	"floorSwitch": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
+			Category:     categories.CollisionSwitch,
+			X:            s * xTiles,
+			Y:            s * yTiles,
+			W:            s,
+			H:            s,
+			SpriteFrames: spriteSets["floorSwitch"],
+		}
+	},
 }
 
 func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
@@ -291,6 +302,7 @@ func run() {
 			MapName: "overworldFourWallsDoorTopBottom",
 			EntityConfigs: []EntityConfig{
 				entityPresets["puzzleBox"](5, 5),
+				entityPresets["floorSwitch"](10, 10),
 			},
 		},
 		3: Room{
@@ -619,6 +631,8 @@ func run() {
 				for _, c := range rooms[currentRoomID].EntityConfigs {
 					var entity entities.Entity
 					switch c.Category {
+					case categories.CollisionSwitch:
+						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					case categories.MovableObstacle:
 						entity = NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					case categories.Warp:
