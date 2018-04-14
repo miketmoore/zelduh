@@ -621,28 +621,21 @@ func run() {
 					switch c.Category {
 					case categories.MovableObstacle:
 						entity = NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
-						if len(c.SpriteFrames) > 0 {
-							entity.Animation = &components.Animation{
-								Default: &components.AnimationData{
-									Frames:    c.SpriteFrames,
-									FrameRate: frameRate,
-								},
-							}
-						}
 					case categories.Warp:
 						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
-						if len(c.SpriteFrames) > 0 {
-							entity.Animation = &components.Animation{
-								Default: &components.AnimationData{
-									Frames:    c.SpriteFrames,
-									FrameRate: frameRate,
-								},
-							}
-						}
 						entity.Spatial.HitBoxRadius = c.HitBoxRadius
 					case categories.Enemy:
 						fmt.Printf("Add enemy to room...\n")
 						entity = NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius, c.SpriteFrames, c.Invincible, c.PatternName, c.Direction)
+					}
+
+					if len(c.SpriteFrames) > 0 {
+						entity.Animation = &components.Animation{
+							Default: &components.AnimationData{
+								Frames:    c.SpriteFrames,
+								FrameRate: frameRate,
+							},
+						}
 					}
 
 					addEntityToSystem(entity)
