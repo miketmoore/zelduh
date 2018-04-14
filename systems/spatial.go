@@ -1,7 +1,6 @@
 package systems
 
 import (
-	"fmt"
 	"math/rand"
 
 	"github.com/faiface/pixel"
@@ -77,7 +76,6 @@ func (s *Spatial) RemoveAll(category categories.Category) {
 
 // MovePlayerBack moves the player back
 func (s *Spatial) MovePlayerBack() {
-	fmt.Println("Move back")
 	player := s.player
 	var v pixel.Vec
 	switch player.Movement.Direction {
@@ -128,15 +126,9 @@ func (s *Spatial) UndoEnemyRect(enemyID entities.EntityID) {
 func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit direction.Name, distance float64) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.Movement.MovingFromHit {
-
-		// v := delta(directionHit, distance, distance)
-		// enemy.Spatial.Rect = enemy.Spatial.PrevRect.Moved(v)
-		// enemy.Spatial.PrevRect = enemy.Spatial.Rect
 		enemy.Movement.MovingFromHit = true
 		enemy.Movement.RemainingMoves = enemy.Movement.HitBackMoves
 		enemy.Movement.Direction = directionHit
-
-		fmt.Printf("MoveEnemyBack %d %s\n", enemy.Movement.RemainingMoves, enemy.Movement.Direction)
 	}
 }
 

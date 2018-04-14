@@ -157,7 +157,6 @@ func (s *Render) Update() {
 	}
 
 	for _, entity := range s.hearts {
-		// fmt.Printf("Heart: %v\n", entity)
 		s.animateDefault(entity)
 	}
 

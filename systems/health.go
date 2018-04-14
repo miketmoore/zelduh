@@ -1,8 +1,6 @@
 package systems
 
 import (
-	"fmt"
-
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
@@ -31,7 +29,6 @@ func (s *Health) Hit(entityID entities.EntityID, d int) bool {
 		entity := s.entities[i]
 		if entity.ID == entityID {
 			entity.Health.Total -= d
-			fmt.Printf("Entity health reduced by %d\n", d)
 			return entity.Health.Total == 0
 		}
 	}
