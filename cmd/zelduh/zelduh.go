@@ -246,7 +246,6 @@ func run() {
 	entitiesMap = map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
-	fmt.Printf("build room configurations...\n")
 	roomsMap = rooms.Rooms{
 		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
 			entityPresets["puzzleBox"](5, 5),
@@ -359,16 +358,13 @@ func run() {
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
-	// gameWorld.SystemsMap["input"] = inputSystem
 	gameWorld.AddSystem(inputSystem)
 	healthSystem := &systems.Health{}
-	// gameWorld.SystemsMap["health"] = healthSystem
 	gameWorld.AddSystem(healthSystem)
 	spatialSystem := &systems.Spatial{
 		Rand: r,
 	}
 	dropCoin := func(v pixel.Vec) {
-		fmt.Printf("Drop coin\n")
 		coin := NewCoin(gameWorld.NewEntityID(), v.X, v.Y, s, s)
 		addEntityToSystem(coin)
 	}
@@ -392,7 +388,6 @@ func run() {
 		},
 		PlayerCollisionWithCoin: func(coinID entities.EntityID) {
 			player.Coins.Coins++
-			fmt.Printf("Player coins: %d\n", player.Coins.Coins)
 			gameWorld.Remove(categories.Coin, coinID)
 		},
 		PlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
@@ -407,10 +402,8 @@ func run() {
 			if !sword.Ignore.Value {
 				dead := false
 				if !spatialSystem.EnemyMovingFromHit(enemyID) {
-					fmt.Printf("HIT!\n")
 					dead = healthSystem.Hit(enemyID, 1)
 					if dead {
-						fmt.Printf("You killed an enemy with a sword\n")
 						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
 						explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
 						explosion.Spatial = &components.Spatial{
@@ -470,7 +463,6 @@ func run() {
 		MoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && !entity.Toggler.Enabled() {
-					fmt.Printf("A\n")
 					entity.Toggler.Toggle()
 				}
 			}
@@ -478,7 +470,6 @@ func run() {
 		MoveableObstacleNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && entity.Toggler.Enabled() {
-					fmt.Printf("B\n")
 					entity.Toggler.Toggle()
 				}
 			}
@@ -605,7 +596,6 @@ func run() {
 						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.ToggleHandler)
 						entity.Spatial.HitBoxRadius = c.HitBoxRadius
 					case categories.Enemy:
-						fmt.Printf("Add enemy to room...\n")
 						entity = NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius, c.SpriteFrames, c.Invincible, c.PatternName, c.Direction)
 					}
 

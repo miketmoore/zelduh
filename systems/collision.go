@@ -240,10 +240,8 @@ func (s *Collision) Update() {
 			}
 		} else {
 			if isColliding(s.player.Spatial.Rect, collisionSwitch.Spatial.Rect) {
-				// fmt.Printf(">>>>\n")
 				s.PlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
-				// fmt.Printf(">>>>>>>>>>\n")
 				s.PlayerNoCollisionWithSwitch(collisionSwitch.ID)
 			}
 		}
