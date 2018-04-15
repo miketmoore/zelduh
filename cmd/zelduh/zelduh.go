@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/miketmoore/zelduh/bounds"
+	"github.com/miketmoore/zelduh/rooms"
 
 	"github.com/deanobob/tmxreader"
 	"github.com/faiface/pixel"
@@ -94,54 +95,16 @@ var tilemapFiles = []string{
 	"dungeonFourDoors",
 }
 
-var roomID RoomID
-
-// RoomID is a room ID
-type RoomID int
-
-// ConnectedRooms is used to configure adjacent rooms
-type ConnectedRooms struct {
-	Top    RoomID
-	Right  RoomID
-	Bottom RoomID
-	Left   RoomID
-}
-
-// MoveableObstacleConfig is used to build moveable obstacles
-type MoveableObstacleConfig struct {
-	W, H, X, Y float64
-	IsAnimated bool
-}
-
-// EntityConfig is used to simplify building entities
-type EntityConfig struct {
-	Category                 categories.Category
-	X, Y, W, H, HitBoxRadius float64
-	SpriteFrames             []int
-	WarpToRoomID             RoomID
-	Invincible               bool
-	PatternName              string
-	Direction                direction.Name
-}
-
-// Room represents one map section
-type Room struct {
-	MapName                 string
-	ConnectedRooms          ConnectedRooms
-	MoveableObstacleConfigs []MoveableObstacleConfig
-	EntityConfigs           []EntityConfig
-}
-
-var rooms map[RoomID]Room
+var roomID rooms.RoomID
 
 // Multi-dimensional array representing the overworld
 // Each room ID should be unique
-var overworld = [][]RoomID{
-	[]RoomID{1, 10},
-	[]RoomID{2, 0, 0, 8},
-	[]RoomID{3, 5, 6, 7},
-	[]RoomID{9},
-	[]RoomID{11},
+var overworld = [][]rooms.RoomID{
+	[]rooms.RoomID{1, 10},
+	[]rooms.RoomID{2, 0, 0, 8},
+	[]rooms.RoomID{3, 5, 6, 7},
+	[]rooms.RoomID{9},
+	[]rooms.RoomID{11},
 }
 
 var nonObstacleSprites = map[int]bool{
@@ -169,16 +132,9 @@ type mapDrawData struct {
 
 var allMapDrawData map[string]MapData
 
-type transitionStyle string
-
-const (
-	transitionSlide transitionStyle = "slide"
-	transitionWarp  transitionStyle = "warp"
-)
-
 const frameRate int = 5
 
-type enemyPresetFn = func(xTiles, yTiles float64) EntityConfig
+type enemyPresetFn = func(xTiles, yTiles float64) rooms.EntityConfig
 
 var spriteSets = map[string][]int{
 	"eyeburrower":      []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
@@ -199,8 +155,8 @@ var spriteSets = map[string][]int{
 }
 
 var entityPresets = map[string]enemyPresetFn{
-	"eyeburrower": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"eyeburrower": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
@@ -210,8 +166,8 @@ var entityPresets = map[string]enemyPresetFn{
 			Direction:    direction.Down,
 		}
 	},
-	"skeleton": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"skeleton": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
@@ -221,8 +177,8 @@ var entityPresets = map[string]enemyPresetFn{
 			Direction:    direction.Down,
 		}
 	},
-	"skull": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"skull": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
@@ -232,8 +188,8 @@ var entityPresets = map[string]enemyPresetFn{
 			Direction:    direction.Down,
 		}
 	},
-	"spinner": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"spinner": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
 			HitBoxRadius: 20,
@@ -243,8 +199,8 @@ var entityPresets = map[string]enemyPresetFn{
 			Direction:    direction.Right,
 		}
 	},
-	"warpstone": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"warpstone": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category:     categories.Warp,
 			X:            s * xTiles,
 			Y:            s * yTiles,
@@ -253,8 +209,8 @@ var entityPresets = map[string]enemyPresetFn{
 			SpriteFrames: spriteSets["warpStone"],
 		}
 	},
-	"puzzleBox": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"puzzleBox": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category:     categories.MovableObstacle,
 			X:            s * xTiles,
 			Y:            s * yTiles,
@@ -263,8 +219,8 @@ var entityPresets = map[string]enemyPresetFn{
 			SpriteFrames: spriteSets["puzzleBox"],
 		}
 	},
-	"floorSwitch": func(xTiles, yTiles float64) EntityConfig {
-		return EntityConfig{
+	"floorSwitch": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
 			Category:     categories.CollisionSwitch,
 			X:            s * xTiles,
 			Y:            s * yTiles,
@@ -275,111 +231,80 @@ var entityPresets = map[string]enemyPresetFn{
 	},
 }
 
-func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
+func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) rooms.EntityConfig {
 	e := entityPresets["warpstone"](X, Y)
 	e.WarpToRoomID = 6
 	e.HitBoxRadius = 5
 	return e
 }
 
-type RoomTransition struct {
-	Active bool
-	Side   bounds.Bound
-	Start  float64
-	Timer  int
-	Style  transitionStyle
-}
+var roomsMap rooms.Rooms
 
 func run() {
 
 	gameWorld = world.New()
 
 	fmt.Printf("build room configurations...\n")
-	rooms = map[RoomID]Room{
-		1: Room{
-			MapName: "overworldFourWallsDoorBottomRight",
-			EntityConfigs: []EntityConfig{
-				presetWarpStone(3, 7, 6, 5),
-				entityPresets["skull"](5, 5),
-				entityPresets["skeleton"](11, 9),
-				entityPresets["spinner"](7, 9),
-				entityPresets["eyeburrower"](8, 9),
+	roomsMap = rooms.Rooms{
+		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
+			presetWarpStone(3, 7, 6, 5),
+			entityPresets["skull"](5, 5),
+			entityPresets["skeleton"](11, 9),
+			entityPresets["spinner"](7, 9),
+			entityPresets["eyeburrower"](8, 9),
+		),
+		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
+			entityPresets["puzzleBox"](5, 5),
+			entityPresets["floorSwitch"](10, 10),
+		),
+		3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom"),
+		5: rooms.NewRoom("rockWithCaveEntrance",
+			rooms.EntityConfig{
+				Category:     categories.Warp,
+				WarpToRoomID: 11,
+				W:            s,
+				H:            s,
+				X:            (s * 7) + s/2,
+				Y:            (s * 9) + s/2,
+				HitBoxRadius: 30,
 			},
-		},
-		2: Room{
-			MapName: "overworldFourWallsDoorTopBottom",
-			EntityConfigs: []EntityConfig{
-				entityPresets["puzzleBox"](5, 5),
-				entityPresets["floorSwitch"](10, 10),
+			rooms.EntityConfig{
+				Category:     categories.Warp,
+				WarpToRoomID: 11,
+				W:            s,
+				H:            s,
+				X:            (s * 8) + s/2,
+				Y:            (s * 9) + s/2,
+				HitBoxRadius: 30,
 			},
-		},
-		3: Room{
-			MapName: "overworldFourWallsDoorRightTopBottom",
-		},
-		5: Room{
-			MapName: "rockWithCaveEntrance",
-			EntityConfigs: []EntityConfig{
-				EntityConfig{
-					Category:     categories.Warp,
-					WarpToRoomID: 11,
-					W:            s,
-					H:            s,
-					X:            (s * 7) + s/2,
-					Y:            (s * 9) + s/2,
-					HitBoxRadius: 30,
-				},
-				EntityConfig{
-					Category:     categories.Warp,
-					WarpToRoomID: 11,
-					W:            s,
-					H:            s,
-					X:            (s * 8) + s/2,
-					Y:            (s * 9) + s/2,
-					HitBoxRadius: 30,
-				},
+		),
+		6:  rooms.NewRoom("rockPathLeftRightEntrance"),
+		7:  rooms.NewRoom("overworldFourWallsDoorLeftTop"),
+		8:  rooms.NewRoom("overworldFourWallsDoorBottom"),
+		9:  rooms.NewRoom("overworldFourWallsDoorTop"),
+		10: rooms.NewRoom("overworldFourWallsDoorLeft"),
+		11: rooms.NewRoom("dungeonFourDoors",
+
+			// South door of cave - warp to cave entrance
+			rooms.EntityConfig{
+				Category:     categories.Warp,
+				WarpToRoomID: 5,
+				W:            s,
+				H:            s,
+				X:            (s * 6) + s + (s / 2.5),
+				Y:            (s * 1) + s + (s / 2.5),
+				HitBoxRadius: 15,
 			},
-		},
-		6: Room{MapName: "rockPathLeftRightEntrance"},
-		7: Room{
-			MapName: "overworldFourWallsDoorLeftTop",
-			MoveableObstacleConfigs: []MoveableObstacleConfig{
-				MoveableObstacleConfig{
-					W: s,
-					H: s,
-					X: (s * 8) + s/2,
-					Y: (s * 9) + s/2,
-				},
+			rooms.EntityConfig{
+				Category:     categories.Warp,
+				WarpToRoomID: 5,
+				W:            s,
+				H:            s,
+				X:            (s * 7) + s + (s / 2.5),
+				Y:            (s * 1) + s + (s / 2.5),
+				HitBoxRadius: 15,
 			},
-		},
-		8: Room{MapName: "overworldFourWallsDoorBottom"},
-		9: Room{MapName: "overworldFourWallsDoorTop"},
-		10: Room{
-			MapName: "overworldFourWallsDoorLeft",
-		},
-		11: Room{
-			MapName: "dungeonFourDoors",
-			EntityConfigs: []EntityConfig{
-				// South door of cave - warp to cave entrance
-				EntityConfig{
-					Category:     categories.Warp,
-					WarpToRoomID: 5,
-					W:            s,
-					H:            s,
-					X:            (s * 6) + s + (s / 2.5),
-					Y:            (s * 1) + s + (s / 2.5),
-					HitBoxRadius: 15,
-				},
-				EntityConfig{
-					Category:     categories.Warp,
-					WarpToRoomID: 5,
-					W:            s,
-					H:            s,
-					X:            (s * 7) + s + (s / 2.5),
-					Y:            (s * 1) + s + (s / 2.5),
-					HitBoxRadius: 15,
-				},
-			},
-		},
+		),
 	}
 
 	processMapLayout(overworld)
@@ -412,15 +337,16 @@ func run() {
 		NewHeart(gameWorld.NewEntityID(), mapX+80, mapY+mapH, s, s),
 	}
 
-	roomTransition := RoomTransition{}
-	roomTransition.Start = float64(s)
+	roomTransition := rooms.RoomTransition{
+		Start: float64(s),
+	}
 
 	currentState := gamestate.Start
 	addEntities := true
-	var currentRoomID RoomID = 1
-	var nextRoomID RoomID
+	var currentRoomID rooms.RoomID = 1
+	var nextRoomID rooms.RoomID
 
-	var roomWarps map[entities.EntityID]EntityConfig
+	var roomWarps map[entities.EntityID]rooms.EntityConfig
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
@@ -449,7 +375,7 @@ func run() {
 			if !roomTransition.Active {
 				roomTransition.Active = true
 				roomTransition.Side = side
-				roomTransition.Style = transitionSlide
+				roomTransition.Style = rooms.TransitionSlide
 				roomTransition.Timer = int(roomTransition.Start)
 				currentState = gamestate.MapTransition
 				addEntities = true
@@ -541,7 +467,7 @@ func run() {
 				fmt.Printf("Warp to room ID %v\n", entityConfig.WarpToRoomID)
 				if !roomTransition.Active {
 					roomTransition.Active = true
-					roomTransition.Style = transitionWarp
+					roomTransition.Style = rooms.TransitionWarp
 					roomTransition.Timer = 1
 					currentState = gamestate.MapTransition
 					addEntities = true
@@ -620,7 +546,7 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
-			drawMapBGImage(rooms[currentRoomID].MapName, 0, 0)
+			drawMapBGImage(roomsMap[currentRoomID].MapName, 0, 0)
 
 			if addEntities {
 				addEntities = false
@@ -631,10 +557,10 @@ func run() {
 					addEntityToSystem(entity)
 				}
 
-				roomWarps = map[entities.EntityID]EntityConfig{}
+				roomWarps = map[entities.EntityID]rooms.EntityConfig{}
 
 				// Iterate through all entity configurations and build entities and add to systems
-				for _, c := range rooms[currentRoomID].EntityConfigs {
+				for _, c := range roomsMap[currentRoomID].EntityConfigs {
 					var entity entities.Entity
 					switch c.Category {
 					case categories.CollisionSwitch:
@@ -700,7 +626,7 @@ func run() {
 			}
 		case gamestate.MapTransition:
 			inputSystem.DisablePlayer()
-			if roomTransition.Style == transitionSlide && roomTransition.Timer > 0 {
+			if roomTransition.Style == rooms.TransitionSlide && roomTransition.Timer > 0 {
 				roomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
@@ -721,33 +647,33 @@ func run() {
 				playerModY := 0.0
 				playerIncY := ((mapH / s) - 1) + 7
 				playerIncX := ((mapW / s) - 1) + 7
-				if roomTransition.Side == bounds.Bottom && rooms[currentRoomID].ConnectedRooms.Bottom != 0 {
+				if roomTransition.Side == bounds.Bottom && roomsMap[currentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - mapH
-					nextRoomID = rooms[currentRoomID].ConnectedRooms.Bottom
+					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Bottom
 
 					playerModY += playerIncY
-				} else if roomTransition.Side == bounds.Top && rooms[currentRoomID].ConnectedRooms.Top != 0 {
+				} else if roomTransition.Side == bounds.Top && roomsMap[currentRoomID].ConnectedRooms.Top != 0 {
 					modY = -incY
 					modYNext = -incY + mapH
-					nextRoomID = rooms[currentRoomID].ConnectedRooms.Top
+					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Top
 					playerModY -= playerIncY
-				} else if roomTransition.Side == bounds.Left && rooms[currentRoomID].ConnectedRooms.Left != 0 {
+				} else if roomTransition.Side == bounds.Left && roomsMap[currentRoomID].ConnectedRooms.Left != 0 {
 					modX = incX
 					modXNext = incX - mapW
-					nextRoomID = rooms[currentRoomID].ConnectedRooms.Left
+					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Left
 					playerModX += playerIncX
-				} else if roomTransition.Side == bounds.Right && rooms[currentRoomID].ConnectedRooms.Right != 0 {
+				} else if roomTransition.Side == bounds.Right && roomsMap[currentRoomID].ConnectedRooms.Right != 0 {
 					modX = -incX
 					modXNext = -incX + mapW
-					nextRoomID = rooms[currentRoomID].ConnectedRooms.Right
+					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Right
 					playerModX -= playerIncX
 				} else {
 					nextRoomID = 0
 				}
 
-				drawMapBGImage(rooms[currentRoomID].MapName, modX, modY)
-				drawMapBGImage(rooms[nextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(roomsMap[currentRoomID].MapName, modX, modY)
+				drawMapBGImage(roomsMap[nextRoomID].MapName, modXNext, modYNext)
 				drawMask()
 
 				// Move player with map transition
@@ -759,7 +685,7 @@ func run() {
 				)
 
 				gameWorld.Update()
-			} else if roomTransition.Style == transitionWarp && roomTransition.Timer > 0 {
+			} else if roomTransition.Style == rooms.TransitionWarp && roomTransition.Timer > 0 {
 				roomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
@@ -1387,8 +1313,8 @@ func drawMapBGImage(name string, modX, modY float64) {
 	}
 }
 
-func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Entity {
-	d := allMapDrawData[rooms[roomID].MapName]
+func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entities.Entity {
+	d := allMapDrawData[roomsMap[roomID].MapName]
 	obstacles := []entities.Entity{}
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
@@ -1406,51 +1332,51 @@ func drawObstaclesPerMapTiles(roomID RoomID, modX, modY float64) []entities.Enti
 	return obstacles
 }
 
-func indexRoom(a, b RoomID, dir direction.Name) {
+func indexRoom(a, b rooms.RoomID, dir direction.Name) {
 	// fmt.Printf("indexRoom a:%d b:%d dir:%s\n", a, b, dir)
-	roomA, okA := rooms[a]
-	roomB, okB := rooms[b]
+	roomA, okA := roomsMap[a]
+	roomB, okB := roomsMap[b]
 	if okA && okB {
 		switch dir {
 		case direction.Up:
 			// b is above a
 			roomA.ConnectedRooms.Top = b
-			rooms[a] = roomA
+			roomsMap[a] = roomA
 			roomB.ConnectedRooms.Bottom = a
-			rooms[b] = roomB
+			roomsMap[b] = roomB
 		case direction.Right:
 			// b is right of a
-			roomA, ok := rooms[a]
+			roomA, ok := roomsMap[a]
 			if ok {
 				roomA.ConnectedRooms.Right = b
-				rooms[a] = roomA
+				roomsMap[a] = roomA
 				roomB.ConnectedRooms.Left = a
-				rooms[b] = roomB
+				roomsMap[b] = roomB
 			}
 		case direction.Down:
 			// b is below a
-			roomA, ok := rooms[a]
+			roomA, ok := roomsMap[a]
 			if ok {
 				roomA.ConnectedRooms.Bottom = b
-				rooms[a] = roomA
+				roomsMap[a] = roomA
 				roomB.ConnectedRooms.Top = a
-				rooms[b] = roomB
+				roomsMap[b] = roomB
 			}
 		case direction.Left:
 			// b is left of a
-			roomA, ok := rooms[a]
+			roomA, ok := roomsMap[a]
 			if ok {
 				roomA.ConnectedRooms.Left = b
-				rooms[a] = roomA
+				roomsMap[a] = roomA
 				roomB.ConnectedRooms.Right = a
-				rooms[b] = roomB
+				roomsMap[b] = roomB
 			}
 		}
 	}
 
 }
 
-func processMapLayout(layout [][]RoomID) {
+func processMapLayout(layout [][]rooms.RoomID) {
 	// transform multi-dimensional array into map of Room structs, indexed by ID
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
