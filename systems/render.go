@@ -17,6 +17,7 @@ type renderEntity struct {
 	*components.Animation
 	*components.Movement
 	*components.Ignore
+	*components.Toggler
 }
 
 // Render is a custom system
@@ -39,13 +40,13 @@ type Render struct {
 // AddEntity adds an entity to the system
 func (s *Render) AddEntity(entity entities.Entity) {
 	r := renderEntity{
-		entity.ID,
-		entity.Category,
-		entity.Spatial,
-		entity.Appearance,
-		entity.Animation,
-		entity.Movement,
-		entity.Ignore,
+		ID:         entity.ID,
+		Category:   entity.Category,
+		Spatial:    entity.Spatial,
+		Appearance: entity.Appearance,
+		Animation:  entity.Animation,
+		Movement:   entity.Movement,
+		Ignore:     entity.Ignore,
 	}
 	switch entity.Category {
 	case categories.Player:
@@ -59,6 +60,7 @@ func (s *Render) AddEntity(entity entities.Entity) {
 	case categories.MovableObstacle:
 		s.defaultEntities = append(s.defaultEntities, r)
 	case categories.CollisionSwitch:
+		r.Toggler = entity.Toggler
 		s.collisionSwitches = append(s.collisionSwitches, r)
 	case categories.Coin:
 		s.defaultEntities = append(s.defaultEntities, r)
@@ -114,7 +116,7 @@ func (s *Render) Update() {
 
 	for _, collisionSwitch := range s.collisionSwitches {
 		if collisionSwitch.Animation != nil {
-			s.animateDefault(collisionSwitch)
+			s.animateToggleFrame(collisionSwitch)
 		} else {
 			// Draw an invisible collision switch
 			collisionSwitch.Shape.Clear()
@@ -160,6 +162,26 @@ func (s *Render) Update() {
 		s.animateDefault(entity)
 	}
 
+}
+
+func (s *Render) animateToggleFrame(entity renderEntity) {
+	if anim := entity.Animation; anim != nil {
+		if animData := anim.Default; animData != nil {
+			var frameIndex int
+			if !entity.Toggler.Enabled() {
+				frameIndex = animData.Frames[0]
+			} else {
+				frameIndex = animData.Frames[1]
+			}
+			frame := s.Spritesheet[frameIndex]
+
+			v := pixel.V(
+				entity.Spatial.Rect.Min.X+entity.Spatial.Width/2,
+				entity.Spatial.Rect.Min.Y+entity.Spatial.Height/2,
+			)
+			frame.Draw(s.Win, pixel.IM.Moved(v))
+		}
+	}
 }
 
 func (s *Render) animateDefault(entity renderEntity) {
