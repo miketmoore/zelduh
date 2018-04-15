@@ -463,19 +463,14 @@ func run() {
 			spatialSystem.UndoEnemyRect(enemyID)
 		},
 		PlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			fmt.Printf("PlayerCollisionWithSwitch %d\n", collisionSwitchID)
 			entityConfig, ok := roomWarps[collisionSwitchID]
-			if ok {
-				fmt.Printf("Warp Config: %v\n", entityConfig)
-				fmt.Printf("Warp to room ID %v\n", entityConfig.WarpToRoomID)
-				if !roomTransition.Active {
-					roomTransition.Active = true
-					roomTransition.Style = rooms.TransitionWarp
-					roomTransition.Timer = 1
-					currentState = gamestate.MapTransition
-					addEntities = true
-					nextRoomID = entityConfig.WarpToRoomID
-				}
+			if ok && !roomTransition.Active {
+				roomTransition.Active = true
+				roomTransition.Style = rooms.TransitionWarp
+				roomTransition.Timer = 1
+				currentState = gamestate.MapTransition
+				addEntities = true
+				nextRoomID = entityConfig.WarpToRoomID
 			}
 		},
 		PlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
