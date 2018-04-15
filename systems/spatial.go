@@ -26,7 +26,7 @@ type Spatial struct {
 	sword             spatialEntity
 	arrow             spatialEntity
 	enemies           []*spatialEntity
-	moveableObstacles []spatialEntity
+	moveableObstacles []*spatialEntity
 }
 
 // AddEntity adds an entity to the system
@@ -45,7 +45,7 @@ func (s *Spatial) AddEntity(entity entities.Entity) {
 	case categories.Arrow:
 		s.arrow = r
 	case categories.MovableObstacle:
-		s.moveableObstacles = append(s.moveableObstacles, r)
+		s.moveableObstacles = append(s.moveableObstacles, &r)
 	case categories.Enemy:
 		s.enemies = append(s.enemies, &r)
 	}
@@ -92,26 +92,16 @@ func (s *Spatial) MovePlayerBack() {
 	player.Spatial.PrevRect = player.Spatial.Rect
 }
 
-// MoveMoveableObstacle moves a moveable obstacle :P
-func (s *Spatial) MoveMoveableObstacle(obstacleID entities.EntityID, dir direction.Name) {
-	obstacle, ok := s.moveableObstacle(obstacleID)
-	if ok {
-		w := obstacle.Spatial.Width
-		h := obstacle.Spatial.Height
-		var v pixel.Vec
-		switch dir {
-		case direction.Up:
-			v = pixel.V(0, h)
-		case direction.Right:
-			v = pixel.V(w, 0)
-		case direction.Down:
-			v = pixel.V(0, -h)
-		case direction.Left:
-			v = pixel.V(-w, 0)
-		}
-		obstacle.Spatial.PrevRect = obstacle.Spatial.Rect
-		obstacle.Spatial.Rect = obstacle.Spatial.Rect.Moved(v)
+// MoveMoveableObstacle moves a moveable obstacle
+func (s *Spatial) MoveMoveableObstacle(obstacleID entities.EntityID, dir direction.Name) bool {
+	entity, ok := s.moveableObstacle(obstacleID)
+	if ok && !entity.Movement.MovingFromHit {
+		entity.Movement.MovingFromHit = true
+		entity.Movement.RemainingMoves = entity.Movement.MaxMoves
+		entity.Movement.Direction = dir
+		return true
 	}
+	return false
 }
 
 // UndoEnemyRect resets current rect to previous rect
@@ -123,7 +113,7 @@ func (s *Spatial) UndoEnemyRect(enemyID entities.EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit direction.Name, distance float64) {
+func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit direction.Name) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.Movement.MovingFromHit {
 		enemy.Movement.MovingFromHit = true
@@ -159,6 +149,11 @@ func (s *Spatial) Update() {
 	s.moveSword()
 	s.moveArrow()
 
+	for i := 0; i < len(s.moveableObstacles); i++ {
+		entity := s.moveableObstacles[i]
+		s.moveMoveableObstacle(entity)
+	}
+
 	for i := 0; i < len(s.enemies); i++ {
 		enemy := s.enemies[i]
 		switch enemy.Movement.PatternName {
@@ -173,7 +168,7 @@ func (s *Spatial) Update() {
 func (s *Spatial) moveableObstacle(id entities.EntityID) (spatialEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
-			return e, true
+			return *e, true
 		}
 	}
 	return spatialEntity{}, false
@@ -239,6 +234,19 @@ func (s *Spatial) movePlayer() {
 		v := delta(player.Movement.Direction, speed, speed)
 		player.Spatial.PrevRect = player.Spatial.Rect
 		player.Spatial.Rect = player.Spatial.Rect.Moved(v)
+	}
+}
+
+func (s *Spatial) moveMoveableObstacle(entity *spatialEntity) {
+	if entity.Movement.RemainingMoves > 0 {
+		speed := entity.Movement.MaxSpeed
+		entity.Spatial.PrevRect = entity.Spatial.Rect
+		moveVec := delta(entity.Movement.Direction, speed, speed)
+		entity.Spatial.Rect = entity.Spatial.Rect.Moved(moveVec)
+		entity.Movement.RemainingMoves--
+	} else {
+		entity.Movement.MovingFromHit = false
+		entity.Movement.RemainingMoves = 0
 	}
 }
 

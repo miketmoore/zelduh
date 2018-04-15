@@ -415,7 +415,7 @@ func run() {
 						addEntityToSystem(explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
-						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, s)
+						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
 					}
 				}
 
@@ -440,7 +440,7 @@ func run() {
 					addEntityToSystem(explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction, s*3)
+					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
 				}
 			}
 		},
@@ -453,7 +453,10 @@ func run() {
 			sword.Spatial.Rect = sword.Spatial.PrevRect
 		},
 		PlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
-			spatialSystem.MoveMoveableObstacle(obstacleID, player.Movement.Direction)
+			moved := spatialSystem.MoveMoveableObstacle(obstacleID, player.Movement.Direction)
+			if !moved {
+				player.Spatial.Rect = player.Spatial.PrevRect
+			}
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
 			// Block enemy within the spatial system by reseting current rect to previous rect
@@ -1042,6 +1045,8 @@ func NewMoveableObstacle(id entities.EntityID, w, h, x, y float64) entities.Enti
 		Movement: &components.Movement{
 			Direction: direction.Down,
 			Speed:     1.0,
+			MaxMoves:  int(s) / 2,
+			MaxSpeed:  2.0,
 		},
 	}
 }
