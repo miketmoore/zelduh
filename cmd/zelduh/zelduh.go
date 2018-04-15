@@ -721,23 +721,23 @@ func run() {
 				playerModY := 0.0
 				playerIncY := ((mapH / s) - 1) + 7
 				playerIncX := ((mapW / s) - 1) + 7
-				if roomTransition.Side == "bottom" && rooms[currentRoomID].ConnectedRooms.Bottom != 0 {
+				if roomTransition.Side == bounds.Bottom && rooms[currentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - mapH
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Bottom
 
 					playerModY += playerIncY
-				} else if roomTransition.Side == "top" && rooms[currentRoomID].ConnectedRooms.Top != 0 {
+				} else if roomTransition.Side == bounds.Top && rooms[currentRoomID].ConnectedRooms.Top != 0 {
 					modY = -incY
 					modYNext = -incY + mapH
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Top
 					playerModY -= playerIncY
-				} else if roomTransition.Side == "left" && rooms[currentRoomID].ConnectedRooms.Left != 0 {
+				} else if roomTransition.Side == bounds.Left && rooms[currentRoomID].ConnectedRooms.Left != 0 {
 					modX = incX
 					modXNext = incX - mapW
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Left
 					playerModX += playerIncX
-				} else if roomTransition.Side == "right" && rooms[currentRoomID].ConnectedRooms.Right != 0 {
+				} else if roomTransition.Side == bounds.Right && rooms[currentRoomID].ConnectedRooms.Right != 0 {
 					modX = -incX
 					modXNext = -incX + mapW
 					nextRoomID = rooms[currentRoomID].ConnectedRooms.Right
