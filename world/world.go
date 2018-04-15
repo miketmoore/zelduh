@@ -59,7 +59,7 @@ func (w *World) Remove(category categories.Category, id entities.EntityID) {
 			case *systems.Collision:
 				sys.Remove(categories.Coin, id)
 			case *systems.Render:
-				sys.Remove(categories.Coin, id)
+				sys.RemoveEntity(id)
 			}
 		}
 	}
@@ -74,7 +74,7 @@ func (w *World) RemoveEnemy(id entities.EntityID) {
 		case *systems.Collision:
 			sys.Remove(categories.Enemy, id)
 		case *systems.Render:
-			sys.Remove(categories.Enemy, id)
+			sys.RemoveEntity(id)
 		}
 	}
 }

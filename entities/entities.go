@@ -23,4 +23,5 @@ type Entity struct {
 	*components.Ignore
 	*components.Movement
 	*components.Spatial
+	*components.Temporary
 }

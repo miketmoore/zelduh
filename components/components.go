@@ -33,7 +33,6 @@ type Enabled struct {
 // Toggler contains information to use when something is toggled
 type Toggler struct {
 	enabled bool
-	Handler func(bool)
 }
 
 // Enabled determine if the Toggler is enabled or not
@@ -44,7 +43,6 @@ func (s *Toggler) Enabled() bool {
 // Toggle handles the switch being toggled
 func (s *Toggler) Toggle() {
 	s.enabled = !s.enabled
-	s.Handler(s.enabled)
 }
 
 // Health contains health data
@@ -96,17 +94,16 @@ type AnimationData struct {
 	FrameRateCount int
 }
 
+// AnimationMap indexes AnimationData by use/context
+type AnimationMap map[string]*AnimationData
+
 // Animation contains everything necessary to animate basic characters
 type Animation struct {
-	Expiration       int
-	OnExpiration     func()
-	Default          *AnimationData
-	SwordAttackDown  *AnimationData
-	SwordAttackUp    *AnimationData
-	SwordAttackRight *AnimationData
-	SwordAttackLeft  *AnimationData
-	Up               *AnimationData
-	Right            *AnimationData
-	Down             *AnimationData
-	Left             *AnimationData
+	Map AnimationMap
+}
+
+// Temporary is used to track when an entity should be removed
+type Temporary struct {
+	Expiration   int
+	OnExpiration func()
 }

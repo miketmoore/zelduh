@@ -18,6 +18,7 @@ type renderEntity struct {
 	*components.Movement
 	*components.Ignore
 	*components.Toggler
+	*components.Temporary
 }
 
 // Render is a custom system
@@ -27,14 +28,10 @@ type Render struct {
 
 	player renderEntity
 	sword  renderEntity
+	arrow  renderEntity
 
-	defaultEntities []renderEntity
-
-	generic           []renderEntity
-	arrow             renderEntity
-	obstacles         []renderEntity
-	collisionSwitches []renderEntity
-	hearts            []renderEntity
+	entities  []renderEntity
+	obstacles []renderEntity
 }
 
 // AddEntity adds an entity to the system
@@ -45,6 +42,7 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		Spatial:   entity.Spatial,
 		Animation: entity.Animation,
 		Movement:  entity.Movement,
+		Temporary: entity.Temporary,
 	}
 	switch entity.Category {
 	case categories.Player:
@@ -56,41 +54,24 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		r.Ignore = entity.Ignore
 		s.arrow = r
 	case categories.Explosion:
-		s.generic = append(s.generic, r)
-	case categories.MovableObstacle:
-		s.defaultEntities = append(s.defaultEntities, r)
-	case categories.CollisionSwitch:
-		r.Appearance = entity.Appearance
-		r.Toggler = entity.Toggler
-		s.collisionSwitches = append(s.collisionSwitches, r)
-	case categories.Coin:
-		s.defaultEntities = append(s.defaultEntities, r)
-	case categories.Enemy:
-		s.defaultEntities = append(s.defaultEntities, r)
+		fallthrough
 	case categories.Heart:
-		s.hearts = append(s.hearts, r)
-	}
-}
-
-// Remove removes the entity from the system
-func (s *Render) Remove(category categories.Category, id entities.EntityID) {
-	switch category {
-	case categories.Explosion:
-		for i := len(s.generic) - 1; i >= 0; i-- {
-			generic := s.generic[i]
-			if generic.ID == id {
-				s.generic = append(s.generic[:i], s.generic[i+1:]...)
-			}
-		}
-	case categories.Coin:
 		fallthrough
 	case categories.Enemy:
-		for i := len(s.defaultEntities) - 1; i >= 0; i-- {
-			entity := s.defaultEntities[i]
-			if entity.ID == id {
-				s.defaultEntities = append(s.defaultEntities[:i], s.defaultEntities[i+1:]...)
-			}
+		fallthrough
+	case categories.CollisionSwitch:
+		fallthrough
+	case categories.MovableObstacle:
+		fallthrough
+	case categories.Warp:
+		fallthrough
+	case categories.Coin:
+		fallthrough
+	default:
+		if entity.Toggler != nil {
+			r.Toggler = entity.Toggler
 		}
+		s.entities = append(s.entities, r)
 	}
 }
 
@@ -98,44 +79,46 @@ func (s *Render) Remove(category categories.Category, id entities.EntityID) {
 func (s *Render) RemoveAll(category categories.Category) {
 	switch category {
 	case categories.Enemy:
-		for i := len(s.defaultEntities) - 1; i >= 0; i-- {
-			s.defaultEntities = append(s.defaultEntities[:i], s.defaultEntities[i+1:]...)
+		for i := len(s.entities) - 1; i >= 0; i-- {
+			if s.entities[i].Category == categories.Enemy {
+				s.entities = append(s.entities[:i], s.entities[i+1:]...)
+			}
 		}
-	case categories.CollisionSwitch:
-		for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
-			s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
+	}
+}
+
+// RemoveEntity removes an entity by ID
+func (s *Render) RemoveEntity(id entities.EntityID) {
+	for i := len(s.entities) - 1; i >= 0; i-- {
+		if s.entities[i].ID == id {
+			s.entities = append(s.entities[:i], s.entities[i+1:]...)
 		}
-	case categories.MovableObstacle:
-		for i := len(s.defaultEntities) - 1; i >= 0; i-- {
-			s.defaultEntities = append(s.defaultEntities[:i], s.defaultEntities[i+1:]...)
-		}
+	}
+}
+
+// RemoveAllEntities removes all entities
+func (s *Render) RemoveAllEntities() {
+	for i := len(s.entities) - 1; i >= 0; i-- {
+		s.entities = append(s.entities[:i], s.entities[i+1:]...)
 	}
 }
 
 // Update changes spatial data based on movement data
 func (s *Render) Update() {
 
-	for _, collisionSwitch := range s.collisionSwitches {
-		if collisionSwitch.Animation != nil {
-			s.animateToggleFrame(collisionSwitch)
-		} else {
-			// Draw an invisible collision switch
-			collisionSwitch.Shape.Clear()
-			collisionSwitch.Shape.Color = collisionSwitch.Appearance.Color
-			collisionSwitch.Shape.Push(collisionSwitch.Spatial.Rect.Min)
-			collisionSwitch.Shape.Push(collisionSwitch.Spatial.Rect.Max)
-			collisionSwitch.Shape.Rectangle(0)
+	for _, entity := range s.entities {
+		if entity.Temporary != nil {
+			if entity.Temporary.Expiration == 0 {
+				entity.Temporary.OnExpiration()
+				s.RemoveEntity(entity.ID)
+			} else {
+				entity.Temporary.Expiration--
+			}
 		}
-
-	}
-
-	for _, generic := range s.generic {
-		s.animateDefault(generic)
-		if generic.Animation.Expiration == 0 {
-			generic.Animation.OnExpiration()
-			s.Remove(generic.Category, generic.ID)
+		if entity.Toggler != nil {
+			s.animateToggleFrame(entity)
 		} else {
-			generic.Animation.Expiration--
+			s.animateDefault(entity)
 		}
 	}
 
@@ -155,19 +138,11 @@ func (s *Render) Update() {
 		s.animateAttackDirection(player.Movement.Direction, player)
 	}
 
-	for _, entity := range s.defaultEntities {
-		s.animateDefault(entity)
-	}
-
-	for _, entity := range s.hearts {
-		s.animateDefault(entity)
-	}
-
 }
 
 func (s *Render) animateToggleFrame(entity renderEntity) {
 	if anim := entity.Animation; anim != nil {
-		if animData := anim.Default; animData != nil {
+		if animData := anim.Map["default"]; animData != nil {
 			var frameIndex int
 			if !entity.Toggler.Enabled() {
 				frameIndex = animData.Frames[0]
@@ -187,7 +162,7 @@ func (s *Render) animateToggleFrame(entity renderEntity) {
 
 func (s *Render) animateDefault(entity renderEntity) {
 	if anim := entity.Animation; anim != nil {
-		if animData := anim.Default; animData != nil {
+		if animData := anim.Map["default"]; animData != nil {
 			rate := animData.FrameRateCount
 			if rate < animData.FrameRate {
 				rate++
@@ -223,13 +198,13 @@ func (s *Render) animateAttackDirection(dir direction.Name, entity renderEntity)
 		var animData *components.AnimationData
 		switch dir {
 		case direction.Up:
-			animData = anim.SwordAttackUp
+			animData = anim.Map["swordAttackUp"]
 		case direction.Right:
-			animData = anim.SwordAttackRight
+			animData = anim.Map["swordAttackRight"]
 		case direction.Down:
-			animData = anim.SwordAttackDown
+			animData = anim.Map["swordAttackDown"]
 		case direction.Left:
-			animData = anim.SwordAttackLeft
+			animData = anim.Map["swordAttackLeft"]
 		}
 
 		rate := animData.FrameRateCount
@@ -280,13 +255,13 @@ func (s *Render) animateDirections(dir direction.Name, entity renderEntity) {
 		var animData *components.AnimationData
 		switch dir {
 		case direction.Up:
-			animData = anim.Up
+			animData = anim.Map["up"]
 		case direction.Right:
-			animData = anim.Right
+			animData = anim.Map["right"]
 		case direction.Down:
-			animData = anim.Down
+			animData = anim.Map["down"]
 		case direction.Left:
-			animData = anim.Left
+			animData = anim.Map["left"]
 		}
 
 		rate := animData.FrameRateCount

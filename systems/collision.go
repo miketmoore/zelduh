@@ -27,6 +27,7 @@ type Collision struct {
 	obstacles                             []collisionEntity
 	moveableObstacles                     []collisionEntity
 	collisionSwitches                     []collisionEntity
+	warps                                 []collisionEntity
 	PlayerCollisionWithCoin               func(entities.EntityID)
 	PlayerCollisionWithEnemy              func(entities.EntityID)
 	SwordCollisionWithEnemy               func(entities.EntityID)
@@ -42,6 +43,7 @@ type Collision struct {
 	PlayerCollisionWithBounds             func(bounds.Bound)
 	MoveableObstacleCollisionWithSwitch   func(entities.EntityID)
 	MoveableObstacleNoCollisionWithSwitch func(entities.EntityID)
+	PlayerCollisionWithWarp               func(entities.EntityID)
 }
 
 // AddEntity adds an entity to the system
@@ -61,6 +63,8 @@ func (s *Collision) AddEntity(entity entities.Entity) {
 		s.moveableObstacles = append(s.moveableObstacles, r)
 	case categories.CollisionSwitch:
 		s.collisionSwitches = append(s.collisionSwitches, r)
+	case categories.Warp:
+		s.warps = append(s.warps, r)
 	case categories.Enemy:
 		r.Invincible = entity.Invincible
 		s.enemies = append(s.enemies, r)
@@ -246,6 +250,12 @@ func (s *Collision) Update() {
 			}
 		}
 
+	}
+
+	for _, warp := range s.warps {
+		if isColliding(s.player.Spatial.Rect, warp.Spatial.Rect) {
+			s.PlayerCollisionWithWarp(warp.ID)
+		}
 	}
 }
 

@@ -137,7 +137,13 @@ const frameRate int = 5
 type enemyPresetFn = func(xTiles, yTiles float64) rooms.EntityConfig
 
 var spriteSets = map[string][]int{
-	"eyeburrower":      []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
+	"eyeburrower": []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
+	"explosion": []int{
+		122, 122, 122,
+		123, 123, 123,
+		124, 124, 124,
+		125, 125, 125,
+	},
 	"skeleton":         []int{31, 32},
 	"skull":            []int{36, 37, 38, 39},
 	"spinner":          []int{51, 52},
@@ -152,89 +158,184 @@ var spriteSets = map[string][]int{
 	"playerSwordLeft":  []int{179},
 	"playerSwordDown":  []int{180},
 	"floorSwitch":      []int{112, 127},
+	"toggleObstacle":   []int{144, 114},
 }
 
 var entityPresets = map[string]enemyPresetFn{
+	"explosion": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category:   categories.Explosion,
+			Expiration: 12,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["explosion"],
+			},
+		}
+	},
 	"eyeburrower": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			HitBoxRadius: 20,
-			SpriteFrames: spriteSets["eyeburrower"],
-			Invincible:   false,
-			PatternName:  "random",
-			Direction:    direction.Down,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["eyeburrower"],
+			},
+			Health: 2,
+			Hitbox: &rooms.HitboxConfig{
+				Box:    imdraw.New(nil),
+				Radius: 20,
+			},
+			Movement: &rooms.MovementConfig{
+				Direction:    direction.Down,
+				Speed:        1.0,
+				MaxSpeed:     1.0,
+				HitSpeed:     10.0,
+				HitBackMoves: 10,
+				MaxMoves:     100,
+				PatternName:  "random",
+			},
 		}
 	},
 	"skeleton": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			HitBoxRadius: 20,
-			SpriteFrames: spriteSets["skeleton"],
-			Invincible:   false,
-			PatternName:  "random",
-			Direction:    direction.Down,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["skeleton"],
+			},
+			Health: 2,
+			Hitbox: &rooms.HitboxConfig{
+				Box:    imdraw.New(nil),
+				Radius: 20,
+			},
+			Movement: &rooms.MovementConfig{
+				Direction:    direction.Down,
+				Speed:        1.0,
+				MaxSpeed:     1.0,
+				HitSpeed:     10.0,
+				HitBackMoves: 10,
+				MaxMoves:     100,
+				PatternName:  "random",
+			},
 		}
 	},
 	"skull": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			HitBoxRadius: 20,
-			SpriteFrames: spriteSets["skull"],
-			Invincible:   false,
-			PatternName:  "random",
-			Direction:    direction.Down,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["skull"],
+			},
+			Health: 2,
+			Hitbox: &rooms.HitboxConfig{
+				Box:    imdraw.New(nil),
+				Radius: 20,
+			},
+			Movement: &rooms.MovementConfig{
+				Direction:    direction.Down,
+				Speed:        1.0,
+				MaxSpeed:     1.0,
+				HitSpeed:     10.0,
+				HitBackMoves: 10,
+				MaxMoves:     100,
+				PatternName:  "random",
+			},
 		}
 	},
 	"spinner": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Enemy,
 			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			HitBoxRadius: 20,
-			SpriteFrames: spriteSets["spinner"],
-			Invincible:   true,
-			PatternName:  "left-right",
-			Direction:    direction.Right,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["spinner"],
+			},
+			Invincible: true,
+			Hitbox: &rooms.HitboxConfig{
+				Box:    imdraw.New(nil),
+				Radius: 20,
+			},
+			Movement: &rooms.MovementConfig{
+				Direction:    direction.Right,
+				Speed:        1.0,
+				MaxSpeed:     1.0,
+				HitSpeed:     10.0,
+				HitBackMoves: 10,
+				MaxMoves:     100,
+				PatternName:  "left-right",
+			},
 		}
 	},
-	"warpstone": func(xTiles, yTiles float64) rooms.EntityConfig {
+	"warpStone": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
-			Category:     categories.Warp,
-			X:            s * xTiles,
-			Y:            s * yTiles,
-			W:            s,
-			H:            s,
-			SpriteFrames: spriteSets["warpStone"],
+			Category: categories.Warp,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+			W:        s,
+			H:        s,
+			Hitbox: &rooms.HitboxConfig{
+				Box:    imdraw.New(nil),
+				Radius: 20,
+			},
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["warpStone"],
+			},
 		}
 	},
 	"puzzleBox": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
-			Category:     categories.MovableObstacle,
-			X:            s * xTiles,
-			Y:            s * yTiles,
-			W:            s,
-			H:            s,
-			SpriteFrames: spriteSets["puzzleBox"],
+			Category: categories.MovableObstacle,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+			W:        s,
+			H:        s,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["puzzleBox"],
+			},
+			Movement: &rooms.MovementConfig{
+				Speed:    1.0,
+				MaxMoves: int(s) / 2,
+				MaxSpeed: 2.0,
+			},
 		}
 	},
 	"floorSwitch": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
-			Category:     categories.CollisionSwitch,
-			X:            s * xTiles,
-			Y:            s * yTiles,
-			W:            s,
-			H:            s,
-			SpriteFrames: spriteSets["floorSwitch"],
+			Category: categories.CollisionSwitch,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+			W:        s,
+			H:        s,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["floorSwitch"],
+			},
+			Toggleable: true,
+
+			// Movement: &rooms.MovementConfig{},
+		}
+	},
+	// this is an impassable obstacle that can be toggled "remotely"
+	// it has two visual states that coincide with each toggle state
+	"toggleObstacle": func(xTiles, yTiles float64) rooms.EntityConfig {
+		// TODO get this working again
+		return rooms.EntityConfig{
+			X: s * xTiles,
+			Y: s * yTiles,
+			W: s,
+			H: s,
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["toggleObstacle"],
+			},
+			// Impassable: true,
+			Toggleable: true,
+
+			// Movement: &rooms.MovementConfig{},
 		}
 	},
 }
 
 func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) rooms.EntityConfig {
-	e := entityPresets["warpstone"](X, Y)
+	fmt.Printf("presetWarpStone\n")
+	e := entityPresets["warpStone"](X, Y)
 	e.WarpToRoomID = 6
-	e.HitBoxRadius = 5
+	e.Hitbox.Radius = 5
 	return e
 }
 
@@ -248,15 +349,13 @@ func run() {
 
 	roomsMap = rooms.Rooms{
 		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
+			presetWarpStone(3, 7, 6, 5),
 			entityPresets["puzzleBox"](5, 5),
 			(func() rooms.EntityConfig {
 				e := entityPresets["floorSwitch"](5, 6)
-				e.ToggleHandler = func(enabled bool) {
-					fmt.Printf("Custom ToggleHandler %v\n", enabled)
-					// TODO...
-				}
 				return e
 			})(),
+			entityPresets["toggleObstacle"](10, 7),
 		),
 		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
 			presetWarpStone(3, 7, 6, 5),
@@ -274,7 +373,9 @@ func run() {
 				H:            s,
 				X:            (s * 7) + s/2,
 				Y:            (s * 9) + s/2,
-				HitBoxRadius: 30,
+				Hitbox: &rooms.HitboxConfig{
+					Radius: 30,
+				},
 			},
 			rooms.EntityConfig{
 				Category:     categories.Warp,
@@ -283,7 +384,9 @@ func run() {
 				H:            s,
 				X:            (s * 8) + s/2,
 				Y:            (s * 9) + s/2,
-				HitBoxRadius: 30,
+				Hitbox: &rooms.HitboxConfig{
+					Radius: 30,
+				},
 			},
 		),
 		6:  rooms.NewRoom("rockPathLeftRightEntrance"),
@@ -301,7 +404,9 @@ func run() {
 				H:            s,
 				X:            (s * 6) + s + (s / 2.5),
 				Y:            (s * 1) + s + (s / 2.5),
-				HitBoxRadius: 15,
+				Hitbox: &rooms.HitboxConfig{
+					Radius: 15,
+				},
 			},
 			rooms.EntityConfig{
 				Category:     categories.Warp,
@@ -310,7 +415,9 @@ func run() {
 				H:            s,
 				X:            (s * 7) + s + (s / 2.5),
 				Y:            (s * 1) + s + (s / 2.5),
-				HitBoxRadius: 15,
+				Hitbox: &rooms.HitboxConfig{
+					Radius: 15,
+				},
 			},
 		),
 	}
@@ -337,7 +444,7 @@ func run() {
 	sword := NewSword(gameWorld.NewEntityID(), s, s, player.Movement.Direction)
 	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, s, s, player.Movement.Direction)
 	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, s, s)
-	explosion := NewExplosion(gameWorld.NewEntityID())
+	explosion := buildEntityFromConfig(entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
 
 	hearts := []entities.Entity{
 		NewHeart(gameWorld.NewEntityID(), mapX+16, mapY+mapH, s, s),
@@ -399,19 +506,20 @@ func run() {
 			}
 		},
 		SwordCollisionWithEnemy: func(enemyID entities.EntityID) {
+			fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
 			if !sword.Ignore.Value {
 				dead := false
 				if !spatialSystem.EnemyMovingFromHit(enemyID) {
 					dead = healthSystem.Hit(enemyID, 1)
 					if dead {
 						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
-						explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
+						explosion.Temporary.Expiration = len(explosion.Animation.Map["default"].Frames)
 						explosion.Spatial = &components.Spatial{
 							Width:  s,
 							Height: s,
 							Rect:   enemySpatial.Rect,
 						}
-						explosion.OnExpiration = func() {
+						explosion.Temporary.OnExpiration = func() {
 							dropCoin(explosion.Spatial.Rect.Min)
 						}
 						addEntityToSystem(explosion)
@@ -430,13 +538,13 @@ func run() {
 				if dead {
 					fmt.Printf("You killed an enemy with an arrow\n")
 					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
-					explosion.Animation.Expiration = len(explosion.Animation.Default.Frames)
+					explosion.Temporary.Expiration = len(explosion.Animation.Map["default"].Frames)
 					explosion.Spatial = &components.Spatial{
 						Width:  s,
 						Height: s,
 						Rect:   enemySpatial.Rect,
 					}
-					explosion.OnExpiration = func() {
+					explosion.Temporary.OnExpiration = func() {
 						dropCoin(explosion.Spatial.Rect.Min)
 					}
 					addEntityToSystem(explosion)
@@ -479,28 +587,29 @@ func run() {
 			spatialSystem.UndoEnemyRect(enemyID)
 		},
 		PlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			entityConfig, ok := roomWarps[collisionSwitchID]
-			if ok && !roomTransition.Active {
-				roomTransition.Active = true
-				roomTransition.Style = rooms.TransitionWarp
-				roomTransition.Timer = 1
-				currentState = gamestate.MapTransition
-				addEntities = true
-				nextRoomID = entityConfig.WarpToRoomID
-			} else {
-				for id, entity := range entitiesMap {
-					if id == collisionSwitchID && !entity.Toggler.Enabled() {
-						entity.Toggler.Toggle()
-					}
+			for id, entity := range entitiesMap {
+				if id == collisionSwitchID && !entity.Toggler.Enabled() {
+					entity.Toggler.Toggle()
 				}
 			}
-
 		},
 		PlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
+			}
+		},
+		PlayerCollisionWithWarp: func(warpID entities.EntityID) {
+			entityConfig, ok := roomWarps[warpID]
+			if ok && !roomTransition.Active {
+				fmt.Printf("Warping!\n")
+				roomTransition.Active = true
+				roomTransition.Style = rooms.TransitionWarp
+				roomTransition.Timer = 1
+				currentState = gamestate.MapTransition
+				addEntities = true
+				nextRoomID = entityConfig.WarpToRoomID
 			}
 		},
 	}
@@ -586,28 +695,7 @@ func run() {
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[currentRoomID].EntityConfigs {
-					var entity entities.Entity
-					switch c.Category {
-					case categories.CollisionSwitch:
-						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.ToggleHandler)
-					case categories.MovableObstacle:
-						entity = NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
-					case categories.Warp:
-						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.ToggleHandler)
-						entity.Spatial.HitBoxRadius = c.HitBoxRadius
-					case categories.Enemy:
-						entity = NewEnemy(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.HitBoxRadius, c.SpriteFrames, c.Invincible, c.PatternName, c.Direction)
-					}
-
-					if len(c.SpriteFrames) > 0 {
-						entity.Animation = &components.Animation{
-							Default: &components.AnimationData{
-								Frames:    c.SpriteFrames,
-								FrameRate: frameRate,
-							},
-						}
-					}
-
+					entity := buildEntityFromConfig(c, gameWorld.NewEntityID())
 					entitiesMap[entity.ID] = entity
 					addEntityToSystem(entity)
 
@@ -660,6 +748,7 @@ func run() {
 				removeAllEnemiesFromSystems()
 				removeAllCollisionSwitchesFromSystems()
 				removeAllMoveableObstaclesFromSystems()
+				removeAllEntitiesFromSystems()
 
 				inc := (roomTransition.Start - float64(roomTransition.Timer))
 				incY := inc * (mapH / s)
@@ -718,6 +807,7 @@ func run() {
 				collisionSystem.RemoveAll(categories.Obstacle)
 				removeAllEnemiesFromSystems()
 				removeAllCollisionSwitchesFromSystems()
+				removeAllEntitiesFromSystems()
 			} else {
 				currentState = gamestate.Game
 				if nextRoomID != 0 {
@@ -731,6 +821,99 @@ func run() {
 		win.Update()
 
 	}
+}
+
+func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.Entity {
+	entity := entities.Entity{
+		ID:       id,
+		Category: c.Category,
+		Spatial: &components.Spatial{
+			Width:  c.W,
+			Height: c.H,
+			Rect:   pixel.R(c.X, c.Y, c.X+c.W, c.Y+c.H),
+			Shape:  imdraw.New(nil),
+			HitBox: imdraw.New(nil),
+		},
+	}
+
+	if c.Expiration > 0 {
+		entity.Temporary = &components.Temporary{
+			Expiration: c.Expiration,
+		}
+	}
+
+	if c.Category == categories.Warp {
+		entity.Enabled = &components.Enabled{
+			Value: true,
+		}
+	}
+
+	if c.Health > 0 {
+		fmt.Printf("\tHealth\n")
+		entity.Health = &components.Health{
+			Total: c.Health,
+		}
+	}
+
+	if c.Hitbox != nil {
+		fmt.Printf("\tHitbox\n")
+		entity.Spatial.HitBoxRadius = c.Hitbox.Radius
+	}
+
+	if c.Toggleable {
+		fmt.Printf("\tToggleable\n")
+		entity.Toggler = &components.Toggler{}
+		if c.Toggled {
+			fmt.Printf("\t\tToggled\n")
+			entity.Toggler.Toggle()
+		}
+	}
+
+	if c.Invincible {
+		fmt.Printf("\tInvincible\n")
+		entity.Invincible = &components.Invincible{
+			Enabled: true,
+		}
+	} else {
+		entity.Invincible = &components.Invincible{
+			Enabled: false,
+		}
+	}
+
+	if c.Movement != nil {
+		fmt.Printf("\tMovement\n")
+		entity.Movement = &components.Movement{
+			Direction:      c.Movement.Direction,
+			MaxSpeed:       c.Movement.MaxSpeed,
+			Speed:          c.Movement.Speed,
+			MaxMoves:       c.Movement.MaxMoves,
+			RemainingMoves: c.Movement.RemainingMoves,
+			HitSpeed:       c.Movement.HitSpeed,
+			MovingFromHit:  c.Movement.MovingFromHit,
+			HitBackMoves:   c.Movement.HitBackMoves,
+			PatternName:    c.Movement.PatternName,
+		}
+	}
+
+	if c.Animation != nil {
+		fmt.Printf("\tAnimated\n")
+		entity.Animation = &components.Animation{
+			Map: components.AnimationMap{},
+		}
+		for key, val := range c.Animation {
+			fmt.Printf("\t\tAnimation %s: %v\n", key, val)
+			entity.Animation.Map[key] = &components.AnimationData{
+				Frames:    val,
+				FrameRate: frameRate,
+			}
+		}
+	} else {
+		entity.Appearance = &components.Appearance{
+			Color: colornames.Sandybrown,
+		}
+	}
+
+	return entity
 }
 
 func main() {
@@ -862,33 +1045,35 @@ func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 			SpeedMod:  7,
 		},
 		Animation: &components.Animation{
-			Up: &components.AnimationData{
-				Frames:    spriteSets["playerUp"],
-				FrameRate: frameRate,
-			},
-			Right: &components.AnimationData{
-				Frames:    spriteSets["playerRight"],
-				FrameRate: frameRate,
-			},
-			Down: &components.AnimationData{
-				Frames:    spriteSets["playerDown"],
-				FrameRate: frameRate,
-			},
-			Left: &components.AnimationData{
-				Frames:    spriteSets["playerLeft"],
-				FrameRate: frameRate,
-			},
-			SwordAttackUp: &components.AnimationData{
-				Frames: spriteSets["playerSwordUp"],
-			},
-			SwordAttackRight: &components.AnimationData{
-				Frames: spriteSets["playerSwordRight"],
-			},
-			SwordAttackLeft: &components.AnimationData{
-				Frames: spriteSets["playerSwordLeft"],
-			},
-			SwordAttackDown: &components.AnimationData{
-				Frames: spriteSets["playerSwordDown"],
+			Map: components.AnimationMap{
+				"up": &components.AnimationData{
+					Frames:    spriteSets["playerUp"],
+					FrameRate: frameRate,
+				},
+				"right": &components.AnimationData{
+					Frames:    spriteSets["playerRight"],
+					FrameRate: frameRate,
+				},
+				"down": &components.AnimationData{
+					Frames:    spriteSets["playerDown"],
+					FrameRate: frameRate,
+				},
+				"left": &components.AnimationData{
+					Frames:    spriteSets["playerLeft"],
+					FrameRate: frameRate,
+				},
+				"swordAttackUp": &components.AnimationData{
+					Frames: spriteSets["playerSwordUp"],
+				},
+				"swordAttackRight": &components.AnimationData{
+					Frames: spriteSets["playerSwordRight"],
+				},
+				"swordAttackLeft": &components.AnimationData{
+					Frames: spriteSets["playerSwordLeft"],
+				},
+				"swordAttackDown": &components.AnimationData{
+					Frames: spriteSets["playerSwordDown"],
+				},
 			},
 		},
 	}
@@ -918,21 +1103,23 @@ func NewSword(id entities.EntityID, w, h float64, dir direction.Name) entities.E
 			Speed:     0.0,
 		},
 		Animation: &components.Animation{
-			Up: &components.AnimationData{
-				Frames:    []int{70},
-				FrameRate: frameRate,
-			},
-			Right: &components.AnimationData{
-				Frames:    []int{67},
-				FrameRate: frameRate,
-			},
-			Down: &components.AnimationData{
-				Frames:    []int{68},
-				FrameRate: frameRate,
-			},
-			Left: &components.AnimationData{
-				Frames:    []int{69},
-				FrameRate: frameRate,
+			Map: components.AnimationMap{
+				"up": &components.AnimationData{
+					Frames:    []int{70},
+					FrameRate: frameRate,
+				},
+				"right": &components.AnimationData{
+					Frames:    []int{67},
+					FrameRate: frameRate,
+				},
+				"down": &components.AnimationData{
+					Frames:    []int{68},
+					FrameRate: frameRate,
+				},
+				"left": &components.AnimationData{
+					Frames:    []int{69},
+					FrameRate: frameRate,
+				},
 			},
 		},
 	}
@@ -962,21 +1149,23 @@ func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) enti
 			Speed:     0.0,
 		},
 		Animation: &components.Animation{
-			Up: &components.AnimationData{
-				Frames:    []int{101},
-				FrameRate: frameRate,
-			},
-			Right: &components.AnimationData{
-				Frames:    []int{100},
-				FrameRate: frameRate,
-			},
-			Down: &components.AnimationData{
-				Frames:    []int{103},
-				FrameRate: frameRate,
-			},
-			Left: &components.AnimationData{
-				Frames:    []int{102},
-				FrameRate: frameRate,
+			Map: components.AnimationMap{
+				"up": &components.AnimationData{
+					Frames:    []int{101},
+					FrameRate: frameRate,
+				},
+				"right": &components.AnimationData{
+					Frames:    []int{100},
+					FrameRate: frameRate,
+				},
+				"down": &components.AnimationData{
+					Frames:    []int{103},
+					FrameRate: frameRate,
+				},
+				"left": &components.AnimationData{
+					Frames:    []int{102},
+					FrameRate: frameRate,
+				},
 			},
 		},
 	}
@@ -1002,9 +1191,11 @@ func NewBomb(id entities.EntityID, x, y, w, h float64) entities.Entity {
 			HitBoxRadius: 5,
 		},
 		Animation: &components.Animation{
-			Default: &components.AnimationData{
-				Frames:    []int{138, 139, 140, 141},
-				FrameRate: frameRate,
+			Map: components.AnimationMap{
+				"default": &components.AnimationData{
+					Frames:    []int{138, 139, 140, 141},
+					FrameRate: frameRate,
+				},
 			},
 		},
 	}
@@ -1024,116 +1215,10 @@ func NewHeart(id entities.EntityID, x, y, w, h float64) entities.Entity {
 			HitBox: imdraw.New(nil),
 		},
 		Animation: &components.Animation{
-			Default: &components.AnimationData{
-				Frames: []int{106},
-			},
-		},
-	}
-}
-
-// NewExplosion builds an explosion entity
-func NewExplosion(id entities.EntityID) entities.Entity {
-	return entities.Entity{
-		ID:       gameWorld.NewEntityID(),
-		Category: categories.Explosion,
-		Animation: &components.Animation{
-			Expiration: 12,
-			Default: &components.AnimationData{
-				Frames: []int{
-					122, 122, 122,
-					123, 123, 123,
-					124, 124, 124,
-					125, 125, 125,
+			Map: components.AnimationMap{
+				"default": &components.AnimationData{
+					Frames: []int{106},
 				},
-			},
-		},
-	}
-}
-
-// NewMoveableObstacle builds a moveable obstacle
-func NewMoveableObstacle(id entities.EntityID, w, h, x, y float64) entities.Entity {
-	return entities.Entity{
-		ID:       id,
-		Category: categories.MovableObstacle,
-		Appearance: &components.Appearance{
-			Color: colornames.Purple,
-		},
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect:   pixel.R(x, y, x+w, y+h),
-			Shape:  imdraw.New(nil),
-		},
-		Movement: &components.Movement{
-			Direction: direction.Down,
-			Speed:     1.0,
-			MaxMoves:  int(s) / 2,
-			MaxSpeed:  2.0,
-		},
-	}
-}
-
-// NewCollisionSwitch builds a new collision switch
-func NewCollisionSwitch(id entities.EntityID, w, h, x, y float64, toggleHandler func(bool)) entities.Entity {
-	return entities.Entity{
-		ID:       id,
-		Category: categories.CollisionSwitch,
-		Enabled: &components.Enabled{
-			Value: false,
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Sandybrown,
-		},
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect:   pixel.R(x, y, x+w, y+h),
-			Shape:  imdraw.New(nil),
-		},
-		Toggler: &components.Toggler{
-			Handler: toggleHandler,
-		},
-	}
-}
-
-// NewEnemy builds a new enemy
-func NewEnemy(id entities.EntityID, w, h, x, y, hitRadius float64, frames []int, invincible bool, patternName string, dir direction.Name) entities.Entity {
-	return entities.Entity{
-		ID:       id,
-		Category: categories.Enemy,
-		Health:   &components.Health{Total: 2},
-		Invincible: &components.Invincible{
-			Enabled: invincible,
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Red,
-		},
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect: pixel.R(
-				x,
-				y,
-				x+w,
-				y+h,
-			),
-			Shape:        imdraw.New(nil),
-			HitBox:       imdraw.New(nil),
-			HitBoxRadius: hitRadius,
-		},
-		Movement: &components.Movement{
-			Direction:    dir,
-			Speed:        1.0,
-			MaxSpeed:     1.0,
-			HitSpeed:     10.0,
-			HitBackMoves: 10,
-			MaxMoves:     100,
-			PatternName:  patternName,
-		},
-		Animation: &components.Animation{
-			Default: &components.AnimationData{
-				Frames:    frames,
-				FrameRate: frameRate,
 			},
 		},
 	}
@@ -1159,9 +1244,11 @@ func NewCoin(id entities.EntityID, x, y, w, h float64) entities.Entity {
 			Shape: imdraw.New(nil),
 		},
 		Animation: &components.Animation{
-			Default: &components.AnimationData{
-				Frames:    []int{5, 5, 6, 6, 21, 21},
-				FrameRate: frameRate,
+			Map: components.AnimationMap{
+				"default": &components.AnimationData{
+					Frames:    []int{5, 5, 6, 6, 21, 21},
+					FrameRate: frameRate,
+				},
 			},
 		},
 	}
@@ -1170,6 +1257,15 @@ func NewCoin(id entities.EntityID, x, y, w, h float64) entities.Entity {
 func addEntityToSystem(entity entities.Entity) {
 	for _, system := range gameWorld.Systems() {
 		system.AddEntity(entity)
+	}
+}
+
+func removeAllEntitiesFromSystems() {
+	for _, system := range gameWorld.Systems() {
+		switch sys := system.(type) {
+		case *systems.Render:
+			sys.RemoveAllEntities()
+		}
 	}
 }
 
@@ -1190,8 +1286,6 @@ func removeAllCollisionSwitchesFromSystems() {
 	for _, system := range gameWorld.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
-			sys.RemoveAll(categories.CollisionSwitch)
-		case *systems.Render:
 			sys.RemoveAll(categories.CollisionSwitch)
 		}
 	}
