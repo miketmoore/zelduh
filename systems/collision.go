@@ -41,6 +41,7 @@ type Collision struct {
 	PlayerNoCollisionWithSwitch           func(entities.EntityID)
 	PlayerCollisionWithBounds             func(bounds.Bound)
 	MoveableObstacleCollisionWithSwitch   func(entities.EntityID)
+	MoveableObstacleNoCollisionWithSwitch func(entities.EntityID)
 }
 
 // AddEntity adds an entity to the system
@@ -205,6 +206,8 @@ func (s *Collision) Update() {
 		for _, collisionSwitch := range s.collisionSwitches {
 			if isColliding(moveableObstacle.Spatial.Rect, collisionSwitch.Spatial.Rect) {
 				s.MoveableObstacleCollisionWithSwitch(collisionSwitch.ID)
+			} else {
+				s.MoveableObstacleNoCollisionWithSwitch(collisionSwitch.ID)
 			}
 		}
 
@@ -237,8 +240,10 @@ func (s *Collision) Update() {
 			}
 		} else {
 			if isColliding(s.player.Spatial.Rect, collisionSwitch.Spatial.Rect) {
+				// fmt.Printf(">>>>\n")
 				s.PlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
+				// fmt.Printf(">>>>>>>>>>\n")
 				s.PlayerNoCollisionWithSwitch(collisionSwitch.ID)
 			}
 		}

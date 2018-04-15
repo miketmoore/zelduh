@@ -30,6 +30,23 @@ type Enabled struct {
 	Value bool
 }
 
+// Toggler contains information to use when something is toggled
+type Toggler struct {
+	enabled bool
+	Handler func(bool)
+}
+
+// Enabled determine if the Toggler is enabled or not
+func (s *Toggler) Enabled() bool {
+	return s.enabled
+}
+
+// Toggle handles the switch being toggled
+func (s *Toggler) Toggle() {
+	s.enabled = !s.enabled
+	s.Handler(s.enabled)
+}
+
 // Health contains health data
 type Health struct {
 	Total int

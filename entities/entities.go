@@ -18,6 +18,7 @@ type Entity struct {
 	*components.Coins
 	*components.Dash
 	*components.Enabled
+	*components.Toggler
 	*components.Health
 	*components.Ignore
 	*components.Movement

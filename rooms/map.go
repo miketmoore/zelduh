@@ -28,6 +28,7 @@ type EntityConfig struct {
 	Invincible               bool
 	PatternName              string
 	Direction                direction.Name
+	ToggleHandler            func(bool)
 }
 
 // Room represents one map section

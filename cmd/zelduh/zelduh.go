@@ -239,23 +239,32 @@ func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) rooms.EntityConfi
 }
 
 var roomsMap rooms.Rooms
+var entitiesMap map[entities.EntityID]entities.Entity
 
 func run() {
 
+	entitiesMap = map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
 	fmt.Printf("build room configurations...\n")
 	roomsMap = rooms.Rooms{
 		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
+			entityPresets["puzzleBox"](5, 5),
+			(func() rooms.EntityConfig {
+				e := entityPresets["floorSwitch"](5, 6)
+				e.ToggleHandler = func(enabled bool) {
+					fmt.Printf("Custom ToggleHandler %v\n", enabled)
+					// TODO...
+				}
+				return e
+			})(),
+		),
+		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
 			presetWarpStone(3, 7, 6, 5),
 			entityPresets["skull"](5, 5),
 			entityPresets["skeleton"](11, 9),
 			entityPresets["spinner"](7, 9),
 			entityPresets["eyeburrower"](8, 9),
-		),
-		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
-			entityPresets["puzzleBox"](5, 5),
-			entityPresets["floorSwitch"](10, 10),
 		),
 		3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom"),
 		5: rooms.NewRoom("rockWithCaveEntrance",
@@ -459,7 +468,20 @@ func run() {
 			}
 		},
 		MoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			fmt.Printf("MoveableObstacleCollisionWithSwitch %d\n", collisionSwitchID)
+			for id, entity := range entitiesMap {
+				if id == collisionSwitchID && !entity.Toggler.Enabled() {
+					fmt.Printf("A\n")
+					entity.Toggler.Toggle()
+				}
+			}
+		},
+		MoveableObstacleNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
+			for id, entity := range entitiesMap {
+				if id == collisionSwitchID && entity.Toggler.Enabled() {
+					fmt.Printf("B\n")
+					entity.Toggler.Toggle()
+				}
+			}
 		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
 			// Block enemy within the spatial system by reseting current rect to previous rect
@@ -474,10 +496,21 @@ func run() {
 				currentState = gamestate.MapTransition
 				addEntities = true
 				nextRoomID = entityConfig.WarpToRoomID
+			} else {
+				for id, entity := range entitiesMap {
+					if id == collisionSwitchID && !entity.Toggler.Enabled() {
+						entity.Toggler.Toggle()
+					}
+				}
 			}
+
 		},
 		PlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			// fmt.Printf("PlayerNoCollisionWithSwitch\n")
+			for id, entity := range entitiesMap {
+				if id == collisionSwitchID && entity.Toggler.Enabled() {
+					entity.Toggler.Toggle()
+				}
+			}
 		},
 	}
 	gameWorld.AddSystem(collisionSystem)
@@ -565,11 +598,11 @@ func run() {
 					var entity entities.Entity
 					switch c.Category {
 					case categories.CollisionSwitch:
-						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.ToggleHandler)
 					case categories.MovableObstacle:
 						entity = NewMoveableObstacle(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
 					case categories.Warp:
-						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y)
+						entity = NewCollisionSwitch(gameWorld.NewEntityID(), c.W, c.H, c.X, c.Y, c.ToggleHandler)
 						entity.Spatial.HitBoxRadius = c.HitBoxRadius
 					case categories.Enemy:
 						fmt.Printf("Add enemy to room...\n")
@@ -585,6 +618,7 @@ func run() {
 						}
 					}
 
+					entitiesMap[entity.ID] = entity
 					addEntityToSystem(entity)
 
 					switch c.Category {
@@ -1050,7 +1084,7 @@ func NewMoveableObstacle(id entities.EntityID, w, h, x, y float64) entities.Enti
 }
 
 // NewCollisionSwitch builds a new collision switch
-func NewCollisionSwitch(id entities.EntityID, w, h, x, y float64) entities.Entity {
+func NewCollisionSwitch(id entities.EntityID, w, h, x, y float64, toggleHandler func(bool)) entities.Entity {
 	return entities.Entity{
 		ID:       id,
 		Category: categories.CollisionSwitch,
@@ -1065,6 +1099,9 @@ func NewCollisionSwitch(id entities.EntityID, w, h, x, y float64) entities.Entit
 			Height: h,
 			Rect:   pixel.R(x, y, x+w, y+h),
 			Shape:  imdraw.New(nil),
+		},
+		Toggler: &components.Toggler{
+			Handler: toggleHandler,
 		},
 	}
 }
