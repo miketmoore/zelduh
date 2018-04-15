@@ -40,26 +40,27 @@ type Render struct {
 // AddEntity adds an entity to the system
 func (s *Render) AddEntity(entity entities.Entity) {
 	r := renderEntity{
-		ID:         entity.ID,
-		Category:   entity.Category,
-		Spatial:    entity.Spatial,
-		Appearance: entity.Appearance,
-		Animation:  entity.Animation,
-		Movement:   entity.Movement,
-		Ignore:     entity.Ignore,
+		ID:        entity.ID,
+		Category:  entity.Category,
+		Spatial:   entity.Spatial,
+		Animation: entity.Animation,
+		Movement:  entity.Movement,
 	}
 	switch entity.Category {
 	case categories.Player:
 		s.player = r
 	case categories.Sword:
+		r.Ignore = entity.Ignore
 		s.sword = r
 	case categories.Arrow:
+		r.Ignore = entity.Ignore
 		s.arrow = r
 	case categories.Explosion:
 		s.generic = append(s.generic, r)
 	case categories.MovableObstacle:
 		s.defaultEntities = append(s.defaultEntities, r)
 	case categories.CollisionSwitch:
+		r.Appearance = entity.Appearance
 		r.Toggler = entity.Toggler
 		s.collisionSwitches = append(s.collisionSwitches, r)
 	case categories.Coin:
