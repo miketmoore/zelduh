@@ -458,6 +458,9 @@ func run() {
 				player.Spatial.Rect = player.Spatial.PrevRect
 			}
 		},
+		MoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
+			fmt.Printf("MoveableObstacleCollisionWithSwitch %d\n", collisionSwitchID)
+		},
 		EnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
 			// Block enemy within the spatial system by reseting current rect to previous rect
 			spatialSystem.UndoEnemyRect(enemyID)
