@@ -159,9 +159,23 @@ var spriteSets = map[string][]int{
 	"playerSwordDown":  []int{180},
 	"floorSwitch":      []int{112, 127},
 	"toggleObstacle":   []int{144, 114},
+	"swordUp":          []int{70},
+	"swordRight":       []int{67},
+	"swordDown":        []int{68},
+	"swordLeft":        []int{69},
 }
 
 var entityPresets = map[string]enemyPresetFn{
+	"coin": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Coin,
+			W:        s, H: s,
+			X: s * xTiles, Y: s * yTiles,
+			Animation: rooms.AnimationConfig{
+				"default": []int{5, 5, 6, 6, 21, 21},
+			},
+		}
+	},
 	"explosion": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category:   categories.Explosion,
@@ -169,6 +183,26 @@ var entityPresets = map[string]enemyPresetFn{
 			Animation: rooms.AnimationConfig{
 				"default": spriteSets["explosion"],
 			},
+		}
+	},
+	"sword": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Sword,
+			Movement: &rooms.MovementConfig{
+				Direction: direction.Down,
+				Speed:     0.0,
+			},
+			W: s, H: s, X: s * xTiles, Y: s * yTiles,
+			Animation: rooms.AnimationConfig{
+				"up":    spriteSets["swordUp"],
+				"right": spriteSets["swordRight"],
+				"down":  spriteSets["swordDown"],
+				"left":  spriteSets["swordLeft"],
+			},
+			Hitbox: &rooms.HitboxConfig{
+				Radius: 20,
+			},
+			Ignore: true,
 		}
 	},
 	"eyeburrower": func(xTiles, yTiles float64) rooms.EntityConfig {
@@ -441,10 +475,10 @@ func run() {
 
 	// Build entities
 	player := NewPlayer(gameWorld.NewEntityID(), s, s, mapW/2, mapH/2)
-	sword := NewSword(gameWorld.NewEntityID(), s, s, player.Movement.Direction)
 	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, s, s, player.Movement.Direction)
 	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, s, s)
 	explosion := buildEntityFromConfig(entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
+	sword := buildEntityFromConfig(entityPresets["sword"](0, 0), gameWorld.NewEntityID())
 
 	hearts := []entities.Entity{
 		NewHeart(gameWorld.NewEntityID(), mapX+16, mapY+mapH, s, s),
@@ -472,7 +506,7 @@ func run() {
 		Rand: r,
 	}
 	dropCoin := func(v pixel.Vec) {
-		coin := NewCoin(gameWorld.NewEntityID(), v.X, v.Y, s, s)
+		coin := buildEntityFromConfig(entityPresets["coin"](v.X/s, v.Y/s), gameWorld.NewEntityID())
 		addEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
@@ -834,6 +868,9 @@ func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.
 			Shape:  imdraw.New(nil),
 			HitBox: imdraw.New(nil),
 		},
+		Ignore: &components.Ignore{
+			Value: c.Ignore,
+		},
 	}
 
 	if c.Expiration > 0 {
@@ -1079,52 +1116,6 @@ func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 	}
 }
 
-// NewSword builds a sword entity
-func NewSword(id entities.EntityID, w, h float64, dir direction.Name) entities.Entity {
-	return entities.Entity{
-		ID:       id,
-		Category: categories.Sword,
-		Ignore: &components.Ignore{
-			Value: true,
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Deeppink,
-		},
-		Spatial: &components.Spatial{
-			Width:        w,
-			Height:       h,
-			Rect:         pixel.R(0, 0, 0, 0),
-			Shape:        imdraw.New(nil),
-			HitBox:       imdraw.New(nil),
-			HitBoxRadius: 20,
-		},
-		Movement: &components.Movement{
-			Direction: dir,
-			Speed:     0.0,
-		},
-		Animation: &components.Animation{
-			Map: components.AnimationMap{
-				"up": &components.AnimationData{
-					Frames:    []int{70},
-					FrameRate: frameRate,
-				},
-				"right": &components.AnimationData{
-					Frames:    []int{67},
-					FrameRate: frameRate,
-				},
-				"down": &components.AnimationData{
-					Frames:    []int{68},
-					FrameRate: frameRate,
-				},
-				"left": &components.AnimationData{
-					Frames:    []int{69},
-					FrameRate: frameRate,
-				},
-			},
-		},
-	}
-}
-
 // NewArrow builds an arrow entity
 func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) entities.Entity {
 	return entities.Entity{
@@ -1218,36 +1209,6 @@ func NewHeart(id entities.EntityID, x, y, w, h float64) entities.Entity {
 			Map: components.AnimationMap{
 				"default": &components.AnimationData{
 					Frames: []int{106},
-				},
-			},
-		},
-	}
-}
-
-// NewCoin builds a coin entity
-func NewCoin(id entities.EntityID, x, y, w, h float64) entities.Entity {
-	return entities.Entity{
-		ID:       gameWorld.NewEntityID(),
-		Category: categories.Coin,
-		Appearance: &components.Appearance{
-			Color: colornames.Purple,
-		},
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect: pixel.R(
-				x,
-				y,
-				x+w,
-				y+h,
-			),
-			Shape: imdraw.New(nil),
-		},
-		Animation: &components.Animation{
-			Map: components.AnimationMap{
-				"default": &components.AnimationData{
-					Frames:    []int{5, 5, 6, 6, 21, 21},
-					FrameRate: frameRate,
 				},
 			},
 		},

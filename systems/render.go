@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/categories"
@@ -27,8 +29,8 @@ type Render struct {
 	Spritesheet map[int]*pixel.Sprite
 
 	player renderEntity
-	sword  renderEntity
 	arrow  renderEntity
+	sword  renderEntity
 
 	entities  []renderEntity
 	obstacles []renderEntity
@@ -36,6 +38,9 @@ type Render struct {
 
 // AddEntity adds an entity to the system
 func (s *Render) AddEntity(entity entities.Entity) {
+	if entity.Category == categories.Coin {
+		fmt.Printf("COIN\n")
+	}
 	r := renderEntity{
 		ID:        entity.ID,
 		Category:  entity.Category,
@@ -43,16 +48,15 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		Animation: entity.Animation,
 		Movement:  entity.Movement,
 		Temporary: entity.Temporary,
+		Ignore:    entity.Ignore,
 	}
 	switch entity.Category {
 	case categories.Player:
 		s.player = r
-	case categories.Sword:
-		r.Ignore = entity.Ignore
-		s.sword = r
 	case categories.Arrow:
-		r.Ignore = entity.Ignore
 		s.arrow = r
+	case categories.Sword:
+		s.sword = r
 	case categories.Explosion:
 		fallthrough
 	case categories.Heart:
@@ -107,32 +111,36 @@ func (s *Render) RemoveAllEntities() {
 func (s *Render) Update() {
 
 	for _, entity := range s.entities {
-		if entity.Temporary != nil {
-			if entity.Temporary.Expiration == 0 {
-				entity.Temporary.OnExpiration()
-				s.RemoveEntity(entity.ID)
-			} else {
-				entity.Temporary.Expiration--
+		if entity.Ignore != nil && !entity.Ignore.Value {
+			if entity.Temporary != nil {
+				if entity.Temporary.Expiration == 0 {
+					entity.Temporary.OnExpiration()
+					s.RemoveEntity(entity.ID)
+				} else {
+					entity.Temporary.Expiration--
+				}
 			}
-		}
-		if entity.Toggler != nil {
-			s.animateToggleFrame(entity)
-		} else {
-			s.animateDefault(entity)
+			if entity.Toggler != nil {
+				s.animateToggleFrame(entity)
+			} else {
+				s.animateDefault(entity)
+			}
 		}
 	}
 
 	player := s.player
+	arrow := s.arrow
+	sword := s.sword
 
-	if !s.sword.Ignore.Value {
-		s.animateDirections(player.Movement.Direction, s.sword)
+	if !sword.Ignore.Value {
+		s.animateDirections(player.Movement.Direction, sword)
 	}
 
-	if !s.arrow.Ignore.Value {
-		s.animateDirections(player.Movement.Direction, s.arrow)
+	if !arrow.Ignore.Value {
+		s.animateDirections(player.Movement.Direction, arrow)
 	}
 
-	if s.sword.Ignore.Value && s.arrow.Ignore.Value {
+	if sword.Ignore != nil && sword.Ignore.Value && arrow.Ignore.Value {
 		s.animateDirections(player.Movement.Direction, player)
 	} else {
 		s.animateAttackDirection(player.Movement.Direction, player)

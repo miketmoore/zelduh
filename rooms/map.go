@@ -56,6 +56,7 @@ type EntityConfig struct {
 	Hitbox                                                 *HitboxConfig
 	Health                                                 int
 	Expiration                                             int
+	Ignore                                                 bool
 
 	Movement *MovementConfig
 }
