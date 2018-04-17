@@ -137,7 +137,7 @@ const frameRate int = 5
 type enemyPresetFn = func(xTiles, yTiles float64) rooms.EntityConfig
 
 var spriteSets = map[string][]int{
-	"eyeburrower": []int{20, 20, 20, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
+	"eyeburrower": []int{50, 50, 50, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
 	"explosion": []int{
 		122, 122, 122,
 		123, 123, 123,
