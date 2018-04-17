@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
@@ -35,22 +37,20 @@ func (s *Input) EnablePlayer() {
 
 // AddEntity adds an entity to the system
 func (s *Input) AddEntity(entity entities.Entity) {
+	r := inputEntity{
+		Movement: entity.Movement,
+		Dash:     entity.Dash,
+		Ignore:   entity.Ignore,
+	}
 	switch entity.Category {
 	case categories.Player:
-		s.playerEntity = inputEntity{
-			Movement: entity.Movement,
-			Dash:     entity.Dash,
-		}
+		s.playerEntity = r
 	case categories.Sword:
-		s.sword = inputEntity{
-			Movement: entity.Movement,
-			Ignore:   entity.Ignore,
-		}
+		fmt.Printf("ADD Sword\n")
+		s.sword = r
 	case categories.Arrow:
-		s.arrow = inputEntity{
-			Movement: entity.Movement,
-			Ignore:   entity.Ignore,
-		}
+		fmt.Printf("ADD Arrow\n")
+		s.arrow = r
 	}
 }
 

@@ -166,6 +166,29 @@ var spriteSets = map[string][]int{
 }
 
 var entityPresets = map[string]enemyPresetFn{
+	"arrow": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Arrow,
+			Movement: &rooms.MovementConfig{
+				Direction: direction.Down,
+				Speed:     0.0,
+			},
+			W: s,
+			H: s,
+			X: s * xTiles,
+			Y: s * yTiles,
+			Animation: rooms.AnimationConfig{
+				"up":    []int{101},
+				"right": []int{100},
+				"down":  []int{103},
+				"left":  []int{102},
+			},
+			Hitbox: &rooms.HitboxConfig{
+				Radius: 5,
+			},
+			Ignore: true,
+		}
+	},
 	"coin": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Coin,
@@ -541,10 +564,10 @@ func run() {
 
 	// Build entities
 	player := buildEntityFromConfig(entityPresets["player"](6, 6), gameWorld.NewEntityID())
-	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, s, s, player.Movement.Direction)
 	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, s, s)
 	explosion := buildEntityFromConfig(entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
 	sword := buildEntityFromConfig(entityPresets["sword"](0, 0), gameWorld.NewEntityID())
+	arrow := buildEntityFromConfig(entityPresets["arrow"](0, 0), gameWorld.NewEntityID())
 
 	hearts := []entities.Entity{
 		buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
@@ -1107,52 +1130,6 @@ func loadPicture(path string) pixel.Picture {
 		os.Exit(1)
 	}
 	return pixel.PictureDataFromImage(img)
-}
-
-// NewArrow builds an arrow entity
-func NewArrow(id entities.EntityID, x, y, w, h float64, dir direction.Name) entities.Entity {
-	return entities.Entity{
-		ID:       id,
-		Category: categories.Arrow,
-		Ignore: &components.Ignore{
-			Value: true,
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Deeppink,
-		},
-		Spatial: &components.Spatial{
-			Width:        w,
-			Height:       h,
-			Rect:         pixel.R(x, y, x+w, y+h),
-			Shape:        imdraw.New(nil),
-			HitBox:       imdraw.New(nil),
-			HitBoxRadius: 5,
-		},
-		Movement: &components.Movement{
-			Direction: dir,
-			Speed:     0.0,
-		},
-		Animation: &components.Animation{
-			Map: components.AnimationMap{
-				"up": &components.AnimationData{
-					Frames:    []int{101},
-					FrameRate: frameRate,
-				},
-				"right": &components.AnimationData{
-					Frames:    []int{100},
-					FrameRate: frameRate,
-				},
-				"down": &components.AnimationData{
-					Frames:    []int{103},
-					FrameRate: frameRate,
-				},
-				"left": &components.AnimationData{
-					Frames:    []int{102},
-					FrameRate: frameRate,
-				},
-			},
-		},
-	}
 }
 
 // NewBomb builds a bomb entity
