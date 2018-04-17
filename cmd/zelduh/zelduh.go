@@ -164,6 +164,13 @@ var spriteSets = map[string][]int{
 	"swordRight":       []int{67},
 	"swordDown":        []int{68},
 	"swordLeft":        []int{69},
+	"arrowUp":          []int{101},
+	"arrowRight":       []int{100},
+	"arrowDown":        []int{103},
+	"arrowLeft":        []int{102},
+	"bomb":             []int{138, 139, 140, 141},
+	"coin":             []int{5, 5, 6, 6, 21, 21},
+	"heart":            []int{106},
 }
 
 var entityPresets = map[string]enemyPresetFn{
@@ -179,10 +186,10 @@ var entityPresets = map[string]enemyPresetFn{
 			X: s * xTiles,
 			Y: s * yTiles,
 			Animation: rooms.AnimationConfig{
-				"up":    []int{101},
-				"right": []int{100},
-				"down":  []int{103},
-				"left":  []int{102},
+				"up":    spriteSets["arrowUp"],
+				"right": spriteSets["arrowRight"],
+				"down":  spriteSets["arrowDown"],
+				"left":  spriteSets["arrowLeft"],
 			},
 			Hitbox: &rooms.HitboxConfig{
 				Radius: 5,
@@ -202,7 +209,7 @@ var entityPresets = map[string]enemyPresetFn{
 			X: s * xTiles,
 			Y: s * yTiles,
 			Animation: rooms.AnimationConfig{
-				"default": []int{138, 139, 140, 141},
+				"default": spriteSets["bomb"],
 			},
 			Hitbox: &rooms.HitboxConfig{
 				Radius: 5,
@@ -218,7 +225,7 @@ var entityPresets = map[string]enemyPresetFn{
 			X:        s * xTiles,
 			Y:        s * yTiles,
 			Animation: rooms.AnimationConfig{
-				"default": []int{5, 5, 6, 6, 21, 21},
+				"default": spriteSets["coin"],
 			},
 		}
 	},
@@ -333,7 +340,7 @@ var entityPresets = map[string]enemyPresetFn{
 				Box: imdraw.New(nil),
 			},
 			Animation: rooms.AnimationConfig{
-				"default": []int{106},
+				"default": spriteSets["heart"],
 			},
 		}
 
@@ -466,8 +473,6 @@ var entityPresets = map[string]enemyPresetFn{
 				"default": spriteSets["floorSwitch"],
 			},
 			Toggleable: true,
-
-			// Movement: &rooms.MovementConfig{},
 		}
 	},
 	// this is an impassable obstacle that can be toggled "remotely"
@@ -484,8 +489,6 @@ var entityPresets = map[string]enemyPresetFn{
 			},
 			// Impassable: true,
 			Toggleable: true,
-
-			// Movement: &rooms.MovementConfig{},
 		}
 	},
 }
