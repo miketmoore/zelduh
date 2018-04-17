@@ -589,12 +589,6 @@ func run() {
 	sword := buildEntityFromConfig(entityPresets["sword"](0, 0), gameWorld.NewEntityID())
 	arrow := buildEntityFromConfig(entityPresets["arrow"](0, 0), gameWorld.NewEntityID())
 
-	hearts := []entities.Entity{
-		buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
-		buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
-		buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
-	}
-
 	roomTransition := rooms.RoomTransition{
 		Start: float64(s),
 	}
@@ -761,13 +755,21 @@ func run() {
 		Spritesheet: spritesheet,
 	})
 
+	addHearts := func() {
+		hearts := []entities.Entity{
+			buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
+			buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
+			buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
+		}
+		for _, entity := range hearts {
+			addEntityToSystem(entity)
+		}
+	}
+
 	addEntityToSystem(player)
 	addEntityToSystem(sword)
 	addEntityToSystem(arrow)
 	addEntityToSystem(bomb)
-	for _, entity := range hearts {
-		addEntityToSystem(entity)
-	}
 
 	drawMask := func() {
 		// top
@@ -817,6 +819,7 @@ func run() {
 				currentState = gamestate.Game
 			}
 		case gamestate.Game:
+			addHearts()
 			inputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
