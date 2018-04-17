@@ -819,7 +819,6 @@ func run() {
 				currentState = gamestate.Game
 			}
 		case gamestate.Game:
-			addHearts()
 			inputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
@@ -829,6 +828,8 @@ func run() {
 
 			if addEntities {
 				addEntities = false
+
+				addHearts()
 
 				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
