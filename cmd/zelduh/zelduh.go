@@ -278,6 +278,22 @@ var entityPresets = map[string]enemyPresetFn{
 			},
 		}
 	},
+	"heart": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Heart,
+			W:        s,
+			H:        s,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+			Hitbox: &rooms.HitboxConfig{
+				Box: imdraw.New(nil),
+			},
+			Animation: rooms.AnimationConfig{
+				"default": []int{106},
+			},
+		}
+
+	},
 	"skeleton": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Enemy,
@@ -531,9 +547,9 @@ func run() {
 	sword := buildEntityFromConfig(entityPresets["sword"](0, 0), gameWorld.NewEntityID())
 
 	hearts := []entities.Entity{
-		NewHeart(gameWorld.NewEntityID(), mapX+16, mapY+mapH, s, s),
-		NewHeart(gameWorld.NewEntityID(), mapX+48, mapY+mapH, s, s),
-		NewHeart(gameWorld.NewEntityID(), mapX+80, mapY+mapH, s, s),
+		buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
+		buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
+		buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
 	}
 
 	roomTransition := rooms.RoomTransition{
@@ -1163,29 +1179,6 @@ func NewBomb(id entities.EntityID, x, y, w, h float64) entities.Entity {
 				"default": &components.AnimationData{
 					Frames:    []int{138, 139, 140, 141},
 					FrameRate: frameRate,
-				},
-			},
-		},
-	}
-}
-
-// NewHeart builds a heart entity
-func NewHeart(id entities.EntityID, x, y, w, h float64) entities.Entity {
-	fmt.Printf("NewHeart %d\n", id)
-	return entities.Entity{
-		ID:       gameWorld.NewEntityID(),
-		Category: categories.Heart,
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect:   pixel.R(x, y, x+w, y+h),
-			Shape:  imdraw.New(nil),
-			HitBox: imdraw.New(nil),
-		},
-		Animation: &components.Animation{
-			Map: components.AnimationMap{
-				"default": &components.AnimationData{
-					Frames: []int{106},
 				},
 			},
 		},
