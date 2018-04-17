@@ -196,6 +196,42 @@ var entityPresets = map[string]enemyPresetFn{
 			Y:        s * yTiles,
 		}
 	},
+	"player": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Player,
+			Health:   3,
+			W:        s,
+			H:        s,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+			Hitbox: &rooms.HitboxConfig{
+				Box:                  imdraw.New(nil),
+				Radius:               15,
+				CollisionWithRectMod: 5,
+			},
+			Movement: &rooms.MovementConfig{
+				Direction: direction.Down,
+				MaxSpeed:  7.0,
+				Speed:     0.0,
+			},
+			Coins: true,
+			Dash: &rooms.DashConfig{
+				Charge:    0,
+				MaxCharge: 50,
+				SpeedMod:  7,
+			},
+			Animation: rooms.AnimationConfig{
+				"up":               spriteSets["playerUp"],
+				"right":            spriteSets["playerRight"],
+				"down":             spriteSets["playerDown"],
+				"left":             spriteSets["playerLeft"],
+				"swordAttackUp":    spriteSets["playerSwordUp"],
+				"swordAttackRight": spriteSets["playerSwordRight"],
+				"swordAttackLeft":  spriteSets["playerSwordLeft"],
+				"swordAttackDown":  spriteSets["playerSwordDown"],
+			},
+		}
+	},
 	"sword": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Sword,
@@ -488,7 +524,7 @@ func run() {
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
-	player := NewPlayer(gameWorld.NewEntityID(), s, s, mapW/2, mapH/2)
+	player := buildEntityFromConfig(entityPresets["player"](6, 6), gameWorld.NewEntityID())
 	arrow := NewArrow(gameWorld.NewEntityID(), 0.0, 0.0, s, s, player.Movement.Direction)
 	bomb := NewBomb(gameWorld.NewEntityID(), 0.0, 0.0, s, s)
 	explosion := buildEntityFromConfig(entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
@@ -946,6 +982,20 @@ func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.
 		}
 	}
 
+	if c.Coins {
+		entity.Coins = &components.Coins{
+			Coins: 0,
+		}
+	}
+
+	if c.Dash != nil {
+		entity.Dash = &components.Dash{
+			Charge:    c.Dash.Charge,
+			MaxCharge: c.Dash.MaxCharge,
+			SpeedMod:  c.Dash.SpeedMod,
+		}
+	}
+
 	if c.Animation != nil {
 		fmt.Printf("\tAnimated\n")
 		entity.Animation = &components.Animation{
@@ -1041,79 +1091,6 @@ func loadPicture(path string) pixel.Picture {
 		os.Exit(1)
 	}
 	return pixel.PictureDataFromImage(img)
-}
-
-// NewPlayer builds a new Entity as a Player
-func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
-	return entities.Entity{
-		ID:       id,
-		Category: categories.Player,
-		Health: &components.Health{
-			Total: 3,
-		},
-		Appearance: &components.Appearance{
-			Color: colornames.Green,
-		},
-		Spatial: &components.Spatial{
-			Width:  w,
-			Height: h,
-			Rect: pixel.R(
-				x,
-				y,
-				x+w,
-				y+h,
-			),
-			Shape:                imdraw.New(nil),
-			HitBox:               imdraw.New(nil),
-			HitBoxRadius:         15,
-			CollisionWithRectMod: 5,
-		},
-		Movement: &components.Movement{
-			Direction: direction.Down,
-			MaxSpeed:  7.0,
-			Speed:     0.0,
-		},
-		Coins: &components.Coins{
-			Coins: 0,
-		},
-		Dash: &components.Dash{
-			Charge:    0,
-			MaxCharge: 50,
-			SpeedMod:  7,
-		},
-		Animation: &components.Animation{
-			Map: components.AnimationMap{
-				"up": &components.AnimationData{
-					Frames:    spriteSets["playerUp"],
-					FrameRate: frameRate,
-				},
-				"right": &components.AnimationData{
-					Frames:    spriteSets["playerRight"],
-					FrameRate: frameRate,
-				},
-				"down": &components.AnimationData{
-					Frames:    spriteSets["playerDown"],
-					FrameRate: frameRate,
-				},
-				"left": &components.AnimationData{
-					Frames:    spriteSets["playerLeft"],
-					FrameRate: frameRate,
-				},
-				"swordAttackUp": &components.AnimationData{
-					Frames: spriteSets["playerSwordUp"],
-				},
-				"swordAttackRight": &components.AnimationData{
-					Frames: spriteSets["playerSwordRight"],
-				},
-				"swordAttackLeft": &components.AnimationData{
-					Frames: spriteSets["playerSwordLeft"],
-				},
-				"swordAttackDown": &components.AnimationData{
-					Frames: spriteSets["playerSwordDown"],
-				},
-			},
-		},
-	}
 }
 
 // NewArrow builds an arrow entity

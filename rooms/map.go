@@ -39,26 +39,33 @@ type MovementConfig struct {
 
 // HitboxConfig is used to configure an entity's hitbox
 type HitboxConfig struct {
-	Box    *imdraw.IMDraw
-	Radius float64
+	Box                  *imdraw.IMDraw
+	Radius               float64
+	CollisionWithRectMod int
+}
+
+// DashConfig is used to configure an entity's dash stats
+type DashConfig struct {
+	Charge, MaxCharge int
+	SpeedMod          float64
 }
 
 // EntityConfig is used to simplify building entities
 type EntityConfig struct {
-	Category                                               categories.Category
-	Moveable, Animated, Toggleable, Impassable, Invincible bool
-	X, Y, W, H                                             float64
-	SpriteFrames                                           []int
-	WarpToRoomID                                           RoomID
-	PatternName                                            string
-	Toggled                                                bool
-	Animation                                              AnimationConfig
-	Hitbox                                                 *HitboxConfig
-	Health                                                 int
-	Expiration                                             int
-	Ignore                                                 bool
-
-	Movement *MovementConfig
+	Category                                                      categories.Category
+	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
+	X, Y, W, H                                                    float64
+	SpriteFrames                                                  []int
+	WarpToRoomID                                                  RoomID
+	PatternName                                                   string
+	Toggled                                                       bool
+	Health                                                        int
+	Expiration                                                    int
+	Ignore                                                        bool
+	Animation                                                     AnimationConfig
+	Hitbox                                                        *HitboxConfig
+	Dash                                                          *DashConfig
+	Movement                                                      *MovementConfig
 }
 
 // Room represents one map section
