@@ -1,8 +1,6 @@
 package systems
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/categories"
@@ -38,9 +36,6 @@ type Render struct {
 
 // AddEntity adds an entity to the system
 func (s *Render) AddEntity(entity entities.Entity) {
-	if entity.Category == categories.Coin {
-		fmt.Printf("COIN\n")
-	}
 	r := renderEntity{
 		ID:        entity.ID,
 		Category:  entity.Category,

@@ -746,7 +746,6 @@ func run() {
 		PlayerCollisionWithWarp: func(warpID entities.EntityID) {
 			entityConfig, ok := roomWarps[warpID]
 			if ok && !roomTransition.Active {
-				fmt.Printf("Warping!\n")
 				roomTransition.Active = true
 				roomTransition.Style = rooms.TransitionWarp
 				roomTransition.Timer = 1
@@ -995,28 +994,23 @@ func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.
 	}
 
 	if c.Health > 0 {
-		fmt.Printf("\tHealth\n")
 		entity.Health = &components.Health{
 			Total: c.Health,
 		}
 	}
 
 	if c.Hitbox != nil {
-		fmt.Printf("\tHitbox\n")
 		entity.Spatial.HitBoxRadius = c.Hitbox.Radius
 	}
 
 	if c.Toggleable {
-		fmt.Printf("\tToggleable\n")
 		entity.Toggler = &components.Toggler{}
 		if c.Toggled {
-			fmt.Printf("\t\tToggled\n")
 			entity.Toggler.Toggle()
 		}
 	}
 
 	if c.Invincible {
-		fmt.Printf("\tInvincible\n")
 		entity.Invincible = &components.Invincible{
 			Enabled: true,
 		}
@@ -1027,7 +1021,6 @@ func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.
 	}
 
 	if c.Movement != nil {
-		fmt.Printf("\tMovement\n")
 		entity.Movement = &components.Movement{
 			Direction:      c.Movement.Direction,
 			MaxSpeed:       c.Movement.MaxSpeed,
@@ -1056,12 +1049,10 @@ func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.
 	}
 
 	if c.Animation != nil {
-		fmt.Printf("\tAnimated\n")
 		entity.Animation = &components.Animation{
 			Map: components.AnimationMap{},
 		}
 		for key, val := range c.Animation {
-			fmt.Printf("\t\tAnimation %s: %v\n", key, val)
 			entity.Animation.Map[key] = &components.AnimationData{
 				Frames:    val,
 				FrameRate: frameRate,

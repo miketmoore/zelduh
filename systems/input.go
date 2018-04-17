@@ -1,8 +1,6 @@
 package systems
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
@@ -46,10 +44,8 @@ func (s *Input) AddEntity(entity entities.Entity) {
 	case categories.Player:
 		s.playerEntity = r
 	case categories.Sword:
-		fmt.Printf("ADD Sword\n")
 		s.sword = r
 	case categories.Arrow:
-		fmt.Printf("ADD Arrow\n")
 		s.arrow = r
 	}
 }
