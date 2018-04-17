@@ -169,8 +169,10 @@ var entityPresets = map[string]enemyPresetFn{
 	"coin": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Coin,
-			W:        s, H: s,
-			X: s * xTiles, Y: s * yTiles,
+			W:        s,
+			H:        s,
+			X:        s * xTiles,
+			Y:        s * yTiles,
 			Animation: rooms.AnimationConfig{
 				"default": []int{5, 5, 6, 6, 21, 21},
 			},
@@ -185,6 +187,15 @@ var entityPresets = map[string]enemyPresetFn{
 			},
 		}
 	},
+	"obstacle": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Obstacle,
+			W:        s,
+			H:        s,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+		}
+	},
 	"sword": func(xTiles, yTiles float64) rooms.EntityConfig {
 		return rooms.EntityConfig{
 			Category: categories.Sword,
@@ -192,7 +203,10 @@ var entityPresets = map[string]enemyPresetFn{
 				Direction: direction.Down,
 				Speed:     0.0,
 			},
-			W: s, H: s, X: s * xTiles, Y: s * yTiles,
+			W: s,
+			H: s,
+			X: s * xTiles,
+			Y: s * yTiles,
 			Animation: rooms.AnimationConfig{
 				"up":    spriteSets["swordUp"],
 				"right": spriteSets["swordRight"],
@@ -1029,20 +1043,6 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-// NewObstacle builds a new obstacle
-func NewObstacle(id entities.EntityID, x, y float64) entities.Entity {
-	return entities.Entity{
-		ID:       gameWorld.NewEntityID(),
-		Category: categories.Obstacle,
-		Spatial: &components.Spatial{
-			Width:  s,
-			Height: s,
-			Rect:   pixel.R(x, y, x+s, y+s),
-			Shape:  imdraw.New(nil),
-		},
-	}
-}
-
 // NewPlayer builds a new Entity as a Player
 func NewPlayer(id entities.EntityID, w, h, x, y float64) entities.Entity {
 	return entities.Entity{
@@ -1401,6 +1401,7 @@ func drawMapBGImage(name string, modX, modY float64) {
 func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entities.Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName]
 	obstacles := []entities.Entity{}
+	mod := 0.5
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
@@ -1408,8 +1409,12 @@ func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entitie
 				vec.X+mapX+modX+s/2,
 				vec.Y+mapY+modY+s/2,
 			)
+
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				obstacle := NewObstacle(gameWorld.NewEntityID(), movedVec.X-s/2, movedVec.Y-s/2)
+				x := movedVec.X/s - mod
+				y := movedVec.Y/s - mod
+				id := gameWorld.NewEntityID()
+				obstacle := buildEntityFromConfig(entityPresets["obstacle"](x, y), id)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
