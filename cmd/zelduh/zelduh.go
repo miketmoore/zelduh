@@ -144,6 +144,7 @@ var spriteSets = map[string][]int{
 		124, 124, 124,
 		125, 125, 125,
 	},
+	"uiCoin":           []int{20},
 	"skeleton":         []int{31, 32},
 	"skull":            []int{36, 37, 38, 39},
 	"spinner":          []int{51, 52},
@@ -403,6 +404,21 @@ var entityPresets = map[string]enemyPresetFn{
 				HitBackMoves: 10,
 				MaxMoves:     100,
 				PatternName:  "left-right",
+			},
+		}
+	},
+	"uiCoin": func(xTiles, yTiles float64) rooms.EntityConfig {
+		return rooms.EntityConfig{
+			Category: categories.Heart,
+			W:        s,
+			H:        s,
+			X:        s * xTiles,
+			Y:        s * yTiles,
+			Hitbox: &rooms.HitboxConfig{
+				Box: imdraw.New(nil),
+			},
+			Animation: rooms.AnimationConfig{
+				"default": spriteSets["uiCoin"],
 			},
 		}
 	},
@@ -766,6 +782,11 @@ func run() {
 		}
 	}
 
+	addUICoin := func() {
+		coin := buildEntityFromConfig(entityPresets["uiCoin"](4, 14), gameWorld.NewEntityID())
+		addEntityToSystem(coin)
+	}
+
 	addEntityToSystem(player)
 	addEntityToSystem(sword)
 	addEntityToSystem(arrow)
@@ -830,6 +851,7 @@ func run() {
 				addEntities = false
 
 				addHearts()
+				addUICoin()
 
 				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
