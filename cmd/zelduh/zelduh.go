@@ -511,7 +511,6 @@ func run() {
 
 	roomsMap = rooms.Rooms{
 		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
-			presetWarpStone(3, 7, 6, 5),
 			entityPresets["puzzleBox"](5, 5),
 			(func() rooms.EntityConfig {
 				e := entityPresets["floorSwitch"](5, 6)
@@ -520,13 +519,14 @@ func run() {
 			entityPresets["toggleObstacle"](10, 7),
 		),
 		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
-			presetWarpStone(3, 7, 6, 5),
 			entityPresets["skull"](5, 5),
 			entityPresets["skeleton"](11, 9),
 			entityPresets["spinner"](7, 9),
 			entityPresets["eyeburrower"](8, 9),
 		),
-		3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom"),
+		3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom",
+			presetWarpStone(3, 7, 6, 5),
+		),
 		5: rooms.NewRoom("rockWithCaveEntrance",
 			rooms.EntityConfig{
 				Category:     categories.Warp,
@@ -557,7 +557,6 @@ func run() {
 		9:  rooms.NewRoom("overworldFourWallsDoorTop"),
 		10: rooms.NewRoom("overworldFourWallsDoorLeft"),
 		11: rooms.NewRoom("dungeonFourDoors",
-
 			// South door of cave - warp to cave entrance
 			rooms.EntityConfig{
 				Category:     categories.Warp,
@@ -657,6 +656,7 @@ func run() {
 			// TODO repeat what I did with the enemies
 			spatialSystem.MovePlayerBack()
 			player.Health.Total--
+			// TODO redraw hearts
 			if player.Health.Total == 0 {
 				currentState = gamestate.Over
 			}
@@ -774,14 +774,16 @@ func run() {
 		Spritesheet: spritesheet,
 	})
 
-	addHearts := func() {
+	addHearts := func(health int) {
 		hearts := []entities.Entity{
 			buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
 			buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
 			buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
 		}
-		for _, entity := range hearts {
-			addEntityToSystem(entity)
+		for i, entity := range hearts {
+			if i < health {
+				addEntityToSystem(entity)
+			}
 		}
 	}
 
@@ -853,7 +855,7 @@ func run() {
 			if addEntities {
 				addEntities = false
 
-				addHearts()
+				addHearts(player.Health.Total)
 				addUICoin()
 
 				// Draw obstacles on appropriate map tiles
