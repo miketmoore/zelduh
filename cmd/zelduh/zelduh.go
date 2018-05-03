@@ -631,6 +631,13 @@ func run() {
 		addEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
+
+	hearts := []entities.Entity{
+		buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
+		buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
+		buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
+	}
+
 	collisionSystem := &systems.Collision{
 		MapBounds: pixel.R(
 			mapX,
@@ -656,6 +663,12 @@ func run() {
 			// TODO repeat what I did with the enemies
 			spatialSystem.MovePlayerBack()
 			player.Health.Total--
+
+			// remove heart entity
+			heartIndex := len(hearts) - 1
+			gameWorld.Remove(categories.Heart, hearts[heartIndex].ID)
+			hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
+
 			// TODO redraw hearts
 			if player.Health.Total == 0 {
 				currentState = gamestate.Over
@@ -774,12 +787,10 @@ func run() {
 		Spritesheet: spritesheet,
 	})
 
+	// make sure only correct number of hearts exists in systems
+	// so, if health is reduced, need to remove a heart entity from the systems,
+	// the correct one... last one
 	addHearts := func(health int) {
-		hearts := []entities.Entity{
-			buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
-			buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
-			buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
-		}
 		for i, entity := range hearts {
 			if i < health {
 				addEntityToSystem(entity)
@@ -852,10 +863,11 @@ func run() {
 
 			drawMapBGImage(roomsMap[currentRoomID].MapName, 0, 0)
 
+			addHearts(player.Health.Total)
+
 			if addEntities {
 				addEntities = false
 
-				addHearts(player.Health.Total)
 				addUICoin()
 
 				// Draw obstacles on appropriate map tiles

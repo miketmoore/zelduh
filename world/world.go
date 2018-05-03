@@ -62,6 +62,13 @@ func (w *World) Remove(category categories.Category, id entities.EntityID) {
 				sys.RemoveEntity(id)
 			}
 		}
+	case categories.Heart:
+		for _, sys := range w.systems {
+			switch sys := sys.(type) {
+			case *systems.Render:
+				sys.RemoveEntity(id)
+			}
+		}
 	}
 }
 
