@@ -600,11 +600,11 @@ func run() {
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
-	player := buildEntityFromConfig(entityPresets["player"](6, 6), gameWorld.NewEntityID())
-	bomb := buildEntityFromConfig(entityPresets["bomb"](0, 0), gameWorld.NewEntityID())
-	explosion := buildEntityFromConfig(entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
-	sword := buildEntityFromConfig(entityPresets["sword"](0, 0), gameWorld.NewEntityID())
-	arrow := buildEntityFromConfig(entityPresets["arrow"](0, 0), gameWorld.NewEntityID())
+	player := entities.BuildEntityFromConfig(frameRate, entityPresets["player"](6, 6), gameWorld.NewEntityID())
+	bomb := entities.BuildEntityFromConfig(frameRate, entityPresets["bomb"](0, 0), gameWorld.NewEntityID())
+	explosion := entities.BuildEntityFromConfig(frameRate, entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
+	sword := entities.BuildEntityFromConfig(frameRate, entityPresets["sword"](0, 0), gameWorld.NewEntityID())
+	arrow := entities.BuildEntityFromConfig(frameRate, entityPresets["arrow"](0, 0), gameWorld.NewEntityID())
 
 	roomTransition := rooms.RoomTransition{
 		Start: float64(s),
@@ -626,15 +626,15 @@ func run() {
 		Rand: r,
 	}
 	dropCoin := func(v pixel.Vec) {
-		coin := buildEntityFromConfig(entityPresets["coin"](v.X/s, v.Y/s), gameWorld.NewEntityID())
+		coin := entities.BuildEntityFromConfig(frameRate, entityPresets["coin"](v.X/s, v.Y/s), gameWorld.NewEntityID())
 		addEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
 
 	hearts := []entities.Entity{
-		buildEntityFromConfig(entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
-		buildEntityFromConfig(entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
-		buildEntityFromConfig(entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(frameRate, entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(frameRate, entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(frameRate, entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
 	}
 
 	collisionSystem := &systems.Collision{
@@ -798,7 +798,7 @@ func run() {
 	}
 
 	addUICoin := func() {
-		coin := buildEntityFromConfig(entityPresets["uiCoin"](4, 14), gameWorld.NewEntityID())
+		coin := entities.BuildEntityFromConfig(frameRate, entityPresets["uiCoin"](4, 14), gameWorld.NewEntityID())
 		addEntityToSystem(coin)
 	}
 
@@ -879,7 +879,7 @@ func run() {
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[currentRoomID].EntityConfigs {
-					entity := buildEntityFromConfig(c, gameWorld.NewEntityID())
+					entity := entities.BuildEntityFromConfig(frameRate, c, gameWorld.NewEntityID())
 					entitiesMap[entity.ID] = entity
 					addEntityToSystem(entity)
 
@@ -1005,108 +1005,6 @@ func run() {
 		win.Update()
 
 	}
-}
-
-func buildEntityFromConfig(c rooms.EntityConfig, id entities.EntityID) entities.Entity {
-	entity := entities.Entity{
-		ID:       id,
-		Category: c.Category,
-		Spatial: &components.Spatial{
-			Width:  c.W,
-			Height: c.H,
-			Rect:   pixel.R(c.X, c.Y, c.X+c.W, c.Y+c.H),
-			Shape:  imdraw.New(nil),
-			HitBox: imdraw.New(nil),
-		},
-		Ignore: &components.Ignore{
-			Value: c.Ignore,
-		},
-	}
-
-	if c.Expiration > 0 {
-		entity.Temporary = &components.Temporary{
-			Expiration: c.Expiration,
-		}
-	}
-
-	if c.Category == categories.Warp {
-		entity.Enabled = &components.Enabled{
-			Value: true,
-		}
-	}
-
-	if c.Health > 0 {
-		entity.Health = &components.Health{
-			Total: c.Health,
-		}
-	}
-
-	if c.Hitbox != nil {
-		entity.Spatial.HitBoxRadius = c.Hitbox.Radius
-	}
-
-	if c.Toggleable {
-		entity.Toggler = &components.Toggler{}
-		if c.Toggled {
-			entity.Toggler.Toggle()
-		}
-	}
-
-	if c.Invincible {
-		entity.Invincible = &components.Invincible{
-			Enabled: true,
-		}
-	} else {
-		entity.Invincible = &components.Invincible{
-			Enabled: false,
-		}
-	}
-
-	if c.Movement != nil {
-		entity.Movement = &components.Movement{
-			Direction:      c.Movement.Direction,
-			MaxSpeed:       c.Movement.MaxSpeed,
-			Speed:          c.Movement.Speed,
-			MaxMoves:       c.Movement.MaxMoves,
-			RemainingMoves: c.Movement.RemainingMoves,
-			HitSpeed:       c.Movement.HitSpeed,
-			MovingFromHit:  c.Movement.MovingFromHit,
-			HitBackMoves:   c.Movement.HitBackMoves,
-			PatternName:    c.Movement.PatternName,
-		}
-	}
-
-	if c.Coins {
-		entity.Coins = &components.Coins{
-			Coins: 0,
-		}
-	}
-
-	if c.Dash != nil {
-		entity.Dash = &components.Dash{
-			Charge:    c.Dash.Charge,
-			MaxCharge: c.Dash.MaxCharge,
-			SpeedMod:  c.Dash.SpeedMod,
-		}
-	}
-
-	if c.Animation != nil {
-		entity.Animation = &components.Animation{
-			Map: components.AnimationMap{},
-		}
-		for key, val := range c.Animation {
-			entity.Animation.Map[key] = &components.AnimationData{
-				Frames:    val,
-				FrameRate: frameRate,
-			}
-		}
-	} else {
-		entity.Appearance = &components.Appearance{
-			Color: colornames.Sandybrown,
-		}
-	}
-
-	return entity
 }
 
 func main() {
@@ -1338,7 +1236,7 @@ func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entitie
 				x := movedVec.X/s - mod
 				y := movedVec.Y/s - mod
 				id := gameWorld.NewEntityID()
-				obstacle := buildEntityFromConfig(entityPresets["obstacle"](x, y), id)
+				obstacle := entities.BuildEntityFromConfig(frameRate, entityPresets["obstacle"](x, y), id)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
