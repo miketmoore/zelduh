@@ -6,7 +6,6 @@ import (
 	"image/color"
 	_ "image/png"
 	"io/ioutil"
-	"math"
 	"math/rand"
 	"os"
 	"strconv"
@@ -16,6 +15,7 @@ import (
 	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/csv"
 	"github.com/miketmoore/zelduh/rooms"
+	"github.com/miketmoore/zelduh/sprites"
 
 	"github.com/deanobob/tmxreader"
 	"github.com/faiface/pixel"
@@ -121,7 +121,7 @@ var nonObstacleSprites = map[int]bool{
 
 var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
-var sprites map[string]*pixel.Sprite
+var spriteMap map[string]*pixel.Sprite
 
 type mapDrawData struct {
 	Rect     pixel.Rect
@@ -592,7 +592,7 @@ func run() {
 	pic = loadPicture(spritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
-	spritesheet = buildSpritesheet()
+	spritesheet = sprites.BuildSpritesheet(pic, s)
 
 	// load all TMX file data for each map
 	tmxMapData = loadTmxData()
@@ -1253,33 +1253,6 @@ func parseTmxFile(filename string) tmxreader.TmxMap {
 	}
 
 	return tmxMap
-}
-
-// this is a map of pixel engine sprites
-func buildSpritesheet() map[int]*pixel.Sprite {
-	cols := pic.Bounds().W() / s
-	rows := pic.Bounds().H() / s
-
-	maxIndex := (rows * cols) - 1.0
-
-	index := maxIndex
-	id := maxIndex + 1
-	spritesheet := map[int]*pixel.Sprite{}
-	for row := (rows - 1); row >= 0; row-- {
-		for col := (cols - 1); col >= 0; col-- {
-			x := col
-			y := math.Abs(rows-row) - 1
-			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
-				x*s,
-				y*s,
-				x*s+s,
-				y*s+s,
-			))
-			index--
-			id--
-		}
-	}
-	return spritesheet
 }
 
 // MapData represents data for one map
