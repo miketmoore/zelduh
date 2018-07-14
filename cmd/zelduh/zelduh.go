@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	_ "image/png"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"strconv"
@@ -30,6 +29,7 @@ import (
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/systems"
+	"github.com/miketmoore/zelduh/tmx"
 	"github.com/miketmoore/zelduh/world"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
@@ -596,7 +596,7 @@ func run() {
 	spritesheet = sprites.BuildSpritesheet(pic, s)
 
 	// load all TMX file data for each map
-	tmxMapData = loadTmxData()
+	tmxMapData = tmx.Load(tilemapFiles, tilemapDir)
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
@@ -1129,29 +1129,6 @@ func removeAllMoveableObstaclesFromSystems() {
 			sys.RemoveAll(categories.MovableObstacle)
 		}
 	}
-}
-
-func loadTmxData() map[string]tmxreader.TmxMap {
-	tmxMapData := map[string]tmxreader.TmxMap{}
-	for _, name := range tilemapFiles {
-		path := fmt.Sprintf("%s%s.tmx", tilemapDir, name)
-		tmxMapData[name] = parseTmxFile(path)
-	}
-	return tmxMapData
-}
-
-func parseTmxFile(filename string) tmxreader.TmxMap {
-	raw, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-
-	tmxMap, err := tmxreader.Parse(raw)
-	if err != nil {
-		panic(err)
-	}
-
-	return tmxMap
 }
 
 // MapData represents data for one map
