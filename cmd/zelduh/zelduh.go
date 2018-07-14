@@ -1,14 +1,11 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"image"
 	"image/color"
 	_ "image/png"
-	"io"
 	"io/ioutil"
-	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -17,6 +14,7 @@ import (
 	"time"
 
 	"github.com/miketmoore/zelduh/bounds"
+	"github.com/miketmoore/zelduh/csv"
 	"github.com/miketmoore/zelduh/rooms"
 
 	"github.com/deanobob/tmxreader"
@@ -1304,7 +1302,7 @@ func buildMapDrawData() map[string]MapData {
 		layers := mapData.Layers
 		for _, layer := range layers {
 
-			records := parseCsv(strings.TrimSpace(layer.Data.Value) + ",")
+			records := csv.Parse(strings.TrimSpace(layer.Data.Value) + ",")
 			for row := 0; row <= len(records); row++ {
 				if len(records) > row {
 					for col := 0; col < len(records[row])-1; col++ {
@@ -1330,25 +1328,6 @@ func buildMapDrawData() map[string]MapData {
 	}
 
 	return all
-}
-
-func parseCsv(in string) [][]string {
-	r := csv.NewReader(strings.NewReader(in))
-
-	records := [][]string{}
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		records = append(records, record)
-	}
-
-	return records
 }
 
 func drawMapBGImage(name string, modX, modY float64) {
