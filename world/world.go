@@ -85,3 +85,17 @@ func (w *World) RemoveEnemy(id entities.EntityID) {
 		}
 	}
 }
+
+// RemoveAllEnemies removes all enemies from all systems
+func (w *World) RemoveAllEnemies() {
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *systems.Spatial:
+			sys.RemoveAll(categories.Enemy)
+		case *systems.Collision:
+			sys.RemoveAll(categories.Enemy)
+		case *systems.Render:
+			sys.RemoveAll(categories.Enemy)
+		}
+	}
+}

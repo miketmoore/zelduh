@@ -929,7 +929,7 @@ func run() {
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
 				collisionSystem.RemoveAll(categories.Obstacle)
-				removeAllEnemiesFromSystems()
+				gameWorld.RemoveAllEnemies()
 				removeAllCollisionSwitchesFromSystems()
 				removeAllMoveableObstaclesFromSystems()
 				removeAllEntitiesFromSystems()
@@ -989,7 +989,7 @@ func run() {
 				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
 
 				collisionSystem.RemoveAll(categories.Obstacle)
-				removeAllEnemiesFromSystems()
+				gameWorld.RemoveAllEnemies()
 				removeAllCollisionSwitchesFromSystems()
 				removeAllEntitiesFromSystems()
 			} else {
@@ -1094,19 +1094,6 @@ func removeAllEntitiesFromSystems() {
 		switch sys := system.(type) {
 		case *systems.Render:
 			sys.RemoveAllEntities()
-		}
-	}
-}
-
-func removeAllEnemiesFromSystems() {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Spatial:
-			sys.RemoveAll(categories.Enemy)
-		case *systems.Collision:
-			sys.RemoveAll(categories.Enemy)
-		case *systems.Render:
-			sys.RemoveAll(categories.Enemy)
 		}
 	}
 }
