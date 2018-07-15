@@ -48,6 +48,9 @@ type GameModel struct {
 	Arrow, Bomb, Explosion, Player, Sword entities.Entity
 	RoomWarps                             map[entities.EntityID]rooms.EntityConfig
 	AllMapDrawData                        map[string]tmx.MapData
+	HealthSystem                          *systems.Health
+	InputSystem                           *systems.Input
+	SpatialSystem                         *systems.Spatial
 }
 
 func run() {
@@ -81,21 +84,23 @@ func run() {
 
 		RoomWarps:      map[entities.EntityID]rooms.EntityConfig{},
 		AllMapDrawData: tmx.BuildMapDrawData(),
+
+		InputSystem:  &systems.Input{Win: win},
+		HealthSystem: &systems.Health{},
 	}
 
-	// Create systems and add to game world
-	inputSystem := &systems.Input{Win: win}
-	gameWorld.AddSystem(inputSystem)
-	healthSystem := &systems.Health{}
-	gameWorld.AddSystem(healthSystem)
-	spatialSystem := &systems.Spatial{
+	gameModel.SpatialSystem = &systems.Spatial{
 		Rand: gameModel.Rand,
 	}
+
+	gameWorld.AddSystem(gameModel.InputSystem)
+	gameWorld.AddSystem(gameModel.HealthSystem)
+
 	dropCoin := func(v pixel.Vec) {
 		coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
 		gameWorld.AddEntityToSystem(coin)
 	}
-	gameWorld.AddSystem(spatialSystem)
+	gameWorld.AddSystem(gameModel.SpatialSystem)
 
 	hearts := []entities.Entity{
 		entities.BuildEntityFromConfig(entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
@@ -121,7 +126,7 @@ func run() {
 		},
 		OnPlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
 			// TODO repeat what I did with the enemies
-			spatialSystem.MovePlayerBack()
+			gameModel.SpatialSystem.MovePlayerBack()
 			gameModel.Player.Health.Total--
 
 			// remove heart entity
@@ -138,10 +143,10 @@ func run() {
 			fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
 			if !gameModel.Sword.Ignore.Value {
 				dead := false
-				if !spatialSystem.EnemyMovingFromHit(enemyID) {
-					dead = healthSystem.Hit(enemyID, 1)
+				if !gameModel.SpatialSystem.EnemyMovingFromHit(enemyID) {
+					dead = gameModel.HealthSystem.Hit(enemyID, 1)
 					if dead {
-						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
+						enemySpatial, _ := gameModel.SpatialSystem.GetEnemySpatial(enemyID)
 						gameModel.Explosion.Temporary.Expiration = len(gameModel.Explosion.Animation.Map["default"].Frames)
 						gameModel.Explosion.Spatial = &components.Spatial{
 							Width:  config.TileSize,
@@ -154,7 +159,7 @@ func run() {
 						gameWorld.AddEntityToSystem(gameModel.Explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
-						spatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
+						gameModel.SpatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
 					}
 				}
 
@@ -162,11 +167,11 @@ func run() {
 		},
 		OnArrowCollisionWithEnemy: func(enemyID entities.EntityID) {
 			if !gameModel.Arrow.Ignore.Value {
-				dead := healthSystem.Hit(enemyID, 1)
+				dead := gameModel.HealthSystem.Hit(enemyID, 1)
 				gameModel.Arrow.Ignore.Value = true
 				if dead {
 					fmt.Printf("You killed an enemy with an arrow\n")
-					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
+					enemySpatial, _ := gameModel.SpatialSystem.GetEnemySpatial(enemyID)
 					gameModel.Explosion.Temporary.Expiration = len(gameModel.Explosion.Animation.Map["default"].Frames)
 					gameModel.Explosion.Spatial = &components.Spatial{
 						Width:  config.TileSize,
@@ -179,7 +184,7 @@ func run() {
 					gameWorld.AddEntityToSystem(gameModel.Explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
-					spatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
+					gameModel.SpatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
 				}
 			}
 		},
@@ -192,7 +197,7 @@ func run() {
 			gameModel.Sword.Spatial.Rect = gameModel.Sword.Spatial.PrevRect
 		},
 		OnPlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
-			moved := spatialSystem.MoveMoveableObstacle(obstacleID, gameModel.Player.Movement.Direction)
+			moved := gameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, gameModel.Player.Movement.Direction)
 			if !moved {
 				gameModel.Player.Spatial.Rect = gameModel.Player.Spatial.PrevRect
 			}
@@ -213,7 +218,7 @@ func run() {
 		},
 		OnEnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
 			// Block enemy within the spatial system by reseting current rect to previous rect
-			spatialSystem.UndoEnemyRect(enemyID)
+			gameModel.SpatialSystem.UndoEnemyRect(enemyID)
 		},
 		OnPlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range gameModel.EntitiesMap {
@@ -263,7 +268,7 @@ func run() {
 				gameModel.CurrentState = gamestate.Game
 			}
 		case gamestate.Game:
-			inputSystem.EnablePlayer()
+			gameModel.InputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
@@ -328,7 +333,7 @@ func run() {
 				gameModel.CurrentState = gamestate.Start
 			}
 		case gamestate.MapTransition:
-			inputSystem.DisablePlayer()
+			gameModel.InputSystem.DisablePlayer()
 			if gameModel.RoomTransition.Style == rooms.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
