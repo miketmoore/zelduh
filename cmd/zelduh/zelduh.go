@@ -40,10 +40,9 @@ var (
 	gameWorld world.World
 )
 
-var randGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
-
 func run() {
 
+	randGenerator := rand.New(rand.NewSource(time.Now().UnixNano()))
 	entitiesMap := map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
