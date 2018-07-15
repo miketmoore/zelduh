@@ -41,17 +41,10 @@ const (
 )
 
 const (
-	winX float64 = 0
-	winY float64 = 0
-	winW float64 = 800
-	winH float64 = 800
-)
-
-const (
 	mapW float64 = 672 // 48 * 14
 	mapH float64 = 576 // 48 * 12
-	mapX         = (winW - mapW) / 2
-	mapY         = (winH - mapH) / 2
+	mapX         = (config.WinW - mapW) / 2
+	mapY         = (config.WinH - mapH) / 2
 )
 
 var (
@@ -219,7 +212,7 @@ func run() {
 	// Initializations
 	t = initI18n()
 	txt = initText(20, 50, colornames.Black)
-	win = initWindow(t("title"), winX, winY, winW, winH)
+	win = initWindow(t("title"), config.WinX, config.WinY, config.WinW, config.WinH)
 
 	// load the spritesheet image
 	pic = loadPicture(spritesheetPath)
@@ -444,7 +437,7 @@ func run() {
 		s := imdraw.New(nil)
 		s.Color = colornames.White
 		s.Push(pixel.V(0, mapY+mapH))
-		s.Push(pixel.V(winW, mapY+mapH+(winH-(mapY+mapH))))
+		s.Push(pixel.V(config.WinW, mapY+mapH+(config.WinH-(mapY+mapH))))
 		s.Rectangle(0)
 		s.Draw(win)
 
@@ -452,7 +445,7 @@ func run() {
 		s = imdraw.New(nil)
 		s.Color = colornames.White
 		s.Push(pixel.V(0, 0))
-		s.Push(pixel.V(winW, (winH - (mapY + mapH))))
+		s.Push(pixel.V(config.WinW, (config.WinH - (mapY + mapH))))
 		s.Rectangle(0)
 		s.Draw(win)
 
@@ -460,7 +453,7 @@ func run() {
 		s = imdraw.New(nil)
 		s.Color = colornames.White
 		s.Push(pixel.V(0, 0))
-		s.Push(pixel.V(0+mapX, winH))
+		s.Push(pixel.V(0+mapX, config.WinH))
 		s.Rectangle(0)
 		s.Draw(win)
 
@@ -468,7 +461,7 @@ func run() {
 		s = imdraw.New(nil)
 		s.Color = colornames.White
 		s.Push(pixel.V(mapX+mapW, mapY))
-		s.Push(pixel.V(winW, winH))
+		s.Push(pixel.V(config.WinW, config.WinH))
 		s.Rectangle(0)
 		s.Draw(win)
 	}
