@@ -262,7 +262,7 @@ func run() {
 			config.MapX+config.MapW,
 			config.MapY+config.MapH,
 		),
-		PlayerCollisionWithBounds: func(side bounds.Bound) {
+		OnPlayerCollisionWithBounds: func(side bounds.Bound) {
 			if !roomTransition.Active {
 				roomTransition.Active = true
 				roomTransition.Side = side
@@ -272,11 +272,11 @@ func run() {
 				addEntities = true
 			}
 		},
-		PlayerCollisionWithCoin: func(coinID entities.EntityID) {
+		OnPlayerCollisionWithCoin: func(coinID entities.EntityID) {
 			player.Coins.Coins++
 			gameWorld.Remove(categories.Coin, coinID)
 		},
-		PlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
+		OnPlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
 			// TODO repeat what I did with the enemies
 			spatialSystem.MovePlayerBack()
 			player.Health.Total--
@@ -291,7 +291,7 @@ func run() {
 				currentState = gamestate.Over
 			}
 		},
-		SwordCollisionWithEnemy: func(enemyID entities.EntityID) {
+		OnSwordCollisionWithEnemy: func(enemyID entities.EntityID) {
 			fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
 			if !sword.Ignore.Value {
 				dead := false
@@ -317,7 +317,7 @@ func run() {
 
 			}
 		},
-		ArrowCollisionWithEnemy: func(enemyID entities.EntityID) {
+		OnArrowCollisionWithEnemy: func(enemyID entities.EntityID) {
 			if !arrow.Ignore.Value {
 				dead := healthSystem.Hit(enemyID, 1)
 				arrow.Ignore.Value = true
@@ -340,53 +340,53 @@ func run() {
 				}
 			}
 		},
-		ArrowCollisionWithObstacle: func() {
+		OnArrowCollisionWithObstacle: func() {
 			arrow.Movement.RemainingMoves = 0
 		},
-		PlayerCollisionWithObstacle: func(obstacleID entities.EntityID) {
+		OnPlayerCollisionWithObstacle: func(obstacleID entities.EntityID) {
 			// "Block" by undoing rect
 			player.Spatial.Rect = player.Spatial.PrevRect
 			sword.Spatial.Rect = sword.Spatial.PrevRect
 		},
-		PlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
+		OnPlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
 			moved := spatialSystem.MoveMoveableObstacle(obstacleID, player.Movement.Direction)
 			if !moved {
 				player.Spatial.Rect = player.Spatial.PrevRect
 			}
 		},
-		MoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
+		OnMoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && !entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
 			}
 		},
-		MoveableObstacleNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
+		OnMoveableObstacleNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
 			}
 		},
-		EnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
+		OnEnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
 			// Block enemy within the spatial system by reseting current rect to previous rect
 			spatialSystem.UndoEnemyRect(enemyID)
 		},
-		PlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
+		OnPlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && !entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
 			}
 		},
-		PlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
+		OnPlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
 			for id, entity := range entitiesMap {
 				if id == collisionSwitchID && entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
 			}
 		},
-		PlayerCollisionWithWarp: func(warpID entities.EntityID) {
+		OnPlayerCollisionWithWarp: func(warpID entities.EntityID) {
 			entityConfig, ok := roomWarps[warpID]
 			if ok && !roomTransition.Active {
 				roomTransition.Active = true
