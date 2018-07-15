@@ -19,7 +19,6 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"github.com/miketmoore/go-pixel-game-template/state"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
@@ -35,8 +34,6 @@ var (
 	win       *pixelgl.Window
 	txt       *text.Text
 	t         i18n.TranslateFunc
-	currState state.State
-	pic       pixel.Picture
 	gameWorld world.World
 )
 
@@ -54,7 +51,7 @@ func run() {
 	win = initWindow(t("title"))
 
 	// load the spritesheet image
-	pic = loadPicture(config.SpritesheetPath)
+	pic := loadPicture(config.SpritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
 	spritesheet := sprites.BuildSpritesheet(pic, config.TileSize)
