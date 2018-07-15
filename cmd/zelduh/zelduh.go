@@ -37,16 +37,19 @@ var (
 	gameWorld world.World
 )
 
+// GameModel contains data used throughout the game
 type GameModel struct {
 	AddEntities    bool
 	CurrentRoomID  rooms.RoomID
 	NextRoomID     rooms.RoomID
 	RoomTransition rooms.RoomTransition
+	CurrentState   gamestate.Name
 }
 
 func run() {
 
 	gameModel := GameModel{
+		CurrentState:  gamestate.Start,
 		AddEntities:   true,
 		CurrentRoomID: 1,
 		RoomTransition: rooms.RoomTransition{
@@ -80,8 +83,6 @@ func run() {
 	sword := entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID())
 	arrow := entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID())
 
-	currentState := gamestate.Start
-
 	var roomWarps map[entities.EntityID]rooms.EntityConfig
 
 	// Create systems and add to game world
@@ -104,6 +105,10 @@ func run() {
 		entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
 	}
 
+	collisionHandler := CollisionHandler{
+		GameModel: &gameModel,
+	}
+
 	collisionSystem := &systems.Collision{
 		MapBounds: pixel.R(
 			config.MapX,
@@ -111,16 +116,17 @@ func run() {
 			config.MapX+config.MapW,
 			config.MapY+config.MapH,
 		),
-		OnPlayerCollisionWithBounds: func(side bounds.Bound) {
-			if !gameModel.RoomTransition.Active {
-				gameModel.RoomTransition.Active = true
-				gameModel.RoomTransition.Side = side
-				gameModel.RoomTransition.Style = rooms.TransitionSlide
-				gameModel.RoomTransition.Timer = int(gameModel.RoomTransition.Start)
-				currentState = gamestate.MapTransition
-				gameModel.AddEntities = true
-			}
-		},
+		OnPlayerCollisionWithBounds: collisionHandler.OnPlayerCollisionWithBounds,
+		// OnPlayerCollisionWithBounds: func(side bounds.Bound) {
+		// 	if !gameModel.RoomTransition.Active {
+		// 		gameModel.RoomTransition.Active = true
+		// 		gameModel.RoomTransition.Side = side
+		// 		gameModel.RoomTransition.Style = rooms.TransitionSlide
+		// 		gameModel.RoomTransition.Timer = int(gameModel.RoomTransition.Start)
+		// 		gameModel.CurrentState = gamestate.MapTransition
+		// 		gameModel.AddEntities = true
+		// 	}
+		// },
 		OnPlayerCollisionWithCoin: func(coinID entities.EntityID) {
 			player.Coins.Coins++
 			gameWorld.Remove(categories.Coin, coinID)
@@ -137,7 +143,7 @@ func run() {
 
 			// TODO redraw hearts
 			if player.Health.Total == 0 {
-				currentState = gamestate.Over
+				gameModel.CurrentState = gamestate.Over
 			}
 		},
 		OnSwordCollisionWithEnemy: func(enemyID entities.EntityID) {
@@ -241,7 +247,7 @@ func run() {
 				gameModel.RoomTransition.Active = true
 				gameModel.RoomTransition.Style = rooms.TransitionWarp
 				gameModel.RoomTransition.Timer = 1
-				currentState = gamestate.MapTransition
+				gameModel.CurrentState = gamestate.MapTransition
 				gameModel.AddEntities = true
 				gameModel.NextRoomID = entityConfig.WarpToRoomID
 			}
@@ -259,14 +265,14 @@ func run() {
 
 		allowQuit()
 
-		switch currentState {
+		switch gameModel.CurrentState {
 		case gamestate.Start:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 			drawCenterText(t("title"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				currentState = gamestate.Game
+				gameModel.CurrentState = gamestate.Game
 			}
 		case gamestate.Game:
 			inputSystem.EnablePlayer()
@@ -307,11 +313,11 @@ func run() {
 			gameWorld.Update()
 
 			if win.JustPressed(pixelgl.KeyP) {
-				currentState = gamestate.Pause
+				gameModel.CurrentState = gamestate.Pause
 			}
 
 			if win.JustPressed(pixelgl.KeyX) {
-				currentState = gamestate.Over
+				gameModel.CurrentState = gamestate.Over
 			}
 
 		case gamestate.Pause:
@@ -320,10 +326,10 @@ func run() {
 			drawCenterText(t("paused"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
-				currentState = gamestate.Game
+				gameModel.CurrentState = gamestate.Game
 			}
 			if win.JustPressed(pixelgl.KeyEscape) {
-				currentState = gamestate.Start
+				gameModel.CurrentState = gamestate.Start
 			}
 		case gamestate.Over:
 			win.Clear(colornames.Darkgray)
@@ -331,7 +337,7 @@ func run() {
 			drawCenterText(t("gameOver"), colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				currentState = gamestate.Start
+				gameModel.CurrentState = gamestate.Start
 			}
 		case gamestate.MapTransition:
 			inputSystem.DisablePlayer()
@@ -406,7 +412,7 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 			} else {
-				currentState = gamestate.Game
+				gameModel.CurrentState = gamestate.Game
 				if gameModel.NextRoomID != 0 {
 					gameModel.CurrentRoomID = gameModel.NextRoomID
 				}
@@ -661,5 +667,22 @@ func addHearts(hearts []entities.Entity, health int) {
 		if i < health {
 			gameWorld.AddEntityToSystem(entity)
 		}
+	}
+}
+
+// CollisionHandler contains collision handlers
+type CollisionHandler struct {
+	GameModel *GameModel
+}
+
+// OnPlayerCollisionWithBounds handles collisions between player and bounds
+func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side bounds.Bound) {
+	if !ch.GameModel.RoomTransition.Active {
+		ch.GameModel.RoomTransition.Active = true
+		ch.GameModel.RoomTransition.Side = side
+		ch.GameModel.RoomTransition.Style = rooms.TransitionSlide
+		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
+		ch.GameModel.CurrentState = gamestate.MapTransition
+		ch.GameModel.AddEntities = true
 	}
 }
