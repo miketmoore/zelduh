@@ -43,7 +43,6 @@ var (
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
 var spriteMap map[string]*pixel.Sprite
 
@@ -65,7 +64,7 @@ func run() {
 	pic = loadPicture(config.SpritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
-	spritesheet = sprites.BuildSpritesheet(pic, config.TileSize)
+	spritesheet := sprites.BuildSpritesheet(pic, config.TileSize)
 
 	// load all TMX file data for each map
 	tmxMapData = tmx.Load(config.TilemapFiles, config.TilemapDir)
@@ -290,7 +289,7 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-			drawMapBGImage(allMapDrawData, roomsMap[currentRoomID].MapName, 0, 0)
+			drawMapBGImage(spritesheet, allMapDrawData, roomsMap[currentRoomID].MapName, 0, 0)
 
 			addHearts(player.Health.Total)
 
@@ -398,8 +397,8 @@ func run() {
 					nextRoomID = 0
 				}
 
-				drawMapBGImage(allMapDrawData, roomsMap[currentRoomID].MapName, modX, modY)
-				drawMapBGImage(allMapDrawData, roomsMap[nextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[currentRoomID].MapName, modX, modY)
+				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[nextRoomID].MapName, modXNext, modYNext)
 				drawMask()
 
 				// Move player with map transition
@@ -512,7 +511,12 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-func drawMapBGImage(allMapDrawData map[string]tmx.MapData, name string, modX, modY float64) {
+func drawMapBGImage(
+	spritesheet map[int]*pixel.Sprite,
+	allMapDrawData map[string]tmx.MapData,
+	name string,
+	modX, modY float64) {
+
 	d := allMapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
