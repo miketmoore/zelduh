@@ -1,5 +1,7 @@
 package config
 
+import "github.com/miketmoore/zelduh/rooms"
+
 const (
 	TranslationFile = "i18n/zelduh/en-US.all.json"
 	Lang            = "en-US"
@@ -49,4 +51,29 @@ var TilemapFiles = []string{
 	"rockPathLeftRightEntrance",
 	"test",
 	"dungeonFourDoors",
+}
+
+// Overworld is a multi-dimensional array representing the overworld
+// Each room ID should be unique
+var Overworld = [][]rooms.RoomID{
+	[]rooms.RoomID{1, 10},
+	[]rooms.RoomID{2, 0, 0, 8},
+	[]rooms.RoomID{3, 5, 6, 7},
+	[]rooms.RoomID{9},
+	[]rooms.RoomID{11},
+}
+
+// NonObstacleSprites defines which sprites are not obstacles
+var NonObstacleSprites = map[int]bool{
+	8:   true,
+	9:   true,
+	24:  true,
+	37:  true,
+	38:  true,
+	52:  true,
+	53:  true,
+	66:  true,
+	86:  true,
+	136: true,
+	137: true,
 }

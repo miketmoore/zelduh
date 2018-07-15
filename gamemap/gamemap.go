@@ -1,6 +1,7 @@
 package gamemap
 
 import (
+	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/rooms"
 )
@@ -50,7 +51,8 @@ func indexRoom(roomsMap rooms.Rooms, a, b rooms.RoomID, dir direction.Name) {
 }
 
 // ProcessMapLayout processes the game maps
-func ProcessMapLayout(roomsMap rooms.Rooms, layout [][]rooms.RoomID) {
+func ProcessMapLayout(roomsMap rooms.Rooms) {
+	layout := config.Overworld
 	// transform multi-dimensional array into map of Room structs, indexed by ID
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {

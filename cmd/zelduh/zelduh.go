@@ -45,30 +45,6 @@ var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 var roomID rooms.RoomID
 
-// Multi-dimensional array representing the overworld
-// Each room ID should be unique
-var overworld = [][]rooms.RoomID{
-	[]rooms.RoomID{1, 10},
-	[]rooms.RoomID{2, 0, 0, 8},
-	[]rooms.RoomID{3, 5, 6, 7},
-	[]rooms.RoomID{9},
-	[]rooms.RoomID{11},
-}
-
-var nonObstacleSprites = map[int]bool{
-	8:   true,
-	9:   true,
-	24:  true,
-	37:  true,
-	38:  true,
-	52:  true,
-	53:  true,
-	66:  true,
-	86:  true,
-	136: true,
-	137: true,
-}
-
 var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
 var spriteMap map[string]*pixel.Sprite
@@ -80,7 +56,7 @@ func run() {
 	entitiesMap = map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
-	gamemap.ProcessMapLayout(roomsMap, overworld)
+	gamemap.ProcessMapLayout(roomsMap)
 
 	// Initializations
 	t = initI18n()
@@ -568,7 +544,7 @@ func drawObstaclesPerMapTiles(allMapDrawData map[string]tmx.MapData, roomID room
 				vec.Y+config.MapY+modY+config.TileSize/2,
 			)
 
-			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
+			if _, ok := config.NonObstacleSprites[spriteData.SpriteID]; !ok {
 				x := movedVec.X/config.TileSize - mod
 				y := movedVec.Y/config.TileSize - mod
 				id := gameWorld.NewEntityID()
