@@ -37,7 +37,15 @@ var (
 	gameWorld world.World
 )
 
+type GameModel struct {
+	AddEntities bool
+}
+
 func run() {
+
+	gameModel := GameModel{
+		AddEntities: true,
+	}
 
 	randGenerator := rand.New(rand.NewSource(time.Now().UnixNano()))
 	entitiesMap := map[entities.EntityID]entities.Entity{}
@@ -70,7 +78,6 @@ func run() {
 	}
 
 	currentState := gamestate.Start
-	addEntities := true
 	var currentRoomID rooms.RoomID = 1
 	var nextRoomID rooms.RoomID
 
@@ -110,7 +117,7 @@ func run() {
 				roomTransition.Style = rooms.TransitionSlide
 				roomTransition.Timer = int(roomTransition.Start)
 				currentState = gamestate.MapTransition
-				addEntities = true
+				gameModel.AddEntities = true
 			}
 		},
 		OnPlayerCollisionWithCoin: func(coinID entities.EntityID) {
@@ -234,7 +241,7 @@ func run() {
 				roomTransition.Style = rooms.TransitionWarp
 				roomTransition.Timer = 1
 				currentState = gamestate.MapTransition
-				addEntities = true
+				gameModel.AddEntities = true
 				nextRoomID = entityConfig.WarpToRoomID
 			}
 		},
@@ -270,8 +277,8 @@ func run() {
 
 			addHearts(hearts, player.Health.Total)
 
-			if addEntities {
-				addEntities = false
+			if gameModel.AddEntities {
+				gameModel.AddEntities = false
 
 				addUICoin()
 
