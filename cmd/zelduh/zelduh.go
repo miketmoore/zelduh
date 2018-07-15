@@ -45,6 +45,7 @@ type GameModel struct {
 	CurrentState              gamestate.Name
 	Rand                      *rand.Rand
 	EntitiesMap               map[entities.EntityID]entities.Entity
+	Spritesheet               map[int]*pixel.Sprite
 }
 
 func run() {
@@ -73,7 +74,7 @@ func run() {
 	pic := loadPicture(config.SpritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
-	spritesheet := sprites.BuildSpritesheet(pic, config.TileSize)
+	gameModel.Spritesheet = sprites.BuildSpritesheet(pic, config.TileSize)
 
 	allMapDrawData := tmx.BuildMapDrawData()
 
@@ -247,7 +248,7 @@ func run() {
 	gameWorld.AddSystem(collisionSystem)
 	gameWorld.AddSystem(&systems.Render{
 		Win:         win,
-		Spritesheet: spritesheet,
+		Spritesheet: gameModel.Spritesheet,
 	})
 
 	gameWorld.AddEntitiesToSystem([]entities.Entity{player, sword, arrow, bomb})
@@ -271,7 +272,7 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-			drawMapBGImage(spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
+			drawMapBGImage(gameModel.Spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
 
 			addHearts(hearts, player.Health.Total)
 
@@ -379,8 +380,8 @@ func run() {
 					gameModel.NextRoomID = 0
 				}
 
-				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, modX, modY)
-				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[gameModel.NextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(gameModel.Spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, modX, modY)
+				drawMapBGImage(gameModel.Spritesheet, allMapDrawData, roomsMap[gameModel.NextRoomID].MapName, modXNext, modYNext)
 				drawMask()
 
 				// Move player with map transition
