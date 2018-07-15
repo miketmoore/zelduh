@@ -991,8 +991,8 @@ func run() {
 				collisionSystem.RemoveAll(categories.Obstacle)
 				gameWorld.RemoveAllEnemies()
 				gameWorld.RemoveAllCollisionSwitches()
+				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
-				// TODO remove moveable obstacles too?
 			} else {
 				currentState = gamestate.Game
 				if nextRoomID != 0 {
