@@ -42,13 +42,9 @@ var (
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-var spriteMap map[string]*pixel.Sprite
-
-var entitiesMap map[entities.EntityID]entities.Entity
-
 func run() {
 
-	entitiesMap = map[entities.EntityID]entities.Entity{}
+	entitiesMap := map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
 	gamemap.ProcessMapLayout(roomsMap)
