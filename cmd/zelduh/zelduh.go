@@ -100,10 +100,6 @@ func run() {
 		Rand: gameModel.Rand,
 	}
 
-	gameWorld.AddSystem(gameModel.InputSystem)
-	gameWorld.AddSystem(gameModel.HealthSystem)
-	gameWorld.AddSystem(gameModel.SpatialSystem)
-
 	collisionHandler := CollisionHandler{
 		GameModel: &gameModel,
 	}
@@ -242,13 +238,22 @@ func run() {
 			}
 		},
 	}
+
+	gameWorld.AddSystem(gameModel.InputSystem)
+	gameWorld.AddSystem(gameModel.HealthSystem)
+	gameWorld.AddSystem(gameModel.SpatialSystem)
 	gameWorld.AddSystem(collisionSystem)
 	gameWorld.AddSystem(&systems.Render{
 		Win:         win,
 		Spritesheet: gameModel.Spritesheet,
 	})
 
-	gameWorld.AddEntitiesToSystem([]entities.Entity{gameModel.Player, gameModel.Sword, gameModel.Arrow, gameModel.Bomb})
+	gameWorld.AddEntitiesToSystem([]entities.Entity{
+		gameModel.Player,
+		gameModel.Sword,
+		gameModel.Arrow,
+		gameModel.Bomb,
+	})
 
 	for !win.Closed() {
 
