@@ -111,68 +111,20 @@ func run() {
 			config.MapX+config.MapW,
 			config.MapY+config.MapH,
 		),
-		OnPlayerCollisionWithBounds: collisionHandler.OnPlayerCollisionWithBounds,
-		OnPlayerCollisionWithCoin:   collisionHandler.OnPlayerCollisionWithCoin,
-		OnPlayerCollisionWithEnemy:  collisionHandler.OnPlayerCollisionWithEnemy,
-		OnSwordCollisionWithEnemy:   collisionHandler.OnSwordCollisionWithEnemy,
-		OnArrowCollisionWithEnemy:   collisionHandler.OnArrowCollisionWithEnemy,
-		OnArrowCollisionWithObstacle: func() {
-			gameModel.Arrow.Movement.RemainingMoves = 0
-		},
-		OnPlayerCollisionWithObstacle: func(obstacleID entities.EntityID) {
-			// "Block" by undoing rect
-			gameModel.Player.Spatial.Rect = gameModel.Player.Spatial.PrevRect
-			gameModel.Sword.Spatial.Rect = gameModel.Sword.Spatial.PrevRect
-		},
-		OnPlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
-			moved := gameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, gameModel.Player.Movement.Direction)
-			if !moved {
-				gameModel.Player.Spatial.Rect = gameModel.Player.Spatial.PrevRect
-			}
-		},
-		OnMoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range gameModel.EntitiesMap {
-				if id == collisionSwitchID && !entity.Toggler.Enabled() {
-					entity.Toggler.Toggle()
-				}
-			}
-		},
-		OnMoveableObstacleNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range gameModel.EntitiesMap {
-				if id == collisionSwitchID && entity.Toggler.Enabled() {
-					entity.Toggler.Toggle()
-				}
-			}
-		},
-		OnEnemyCollisionWithObstacle: func(enemyID, obstacleID entities.EntityID) {
-			// Block enemy within the spatial system by reseting current rect to previous rect
-			gameModel.SpatialSystem.UndoEnemyRect(enemyID)
-		},
-		OnPlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range gameModel.EntitiesMap {
-				if id == collisionSwitchID && !entity.Toggler.Enabled() {
-					entity.Toggler.Toggle()
-				}
-			}
-		},
-		OnPlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range gameModel.EntitiesMap {
-				if id == collisionSwitchID && entity.Toggler.Enabled() {
-					entity.Toggler.Toggle()
-				}
-			}
-		},
-		OnPlayerCollisionWithWarp: func(warpID entities.EntityID) {
-			entityConfig, ok := gameModel.RoomWarps[warpID]
-			if ok && !gameModel.RoomTransition.Active {
-				gameModel.RoomTransition.Active = true
-				gameModel.RoomTransition.Style = rooms.TransitionWarp
-				gameModel.RoomTransition.Timer = 1
-				gameModel.CurrentState = gamestate.MapTransition
-				gameModel.AddEntities = true
-				gameModel.NextRoomID = entityConfig.WarpToRoomID
-			}
-		},
+		OnPlayerCollisionWithBounds:             collisionHandler.OnPlayerCollisionWithBounds,
+		OnPlayerCollisionWithCoin:               collisionHandler.OnPlayerCollisionWithCoin,
+		OnPlayerCollisionWithEnemy:              collisionHandler.OnPlayerCollisionWithEnemy,
+		OnSwordCollisionWithEnemy:               collisionHandler.OnSwordCollisionWithEnemy,
+		OnArrowCollisionWithEnemy:               collisionHandler.OnArrowCollisionWithEnemy,
+		OnArrowCollisionWithObstacle:            collisionHandler.OnArrowCollisionWithObstacle,
+		OnPlayerCollisionWithObstacle:           collisionHandler.OnPlayerCollisionWithObstacle,
+		OnPlayerCollisionWithMoveableObstacle:   collisionHandler.OnPlayerCollisionWithMoveableObstacle,
+		OnMoveableObstacleCollisionWithSwitch:   collisionHandler.OnMoveableObstacleCollisionWithSwitch,
+		OnMoveableObstacleNoCollisionWithSwitch: collisionHandler.OnMoveableObstacleNoCollisionWithSwitch,
+		OnEnemyCollisionWithObstacle:            collisionHandler.OnEnemyCollisionWithObstacle,
+		OnPlayerCollisionWithSwitch:             collisionHandler.OnPlayerCollisionWithSwitch,
+		OnPlayerNoCollisionWithSwitch:           collisionHandler.OnPlayerNoCollisionWithSwitch,
+		OnPlayerCollisionWithWarp:               collisionHandler.OnPlayerCollisionWithWarp,
 	}
 
 	gameWorld.AddSystem(gameModel.InputSystem)
@@ -678,5 +630,80 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID entities.EntityID)
 		} else {
 			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.Movement.Direction)
 		}
+	}
+}
+
+// OnArrowCollisionWithObstacle handles collision between arrow and obstacle
+func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
+	ch.GameModel.Arrow.Movement.RemainingMoves = 0
+}
+
+// OnPlayerCollisionWithObstacle handles collision between player and obstacle
+func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID entities.EntityID) {
+	// "Block" by undoing rect
+	ch.GameModel.Player.Spatial.Rect = ch.GameModel.Player.Spatial.PrevRect
+	ch.GameModel.Sword.Spatial.Rect = ch.GameModel.Sword.Spatial.PrevRect
+}
+
+// OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
+func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID entities.EntityID) {
+	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Player.Movement.Direction)
+	if !moved {
+		ch.GameModel.Player.Spatial.Rect = ch.GameModel.Player.Spatial.PrevRect
+	}
+}
+
+// OnMoveableObstacleCollisionWithSwitch handles collision between moveable obstacle and switch
+func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+	for id, entity := range ch.GameModel.EntitiesMap {
+		if id == collisionSwitchID && !entity.Toggler.Enabled() {
+			entity.Toggler.Toggle()
+		}
+	}
+}
+
+// OnMoveableObstacleNoCollisionWithSwitch handles *no* collision between moveable obstacle and switch
+func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+	for id, entity := range ch.GameModel.EntitiesMap {
+		if id == collisionSwitchID && entity.Toggler.Enabled() {
+			entity.Toggler.Toggle()
+		}
+	}
+}
+
+// OnEnemyCollisionWithObstacle handles collision between enemy and obstacle
+func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID entities.EntityID) {
+	// Block enemy within the spatial system by reseting current rect to previous rect
+	ch.GameModel.SpatialSystem.UndoEnemyRect(enemyID)
+}
+
+// OnPlayerCollisionWithSwitch handles collision between player and switch
+func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+	for id, entity := range ch.GameModel.EntitiesMap {
+		if id == collisionSwitchID && !entity.Toggler.Enabled() {
+			entity.Toggler.Toggle()
+		}
+	}
+}
+
+// OnPlayerNoCollisionWithSwitch handles *no* collision between player and switch
+func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+	for id, entity := range ch.GameModel.EntitiesMap {
+		if id == collisionSwitchID && entity.Toggler.Enabled() {
+			entity.Toggler.Toggle()
+		}
+	}
+}
+
+// OnPlayerCollisionWithWarp handles collision between player and warp
+func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID entities.EntityID) {
+	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
+	if ok && !ch.GameModel.RoomTransition.Active {
+		ch.GameModel.RoomTransition.Active = true
+		ch.GameModel.RoomTransition.Style = rooms.TransitionWarp
+		ch.GameModel.RoomTransition.Timer = 1
+		ch.GameModel.CurrentState = gamestate.MapTransition
+		ch.GameModel.AddEntities = true
+		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
 	}
 }
