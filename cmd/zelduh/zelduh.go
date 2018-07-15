@@ -43,8 +43,6 @@ var (
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-var roomID rooms.RoomID
-
 var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
 var spriteMap map[string]*pixel.Sprite
