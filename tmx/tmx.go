@@ -48,7 +48,11 @@ type MapData struct {
 }
 
 // BuildMapDrawData builds draw data and stores it in a map
-func BuildMapDrawData(tmxMapData map[string]tmxreader.TmxMap) map[string]MapData {
+func BuildMapDrawData() map[string]MapData {
+
+	// load all TMX file data for each map
+	tmxMapData := Load(config.TilemapFiles, config.TilemapDir)
+
 	all := map[string]MapData{}
 
 	for mapName, mapData := range tmxMapData {

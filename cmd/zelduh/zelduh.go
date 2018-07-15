@@ -15,7 +15,6 @@ import (
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/sprites"
 
-	"github.com/deanobob/tmxreader"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -43,7 +42,6 @@ var (
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
-var tmxMapData map[string]tmxreader.TmxMap
 var spriteMap map[string]*pixel.Sprite
 
 var entitiesMap map[entities.EntityID]entities.Entity
@@ -66,9 +64,7 @@ func run() {
 	// this is a map of TMX IDs to sprite instances
 	spritesheet := sprites.BuildSpritesheet(pic, config.TileSize)
 
-	// load all TMX file data for each map
-	tmxMapData = tmx.Load(config.TilemapFiles, config.TilemapDir)
-	allMapDrawData := tmx.BuildMapDrawData(tmxMapData)
+	allMapDrawData := tmx.BuildMapDrawData()
 
 	// Build entities
 	player := entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID())
