@@ -425,40 +425,6 @@ func run() {
 	gameWorld.AddEntityToSystem(arrow)
 	gameWorld.AddEntityToSystem(bomb)
 
-	drawMask := func() {
-		// top
-		s := imdraw.New(nil)
-		s.Color = colornames.White
-		s.Push(pixel.V(0, config.MapY+config.MapH))
-		s.Push(pixel.V(config.WinW, config.MapY+config.MapH+(config.WinH-(config.MapY+config.MapH))))
-		s.Rectangle(0)
-		s.Draw(win)
-
-		// bottom
-		s = imdraw.New(nil)
-		s.Color = colornames.White
-		s.Push(pixel.V(0, 0))
-		s.Push(pixel.V(config.WinW, (config.WinH - (config.MapY + config.MapH))))
-		s.Rectangle(0)
-		s.Draw(win)
-
-		// left
-		s = imdraw.New(nil)
-		s.Color = colornames.White
-		s.Push(pixel.V(0, 0))
-		s.Push(pixel.V(0+config.MapX, config.WinH))
-		s.Rectangle(0)
-		s.Draw(win)
-
-		// right
-		s = imdraw.New(nil)
-		s.Color = colornames.White
-		s.Push(pixel.V(config.MapX+config.MapW, config.MapY))
-		s.Push(pixel.V(config.WinW, config.WinH))
-		s.Rectangle(0)
-		s.Draw(win)
-	}
-
 	for !win.Closed() {
 
 		allowQuit()
@@ -790,4 +756,38 @@ func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entitie
 		}
 	}
 	return obstacles
+}
+
+func drawMask() {
+	// top
+	s := imdraw.New(nil)
+	s.Color = colornames.White
+	s.Push(pixel.V(0, config.MapY+config.MapH))
+	s.Push(pixel.V(config.WinW, config.MapY+config.MapH+(config.WinH-(config.MapY+config.MapH))))
+	s.Rectangle(0)
+	s.Draw(win)
+
+	// bottom
+	s = imdraw.New(nil)
+	s.Color = colornames.White
+	s.Push(pixel.V(0, 0))
+	s.Push(pixel.V(config.WinW, (config.WinH - (config.MapY + config.MapH))))
+	s.Rectangle(0)
+	s.Draw(win)
+
+	// left
+	s = imdraw.New(nil)
+	s.Color = colornames.White
+	s.Push(pixel.V(0, 0))
+	s.Push(pixel.V(0+config.MapX, config.WinH))
+	s.Rectangle(0)
+	s.Draw(win)
+
+	// right
+	s = imdraw.New(nil)
+	s.Color = colornames.White
+	s.Push(pixel.V(config.MapX+config.MapW, config.MapY))
+	s.Push(pixel.V(config.WinW, config.WinH))
+	s.Rectangle(0)
+	s.Draw(win)
 }
