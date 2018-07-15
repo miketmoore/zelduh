@@ -38,28 +38,20 @@ var (
 
 // GameModel contains data used throughout the game
 type GameModel struct {
-	AddEntities               bool
-	CurrentRoomID, NextRoomID rooms.RoomID
-	RoomTransition            rooms.RoomTransition
-	CurrentState              gamestate.Name
-	Rand                      *rand.Rand
-	EntitiesMap               map[entities.EntityID]entities.Entity
-	Spritesheet               map[int]*pixel.Sprite
+	AddEntities                           bool
+	CurrentRoomID, NextRoomID             rooms.RoomID
+	RoomTransition                        rooms.RoomTransition
+	CurrentState                          gamestate.Name
+	Rand                                  *rand.Rand
+	EntitiesMap                           map[entities.EntityID]entities.Entity
+	Spritesheet                           map[int]*pixel.Sprite
+	Arrow, Bomb, Explosion, Player, Sword entities.Entity
+	RoomWarps                             map[entities.EntityID]rooms.EntityConfig
+	AllMapDrawData                        map[string]tmx.MapData
 }
 
 func run() {
 
-	gameModel := GameModel{
-		CurrentState:  gamestate.Start,
-		AddEntities:   true,
-		CurrentRoomID: 1,
-		RoomTransition: rooms.RoomTransition{
-			Start: float64(config.TileSize),
-		},
-	}
-
-	gameModel.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
-	gameModel.EntitiesMap = map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
 	gamemap.ProcessMapLayout(roomsMap)
@@ -69,18 +61,27 @@ func run() {
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(t("title"))
 
-	gameModel.Spritesheet = sprites.LoadAndBuildSpritesheet()
+	gameModel := GameModel{
+		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
+		EntitiesMap:   map[entities.EntityID]entities.Entity{},
+		CurrentState:  gamestate.Start,
+		AddEntities:   true,
+		CurrentRoomID: 1,
+		RoomTransition: rooms.RoomTransition{
+			Start: float64(config.TileSize),
+		},
+		Spritesheet: sprites.LoadAndBuildSpritesheet(),
 
-	allMapDrawData := tmx.BuildMapDrawData()
+		// Build entities
+		Player:    entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
+		Bomb:      entities.BuildEntityFromConfig(entities.GetPreset("bomb")(0, 0), gameWorld.NewEntityID()),
+		Explosion: entities.BuildEntityFromConfig(entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID()),
+		Sword:     entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
+		Arrow:     entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
-	// Build entities
-	player := entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID())
-	bomb := entities.BuildEntityFromConfig(entities.GetPreset("bomb")(0, 0), gameWorld.NewEntityID())
-	explosion := entities.BuildEntityFromConfig(entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID())
-	sword := entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID())
-	arrow := entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID())
-
-	var roomWarps map[entities.EntityID]rooms.EntityConfig
+		RoomWarps:      map[entities.EntityID]rooms.EntityConfig{},
+		AllMapDrawData: tmx.BuildMapDrawData(),
+	}
 
 	// Create systems and add to game world
 	inputSystem := &systems.Input{Win: win}
@@ -115,13 +116,13 @@ func run() {
 		),
 		OnPlayerCollisionWithBounds: collisionHandler.OnPlayerCollisionWithBounds,
 		OnPlayerCollisionWithCoin: func(coinID entities.EntityID) {
-			player.Coins.Coins++
+			gameModel.Player.Coins.Coins++
 			gameWorld.Remove(categories.Coin, coinID)
 		},
 		OnPlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
 			// TODO repeat what I did with the enemies
 			spatialSystem.MovePlayerBack()
-			player.Health.Total--
+			gameModel.Player.Health.Total--
 
 			// remove heart entity
 			heartIndex := len(hearts) - 1
@@ -129,71 +130,71 @@ func run() {
 			hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
 
 			// TODO redraw hearts
-			if player.Health.Total == 0 {
+			if gameModel.Player.Health.Total == 0 {
 				gameModel.CurrentState = gamestate.Over
 			}
 		},
 		OnSwordCollisionWithEnemy: func(enemyID entities.EntityID) {
 			fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
-			if !sword.Ignore.Value {
+			if !gameModel.Sword.Ignore.Value {
 				dead := false
 				if !spatialSystem.EnemyMovingFromHit(enemyID) {
 					dead = healthSystem.Hit(enemyID, 1)
 					if dead {
 						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
-						explosion.Temporary.Expiration = len(explosion.Animation.Map["default"].Frames)
-						explosion.Spatial = &components.Spatial{
+						gameModel.Explosion.Temporary.Expiration = len(gameModel.Explosion.Animation.Map["default"].Frames)
+						gameModel.Explosion.Spatial = &components.Spatial{
 							Width:  config.TileSize,
 							Height: config.TileSize,
 							Rect:   enemySpatial.Rect,
 						}
-						explosion.Temporary.OnExpiration = func() {
-							dropCoin(explosion.Spatial.Rect.Min)
+						gameModel.Explosion.Temporary.OnExpiration = func() {
+							dropCoin(gameModel.Explosion.Spatial.Rect.Min)
 						}
-						gameWorld.AddEntityToSystem(explosion)
+						gameWorld.AddEntityToSystem(gameModel.Explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
-						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
+						spatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
 					}
 				}
 
 			}
 		},
 		OnArrowCollisionWithEnemy: func(enemyID entities.EntityID) {
-			if !arrow.Ignore.Value {
+			if !gameModel.Arrow.Ignore.Value {
 				dead := healthSystem.Hit(enemyID, 1)
-				arrow.Ignore.Value = true
+				gameModel.Arrow.Ignore.Value = true
 				if dead {
 					fmt.Printf("You killed an enemy with an arrow\n")
 					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
-					explosion.Temporary.Expiration = len(explosion.Animation.Map["default"].Frames)
-					explosion.Spatial = &components.Spatial{
+					gameModel.Explosion.Temporary.Expiration = len(gameModel.Explosion.Animation.Map["default"].Frames)
+					gameModel.Explosion.Spatial = &components.Spatial{
 						Width:  config.TileSize,
 						Height: config.TileSize,
 						Rect:   enemySpatial.Rect,
 					}
-					explosion.Temporary.OnExpiration = func() {
-						dropCoin(explosion.Spatial.Rect.Min)
+					gameModel.Explosion.Temporary.OnExpiration = func() {
+						dropCoin(gameModel.Explosion.Spatial.Rect.Min)
 					}
-					gameWorld.AddEntityToSystem(explosion)
+					gameWorld.AddEntityToSystem(gameModel.Explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
-					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
+					spatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
 				}
 			}
 		},
 		OnArrowCollisionWithObstacle: func() {
-			arrow.Movement.RemainingMoves = 0
+			gameModel.Arrow.Movement.RemainingMoves = 0
 		},
 		OnPlayerCollisionWithObstacle: func(obstacleID entities.EntityID) {
 			// "Block" by undoing rect
-			player.Spatial.Rect = player.Spatial.PrevRect
-			sword.Spatial.Rect = sword.Spatial.PrevRect
+			gameModel.Player.Spatial.Rect = gameModel.Player.Spatial.PrevRect
+			gameModel.Sword.Spatial.Rect = gameModel.Sword.Spatial.PrevRect
 		},
 		OnPlayerCollisionWithMoveableObstacle: func(obstacleID entities.EntityID) {
-			moved := spatialSystem.MoveMoveableObstacle(obstacleID, player.Movement.Direction)
+			moved := spatialSystem.MoveMoveableObstacle(obstacleID, gameModel.Player.Movement.Direction)
 			if !moved {
-				player.Spatial.Rect = player.Spatial.PrevRect
+				gameModel.Player.Spatial.Rect = gameModel.Player.Spatial.PrevRect
 			}
 		},
 		OnMoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
@@ -229,7 +230,7 @@ func run() {
 			}
 		},
 		OnPlayerCollisionWithWarp: func(warpID entities.EntityID) {
-			entityConfig, ok := roomWarps[warpID]
+			entityConfig, ok := gameModel.RoomWarps[warpID]
 			if ok && !gameModel.RoomTransition.Active {
 				gameModel.RoomTransition.Active = true
 				gameModel.RoomTransition.Style = rooms.TransitionWarp
@@ -246,7 +247,7 @@ func run() {
 		Spritesheet: gameModel.Spritesheet,
 	})
 
-	gameWorld.AddEntitiesToSystem([]entities.Entity{player, sword, arrow, bomb})
+	gameWorld.AddEntitiesToSystem([]entities.Entity{gameModel.Player, gameModel.Sword, gameModel.Arrow, gameModel.Bomb})
 
 	for !win.Closed() {
 
@@ -267,9 +268,9 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-			drawMapBGImage(gameModel.Spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
+			drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
 
-			addHearts(hearts, player.Health.Total)
+			addHearts(hearts, gameModel.Player.Health.Total)
 
 			if gameModel.AddEntities {
 				gameModel.AddEntities = false
@@ -277,10 +278,10 @@ func run() {
 				addUICoin()
 
 				// Draw obstacles on appropriate map tiles
-				obstacles := drawObstaclesPerMapTiles(allMapDrawData, gameModel.CurrentRoomID, 0, 0)
+				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
 				gameWorld.AddEntitiesToSystem(obstacles)
 
-				roomWarps = map[entities.EntityID]rooms.EntityConfig{}
+				gameModel.RoomWarps = map[entities.EntityID]rooms.EntityConfig{}
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
@@ -290,7 +291,7 @@ func run() {
 
 					switch c.Category {
 					case categories.Warp:
-						roomWarps[entity.ID] = c
+						gameModel.RoomWarps[entity.ID] = c
 					}
 				}
 			}
@@ -375,16 +376,16 @@ func run() {
 					gameModel.NextRoomID = 0
 				}
 
-				drawMapBGImage(gameModel.Spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, modX, modY)
-				drawMapBGImage(gameModel.Spritesheet, allMapDrawData, roomsMap[gameModel.NextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, modX, modY)
+				drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.NextRoomID].MapName, modXNext, modYNext)
 				drawMask()
 
 				// Move player with map transition
-				player.Spatial.Rect = pixel.R(
-					player.Spatial.Rect.Min.X+playerModX,
-					player.Spatial.Rect.Min.Y+playerModY,
-					player.Spatial.Rect.Min.X+playerModX+config.TileSize,
-					player.Spatial.Rect.Min.Y+playerModY+config.TileSize,
+				gameModel.Player.Spatial.Rect = pixel.R(
+					gameModel.Player.Spatial.Rect.Min.X+playerModX,
+					gameModel.Player.Spatial.Rect.Min.Y+playerModY,
+					gameModel.Player.Spatial.Rect.Min.X+playerModX+config.TileSize,
+					gameModel.Player.Spatial.Rect.Min.Y+playerModY+config.TileSize,
 				)
 
 				gameWorld.Update()
