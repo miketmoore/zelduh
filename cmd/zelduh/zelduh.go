@@ -38,13 +38,16 @@ var (
 )
 
 type GameModel struct {
-	AddEntities bool
+	AddEntities   bool
+	CurrentRoomID rooms.RoomID
+	NextRoomID    rooms.RoomID
 }
 
 func run() {
 
 	gameModel := GameModel{
-		AddEntities: true,
+		AddEntities:   true,
+		CurrentRoomID: 1,
 	}
 
 	randGenerator := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -78,8 +81,6 @@ func run() {
 	}
 
 	currentState := gamestate.Start
-	var currentRoomID rooms.RoomID = 1
-	var nextRoomID rooms.RoomID
 
 	var roomWarps map[entities.EntityID]rooms.EntityConfig
 
@@ -242,7 +243,7 @@ func run() {
 				roomTransition.Timer = 1
 				currentState = gamestate.MapTransition
 				gameModel.AddEntities = true
-				nextRoomID = entityConfig.WarpToRoomID
+				gameModel.NextRoomID = entityConfig.WarpToRoomID
 			}
 		},
 	}
@@ -273,7 +274,7 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-			drawMapBGImage(spritesheet, allMapDrawData, roomsMap[currentRoomID].MapName, 0, 0)
+			drawMapBGImage(spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
 
 			addHearts(hearts, player.Health.Total)
 
@@ -283,13 +284,13 @@ func run() {
 				addUICoin()
 
 				// Draw obstacles on appropriate map tiles
-				obstacles := drawObstaclesPerMapTiles(allMapDrawData, currentRoomID, 0, 0)
+				obstacles := drawObstaclesPerMapTiles(allMapDrawData, gameModel.CurrentRoomID, 0, 0)
 				gameWorld.AddEntitiesToSystem(obstacles)
 
 				roomWarps = map[entities.EntityID]rooms.EntityConfig{}
 
 				// Iterate through all entity configurations and build entities and add to systems
-				for _, c := range roomsMap[currentRoomID].EntityConfigs {
+				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
 					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
 					entitiesMap[entity.ID] = entity
 					gameWorld.AddEntityToSystem(entity)
@@ -356,33 +357,33 @@ func run() {
 				playerModY := 0.0
 				playerIncY := ((config.MapH / config.TileSize) - 1) + 7
 				playerIncX := ((config.MapW / config.TileSize) - 1) + 7
-				if roomTransition.Side == bounds.Bottom && roomsMap[currentRoomID].ConnectedRooms.Bottom != 0 {
+				if roomTransition.Side == bounds.Bottom && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - config.MapH
-					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Bottom
+					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom
 
 					playerModY += playerIncY
-				} else if roomTransition.Side == bounds.Top && roomsMap[currentRoomID].ConnectedRooms.Top != 0 {
+				} else if roomTransition.Side == bounds.Top && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top != 0 {
 					modY = -incY
 					modYNext = -incY + config.MapH
-					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Top
+					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top
 					playerModY -= playerIncY
-				} else if roomTransition.Side == bounds.Left && roomsMap[currentRoomID].ConnectedRooms.Left != 0 {
+				} else if roomTransition.Side == bounds.Left && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left != 0 {
 					modX = incX
 					modXNext = incX - config.MapW
-					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Left
+					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left
 					playerModX += playerIncX
-				} else if roomTransition.Side == bounds.Right && roomsMap[currentRoomID].ConnectedRooms.Right != 0 {
+				} else if roomTransition.Side == bounds.Right && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right != 0 {
 					modX = -incX
 					modXNext = -incX + config.MapW
-					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Right
+					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right
 					playerModX -= playerIncX
 				} else {
-					nextRoomID = 0
+					gameModel.NextRoomID = 0
 				}
 
-				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[currentRoomID].MapName, modX, modY)
-				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[nextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, modX, modY)
+				drawMapBGImage(spritesheet, allMapDrawData, roomsMap[gameModel.NextRoomID].MapName, modXNext, modYNext)
 				drawMask()
 
 				// Move player with map transition
@@ -406,8 +407,8 @@ func run() {
 				gameWorld.RemoveAllEntities()
 			} else {
 				currentState = gamestate.Game
-				if nextRoomID != 0 {
-					currentRoomID = nextRoomID
+				if gameModel.NextRoomID != 0 {
+					gameModel.CurrentRoomID = gameModel.NextRoomID
 				}
 				roomTransition.Active = false
 			}
