@@ -138,3 +138,10 @@ func (w *World) AddEntityToSystem(entity entities.Entity) {
 		system.AddEntity(entity)
 	}
 }
+
+// AddEntitiesToSystem adds the entities to their system
+func (w *World) AddEntitiesToSystem(entities []entities.Entity) {
+	for _, entity := range entities {
+		w.AddEntityToSystem(entity)
+	}
+}

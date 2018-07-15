@@ -340,15 +340,7 @@ func run() {
 		}
 	}
 
-	addUICoin := func() {
-		coin := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
-		gameWorld.AddEntityToSystem(coin)
-	}
-
-	gameWorld.AddEntityToSystem(player)
-	gameWorld.AddEntityToSystem(sword)
-	gameWorld.AddEntityToSystem(arrow)
-	gameWorld.AddEntityToSystem(bomb)
+	gameWorld.AddEntitiesToSystem([]entities.Entity{player, sword, arrow, bomb})
 
 	for !win.Closed() {
 
@@ -380,9 +372,7 @@ func run() {
 
 				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
-				for _, entity := range obstacles {
-					gameWorld.AddEntityToSystem(entity)
-				}
+				gameWorld.AddEntitiesToSystem(obstacles)
 
 				roomWarps = map[entities.EntityID]rooms.EntityConfig{}
 
@@ -786,4 +776,9 @@ var roomsMap = rooms.Rooms{
 			},
 		},
 	),
+}
+
+func addUICoin() {
+	coin := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
+	gameWorld.AddEntityToSystem(coin)
 }
