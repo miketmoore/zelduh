@@ -932,7 +932,7 @@ func run() {
 				gameWorld.RemoveAllEnemies()
 				removeAllCollisionSwitchesFromSystems()
 				removeAllMoveableObstaclesFromSystems()
-				removeAllEntitiesFromSystems()
+				gameWorld.RemoveAllEntities()
 
 				inc := (roomTransition.Start - float64(roomTransition.Timer))
 				incY := inc * (mapH / s)
@@ -991,7 +991,7 @@ func run() {
 				collisionSystem.RemoveAll(categories.Obstacle)
 				gameWorld.RemoveAllEnemies()
 				removeAllCollisionSwitchesFromSystems()
-				removeAllEntitiesFromSystems()
+				gameWorld.RemoveAllEntities()
 			} else {
 				currentState = gamestate.Game
 				if nextRoomID != 0 {
@@ -1086,15 +1086,6 @@ func loadPicture(path string) pixel.Picture {
 func addEntityToSystem(entity entities.Entity) {
 	for _, system := range gameWorld.Systems() {
 		system.AddEntity(entity)
-	}
-}
-
-func removeAllEntitiesFromSystems() {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Render:
-			sys.RemoveAllEntities()
-		}
 	}
 }
 

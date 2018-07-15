@@ -99,3 +99,13 @@ func (w *World) RemoveAllEnemies() {
 		}
 	}
 }
+
+// RemoveAllEntities removes all entities from systems
+func (w *World) RemoveAllEntities() {
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *systems.Render:
+			sys.RemoveAllEntities()
+		}
+	}
+}
