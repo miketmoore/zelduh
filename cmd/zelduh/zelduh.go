@@ -7,13 +7,10 @@ import (
 	_ "image/png"
 	"math/rand"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/config"
-	"github.com/miketmoore/zelduh/csv"
 	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/sprites"
@@ -109,13 +106,6 @@ var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
 var spriteMap map[string]*pixel.Sprite
 
-type mapDrawData struct {
-	Rect     pixel.Rect
-	SpriteID int
-}
-
-var allMapDrawData map[string]MapData
-
 const frameRate int = 5
 
 var entitiesMap map[entities.EntityID]entities.Entity
@@ -140,7 +130,7 @@ func run() {
 
 	// load all TMX file data for each map
 	tmxMapData = tmx.Load(tilemapFiles, tilemapDir)
-	allMapDrawData = buildMapDrawData()
+	allMapDrawData := tmx.BuildMapDrawData(tmxMapData)
 
 	// Build entities
 	player := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("player")(6, 6), gameWorld.NewEntityID())
@@ -361,7 +351,7 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-			drawMapBGImage(roomsMap[currentRoomID].MapName, 0, 0)
+			drawMapBGImage(allMapDrawData, roomsMap[currentRoomID].MapName, 0, 0)
 
 			addHearts(player.Health.Total)
 
@@ -371,7 +361,7 @@ func run() {
 				addUICoin()
 
 				// Draw obstacles on appropriate map tiles
-				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
+				obstacles := drawObstaclesPerMapTiles(allMapDrawData, currentRoomID, 0, 0)
 				gameWorld.AddEntitiesToSystem(obstacles)
 
 				roomWarps = map[entities.EntityID]rooms.EntityConfig{}
@@ -469,8 +459,8 @@ func run() {
 					nextRoomID = 0
 				}
 
-				drawMapBGImage(roomsMap[currentRoomID].MapName, modX, modY)
-				drawMapBGImage(roomsMap[nextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(allMapDrawData, roomsMap[currentRoomID].MapName, modX, modY)
+				drawMapBGImage(allMapDrawData, roomsMap[nextRoomID].MapName, modXNext, modYNext)
 				drawMask()
 
 				// Move player with map transition
@@ -583,55 +573,7 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
-// MapData represents data for one map
-type MapData struct {
-	Name string
-	Data []mapDrawData
-}
-
-func buildMapDrawData() map[string]MapData {
-	all := map[string]MapData{}
-
-	for mapName, mapData := range tmxMapData {
-		// fmt.Printf("Building map draw data for map %config.TileSize\n", mapName)
-
-		md := MapData{
-			Name: mapName,
-			Data: []mapDrawData{},
-		}
-
-		layers := mapData.Layers
-		for _, layer := range layers {
-
-			records := csv.Parse(strings.TrimSpace(layer.Data.Value) + ",")
-			for row := 0; row <= len(records); row++ {
-				if len(records) > row {
-					for col := 0; col < len(records[row])-1; col++ {
-						y := float64(11-row) * config.TileSize
-						x := float64(col) * config.TileSize
-
-						record := records[row][col]
-						spriteID, err := strconv.Atoi(record)
-						if err != nil {
-							panic(err)
-						}
-						mrd := mapDrawData{
-							Rect:     pixel.R(x, y, x+config.TileSize, y+config.TileSize),
-							SpriteID: spriteID,
-						}
-						md.Data = append(md.Data, mrd)
-					}
-				}
-
-			}
-			all[mapName] = md
-		}
-	}
-
-	return all
-}
-
-func drawMapBGImage(name string, modX, modY float64) {
+func drawMapBGImage(allMapDrawData map[string]tmx.MapData, name string, modX, modY float64) {
 	d := allMapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
@@ -649,7 +591,7 @@ func drawMapBGImage(name string, modX, modY float64) {
 	}
 }
 
-func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entities.Entity {
+func drawObstaclesPerMapTiles(allMapDrawData map[string]tmx.MapData, roomID rooms.RoomID, modX, modY float64) []entities.Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName]
 	obstacles := []entities.Entity{}
 	mod := 0.5
