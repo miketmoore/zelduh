@@ -131,3 +131,10 @@ func (w *World) RemoveAllCollisionSwitches() {
 		}
 	}
 }
+
+// AddEntityToSystem adds the entity to it's system
+func (w *World) AddEntityToSystem(entity entities.Entity) {
+	for _, system := range w.Systems() {
+		system.AddEntity(entity)
+	}
+}

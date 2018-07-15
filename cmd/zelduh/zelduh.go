@@ -627,7 +627,7 @@ func run() {
 	}
 	dropCoin := func(v pixel.Vec) {
 		coin := entities.BuildEntityFromConfig(frameRate, entityPresets["coin"](v.X/s, v.Y/s), gameWorld.NewEntityID())
-		addEntityToSystem(coin)
+		gameWorld.AddEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
 
@@ -690,7 +690,7 @@ func run() {
 						explosion.Temporary.OnExpiration = func() {
 							dropCoin(explosion.Spatial.Rect.Min)
 						}
-						addEntityToSystem(explosion)
+						gameWorld.AddEntityToSystem(explosion)
 						gameWorld.RemoveEnemy(enemyID)
 					} else {
 						spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
@@ -715,7 +715,7 @@ func run() {
 					explosion.Temporary.OnExpiration = func() {
 						dropCoin(explosion.Spatial.Rect.Min)
 					}
-					addEntityToSystem(explosion)
+					gameWorld.AddEntityToSystem(explosion)
 					gameWorld.RemoveEnemy(enemyID)
 				} else {
 					spatialSystem.MoveEnemyBack(enemyID, player.Movement.Direction)
@@ -792,20 +792,20 @@ func run() {
 	addHearts := func(health int) {
 		for i, entity := range hearts {
 			if i < health {
-				addEntityToSystem(entity)
+				gameWorld.AddEntityToSystem(entity)
 			}
 		}
 	}
 
 	addUICoin := func() {
 		coin := entities.BuildEntityFromConfig(frameRate, entityPresets["uiCoin"](4, 14), gameWorld.NewEntityID())
-		addEntityToSystem(coin)
+		gameWorld.AddEntityToSystem(coin)
 	}
 
-	addEntityToSystem(player)
-	addEntityToSystem(sword)
-	addEntityToSystem(arrow)
-	addEntityToSystem(bomb)
+	gameWorld.AddEntityToSystem(player)
+	gameWorld.AddEntityToSystem(sword)
+	gameWorld.AddEntityToSystem(arrow)
+	gameWorld.AddEntityToSystem(bomb)
 
 	drawMask := func() {
 		// top
@@ -872,7 +872,7 @@ func run() {
 				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(currentRoomID, 0, 0)
 				for _, entity := range obstacles {
-					addEntityToSystem(entity)
+					gameWorld.AddEntityToSystem(entity)
 				}
 
 				roomWarps = map[entities.EntityID]rooms.EntityConfig{}
@@ -881,7 +881,7 @@ func run() {
 				for _, c := range roomsMap[currentRoomID].EntityConfigs {
 					entity := entities.BuildEntityFromConfig(frameRate, c, gameWorld.NewEntityID())
 					entitiesMap[entity.ID] = entity
-					addEntityToSystem(entity)
+					gameWorld.AddEntityToSystem(entity)
 
 					switch c.Category {
 					case categories.Warp:
@@ -1082,12 +1082,6 @@ func loadPicture(path string) pixel.Picture {
 		os.Exit(1)
 	}
 	return pixel.PictureDataFromImage(img)
-}
-
-func addEntityToSystem(entity entities.Entity) {
-	for _, system := range gameWorld.Systems() {
-		system.AddEntity(entity)
-	}
 }
 
 // MapData represents data for one map
