@@ -117,16 +117,6 @@ func run() {
 			config.MapY+config.MapH,
 		),
 		OnPlayerCollisionWithBounds: collisionHandler.OnPlayerCollisionWithBounds,
-		// OnPlayerCollisionWithBounds: func(side bounds.Bound) {
-		// 	if !gameModel.RoomTransition.Active {
-		// 		gameModel.RoomTransition.Active = true
-		// 		gameModel.RoomTransition.Side = side
-		// 		gameModel.RoomTransition.Style = rooms.TransitionSlide
-		// 		gameModel.RoomTransition.Timer = int(gameModel.RoomTransition.Start)
-		// 		gameModel.CurrentState = gamestate.MapTransition
-		// 		gameModel.AddEntities = true
-		// 	}
-		// },
 		OnPlayerCollisionWithCoin: func(coinID entities.EntityID) {
 			player.Coins.Coins++
 			gameWorld.Remove(categories.Coin, coinID)
