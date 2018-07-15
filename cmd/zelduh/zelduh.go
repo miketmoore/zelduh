@@ -46,6 +46,7 @@ type GameModel struct {
 	EntitiesMap                           map[entities.EntityID]entities.Entity
 	Spritesheet                           map[int]*pixel.Sprite
 	Arrow, Bomb, Explosion, Player, Sword entities.Entity
+	Hearts                                []entities.Entity
 	RoomWarps                             map[entities.EntityID]rooms.EntityConfig
 	AllMapDrawData                        map[string]tmx.MapData
 	HealthSystem                          *systems.Health
@@ -87,6 +88,12 @@ func run() {
 
 		InputSystem:  &systems.Input{Win: win},
 		HealthSystem: &systems.Health{},
+
+		Hearts: []entities.Entity{
+			entities.BuildEntityFromConfig(entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
+			entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.15, 14), gameWorld.NewEntityID()),
+			entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
+		},
 	}
 
 	gameModel.SpatialSystem = &systems.Spatial{
@@ -96,12 +103,6 @@ func run() {
 	gameWorld.AddSystem(gameModel.InputSystem)
 	gameWorld.AddSystem(gameModel.HealthSystem)
 	gameWorld.AddSystem(gameModel.SpatialSystem)
-
-	hearts := []entities.Entity{
-		entities.BuildEntityFromConfig(entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
-		entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.15, 14), gameWorld.NewEntityID()),
-		entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
-	}
 
 	collisionHandler := CollisionHandler{
 		GameModel: &gameModel,
@@ -125,9 +126,9 @@ func run() {
 			gameModel.Player.Health.Total--
 
 			// remove heart entity
-			heartIndex := len(hearts) - 1
-			gameWorld.Remove(categories.Heart, hearts[heartIndex].ID)
-			hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
+			heartIndex := len(gameModel.Hearts) - 1
+			gameWorld.Remove(categories.Heart, gameModel.Hearts[heartIndex].ID)
+			gameModel.Hearts = append(gameModel.Hearts[:heartIndex], gameModel.Hearts[heartIndex+1:]...)
 
 			// TODO redraw hearts
 			if gameModel.Player.Health.Total == 0 {
@@ -270,7 +271,7 @@ func run() {
 
 			drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
 
-			addHearts(hearts, gameModel.Player.Health.Total)
+			addHearts(gameModel.Hearts, gameModel.Player.Health.Total)
 
 			if gameModel.AddEntities {
 				gameModel.AddEntities = false
