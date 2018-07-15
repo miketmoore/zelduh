@@ -109,3 +109,25 @@ func (w *World) RemoveAllEntities() {
 		}
 	}
 }
+
+// RemoveAllMoveableObstacles removes all moveable obstacles from systems
+func (w *World) RemoveAllMoveableObstacles() {
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *systems.Collision:
+			sys.RemoveAll(categories.MovableObstacle)
+		case *systems.Render:
+			sys.RemoveAll(categories.MovableObstacle)
+		}
+	}
+}
+
+// RemoveAllCollisionSwitches removes all collision switches from systems
+func (w *World) RemoveAllCollisionSwitches() {
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *systems.Collision:
+			sys.RemoveAll(categories.CollisionSwitch)
+		}
+	}
+}

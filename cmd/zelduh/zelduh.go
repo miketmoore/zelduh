@@ -930,8 +930,8 @@ func run() {
 
 				collisionSystem.RemoveAll(categories.Obstacle)
 				gameWorld.RemoveAllEnemies()
-				removeAllCollisionSwitchesFromSystems()
-				removeAllMoveableObstaclesFromSystems()
+				gameWorld.RemoveAllCollisionSwitches()
+				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
 				inc := (roomTransition.Start - float64(roomTransition.Timer))
@@ -990,8 +990,9 @@ func run() {
 
 				collisionSystem.RemoveAll(categories.Obstacle)
 				gameWorld.RemoveAllEnemies()
-				removeAllCollisionSwitchesFromSystems()
+				gameWorld.RemoveAllCollisionSwitches()
 				gameWorld.RemoveAllEntities()
+				// TODO remove moveable obstacles too?
 			} else {
 				currentState = gamestate.Game
 				if nextRoomID != 0 {
@@ -1086,26 +1087,6 @@ func loadPicture(path string) pixel.Picture {
 func addEntityToSystem(entity entities.Entity) {
 	for _, system := range gameWorld.Systems() {
 		system.AddEntity(entity)
-	}
-}
-
-func removeAllCollisionSwitchesFromSystems() {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Collision:
-			sys.RemoveAll(categories.CollisionSwitch)
-		}
-	}
-}
-
-func removeAllMoveableObstaclesFromSystems() {
-	for _, system := range gameWorld.Systems() {
-		switch sys := system.(type) {
-		case *systems.Collision:
-			sys.RemoveAll(categories.MovableObstacle)
-		case *systems.Render:
-			sys.RemoveAll(categories.MovableObstacle)
-		}
 	}
 }
 
