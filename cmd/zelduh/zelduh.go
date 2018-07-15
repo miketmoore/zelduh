@@ -112,10 +112,7 @@ func run() {
 			config.MapY+config.MapH,
 		),
 		OnPlayerCollisionWithBounds: collisionHandler.OnPlayerCollisionWithBounds,
-		OnPlayerCollisionWithCoin: func(coinID entities.EntityID) {
-			gameModel.Player.Coins.Coins++
-			gameWorld.Remove(categories.Coin, coinID)
-		},
+		OnPlayerCollisionWithCoin:   collisionHandler.OnPlayerCollisionWithCoin,
 		OnPlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
 			// TODO repeat what I did with the enemies
 			gameModel.SpatialSystem.MovePlayerBack()
@@ -667,4 +664,10 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side bounds.Bound) {
 		ch.GameModel.CurrentState = gamestate.MapTransition
 		ch.GameModel.AddEntities = true
 	}
+}
+
+// OnPlayerCollisionWithCoin handles collision between player and coin
+func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID entities.EntityID) {
+	ch.GameModel.Player.Coins.Coins++
+	gameWorld.Remove(categories.Coin, coinID)
 }
