@@ -115,29 +115,7 @@ func run() {
 		OnPlayerCollisionWithCoin:   collisionHandler.OnPlayerCollisionWithCoin,
 		OnPlayerCollisionWithEnemy:  collisionHandler.OnPlayerCollisionWithEnemy,
 		OnSwordCollisionWithEnemy:   collisionHandler.OnSwordCollisionWithEnemy,
-		OnArrowCollisionWithEnemy: func(enemyID entities.EntityID) {
-			if !gameModel.Arrow.Ignore.Value {
-				dead := gameModel.HealthSystem.Hit(enemyID, 1)
-				gameModel.Arrow.Ignore.Value = true
-				if dead {
-					fmt.Printf("You killed an enemy with an arrow\n")
-					enemySpatial, _ := gameModel.SpatialSystem.GetEnemySpatial(enemyID)
-					gameModel.Explosion.Temporary.Expiration = len(gameModel.Explosion.Animation.Map["default"].Frames)
-					gameModel.Explosion.Spatial = &components.Spatial{
-						Width:  config.TileSize,
-						Height: config.TileSize,
-						Rect:   enemySpatial.Rect,
-					}
-					gameModel.Explosion.Temporary.OnExpiration = func() {
-						dropCoin(gameModel.Explosion.Spatial.Rect.Min)
-					}
-					gameWorld.AddEntityToSystem(gameModel.Explosion)
-					gameWorld.RemoveEnemy(enemyID)
-				} else {
-					gameModel.SpatialSystem.MoveEnemyBack(enemyID, gameModel.Player.Movement.Direction)
-				}
-			}
-		},
+		OnArrowCollisionWithEnemy:   collisionHandler.OnArrowCollisionWithEnemy,
 		OnArrowCollisionWithObstacle: func() {
 			gameModel.Arrow.Movement.RemainingMoves = 0
 		},
@@ -675,5 +653,30 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID entities.EntityID)
 			}
 		}
 
+	}
+}
+
+// OnArrowCollisionWithEnemy handles collision between arrow and enemy
+func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID entities.EntityID) {
+	if !ch.GameModel.Arrow.Ignore.Value {
+		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
+		ch.GameModel.Arrow.Ignore.Value = true
+		if dead {
+			fmt.Printf("You killed an enemy with an arrow\n")
+			enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
+			ch.GameModel.Explosion.Temporary.Expiration = len(ch.GameModel.Explosion.Animation.Map["default"].Frames)
+			ch.GameModel.Explosion.Spatial = &components.Spatial{
+				Width:  config.TileSize,
+				Height: config.TileSize,
+				Rect:   enemySpatial.Rect,
+			}
+			ch.GameModel.Explosion.Temporary.OnExpiration = func() {
+				dropCoin(ch.GameModel.Explosion.Spatial.Rect.Min)
+			}
+			gameWorld.AddEntityToSystem(ch.GameModel.Explosion)
+			gameWorld.RemoveEnemy(enemyID)
+		} else {
+			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.Movement.Direction)
+		}
 	}
 }
