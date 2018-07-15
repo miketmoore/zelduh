@@ -44,6 +44,7 @@ type GameModel struct {
 	RoomTransition            rooms.RoomTransition
 	CurrentState              gamestate.Name
 	Rand                      *rand.Rand
+	EntitiesMap               map[entities.EntityID]entities.Entity
 }
 
 func run() {
@@ -58,7 +59,7 @@ func run() {
 	}
 
 	gameModel.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
-	entitiesMap := map[entities.EntityID]entities.Entity{}
+	gameModel.EntitiesMap = map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
 	gamemap.ProcessMapLayout(roomsMap)
@@ -200,14 +201,14 @@ func run() {
 			}
 		},
 		OnMoveableObstacleCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range entitiesMap {
+			for id, entity := range gameModel.EntitiesMap {
 				if id == collisionSwitchID && !entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
 			}
 		},
 		OnMoveableObstacleNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range entitiesMap {
+			for id, entity := range gameModel.EntitiesMap {
 				if id == collisionSwitchID && entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
@@ -218,14 +219,14 @@ func run() {
 			spatialSystem.UndoEnemyRect(enemyID)
 		},
 		OnPlayerCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range entitiesMap {
+			for id, entity := range gameModel.EntitiesMap {
 				if id == collisionSwitchID && !entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
 			}
 		},
 		OnPlayerNoCollisionWithSwitch: func(collisionSwitchID entities.EntityID) {
-			for id, entity := range entitiesMap {
+			for id, entity := range gameModel.EntitiesMap {
 				if id == collisionSwitchID && entity.Toggler.Enabled() {
 					entity.Toggler.Toggle()
 				}
@@ -288,7 +289,7 @@ func run() {
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
 					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
-					entitiesMap[entity.ID] = entity
+					gameModel.EntitiesMap[entity.ID] = entity
 					gameWorld.AddEntityToSystem(entity)
 
 					switch c.Category {
