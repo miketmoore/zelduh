@@ -113,21 +113,7 @@ func run() {
 		),
 		OnPlayerCollisionWithBounds: collisionHandler.OnPlayerCollisionWithBounds,
 		OnPlayerCollisionWithCoin:   collisionHandler.OnPlayerCollisionWithCoin,
-		OnPlayerCollisionWithEnemy: func(enemyID entities.EntityID) {
-			// TODO repeat what I did with the enemies
-			gameModel.SpatialSystem.MovePlayerBack()
-			gameModel.Player.Health.Total--
-
-			// remove heart entity
-			heartIndex := len(gameModel.Hearts) - 1
-			gameWorld.Remove(categories.Heart, gameModel.Hearts[heartIndex].ID)
-			gameModel.Hearts = append(gameModel.Hearts[:heartIndex], gameModel.Hearts[heartIndex+1:]...)
-
-			// TODO redraw hearts
-			if gameModel.Player.Health.Total == 0 {
-				gameModel.CurrentState = gamestate.Over
-			}
-		},
+		OnPlayerCollisionWithEnemy:  collisionHandler.OnPlayerCollisionWithEnemy,
 		OnSwordCollisionWithEnemy: func(enemyID entities.EntityID) {
 			fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
 			if !gameModel.Sword.Ignore.Value {
@@ -670,4 +656,21 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side bounds.Bound) {
 func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID entities.EntityID) {
 	ch.GameModel.Player.Coins.Coins++
 	gameWorld.Remove(categories.Coin, coinID)
+}
+
+// OnPlayerCollisionWithEnemy handles collision between player and enemy
+func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID entities.EntityID) {
+	// TODO repeat what I did with the enemies
+	ch.GameModel.SpatialSystem.MovePlayerBack()
+	ch.GameModel.Player.Health.Total--
+
+	// remove heart entity
+	heartIndex := len(ch.GameModel.Hearts) - 1
+	gameWorld.Remove(categories.Heart, ch.GameModel.Hearts[heartIndex].ID)
+	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
+
+	// TODO redraw hearts
+	if ch.GameModel.Player.Health.Total == 0 {
+		ch.GameModel.CurrentState = gamestate.Over
+	}
 }
