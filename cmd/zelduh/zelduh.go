@@ -245,17 +245,6 @@ func run() {
 		Spritesheet: spritesheet,
 	})
 
-	// make sure only correct number of hearts exists in systems
-	// so, if health is reduced, need to remove a heart entity from the systems,
-	// the correct one... last one
-	addHearts := func(health int) {
-		for i, entity := range hearts {
-			if i < health {
-				gameWorld.AddEntityToSystem(entity)
-			}
-		}
-	}
-
 	gameWorld.AddEntitiesToSystem([]entities.Entity{player, sword, arrow, bomb})
 
 	for !win.Closed() {
@@ -279,7 +268,7 @@ func run() {
 
 			drawMapBGImage(spritesheet, allMapDrawData, roomsMap[currentRoomID].MapName, 0, 0)
 
-			addHearts(player.Health.Total)
+			addHearts(hearts, player.Health.Total)
 
 			if addEntities {
 				addEntities = false
@@ -654,4 +643,15 @@ var roomsMap = rooms.Rooms{
 func addUICoin() {
 	coin := entities.BuildEntityFromConfig(entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
 	gameWorld.AddEntityToSystem(coin)
+}
+
+// make sure only correct number of hearts exists in systems
+// so, if health is reduced, need to remove a heart entity from the systems,
+// the correct one... last one
+func addHearts(hearts []entities.Entity, health int) {
+	for i, entity := range hearts {
+		if i < health {
+			gameWorld.AddEntityToSystem(entity)
+		}
+	}
 }
