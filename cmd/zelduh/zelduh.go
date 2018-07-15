@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/miketmoore/zelduh/bounds"
+	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/csv"
 	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
@@ -25,7 +26,6 @@ import (
 	"github.com/miketmoore/go-pixel-game-template/state"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
-	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/systems"
@@ -64,8 +64,7 @@ var (
 )
 
 const (
-	s               float64 = 48
-	spritesheetPath string  = "assets/spritesheet.png"
+	spritesheetPath string = "assets/spritesheet.png"
 )
 
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -133,373 +132,6 @@ var allMapDrawData map[string]MapData
 
 const frameRate int = 5
 
-type enemyPresetFn = func(xTiles, yTiles float64) rooms.EntityConfig
-
-var spriteSets = map[string][]int{
-	"eyeburrower": []int{50, 50, 50, 91, 91, 91, 92, 92, 92, 93, 93, 93, 92, 92, 92},
-	"explosion": []int{
-		122, 122, 122,
-		123, 123, 123,
-		124, 124, 124,
-		125, 125, 125,
-	},
-	"uiCoin":           []int{20},
-	"skeleton":         []int{31, 32},
-	"skull":            []int{36, 37, 38, 39},
-	"spinner":          []int{51, 52},
-	"puzzleBox":        []int{63},
-	"warpStone":        []int{61},
-	"playerUp":         []int{4, 195},
-	"playerRight":      []int{3, 194},
-	"playerDown":       []int{1, 192},
-	"playerLeft":       []int{2, 193},
-	"playerSwordUp":    []int{165},
-	"playerSwordRight": []int{164},
-	"playerSwordLeft":  []int{179},
-	"playerSwordDown":  []int{180},
-	"floorSwitch":      []int{112, 127},
-	"toggleObstacle":   []int{144, 114},
-	"swordUp":          []int{70},
-	"swordRight":       []int{67},
-	"swordDown":        []int{68},
-	"swordLeft":        []int{69},
-	"arrowUp":          []int{101},
-	"arrowRight":       []int{100},
-	"arrowDown":        []int{103},
-	"arrowLeft":        []int{102},
-	"bomb":             []int{138, 139, 140, 141},
-	"coin":             []int{5, 5, 6, 6, 21, 21},
-	"heart":            []int{106},
-}
-
-var entityPresets = map[string]enemyPresetFn{
-	"arrow": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Arrow,
-			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
-				Speed:     0.0,
-			},
-			W: s,
-			H: s,
-			X: s * xTiles,
-			Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"up":    spriteSets["arrowUp"],
-				"right": spriteSets["arrowRight"],
-				"down":  spriteSets["arrowDown"],
-				"left":  spriteSets["arrowLeft"],
-			},
-			Hitbox: &rooms.HitboxConfig{
-				Radius: 5,
-			},
-			Ignore: true,
-		}
-	},
-	"bomb": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Bomb,
-			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
-				Speed:     0.0,
-			},
-			W: s,
-			H: s,
-			X: s * xTiles,
-			Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["bomb"],
-			},
-			Hitbox: &rooms.HitboxConfig{
-				Radius: 5,
-			},
-			Ignore: true,
-		}
-	},
-	"coin": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Coin,
-			W:        s,
-			H:        s,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["coin"],
-			},
-		}
-	},
-	"explosion": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category:   categories.Explosion,
-			Expiration: 12,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["explosion"],
-			},
-		}
-	},
-	"obstacle": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Obstacle,
-			W:        s,
-			H:        s,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-		}
-	},
-	"player": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Player,
-			Health:   3,
-			W:        s,
-			H:        s,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			Hitbox: &rooms.HitboxConfig{
-				Box:                  imdraw.New(nil),
-				Radius:               15,
-				CollisionWithRectMod: 5,
-			},
-			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
-				MaxSpeed:  7.0,
-				Speed:     0.0,
-			},
-			Coins: true,
-			Dash: &rooms.DashConfig{
-				Charge:    0,
-				MaxCharge: 50,
-				SpeedMod:  7,
-			},
-			Animation: rooms.AnimationConfig{
-				"up":               spriteSets["playerUp"],
-				"right":            spriteSets["playerRight"],
-				"down":             spriteSets["playerDown"],
-				"left":             spriteSets["playerLeft"],
-				"swordAttackUp":    spriteSets["playerSwordUp"],
-				"swordAttackRight": spriteSets["playerSwordRight"],
-				"swordAttackLeft":  spriteSets["playerSwordLeft"],
-				"swordAttackDown":  spriteSets["playerSwordDown"],
-			},
-		}
-	},
-	"sword": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Sword,
-			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
-				Speed:     0.0,
-			},
-			W: s,
-			H: s,
-			X: s * xTiles,
-			Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"up":    spriteSets["swordUp"],
-				"right": spriteSets["swordRight"],
-				"down":  spriteSets["swordDown"],
-				"left":  spriteSets["swordLeft"],
-			},
-			Hitbox: &rooms.HitboxConfig{
-				Radius: 20,
-			},
-			Ignore: true,
-		}
-	},
-	"eyeburrower": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Enemy,
-			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["eyeburrower"],
-			},
-			Health: 2,
-			Hitbox: &rooms.HitboxConfig{
-				Box:    imdraw.New(nil),
-				Radius: 20,
-			},
-			Movement: &rooms.MovementConfig{
-				Direction:    direction.Down,
-				Speed:        1.0,
-				MaxSpeed:     1.0,
-				HitSpeed:     10.0,
-				HitBackMoves: 10,
-				MaxMoves:     100,
-				PatternName:  "random",
-			},
-		}
-	},
-	"heart": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Heart,
-			W:        s,
-			H:        s,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			Hitbox: &rooms.HitboxConfig{
-				Box: imdraw.New(nil),
-			},
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["heart"],
-			},
-		}
-
-	},
-	"skeleton": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Enemy,
-			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["skeleton"],
-			},
-			Health: 2,
-			Hitbox: &rooms.HitboxConfig{
-				Box:    imdraw.New(nil),
-				Radius: 20,
-			},
-			Movement: &rooms.MovementConfig{
-				Direction:    direction.Down,
-				Speed:        1.0,
-				MaxSpeed:     1.0,
-				HitSpeed:     10.0,
-				HitBackMoves: 10,
-				MaxMoves:     100,
-				PatternName:  "random",
-			},
-		}
-	},
-	"skull": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Enemy,
-			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["skull"],
-			},
-			Health: 2,
-			Hitbox: &rooms.HitboxConfig{
-				Box:    imdraw.New(nil),
-				Radius: 20,
-			},
-			Movement: &rooms.MovementConfig{
-				Direction:    direction.Down,
-				Speed:        1.0,
-				MaxSpeed:     1.0,
-				HitSpeed:     10.0,
-				HitBackMoves: 10,
-				MaxMoves:     100,
-				PatternName:  "random",
-			},
-		}
-	},
-	"spinner": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Enemy,
-			W:        s, H: s, X: s * xTiles, Y: s * yTiles,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["spinner"],
-			},
-			Invincible: true,
-			Hitbox: &rooms.HitboxConfig{
-				Box:    imdraw.New(nil),
-				Radius: 20,
-			},
-			Movement: &rooms.MovementConfig{
-				Direction:    direction.Right,
-				Speed:        1.0,
-				MaxSpeed:     1.0,
-				HitSpeed:     10.0,
-				HitBackMoves: 10,
-				MaxMoves:     100,
-				PatternName:  "left-right",
-			},
-		}
-	},
-	"uiCoin": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Heart,
-			W:        s,
-			H:        s,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			Hitbox: &rooms.HitboxConfig{
-				Box: imdraw.New(nil),
-			},
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["uiCoin"],
-			},
-		}
-	},
-	"warpStone": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.Warp,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			W:        s,
-			H:        s,
-			Hitbox: &rooms.HitboxConfig{
-				Box:    imdraw.New(nil),
-				Radius: 20,
-			},
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["warpStone"],
-			},
-		}
-	},
-	"puzzleBox": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.MovableObstacle,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			W:        s,
-			H:        s,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["puzzleBox"],
-			},
-			Movement: &rooms.MovementConfig{
-				Speed:    1.0,
-				MaxMoves: int(s) / 2,
-				MaxSpeed: 2.0,
-			},
-		}
-	},
-	"floorSwitch": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
-			Category: categories.CollisionSwitch,
-			X:        s * xTiles,
-			Y:        s * yTiles,
-			W:        s,
-			H:        s,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["floorSwitch"],
-			},
-			Toggleable: true,
-		}
-	},
-	// this is an impassable obstacle that can be toggled "remotely"
-	// it has two visual states that coincide with each toggle state
-	"toggleObstacle": func(xTiles, yTiles float64) rooms.EntityConfig {
-		// TODO get this working again
-		return rooms.EntityConfig{
-			X: s * xTiles,
-			Y: s * yTiles,
-			W: s,
-			H: s,
-			Animation: rooms.AnimationConfig{
-				"default": spriteSets["toggleObstacle"],
-			},
-			// Impassable: true,
-			Toggleable: true,
-		}
-	},
-}
-
-func presetWarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) rooms.EntityConfig {
-	fmt.Printf("presetWarpStone\n")
-	e := entityPresets["warpStone"](X, Y)
-	e.WarpToRoomID = 6
-	e.Hitbox.Radius = 5
-	return e
-}
-
 var roomsMap rooms.Rooms
 var entitiesMap map[entities.EntityID]entities.Entity
 
@@ -510,30 +142,30 @@ func run() {
 
 	roomsMap = rooms.Rooms{
 		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
-			entityPresets["puzzleBox"](5, 5),
+			entities.GetPreset("puzzleBox")(5, 5),
 			(func() rooms.EntityConfig {
-				e := entityPresets["floorSwitch"](5, 6)
+				e := entities.GetPreset("floorSwitch")(5, 6)
 				return e
 			})(),
-			entityPresets["toggleObstacle"](10, 7),
+			entities.GetPreset("toggleObstacle")(10, 7),
 		),
 		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
-			entityPresets["skull"](5, 5),
-			entityPresets["skeleton"](11, 9),
-			entityPresets["spinner"](7, 9),
-			entityPresets["eyeburrower"](8, 9),
+			entities.GetPreset("skull")(5, 5),
+			entities.GetPreset("skeleton")(11, 9),
+			entities.GetPreset("spinner")(7, 9),
+			entities.GetPreset("eyeburrower")(8, 9),
 		),
 		3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom",
-			presetWarpStone(3, 7, 6, 5),
+			entities.WarpStone(3, 7, 6, 5),
 		),
 		5: rooms.NewRoom("rockWithCaveEntrance",
 			rooms.EntityConfig{
 				Category:     categories.Warp,
 				WarpToRoomID: 11,
-				W:            s,
-				H:            s,
-				X:            (s * 7) + s/2,
-				Y:            (s * 9) + s/2,
+				W:            config.TileSize,
+				H:            config.TileSize,
+				X:            (config.TileSize * 7) + config.TileSize/2,
+				Y:            (config.TileSize * 9) + config.TileSize/2,
 				Hitbox: &rooms.HitboxConfig{
 					Radius: 30,
 				},
@@ -541,10 +173,10 @@ func run() {
 			rooms.EntityConfig{
 				Category:     categories.Warp,
 				WarpToRoomID: 11,
-				W:            s,
-				H:            s,
-				X:            (s * 8) + s/2,
-				Y:            (s * 9) + s/2,
+				W:            config.TileSize,
+				H:            config.TileSize,
+				X:            (config.TileSize * 8) + config.TileSize/2,
+				Y:            (config.TileSize * 9) + config.TileSize/2,
 				Hitbox: &rooms.HitboxConfig{
 					Radius: 30,
 				},
@@ -560,10 +192,10 @@ func run() {
 			rooms.EntityConfig{
 				Category:     categories.Warp,
 				WarpToRoomID: 5,
-				W:            s,
-				H:            s,
-				X:            (s * 6) + s + (s / 2.5),
-				Y:            (s * 1) + s + (s / 2.5),
+				W:            config.TileSize,
+				H:            config.TileSize,
+				X:            (config.TileSize * 6) + config.TileSize + (config.TileSize / 2.5),
+				Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
 				Hitbox: &rooms.HitboxConfig{
 					Radius: 15,
 				},
@@ -571,10 +203,10 @@ func run() {
 			rooms.EntityConfig{
 				Category:     categories.Warp,
 				WarpToRoomID: 5,
-				W:            s,
-				H:            s,
-				X:            (s * 7) + s + (s / 2.5),
-				Y:            (s * 1) + s + (s / 2.5),
+				W:            config.TileSize,
+				H:            config.TileSize,
+				X:            (config.TileSize * 7) + config.TileSize + (config.TileSize / 2.5),
+				Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
 				Hitbox: &rooms.HitboxConfig{
 					Radius: 15,
 				},
@@ -593,21 +225,21 @@ func run() {
 	pic = loadPicture(spritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
-	spritesheet = sprites.BuildSpritesheet(pic, s)
+	spritesheet = sprites.BuildSpritesheet(pic, config.TileSize)
 
 	// load all TMX file data for each map
 	tmxMapData = tmx.Load(tilemapFiles, tilemapDir)
 	allMapDrawData = buildMapDrawData()
 
 	// Build entities
-	player := entities.BuildEntityFromConfig(frameRate, entityPresets["player"](6, 6), gameWorld.NewEntityID())
-	bomb := entities.BuildEntityFromConfig(frameRate, entityPresets["bomb"](0, 0), gameWorld.NewEntityID())
-	explosion := entities.BuildEntityFromConfig(frameRate, entityPresets["explosion"](0, 0), gameWorld.NewEntityID())
-	sword := entities.BuildEntityFromConfig(frameRate, entityPresets["sword"](0, 0), gameWorld.NewEntityID())
-	arrow := entities.BuildEntityFromConfig(frameRate, entityPresets["arrow"](0, 0), gameWorld.NewEntityID())
+	player := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("player")(6, 6), gameWorld.NewEntityID())
+	bomb := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("bomb")(0, 0), gameWorld.NewEntityID())
+	explosion := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID())
+	sword := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID())
+	arrow := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID())
 
 	roomTransition := rooms.RoomTransition{
-		Start: float64(s),
+		Start: float64(config.TileSize),
 	}
 
 	currentState := gamestate.Start
@@ -626,15 +258,15 @@ func run() {
 		Rand: r,
 	}
 	dropCoin := func(v pixel.Vec) {
-		coin := entities.BuildEntityFromConfig(frameRate, entityPresets["coin"](v.X/s, v.Y/s), gameWorld.NewEntityID())
+		coin := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
 		gameWorld.AddEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
 
 	hearts := []entities.Entity{
-		entities.BuildEntityFromConfig(frameRate, entityPresets["heart"](1.5, 14), gameWorld.NewEntityID()),
-		entities.BuildEntityFromConfig(frameRate, entityPresets["heart"](2.15, 14), gameWorld.NewEntityID()),
-		entities.BuildEntityFromConfig(frameRate, entityPresets["heart"](2.80, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(frameRate, entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(frameRate, entities.GetPreset("heart")(2.15, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(frameRate, entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
 	}
 
 	collisionSystem := &systems.Collision{
@@ -683,8 +315,8 @@ func run() {
 						enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
 						explosion.Temporary.Expiration = len(explosion.Animation.Map["default"].Frames)
 						explosion.Spatial = &components.Spatial{
-							Width:  s,
-							Height: s,
+							Width:  config.TileSize,
+							Height: config.TileSize,
 							Rect:   enemySpatial.Rect,
 						}
 						explosion.Temporary.OnExpiration = func() {
@@ -708,8 +340,8 @@ func run() {
 					enemySpatial, _ := spatialSystem.GetEnemySpatial(enemyID)
 					explosion.Temporary.Expiration = len(explosion.Animation.Map["default"].Frames)
 					explosion.Spatial = &components.Spatial{
-						Width:  s,
-						Height: s,
+						Width:  config.TileSize,
+						Height: config.TileSize,
 						Rect:   enemySpatial.Rect,
 					}
 					explosion.Temporary.OnExpiration = func() {
@@ -798,7 +430,7 @@ func run() {
 	}
 
 	addUICoin := func() {
-		coin := entities.BuildEntityFromConfig(frameRate, entityPresets["uiCoin"](4, 14), gameWorld.NewEntityID())
+		coin := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
 		gameWorld.AddEntityToSystem(coin)
 	}
 
@@ -935,16 +567,16 @@ func run() {
 				gameWorld.RemoveAllEntities()
 
 				inc := (roomTransition.Start - float64(roomTransition.Timer))
-				incY := inc * (mapH / s)
-				incX := inc * (mapW / s)
+				incY := inc * (mapH / config.TileSize)
+				incX := inc * (mapW / config.TileSize)
 				modY := 0.0
 				modYNext := 0.0
 				modX := 0.0
 				modXNext := 0.0
 				playerModX := 0.0
 				playerModY := 0.0
-				playerIncY := ((mapH / s) - 1) + 7
-				playerIncX := ((mapW / s) - 1) + 7
+				playerIncY := ((mapH / config.TileSize) - 1) + 7
+				playerIncX := ((mapW / config.TileSize) - 1) + 7
 				if roomTransition.Side == bounds.Bottom && roomsMap[currentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - mapH
@@ -978,8 +610,8 @@ func run() {
 				player.Spatial.Rect = pixel.R(
 					player.Spatial.Rect.Min.X+playerModX,
 					player.Spatial.Rect.Min.Y+playerModY,
-					player.Spatial.Rect.Min.X+playerModX+s,
-					player.Spatial.Rect.Min.Y+playerModY+s,
+					player.Spatial.Rect.Min.X+playerModX+config.TileSize,
+					player.Spatial.Rect.Min.Y+playerModY+config.TileSize,
 				)
 
 				gameWorld.Update()
@@ -1094,7 +726,7 @@ func buildMapDrawData() map[string]MapData {
 	all := map[string]MapData{}
 
 	for mapName, mapData := range tmxMapData {
-		// fmt.Printf("Building map draw data for map %s\n", mapName)
+		// fmt.Printf("Building map draw data for map %config.TileSize\n", mapName)
 
 		md := MapData{
 			Name: mapName,
@@ -1108,8 +740,8 @@ func buildMapDrawData() map[string]MapData {
 			for row := 0; row <= len(records); row++ {
 				if len(records) > row {
 					for col := 0; col < len(records[row])-1; col++ {
-						y := float64(11-row) * s
-						x := float64(col) * s
+						y := float64(11-row) * config.TileSize
+						x := float64(col) * config.TileSize
 
 						record := records[row][col]
 						spriteID, err := strconv.Atoi(record)
@@ -1117,7 +749,7 @@ func buildMapDrawData() map[string]MapData {
 							panic(err)
 						}
 						mrd := mapDrawData{
-							Rect:     pixel.R(x, y, x+s, y+s),
+							Rect:     pixel.R(x, y, x+config.TileSize, y+config.TileSize),
 							SpriteID: spriteID,
 						}
 						md.Data = append(md.Data, mrd)
@@ -1141,8 +773,8 @@ func drawMapBGImage(name string, modX, modY float64) {
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+mapX+modX+s/2,
-				vec.Y+mapY+modY+s/2,
+				vec.X+mapX+modX+config.TileSize/2,
+				vec.Y+mapY+modY+config.TileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -1158,15 +790,15 @@ func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entitie
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+mapX+modX+s/2,
-				vec.Y+mapY+modY+s/2,
+				vec.X+mapX+modX+config.TileSize/2,
+				vec.Y+mapY+modY+config.TileSize/2,
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				x := movedVec.X/s - mod
-				y := movedVec.Y/s - mod
+				x := movedVec.X/config.TileSize - mod
+				y := movedVec.Y/config.TileSize - mod
 				id := gameWorld.NewEntityID()
-				obstacle := entities.BuildEntityFromConfig(frameRate, entityPresets["obstacle"](x, y), id)
+				obstacle := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("obstacle")(x, y), id)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
