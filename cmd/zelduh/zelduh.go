@@ -40,7 +40,7 @@ var (
 	gameWorld world.World
 )
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+var randGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func run() {
 
@@ -86,7 +86,7 @@ func run() {
 	healthSystem := &systems.Health{}
 	gameWorld.AddSystem(healthSystem)
 	spatialSystem := &systems.Spatial{
-		Rand: r,
+		Rand: randGenerator,
 	}
 	dropCoin := func(v pixel.Vec) {
 		coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
