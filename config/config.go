@@ -1,5 +1,10 @@
 package config
 
+const (
+	TranslationFile = "i18n/zelduh/en-US.all.json"
+	Lang            = "en-US"
+)
+
 const FrameRate int = 5
 
 // TileSize defines the width and height of a tile

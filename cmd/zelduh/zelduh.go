@@ -32,11 +32,6 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const (
-	translationFile = "i18n/zelduh/en-US.all.json"
-	lang            = "en-US"
-)
-
 var (
 	win       *pixelgl.Window
 	txt       *text.Text
@@ -500,8 +495,8 @@ func main() {
 }
 
 func initI18n() i18n.TranslateFunc {
-	i18n.LoadTranslationFile(translationFile)
-	T, err := i18n.Tfunc(lang)
+	i18n.LoadTranslationFile(config.TranslationFile)
+	T, err := i18n.Tfunc(config.Lang)
 	if err != nil {
 		fmt.Println("Initializing i18n failed:")
 		fmt.Println(err)
