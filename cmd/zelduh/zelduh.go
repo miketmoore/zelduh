@@ -39,11 +39,11 @@ var (
 
 // GameModel contains data used throughout the game
 type GameModel struct {
-	AddEntities    bool
-	CurrentRoomID  rooms.RoomID
-	NextRoomID     rooms.RoomID
-	RoomTransition rooms.RoomTransition
-	CurrentState   gamestate.Name
+	AddEntities               bool
+	CurrentRoomID, NextRoomID rooms.RoomID
+	RoomTransition            rooms.RoomTransition
+	CurrentState              gamestate.Name
+	Rand                      *rand.Rand
 }
 
 func run() {
@@ -57,7 +57,7 @@ func run() {
 		},
 	}
 
-	randGenerator := rand.New(rand.NewSource(time.Now().UnixNano()))
+	gameModel.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	entitiesMap := map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
 
@@ -91,7 +91,7 @@ func run() {
 	healthSystem := &systems.Health{}
 	gameWorld.AddSystem(healthSystem)
 	spatialSystem := &systems.Spatial{
-		Rand: randGenerator,
+		Rand: gameModel.Rand,
 	}
 	dropCoin := func(v pixel.Vec) {
 		coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
