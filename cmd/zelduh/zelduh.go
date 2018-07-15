@@ -38,9 +38,10 @@ var (
 )
 
 type GameModel struct {
-	AddEntities   bool
-	CurrentRoomID rooms.RoomID
-	NextRoomID    rooms.RoomID
+	AddEntities    bool
+	CurrentRoomID  rooms.RoomID
+	NextRoomID     rooms.RoomID
+	RoomTransition rooms.RoomTransition
 }
 
 func run() {
@@ -48,6 +49,9 @@ func run() {
 	gameModel := GameModel{
 		AddEntities:   true,
 		CurrentRoomID: 1,
+		RoomTransition: rooms.RoomTransition{
+			Start: float64(config.TileSize),
+		},
 	}
 
 	randGenerator := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -75,10 +79,6 @@ func run() {
 	explosion := entities.BuildEntityFromConfig(entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID())
 	sword := entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID())
 	arrow := entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID())
-
-	roomTransition := rooms.RoomTransition{
-		Start: float64(config.TileSize),
-	}
 
 	currentState := gamestate.Start
 
@@ -112,11 +112,11 @@ func run() {
 			config.MapY+config.MapH,
 		),
 		OnPlayerCollisionWithBounds: func(side bounds.Bound) {
-			if !roomTransition.Active {
-				roomTransition.Active = true
-				roomTransition.Side = side
-				roomTransition.Style = rooms.TransitionSlide
-				roomTransition.Timer = int(roomTransition.Start)
+			if !gameModel.RoomTransition.Active {
+				gameModel.RoomTransition.Active = true
+				gameModel.RoomTransition.Side = side
+				gameModel.RoomTransition.Style = rooms.TransitionSlide
+				gameModel.RoomTransition.Timer = int(gameModel.RoomTransition.Start)
 				currentState = gamestate.MapTransition
 				gameModel.AddEntities = true
 			}
@@ -237,10 +237,10 @@ func run() {
 		},
 		OnPlayerCollisionWithWarp: func(warpID entities.EntityID) {
 			entityConfig, ok := roomWarps[warpID]
-			if ok && !roomTransition.Active {
-				roomTransition.Active = true
-				roomTransition.Style = rooms.TransitionWarp
-				roomTransition.Timer = 1
+			if ok && !gameModel.RoomTransition.Active {
+				gameModel.RoomTransition.Active = true
+				gameModel.RoomTransition.Style = rooms.TransitionWarp
+				gameModel.RoomTransition.Timer = 1
 				currentState = gamestate.MapTransition
 				gameModel.AddEntities = true
 				gameModel.NextRoomID = entityConfig.WarpToRoomID
@@ -335,8 +335,8 @@ func run() {
 			}
 		case gamestate.MapTransition:
 			inputSystem.DisablePlayer()
-			if roomTransition.Style == rooms.TransitionSlide && roomTransition.Timer > 0 {
-				roomTransition.Timer--
+			if gameModel.RoomTransition.Style == rooms.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
+				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
@@ -346,7 +346,7 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
-				inc := (roomTransition.Start - float64(roomTransition.Timer))
+				inc := (gameModel.RoomTransition.Start - float64(gameModel.RoomTransition.Timer))
 				incY := inc * (config.MapH / config.TileSize)
 				incX := inc * (config.MapW / config.TileSize)
 				modY := 0.0
@@ -357,23 +357,23 @@ func run() {
 				playerModY := 0.0
 				playerIncY := ((config.MapH / config.TileSize) - 1) + 7
 				playerIncX := ((config.MapW / config.TileSize) - 1) + 7
-				if roomTransition.Side == bounds.Bottom && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom != 0 {
+				if gameModel.RoomTransition.Side == bounds.Bottom && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
 					modYNext = incY - config.MapH
 					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom
 
 					playerModY += playerIncY
-				} else if roomTransition.Side == bounds.Top && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top != 0 {
+				} else if gameModel.RoomTransition.Side == bounds.Top && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top != 0 {
 					modY = -incY
 					modYNext = -incY + config.MapH
 					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top
 					playerModY -= playerIncY
-				} else if roomTransition.Side == bounds.Left && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left != 0 {
+				} else if gameModel.RoomTransition.Side == bounds.Left && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left != 0 {
 					modX = incX
 					modXNext = incX - config.MapW
 					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left
 					playerModX += playerIncX
-				} else if roomTransition.Side == bounds.Right && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right != 0 {
+				} else if gameModel.RoomTransition.Side == bounds.Right && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right != 0 {
 					modX = -incX
 					modXNext = -incX + config.MapW
 					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right
@@ -395,8 +395,8 @@ func run() {
 				)
 
 				gameWorld.Update()
-			} else if roomTransition.Style == rooms.TransitionWarp && roomTransition.Timer > 0 {
-				roomTransition.Timer--
+			} else if gameModel.RoomTransition.Style == rooms.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
+				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
@@ -410,7 +410,7 @@ func run() {
 				if gameModel.NextRoomID != 0 {
 					gameModel.CurrentRoomID = gameModel.NextRoomID
 				}
-				roomTransition.Active = false
+				gameModel.RoomTransition.Active = false
 			}
 
 		}
