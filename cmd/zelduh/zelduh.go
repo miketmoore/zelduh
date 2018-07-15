@@ -41,35 +41,7 @@ var (
 	gameWorld world.World
 )
 
-const (
-	spritesheetPath string = "assets/spritesheet.png"
-)
-
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
-
-var tilemapDir = "assets/tilemaps/"
-var tilemapFiles = []string{
-	"overworldOpen",
-	"overworldOpenCircleOfTrees",
-	"overworldFourWallsDoorBottom",
-	"overworldFourWallsDoorLeftTop",
-	"overworldFourWallsDoorRightTop",
-	"overworldFourWallsDoorTopBottom",
-	"overworldFourWallsDoorRightTopBottom",
-	"overworldFourWallsDoorBottomRight",
-	"overworldFourWallsDoorTop",
-	"overworldFourWallsDoorRight",
-	"overworldFourWallsDoorLeft",
-	"overworldTreeClusterTopRight",
-	"overworldFourWallsClusterTrees",
-	"overworldFourWallsDoorsAllSides",
-	"rockPatternTest",
-	"rockPathOpenLeft",
-	"rockWithCaveEntrance",
-	"rockPathLeftRightEntrance",
-	"test",
-	"dungeonFourDoors",
-}
 
 var roomID rooms.RoomID
 
@@ -116,13 +88,13 @@ func run() {
 	win = initWindow(t("title"))
 
 	// load the spritesheet image
-	pic = loadPicture(spritesheetPath)
+	pic = loadPicture(config.SpritesheetPath)
 	// build spritesheet
 	// this is a map of TMX IDs to sprite instances
 	spritesheet = sprites.BuildSpritesheet(pic, config.TileSize)
 
 	// load all TMX file data for each map
-	tmxMapData = tmx.Load(tilemapFiles, tilemapDir)
+	tmxMapData = tmx.Load(config.TilemapFiles, config.TilemapDir)
 	allMapDrawData := tmx.BuildMapDrawData(tmxMapData)
 
 	// Build entities

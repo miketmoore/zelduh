@@ -23,3 +23,30 @@ const (
 	MapX         = (WinW - MapW) / 2
 	MapY         = (WinH - MapH) / 2
 )
+
+const SpritesheetPath string = "assets/spritesheet.png"
+
+const TilemapDir = "assets/tilemaps/"
+
+var TilemapFiles = []string{
+	"overworldOpen",
+	"overworldOpenCircleOfTrees",
+	"overworldFourWallsDoorBottom",
+	"overworldFourWallsDoorLeftTop",
+	"overworldFourWallsDoorRightTop",
+	"overworldFourWallsDoorTopBottom",
+	"overworldFourWallsDoorRightTopBottom",
+	"overworldFourWallsDoorBottomRight",
+	"overworldFourWallsDoorTop",
+	"overworldFourWallsDoorRight",
+	"overworldFourWallsDoorLeft",
+	"overworldTreeClusterTopRight",
+	"overworldFourWallsClusterTrees",
+	"overworldFourWallsDoorsAllSides",
+	"rockPatternTest",
+	"rockPathOpenLeft",
+	"rockWithCaveEntrance",
+	"rockPathLeftRightEntrance",
+	"test",
+	"dungeonFourDoors",
+}
