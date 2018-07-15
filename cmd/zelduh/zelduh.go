@@ -106,8 +106,6 @@ var spritesheet map[int]*pixel.Sprite
 var tmxMapData map[string]tmxreader.TmxMap
 var spriteMap map[string]*pixel.Sprite
 
-const frameRate int = 5
-
 var entitiesMap map[entities.EntityID]entities.Entity
 
 func run() {
@@ -133,11 +131,11 @@ func run() {
 	allMapDrawData := tmx.BuildMapDrawData(tmxMapData)
 
 	// Build entities
-	player := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("player")(6, 6), gameWorld.NewEntityID())
-	bomb := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("bomb")(0, 0), gameWorld.NewEntityID())
-	explosion := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID())
-	sword := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID())
-	arrow := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID())
+	player := entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID())
+	bomb := entities.BuildEntityFromConfig(entities.GetPreset("bomb")(0, 0), gameWorld.NewEntityID())
+	explosion := entities.BuildEntityFromConfig(entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID())
+	sword := entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID())
+	arrow := entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID())
 
 	roomTransition := rooms.RoomTransition{
 		Start: float64(config.TileSize),
@@ -159,15 +157,15 @@ func run() {
 		Rand: r,
 	}
 	dropCoin := func(v pixel.Vec) {
-		coin := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
+		coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
 		gameWorld.AddEntityToSystem(coin)
 	}
 	gameWorld.AddSystem(spatialSystem)
 
 	hearts := []entities.Entity{
-		entities.BuildEntityFromConfig(frameRate, entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
-		entities.BuildEntityFromConfig(frameRate, entities.GetPreset("heart")(2.15, 14), gameWorld.NewEntityID()),
-		entities.BuildEntityFromConfig(frameRate, entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.15, 14), gameWorld.NewEntityID()),
+		entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
 	}
 
 	collisionSystem := &systems.Collision{
@@ -368,7 +366,7 @@ func run() {
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[currentRoomID].EntityConfigs {
-					entity := entities.BuildEntityFromConfig(frameRate, c, gameWorld.NewEntityID())
+					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
 					entitiesMap[entity.ID] = entity
 					gameWorld.AddEntityToSystem(entity)
 
@@ -607,7 +605,7 @@ func drawObstaclesPerMapTiles(allMapDrawData map[string]tmx.MapData, roomID room
 				x := movedVec.X/config.TileSize - mod
 				y := movedVec.Y/config.TileSize - mod
 				id := gameWorld.NewEntityID()
-				obstacle := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("obstacle")(x, y), id)
+				obstacle := entities.BuildEntityFromConfig(entities.GetPreset("obstacle")(x, y), id)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
@@ -721,6 +719,6 @@ var roomsMap = rooms.Rooms{
 }
 
 func addUICoin() {
-	coin := entities.BuildEntityFromConfig(frameRate, entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
+	coin := entities.BuildEntityFromConfig(entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
 	gameWorld.AddEntityToSystem(coin)
 }

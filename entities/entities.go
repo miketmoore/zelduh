@@ -5,6 +5,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
+	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/rooms"
 	"golang.org/x/image/colornames"
 )
@@ -31,7 +32,7 @@ type Entity struct {
 }
 
 // BuildEntityFromConfig builds an entity from a configuration
-func BuildEntityFromConfig(frameRate int, c rooms.EntityConfig, id EntityID) Entity {
+func BuildEntityFromConfig(c rooms.EntityConfig, id EntityID) Entity {
 	entity := Entity{
 		ID:       id,
 		Category: c.Category,
@@ -121,7 +122,7 @@ func BuildEntityFromConfig(frameRate int, c rooms.EntityConfig, id EntityID) Ent
 		for key, val := range c.Animation {
 			entity.Animation.Map[key] = &components.AnimationData{
 				Frames:    val,
-				FrameRate: frameRate,
+				FrameRate: config.FrameRate,
 			}
 		}
 	} else {

@@ -1,5 +1,7 @@
 package config
 
+const FrameRate int = 5
+
 // TileSize defines the width and height of a tile
 const TileSize float64 = 48
 
