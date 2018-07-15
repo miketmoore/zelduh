@@ -118,87 +118,12 @@ var allMapDrawData map[string]MapData
 
 const frameRate int = 5
 
-var roomsMap rooms.Rooms
 var entitiesMap map[entities.EntityID]entities.Entity
 
 func run() {
 
 	entitiesMap = map[entities.EntityID]entities.Entity{}
 	gameWorld = world.New()
-
-	roomsMap = rooms.Rooms{
-		1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
-			entities.GetPreset("puzzleBox")(5, 5),
-			(func() rooms.EntityConfig {
-				e := entities.GetPreset("floorSwitch")(5, 6)
-				return e
-			})(),
-			entities.GetPreset("toggleObstacle")(10, 7),
-		),
-		2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
-			entities.GetPreset("skull")(5, 5),
-			entities.GetPreset("skeleton")(11, 9),
-			entities.GetPreset("spinner")(7, 9),
-			entities.GetPreset("eyeburrower")(8, 9),
-		),
-		3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom",
-			entities.WarpStone(3, 7, 6, 5),
-		),
-		5: rooms.NewRoom("rockWithCaveEntrance",
-			rooms.EntityConfig{
-				Category:     categories.Warp,
-				WarpToRoomID: 11,
-				W:            config.TileSize,
-				H:            config.TileSize,
-				X:            (config.TileSize * 7) + config.TileSize/2,
-				Y:            (config.TileSize * 9) + config.TileSize/2,
-				Hitbox: &rooms.HitboxConfig{
-					Radius: 30,
-				},
-			},
-			rooms.EntityConfig{
-				Category:     categories.Warp,
-				WarpToRoomID: 11,
-				W:            config.TileSize,
-				H:            config.TileSize,
-				X:            (config.TileSize * 8) + config.TileSize/2,
-				Y:            (config.TileSize * 9) + config.TileSize/2,
-				Hitbox: &rooms.HitboxConfig{
-					Radius: 30,
-				},
-			},
-		),
-		6:  rooms.NewRoom("rockPathLeftRightEntrance"),
-		7:  rooms.NewRoom("overworldFourWallsDoorLeftTop"),
-		8:  rooms.NewRoom("overworldFourWallsDoorBottom"),
-		9:  rooms.NewRoom("overworldFourWallsDoorTop"),
-		10: rooms.NewRoom("overworldFourWallsDoorLeft"),
-		11: rooms.NewRoom("dungeonFourDoors",
-			// South door of cave - warp to cave entrance
-			rooms.EntityConfig{
-				Category:     categories.Warp,
-				WarpToRoomID: 5,
-				W:            config.TileSize,
-				H:            config.TileSize,
-				X:            (config.TileSize * 6) + config.TileSize + (config.TileSize / 2.5),
-				Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
-				Hitbox: &rooms.HitboxConfig{
-					Radius: 15,
-				},
-			},
-			rooms.EntityConfig{
-				Category:     categories.Warp,
-				WarpToRoomID: 5,
-				W:            config.TileSize,
-				H:            config.TileSize,
-				X:            (config.TileSize * 7) + config.TileSize + (config.TileSize / 2.5),
-				Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
-				Hitbox: &rooms.HitboxConfig{
-					Radius: 15,
-				},
-			},
-		),
-	}
 
 	gamemap.ProcessMapLayout(roomsMap, overworld)
 
@@ -790,4 +715,75 @@ func drawMask() {
 	s.Push(pixel.V(config.WinW, config.WinH))
 	s.Rectangle(0)
 	s.Draw(win)
+}
+
+var roomsMap = rooms.Rooms{
+	1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
+		entities.GetPreset("puzzleBox")(5, 5),
+		entities.GetPreset("floorSwitch")(5, 6),
+		entities.GetPreset("toggleObstacle")(10, 7),
+	),
+	2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
+		entities.GetPreset("skull")(5, 5),
+		entities.GetPreset("skeleton")(11, 9),
+		entities.GetPreset("spinner")(7, 9),
+		entities.GetPreset("eyeburrower")(8, 9),
+	),
+	3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom",
+		entities.WarpStone(3, 7, 6, 5),
+	),
+	5: rooms.NewRoom("rockWithCaveEntrance",
+		rooms.EntityConfig{
+			Category:     categories.Warp,
+			WarpToRoomID: 11,
+			W:            config.TileSize,
+			H:            config.TileSize,
+			X:            (config.TileSize * 7) + config.TileSize/2,
+			Y:            (config.TileSize * 9) + config.TileSize/2,
+			Hitbox: &rooms.HitboxConfig{
+				Radius: 30,
+			},
+		},
+		rooms.EntityConfig{
+			Category:     categories.Warp,
+			WarpToRoomID: 11,
+			W:            config.TileSize,
+			H:            config.TileSize,
+			X:            (config.TileSize * 8) + config.TileSize/2,
+			Y:            (config.TileSize * 9) + config.TileSize/2,
+			Hitbox: &rooms.HitboxConfig{
+				Radius: 30,
+			},
+		},
+	),
+	6:  rooms.NewRoom("rockPathLeftRightEntrance"),
+	7:  rooms.NewRoom("overworldFourWallsDoorLeftTop"),
+	8:  rooms.NewRoom("overworldFourWallsDoorBottom"),
+	9:  rooms.NewRoom("overworldFourWallsDoorTop"),
+	10: rooms.NewRoom("overworldFourWallsDoorLeft"),
+	11: rooms.NewRoom("dungeonFourDoors",
+		// South door of cave - warp to cave entrance
+		rooms.EntityConfig{
+			Category:     categories.Warp,
+			WarpToRoomID: 5,
+			W:            config.TileSize,
+			H:            config.TileSize,
+			X:            (config.TileSize * 6) + config.TileSize + (config.TileSize / 2.5),
+			Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
+			Hitbox: &rooms.HitboxConfig{
+				Radius: 15,
+			},
+		},
+		rooms.EntityConfig{
+			Category:     categories.Warp,
+			WarpToRoomID: 5,
+			W:            config.TileSize,
+			H:            config.TileSize,
+			X:            (config.TileSize * 7) + config.TileSize + (config.TileSize / 2.5),
+			Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
+			Hitbox: &rooms.HitboxConfig{
+				Radius: 15,
+			},
+		},
+	),
 }
