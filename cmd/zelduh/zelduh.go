@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 	_ "image/png"
 	"math/rand"
@@ -70,11 +69,7 @@ func run() {
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(t("title"))
 
-	// load the spritesheet image
-	pic := loadPicture(config.SpritesheetPath)
-	// build spritesheet
-	// this is a map of TMX IDs to sprite instances
-	gameModel.Spritesheet = sprites.BuildSpritesheet(pic, config.TileSize)
+	gameModel.Spritesheet = sprites.LoadAndBuildSpritesheet()
 
 	allMapDrawData := tmx.BuildMapDrawData()
 
@@ -475,23 +470,6 @@ func drawMapBG(x, y, w, h float64, color color.Color) {
 	s.Push(pixel.V(x+w, y+h))
 	s.Rectangle(0)
 	s.Draw(win)
-}
-
-func loadPicture(path string) pixel.Picture {
-	file, err := os.Open(path)
-	if err != nil {
-		fmt.Println("Could not open the picture:")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	defer file.Close()
-	img, _, err := image.Decode(file)
-	if err != nil {
-		fmt.Println("Could not decode the picture:")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	return pixel.PictureDataFromImage(img)
 }
 
 func drawMapBGImage(

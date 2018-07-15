@@ -1,15 +1,38 @@
 package sprites
 
 import (
+	"fmt"
+	"image"
 	"math"
+	"os"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/config"
 )
 
-// BuildSpritesheet this is a map of pixel engine sprites
-func BuildSpritesheet(pic pixel.Picture, s float64) map[int]*pixel.Sprite {
-	cols := pic.Bounds().W() / s
-	rows := pic.Bounds().H() / s
+func loadPicture(path string) pixel.Picture {
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println("Could not open the picture:")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer file.Close()
+	img, _, err := image.Decode(file)
+	if err != nil {
+		fmt.Println("Could not decode the picture:")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	return pixel.PictureDataFromImage(img)
+}
+
+// LoadAndBuildSpritesheet this is a map of pixel engine sprites
+func LoadAndBuildSpritesheet() map[int]*pixel.Sprite {
+	pic := loadPicture(config.SpritesheetPath)
+
+	cols := pic.Bounds().W() / config.TileSize
+	rows := pic.Bounds().H() / config.TileSize
 
 	maxIndex := (rows * cols) - 1.0
 
@@ -21,10 +44,10 @@ func BuildSpritesheet(pic pixel.Picture, s float64) map[int]*pixel.Sprite {
 			x := col
 			y := math.Abs(rows-row) - 1
 			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
-				x*s,
-				y*s,
-				x*s+s,
-				y*s+s,
+				x*config.TileSize,
+				y*config.TileSize,
+				x*config.TileSize+config.TileSize,
+				y*config.TileSize+config.TileSize,
 			))
 			index--
 			id--
