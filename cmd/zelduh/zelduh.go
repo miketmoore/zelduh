@@ -95,11 +95,6 @@ func run() {
 
 	gameWorld.AddSystem(gameModel.InputSystem)
 	gameWorld.AddSystem(gameModel.HealthSystem)
-
-	dropCoin := func(v pixel.Vec) {
-		coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
-		gameWorld.AddEntityToSystem(coin)
-	}
 	gameWorld.AddSystem(gameModel.SpatialSystem)
 
 	hearts := []entities.Entity{
@@ -644,6 +639,11 @@ func addHearts(hearts []entities.Entity, health int) {
 			gameWorld.AddEntityToSystem(entity)
 		}
 	}
+}
+
+func dropCoin(v pixel.Vec) {
+	coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
+	gameWorld.AddEntityToSystem(coin)
 }
 
 // CollisionHandler contains collision handlers
