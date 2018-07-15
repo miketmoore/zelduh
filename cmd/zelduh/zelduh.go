@@ -40,13 +40,6 @@ const (
 	lang            = "en-US"
 )
 
-const (
-	mapW float64 = 672 // 48 * 14
-	mapH float64 = 576 // 48 * 12
-	mapX         = (config.WinW - mapW) / 2
-	mapY         = (config.WinH - mapH) / 2
-)
-
 var (
 	win       *pixelgl.Window
 	txt       *text.Text
@@ -212,7 +205,7 @@ func run() {
 	// Initializations
 	t = initI18n()
 	txt = initText(20, 50, colornames.Black)
-	win = initWindow(t("title"), config.WinX, config.WinY, config.WinW, config.WinH)
+	win = initWindow(t("title"))
 
 	// load the spritesheet image
 	pic = loadPicture(spritesheetPath)
@@ -264,10 +257,10 @@ func run() {
 
 	collisionSystem := &systems.Collision{
 		MapBounds: pixel.R(
-			mapX,
-			mapY,
-			mapX+mapW,
-			mapY+mapH,
+			config.MapX,
+			config.MapY,
+			config.MapX+config.MapW,
+			config.MapY+config.MapH,
 		),
 		PlayerCollisionWithBounds: func(side bounds.Bound) {
 			if !roomTransition.Active {
@@ -436,8 +429,8 @@ func run() {
 		// top
 		s := imdraw.New(nil)
 		s.Color = colornames.White
-		s.Push(pixel.V(0, mapY+mapH))
-		s.Push(pixel.V(config.WinW, mapY+mapH+(config.WinH-(mapY+mapH))))
+		s.Push(pixel.V(0, config.MapY+config.MapH))
+		s.Push(pixel.V(config.WinW, config.MapY+config.MapH+(config.WinH-(config.MapY+config.MapH))))
 		s.Rectangle(0)
 		s.Draw(win)
 
@@ -445,7 +438,7 @@ func run() {
 		s = imdraw.New(nil)
 		s.Color = colornames.White
 		s.Push(pixel.V(0, 0))
-		s.Push(pixel.V(config.WinW, (config.WinH - (mapY + mapH))))
+		s.Push(pixel.V(config.WinW, (config.WinH - (config.MapY + config.MapH))))
 		s.Rectangle(0)
 		s.Draw(win)
 
@@ -453,14 +446,14 @@ func run() {
 		s = imdraw.New(nil)
 		s.Color = colornames.White
 		s.Push(pixel.V(0, 0))
-		s.Push(pixel.V(0+mapX, config.WinH))
+		s.Push(pixel.V(0+config.MapX, config.WinH))
 		s.Rectangle(0)
 		s.Draw(win)
 
 		// right
 		s = imdraw.New(nil)
 		s.Color = colornames.White
-		s.Push(pixel.V(mapX+mapW, mapY))
+		s.Push(pixel.V(config.MapX+config.MapW, config.MapY))
 		s.Push(pixel.V(config.WinW, config.WinH))
 		s.Rectangle(0)
 		s.Draw(win)
@@ -473,7 +466,7 @@ func run() {
 		switch currentState {
 		case gamestate.Start:
 			win.Clear(colornames.Darkgray)
-			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 			drawCenterText(t("title"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
@@ -483,7 +476,7 @@ func run() {
 			inputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
-			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
 			drawMapBGImage(roomsMap[currentRoomID].MapName, 0, 0)
 
@@ -529,7 +522,7 @@ func run() {
 
 		case gamestate.Pause:
 			win.Clear(colornames.Darkgray)
-			drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 			drawCenterText(t("paused"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -540,7 +533,7 @@ func run() {
 			}
 		case gamestate.Over:
 			win.Clear(colornames.Darkgray)
-			drawMapBG(mapX, mapY, mapW, mapH, colornames.Black)
+			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.Black)
 			drawCenterText(t("gameOver"), colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
@@ -551,7 +544,7 @@ func run() {
 			if roomTransition.Style == rooms.TransitionSlide && roomTransition.Timer > 0 {
 				roomTransition.Timer--
 				win.Clear(colornames.Darkgray)
-				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
 				collisionSystem.RemoveAll(categories.Obstacle)
 				gameWorld.RemoveAllEnemies()
@@ -560,35 +553,35 @@ func run() {
 				gameWorld.RemoveAllEntities()
 
 				inc := (roomTransition.Start - float64(roomTransition.Timer))
-				incY := inc * (mapH / config.TileSize)
-				incX := inc * (mapW / config.TileSize)
+				incY := inc * (config.MapH / config.TileSize)
+				incX := inc * (config.MapW / config.TileSize)
 				modY := 0.0
 				modYNext := 0.0
 				modX := 0.0
 				modXNext := 0.0
 				playerModX := 0.0
 				playerModY := 0.0
-				playerIncY := ((mapH / config.TileSize) - 1) + 7
-				playerIncX := ((mapW / config.TileSize) - 1) + 7
+				playerIncY := ((config.MapH / config.TileSize) - 1) + 7
+				playerIncX := ((config.MapW / config.TileSize) - 1) + 7
 				if roomTransition.Side == bounds.Bottom && roomsMap[currentRoomID].ConnectedRooms.Bottom != 0 {
 					modY = incY
-					modYNext = incY - mapH
+					modYNext = incY - config.MapH
 					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Bottom
 
 					playerModY += playerIncY
 				} else if roomTransition.Side == bounds.Top && roomsMap[currentRoomID].ConnectedRooms.Top != 0 {
 					modY = -incY
-					modYNext = -incY + mapH
+					modYNext = -incY + config.MapH
 					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Top
 					playerModY -= playerIncY
 				} else if roomTransition.Side == bounds.Left && roomsMap[currentRoomID].ConnectedRooms.Left != 0 {
 					modX = incX
-					modXNext = incX - mapW
+					modXNext = incX - config.MapW
 					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Left
 					playerModX += playerIncX
 				} else if roomTransition.Side == bounds.Right && roomsMap[currentRoomID].ConnectedRooms.Right != 0 {
 					modX = -incX
-					modXNext = -incX + mapW
+					modXNext = -incX + config.MapW
 					nextRoomID = roomsMap[currentRoomID].ConnectedRooms.Right
 					playerModX -= playerIncX
 				} else {
@@ -611,7 +604,7 @@ func run() {
 			} else if roomTransition.Style == rooms.TransitionWarp && roomTransition.Timer > 0 {
 				roomTransition.Timer--
 				win.Clear(colornames.Darkgray)
-				drawMapBG(mapX, mapY, mapW, mapH, colornames.White)
+				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
 				collisionSystem.RemoveAll(categories.Obstacle)
 				gameWorld.RemoveAllEnemies()
@@ -655,10 +648,10 @@ func initText(x, y float64, color color.RGBA) *text.Text {
 	return txt
 }
 
-func initWindow(title string, x, y, w, h float64) *pixelgl.Window {
+func initWindow(title string) *pixelgl.Window {
 	cfg := pixelgl.WindowConfig{
 		Title:  title,
-		Bounds: pixel.R(x, y, w, h),
+		Bounds: pixel.R(config.WinX, config.WinY, config.WinW, config.WinH),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -766,8 +759,8 @@ func drawMapBGImage(name string, modX, modY float64) {
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+mapX+modX+config.TileSize/2,
-				vec.Y+mapY+modY+config.TileSize/2,
+				vec.X+config.MapX+modX+config.TileSize/2,
+				vec.Y+config.MapY+modY+config.TileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -783,8 +776,8 @@ func drawObstaclesPerMapTiles(roomID rooms.RoomID, modX, modY float64) []entitie
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+mapX+modX+config.TileSize/2,
-				vec.Y+mapY+modY+config.TileSize/2,
+				vec.X+config.MapX+modX+config.TileSize/2,
+				vec.Y+config.MapY+modY+config.TileSize/2,
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
