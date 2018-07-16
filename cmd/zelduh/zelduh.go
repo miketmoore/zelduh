@@ -37,7 +37,7 @@ var (
 type GameModel struct {
 	AddEntities                           bool
 	CurrentRoomID, NextRoomID             terraform2d.RoomID
-	RoomTransition                        rooms.RoomTransition
+	RoomTransition                        terraform2d.RoomTransition
 	CurrentState                          terraform2d.State
 	Rand                                  *rand.Rand
 	EntitiesMap                           map[terraform2d.EntityID]entities.Entity
@@ -68,7 +68,7 @@ func run() {
 		CurrentState:  terraform2d.StateStart,
 		AddEntities:   true,
 		CurrentRoomID: 1,
-		RoomTransition: rooms.RoomTransition{
+		RoomTransition: terraform2d.RoomTransition{
 			Start: float64(config.TileSize),
 		},
 		Spritesheet: terraform2d.LoadAndBuildSpritesheet(config.SpritesheetPath, config.TileSize),
@@ -223,7 +223,7 @@ func run() {
 			}
 		case terraform2d.StateMapTransition:
 			gameModel.InputSystem.DisablePlayer()
-			if gameModel.RoomTransition.Style == rooms.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
+			if gameModel.RoomTransition.Style == terraform2d.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
@@ -267,7 +267,7 @@ func run() {
 				)
 
 				gameWorld.Update()
-			} else if gameModel.RoomTransition.Style == rooms.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
+			} else if gameModel.RoomTransition.Style == terraform2d.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
@@ -534,7 +534,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side terraform2d.Bound) 
 	if !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Side = side
-		ch.GameModel.RoomTransition.Style = rooms.TransitionSlide
+		ch.GameModel.RoomTransition.Style = terraform2d.TransitionSlide
 		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
 		ch.GameModel.CurrentState = terraform2d.StateMapTransition
 		ch.GameModel.AddEntities = true
@@ -684,7 +684,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID terraform2d.EntityI
 	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
 	if ok && !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true
-		ch.GameModel.RoomTransition.Style = rooms.TransitionWarp
+		ch.GameModel.RoomTransition.Style = terraform2d.TransitionWarp
 		ch.GameModel.RoomTransition.Timer = 1
 		ch.GameModel.CurrentState = terraform2d.StateMapTransition
 		ch.GameModel.AddEntities = true
@@ -699,7 +699,7 @@ type TransitionRoomResponse struct {
 }
 
 func calculateTransitionSlide(
-	roomTransition *rooms.RoomTransition,
+	roomTransition *terraform2d.RoomTransition,
 	connectedRooms terraform2d.ConnectedRooms,
 	currentRoomID terraform2d.RoomID) TransitionRoomResponse {
 
