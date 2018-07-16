@@ -3,7 +3,6 @@ package rooms
 import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/direction"
 )
 
 // RoomID is a room ID
@@ -25,8 +24,8 @@ type AnimationConfig map[string][]int
 
 // MovementConfig is used to configure an entity's Movement component
 type MovementConfig struct {
-	LastDirection  direction.Name
-	Direction      direction.Name
+	LastDirection  terraform2d.Direction
+	Direction      terraform2d.Direction
 	MaxSpeed       float64
 	Speed          float64
 	MaxMoves       int

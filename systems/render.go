@@ -6,7 +6,6 @@ import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
-	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 )
 
@@ -197,17 +196,17 @@ func (s *Render) animateDefault(entity renderEntity) {
 	}
 }
 
-func (s *Render) animateAttackDirection(dir direction.Name, entity renderEntity) {
+func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity renderEntity) {
 	if anim := entity.Animation; anim != nil {
 		var animData *components.AnimationData
 		switch dir {
-		case direction.Up:
+		case terraform2d.DirectionUp:
 			animData = anim.Map["swordAttackUp"]
-		case direction.Right:
+		case terraform2d.DirectionRight:
 			animData = anim.Map["swordAttackRight"]
-		case direction.Down:
+		case terraform2d.DirectionDown:
 			animData = anim.Map["swordAttackDown"]
-		case direction.Left:
+		case terraform2d.DirectionLeft:
 			animData = anim.Map["swordAttackLeft"]
 		}
 
@@ -242,7 +241,7 @@ func (s *Render) animateAttackDirection(dir direction.Name, entity renderEntity)
 	}
 }
 
-func (s *Render) animateDirections(dir direction.Name, entity renderEntity) {
+func (s *Render) animateDirections(dir terraform2d.Direction, entity renderEntity) {
 	// if entity.Spatial.HitBoxRadius > 0 {
 	// 	shape := entity.Spatial.Shape
 	// 	shape.Clear()
@@ -258,13 +257,13 @@ func (s *Render) animateDirections(dir direction.Name, entity renderEntity) {
 	if anim := entity.Animation; anim != nil {
 		var animData *components.AnimationData
 		switch dir {
-		case direction.Up:
+		case terraform2d.DirectionUp:
 			animData = anim.Map["up"]
-		case direction.Right:
+		case terraform2d.DirectionRight:
 			animData = anim.Map["right"]
-		case direction.Down:
+		case terraform2d.DirectionDown:
 			animData = anim.Map["down"]
-		case direction.Left:
+		case terraform2d.DirectionLeft:
 			animData = anim.Map["left"]
 		}
 

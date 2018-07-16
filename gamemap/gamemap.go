@@ -1,24 +1,24 @@
 package gamemap
 
 import (
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/config"
-	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/rooms"
 )
 
-func indexRoom(roomsMap rooms.Rooms, a, b rooms.RoomID, dir direction.Name) {
+func indexRoom(roomsMap rooms.Rooms, a, b rooms.RoomID, dir terraform2d.Direction) {
 	// fmt.Printf("indexRoom a:%d b:%d dir:%s\n", a, b, dir)
 	roomA, okA := roomsMap[a]
 	roomB, okB := roomsMap[b]
 	if okA && okB {
 		switch dir {
-		case direction.Up:
+		case terraform2d.DirectionUp:
 			// b is above a
 			roomA.ConnectedRooms.Top = b
 			roomsMap[a] = roomA
 			roomB.ConnectedRooms.Bottom = a
 			roomsMap[b] = roomB
-		case direction.Right:
+		case terraform2d.DirectionRight:
 			// b is right of a
 			roomA, ok := roomsMap[a]
 			if ok {
@@ -27,7 +27,7 @@ func indexRoom(roomsMap rooms.Rooms, a, b rooms.RoomID, dir direction.Name) {
 				roomB.ConnectedRooms.Left = a
 				roomsMap[b] = roomB
 			}
-		case direction.Down:
+		case terraform2d.DirectionDown:
 			// b is below a
 			roomA, ok := roomsMap[a]
 			if ok {
@@ -36,7 +36,7 @@ func indexRoom(roomsMap rooms.Rooms, a, b rooms.RoomID, dir direction.Name) {
 				roomB.ConnectedRooms.Top = a
 				roomsMap[b] = roomB
 			}
-		case direction.Left:
+		case terraform2d.DirectionLeft:
 			// b is left of a
 			roomA, ok := roomsMap[a]
 			if ok {
@@ -64,7 +64,7 @@ func ProcessMapLayout(roomsMap rooms.Rooms) {
 					n := layout[row-1][col]
 					if n > 0 {
 						// fmt.Printf("\t%d is below %d\n", roomID, n)
-						indexRoom(roomsMap, roomID, n, direction.Up)
+						indexRoom(roomsMap, roomID, n, terraform2d.DirectionUp)
 					}
 				}
 			}
@@ -73,7 +73,7 @@ func ProcessMapLayout(roomsMap rooms.Rooms) {
 				n := layout[row][col+1]
 				if n > 0 {
 					// fmt.Printf("\t%d is left of %d\n", roomID, n)
-					indexRoom(roomsMap, roomID, n, direction.Right)
+					indexRoom(roomsMap, roomID, n, terraform2d.DirectionRight)
 				}
 			}
 			// Bottom
@@ -82,7 +82,7 @@ func ProcessMapLayout(roomsMap rooms.Rooms) {
 					n := layout[row+1][col]
 					if n > 0 {
 						// fmt.Printf("\t%d is above %d\n", roomID, n)
-						indexRoom(roomsMap, roomID, n, direction.Down)
+						indexRoom(roomsMap, roomID, n, terraform2d.DirectionDown)
 					}
 				}
 			}
@@ -91,7 +91,7 @@ func ProcessMapLayout(roomsMap rooms.Rooms) {
 				n := layout[row][col-1]
 				if n > 0 {
 					// fmt.Printf("\t%d is right of %d\n", roomID, n)
-					indexRoom(roomsMap, roomID, n, direction.Left)
+					indexRoom(roomsMap, roomID, n, terraform2d.DirectionLeft)
 				}
 			}
 		}

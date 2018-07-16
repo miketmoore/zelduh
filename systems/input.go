@@ -2,9 +2,9 @@ package systems
 
 import (
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
-	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 )
 
@@ -64,16 +64,16 @@ func (s Input) Update() {
 	player.Movement.LastDirection = player.Movement.Direction
 	if win.Pressed(pixelgl.KeyUp) {
 		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = direction.Up
+		player.Movement.Direction = terraform2d.DirectionUp
 	} else if win.Pressed(pixelgl.KeyRight) {
 		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = direction.Right
+		player.Movement.Direction = terraform2d.DirectionRight
 	} else if win.Pressed(pixelgl.KeyDown) {
 		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = direction.Down
+		player.Movement.Direction = terraform2d.DirectionDown
 	} else if win.Pressed(pixelgl.KeyLeft) {
 		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = direction.Left
+		player.Movement.Direction = terraform2d.DirectionLeft
 	} else {
 		player.Movement.Speed = 0
 	}

@@ -5,7 +5,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
-	"github.com/miketmoore/zelduh/direction"
+	"github.com/miketmoore/terraform2d"
 )
 
 // Appearance contains data about visual appearance
@@ -62,8 +62,8 @@ type Invincible struct {
 
 // Movement contains data about movement
 type Movement struct {
-	LastDirection  direction.Name
-	Direction      direction.Name
+	LastDirection  terraform2d.Direction
+	Direction      terraform2d.Direction
 	MaxSpeed       float64
 	Speed          float64
 	MaxMoves       int

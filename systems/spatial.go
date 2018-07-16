@@ -7,7 +7,6 @@ import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
-	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/entities"
 )
 
@@ -80,13 +79,13 @@ func (s *Spatial) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
 	switch player.Movement.Direction {
-	case direction.Up:
+	case terraform2d.DirectionUp:
 		v = pixel.V(0, -48)
-	case direction.Right:
+	case terraform2d.DirectionRight:
 		v = pixel.V(-48, 0)
-	case direction.Down:
+	case terraform2d.DirectionDown:
 		v = pixel.V(0, 48)
-	case direction.Left:
+	case terraform2d.DirectionLeft:
 		v = pixel.V(48, 0)
 	}
 	player.Spatial.Rect = player.Spatial.PrevRect.Moved(v)
@@ -94,7 +93,7 @@ func (s *Spatial) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir direction.Name) bool {
+func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terraform2d.Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.Movement.MovingFromHit {
 		entity.Movement.MovingFromHit = true
@@ -114,7 +113,7 @@ func (s *Spatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit direction.Name) {
+func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terraform2d.Direction) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.Movement.MovingFromHit {
 		enemy.Movement.MovingFromHit = true
@@ -184,15 +183,15 @@ func (s *Spatial) enemy(id terraform2d.EntityID) (spatialEntity, bool) {
 	return spatialEntity{}, false
 }
 
-func delta(dir direction.Name, modX, modY float64) pixel.Vec {
+func delta(dir terraform2d.Direction, modX, modY float64) pixel.Vec {
 	switch dir {
-	case direction.Up:
+	case terraform2d.DirectionUp:
 		return pixel.V(0, modY)
-	case direction.Right:
+	case terraform2d.DirectionRight:
 		return pixel.V(modX, 0)
-	case direction.Down:
+	case terraform2d.DirectionDown:
 		return pixel.V(0, -modY)
-	case direction.Left:
+	case terraform2d.DirectionLeft:
 		return pixel.V(-modX, 0)
 	default:
 		return pixel.V(0, 0)
@@ -255,7 +254,7 @@ func (s *Spatial) moveEnemyRandom(enemy *spatialEntity) {
 	if enemy.Movement.RemainingMoves == 0 {
 		enemy.Movement.MovingFromHit = false
 		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
-		enemy.Movement.Direction = direction.Rand()
+		enemy.Movement.Direction = terraform2d.RandomDirection(s.Rand)
 	} else if enemy.Movement.RemainingMoves > 0 {
 		var speed float64
 		if enemy.Movement.MovingFromHit {
@@ -278,10 +277,10 @@ func (s *Spatial) moveEnemyLeftRight(enemy *spatialEntity) {
 		enemy.Movement.MovingFromHit = false
 		enemy.Movement.RemainingMoves = enemy.Movement.MaxMoves
 		switch enemy.Movement.Direction {
-		case direction.Left:
-			enemy.Movement.Direction = direction.Right
-		case direction.Right:
-			enemy.Movement.Direction = direction.Left
+		case terraform2d.DirectionLeft:
+			enemy.Movement.Direction = terraform2d.DirectionRight
+		case terraform2d.DirectionRight:
+			enemy.Movement.Direction = terraform2d.DirectionLeft
 		}
 	} else if enemy.Movement.RemainingMoves > 0 {
 		var speed float64

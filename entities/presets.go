@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/config"
-	"github.com/miketmoore/zelduh/direction"
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/sprites"
 )
@@ -23,7 +23,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 		return rooms.EntityConfig{
 			Category: categories.Arrow,
 			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
+				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
 			},
 			W: config.TileSize,
@@ -46,7 +46,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 		return rooms.EntityConfig{
 			Category: categories.Bomb,
 			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
+				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
 			},
 			W: config.TileSize,
@@ -106,7 +106,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				CollisionWithRectMod: 5,
 			},
 			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
+				Direction: terraform2d.DirectionDown,
 				MaxSpeed:  7.0,
 				Speed:     0.0,
 			},
@@ -132,7 +132,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 		return rooms.EntityConfig{
 			Category: categories.Sword,
 			Movement: &rooms.MovementConfig{
-				Direction: direction.Down,
+				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
 			},
 			W: config.TileSize,
@@ -164,7 +164,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &rooms.MovementConfig{
-				Direction:    direction.Down,
+				Direction:    terraform2d.DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
@@ -203,7 +203,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &rooms.MovementConfig{
-				Direction:    direction.Down,
+				Direction:    terraform2d.DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
@@ -226,7 +226,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &rooms.MovementConfig{
-				Direction:    direction.Down,
+				Direction:    terraform2d.DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
@@ -249,7 +249,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &rooms.MovementConfig{
-				Direction:    direction.Right,
+				Direction:    terraform2d.DirectionRight,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
