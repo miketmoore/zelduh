@@ -25,7 +25,6 @@ import (
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/systems"
-	"github.com/miketmoore/zelduh/tmx"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
 )
@@ -49,7 +48,7 @@ type GameModel struct {
 	Arrow, Bomb, Explosion, Player, Sword entities.Entity
 	Hearts                                []entities.Entity
 	RoomWarps                             map[terraform2d.EntityID]rooms.EntityConfig
-	AllMapDrawData                        map[string]tmx.MapData
+	AllMapDrawData                        map[string]terraform2d.MapData
 	HealthSystem                          *systems.Health
 	InputSystem                           *systems.Input
 	SpatialSystem                         *systems.Spatial
@@ -85,7 +84,7 @@ func run() {
 		Arrow:     entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
 		RoomWarps:      map[terraform2d.EntityID]rooms.EntityConfig{},
-		AllMapDrawData: tmx.BuildMapDrawData(),
+		AllMapDrawData: terraform2d.BuildMapDrawData(config.TilemapDir, config.TilemapFiles, config.TileSize),
 
 		InputSystem:  &systems.Input{Win: win},
 		HealthSystem: &systems.Health{},
@@ -357,7 +356,7 @@ func drawMapBG(x, y, w, h float64, color color.Color) {
 
 func drawMapBGImage(
 	spritesheet map[int]*pixel.Sprite,
-	allMapDrawData map[string]tmx.MapData,
+	allMapDrawData map[string]terraform2d.MapData,
 	name string,
 	modX, modY float64) {
 
@@ -378,7 +377,7 @@ func drawMapBGImage(
 	}
 }
 
-func drawObstaclesPerMapTiles(allMapDrawData map[string]tmx.MapData, roomID rooms.RoomID, modX, modY float64) []entities.Entity {
+func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID rooms.RoomID, modX, modY float64) []entities.Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName]
 	obstacles := []entities.Entity{}
 	mod := 0.5
