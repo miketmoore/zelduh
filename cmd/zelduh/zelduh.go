@@ -22,7 +22,6 @@ import (
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
-	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
@@ -40,7 +39,7 @@ type GameModel struct {
 	AddEntities                           bool
 	CurrentRoomID, NextRoomID             rooms.RoomID
 	RoomTransition                        rooms.RoomTransition
-	CurrentState                          gamestate.Name
+	CurrentState                          terraform2d.State
 	Rand                                  *rand.Rand
 	EntitiesMap                           map[terraform2d.EntityID]entities.Entity
 	Spritesheet                           map[int]*pixel.Sprite
@@ -67,7 +66,7 @@ func run() {
 	gameModel := GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
 		EntitiesMap:   map[terraform2d.EntityID]entities.Entity{},
-		CurrentState:  gamestate.Start,
+		CurrentState:  terraform2d.StateStart,
 		AddEntities:   true,
 		CurrentRoomID: 1,
 		RoomTransition: rooms.RoomTransition{
@@ -150,15 +149,15 @@ func run() {
 		allowQuit()
 
 		switch gameModel.CurrentState {
-		case gamestate.Start:
+		case terraform2d.StateStart:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 			drawCenterText(t("title"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				gameModel.CurrentState = gamestate.Game
+				gameModel.CurrentState = terraform2d.StateGame
 			}
-		case gamestate.Game:
+		case terraform2d.StateGame:
 			gameModel.InputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
@@ -197,33 +196,33 @@ func run() {
 			gameWorld.Update()
 
 			if win.JustPressed(pixelgl.KeyP) {
-				gameModel.CurrentState = gamestate.Pause
+				gameModel.CurrentState = terraform2d.StatePause
 			}
 
 			if win.JustPressed(pixelgl.KeyX) {
-				gameModel.CurrentState = gamestate.Over
+				gameModel.CurrentState = terraform2d.StateOver
 			}
 
-		case gamestate.Pause:
+		case terraform2d.StatePause:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 			drawCenterText(t("paused"), colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
-				gameModel.CurrentState = gamestate.Game
+				gameModel.CurrentState = terraform2d.StateGame
 			}
 			if win.JustPressed(pixelgl.KeyEscape) {
-				gameModel.CurrentState = gamestate.Start
+				gameModel.CurrentState = terraform2d.StateStart
 			}
-		case gamestate.Over:
+		case terraform2d.StateOver:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.Black)
 			drawCenterText(t("gameOver"), colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				gameModel.CurrentState = gamestate.Start
+				gameModel.CurrentState = terraform2d.StateStart
 			}
-		case gamestate.MapTransition:
+		case terraform2d.StateMapTransition:
 			gameModel.InputSystem.DisablePlayer()
 			if gameModel.RoomTransition.Style == rooms.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
@@ -280,7 +279,7 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 			} else {
-				gameModel.CurrentState = gamestate.Game
+				gameModel.CurrentState = terraform2d.StateGame
 				if gameModel.NextRoomID != 0 {
 					gameModel.CurrentRoomID = gameModel.NextRoomID
 				}
@@ -538,7 +537,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side bounds.Bound) {
 		ch.GameModel.RoomTransition.Side = side
 		ch.GameModel.RoomTransition.Style = rooms.TransitionSlide
 		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
-		ch.GameModel.CurrentState = gamestate.MapTransition
+		ch.GameModel.CurrentState = terraform2d.StateMapTransition
 		ch.GameModel.AddEntities = true
 	}
 }
@@ -562,7 +561,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.Entit
 
 	// TODO redraw hearts
 	if ch.GameModel.Player.Health.Total == 0 {
-		ch.GameModel.CurrentState = gamestate.Over
+		ch.GameModel.CurrentState = terraform2d.StateOver
 	}
 }
 
@@ -688,7 +687,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID terraform2d.EntityI
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Style = rooms.TransitionWarp
 		ch.GameModel.RoomTransition.Timer = 1
-		ch.GameModel.CurrentState = gamestate.MapTransition
+		ch.GameModel.CurrentState = terraform2d.StateMapTransition
 		ch.GameModel.AddEntities = true
 		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
 	}
