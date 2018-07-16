@@ -14,6 +14,7 @@ import (
 	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/sprites"
+	"github.com/miketmoore/zelduh/world"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -33,7 +34,7 @@ var (
 	win       *pixelgl.Window
 	txt       *text.Text
 	t         i18n.TranslateFunc
-	gameWorld terraform2d.World
+	gameWorld world.World
 )
 
 // GameModel contains data used throughout the game
@@ -54,24 +55,9 @@ type GameModel struct {
 	SpatialSystem                         *systems.Spatial
 }
 
-// EntityRemover is a concrete terraform2d.EntityRemover
-type EntityRemover struct{}
-
-// Remove removes an entity by category and id
-func (r EntityRemover) Remove(w *terraform2d.World, category terraform2d.EntityCategory, id terraform2d.EntityID) {
-
-}
-
-// RemoveAllEntities removes all entities
-func (r EntityRemover) RemoveAllEntities(w *terraform2d.World) {
-
-}
-
 func run() {
 
-	entityRemover := EntityRemover{}
-
-	gameWorld = terraform2d.NewWorld(entityRemover)
+	gameWorld = world.New()
 
 	gamemap.ProcessMapLayout(roomsMap)
 
@@ -198,12 +184,12 @@ func run() {
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
 					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
-					gameModel.EntitiesMap[entity.ID] = entity
+					gameModel.EntitiesMap[entity.ID()] = entity
 					gameWorld.AddEntityToSystem(entity)
 
 					switch c.Category {
 					case categories.Warp:
-						gameModel.RoomWarps[entity.ID] = c
+						gameModel.RoomWarps[entity.ID()] = c
 					}
 				}
 			}
@@ -573,7 +559,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.Entit
 
 	// remove heart entity
 	heartIndex := len(ch.GameModel.Hearts) - 1
-	gameWorld.Remove(categories.Heart, ch.GameModel.Hearts[heartIndex].ID)
+	gameWorld.Remove(categories.Heart, ch.GameModel.Hearts[heartIndex].ID())
 	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
 
 	// TODO redraw hearts

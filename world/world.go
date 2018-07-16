@@ -58,6 +58,20 @@ func (w *World) NewEntityID() terraform2d.EntityID {
 	return w.lastEntityID
 }
 
+// AddEntityToSystem adds the entity to it's system
+func (w *World) AddEntityToSystem(entity entities.Entity) {
+	for _, system := range w.Systems() {
+		system.AddEntity(entity)
+	}
+}
+
+// AddEntitiesToSystem adds the terraform2d to their system
+func (w *World) AddEntitiesToSystem(all ...entities.Entity) {
+	for _, entity := range all {
+		w.AddEntityToSystem(entity)
+	}
+}
+
 // Remove removes the specific entity from all systems
 func (w *World) Remove(category categories.Category, id terraform2d.EntityID) {
 	switch category {
@@ -137,19 +151,5 @@ func (w *World) RemoveAllCollisionSwitches() {
 		case *systems.Collision:
 			sys.RemoveAll(categories.CollisionSwitch)
 		}
-	}
-}
-
-// AddEntityToSystem adds the entity to it's system
-func (w *World) AddEntityToSystem(entity entities.Entity) {
-	for _, system := range w.Systems() {
-		system.AddEntity(entity)
-	}
-}
-
-// AddEntitiesToSystem adds the entities to their system
-func (w *World) AddEntitiesToSystem(entities ...entities.Entity) {
-	for _, entity := range entities {
-		w.AddEntityToSystem(entity)
 	}
 }

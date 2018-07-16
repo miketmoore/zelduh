@@ -2,10 +2,10 @@ package systems
 
 import (
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
+	"github.com/miketmoore/zelduh/entities"
 )
 
 type inputEntity struct {
@@ -34,7 +34,7 @@ func (s *Input) EnablePlayer() {
 }
 
 // AddEntity adds an entity to the system
-func (s *Input) AddEntity(entity terraform2d.Entity) {
+func (s *Input) AddEntity(entity entities.Entity) {
 	r := inputEntity{
 		Movement: entity.Movement,
 		Dash:     entity.Dash,

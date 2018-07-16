@@ -29,36 +29,36 @@ type Entity struct {
 	*components.Temporary
 }
 
-// Component returns an entity component by name
-func (e *Entity) Component(name string) interface{} {
-	switch name {
-	case "invincible":
-		return e.Invincible
-	case "animation":
-		return e.Animation
-	case "appearance":
-		return e.Appearance
-	case "coins":
-		return e.Coins
-	case "dash":
-		return e.Dash
-	case "enabled":
-		return e.Enabled
-	case "toggler":
-		return e.Toggler
-	case "health":
-		return e.Health
-	case "ignore":
-		return e.Ignore
-	case "movement":
-		return e.Movement
-	case "spatial":
-		return e.Spatial
-	case "temporary":
-		return e.Temporary
-	}
-	return nil
-}
+// // Component returns an entity component by name
+// func (e *Entity) Component(name string) interface{} {
+// 	switch name {
+// 	case "invincible":
+// 		return e.Invincible
+// 	case "animation":
+// 		return e.Animation
+// 	case "appearance":
+// 		return e.Appearance
+// 	case "coins":
+// 		return e.Coins
+// 	case "dash":
+// 		return e.Dash
+// 	case "enabled":
+// 		return e.Enabled
+// 	case "toggler":
+// 		return e.Toggler
+// 	case "health":
+// 		return e.Health
+// 	case "ignore":
+// 		return e.Ignore
+// 	case "movement":
+// 		return e.Movement
+// 	case "spatial":
+// 		return e.Spatial
+// 	case "temporary":
+// 		return e.Temporary
+// 	}
+// 	return nil
+// }
 
 // ID returns the entity ID
 func (e *Entity) ID() terraform2d.EntityID {
