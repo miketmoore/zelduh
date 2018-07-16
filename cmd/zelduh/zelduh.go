@@ -237,52 +237,36 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
-				inc := (gameModel.RoomTransition.Start - float64(gameModel.RoomTransition.Timer))
-				incY := inc * (config.MapH / config.TileSize)
-				incX := inc * (config.MapW / config.TileSize)
-				modY := 0.0
-				modYNext := 0.0
-				modX := 0.0
-				modXNext := 0.0
-				playerModX := 0.0
-				playerModY := 0.0
-				playerIncY := ((config.MapH / config.TileSize) - 1) + 7
-				playerIncX := ((config.MapW / config.TileSize) - 1) + 7
-				if gameModel.RoomTransition.Side == bounds.Bottom && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom != 0 {
-					modY = incY
-					modYNext = incY - config.MapH
-					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Bottom
+				transitionRoomResp := calculateTransitionSlide(
+					&gameModel.RoomTransition,
+					roomsMap[gameModel.CurrentRoomID].ConnectedRooms,
+					gameModel.CurrentRoomID,
+				)
 
-					playerModY += playerIncY
-				} else if gameModel.RoomTransition.Side == bounds.Top && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top != 0 {
-					modY = -incY
-					modYNext = -incY + config.MapH
-					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Top
-					playerModY -= playerIncY
-				} else if gameModel.RoomTransition.Side == bounds.Left && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left != 0 {
-					modX = incX
-					modXNext = incX - config.MapW
-					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Left
-					playerModX += playerIncX
-				} else if gameModel.RoomTransition.Side == bounds.Right && roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right != 0 {
-					modX = -incX
-					modXNext = -incX + config.MapW
-					gameModel.NextRoomID = roomsMap[gameModel.CurrentRoomID].ConnectedRooms.Right
-					playerModX -= playerIncX
-				} else {
-					gameModel.NextRoomID = 0
-				}
+				gameModel.NextRoomID = transitionRoomResp.nextRoomID
 
-				drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, modX, modY)
-				drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.NextRoomID].MapName, modXNext, modYNext)
+				drawMapBGImage(
+					gameModel.Spritesheet,
+					gameModel.AllMapDrawData,
+					roomsMap[gameModel.CurrentRoomID].MapName,
+					transitionRoomResp.modX,
+					transitionRoomResp.modY,
+				)
+				drawMapBGImage(
+					gameModel.Spritesheet,
+					gameModel.AllMapDrawData,
+					roomsMap[gameModel.NextRoomID].MapName,
+					transitionRoomResp.modXNext,
+					transitionRoomResp.modYNext,
+				)
 				drawMask()
 
 				// Move player with map transition
 				gameModel.Player.Spatial.Rect = pixel.R(
-					gameModel.Player.Spatial.Rect.Min.X+playerModX,
-					gameModel.Player.Spatial.Rect.Min.Y+playerModY,
-					gameModel.Player.Spatial.Rect.Min.X+playerModX+config.TileSize,
-					gameModel.Player.Spatial.Rect.Min.Y+playerModY+config.TileSize,
+					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX,
+					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY,
+					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX+config.TileSize,
+					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY+config.TileSize,
 				)
 
 				gameWorld.Update()
@@ -708,5 +692,58 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID entities.EntityID) 
 		ch.GameModel.CurrentState = gamestate.MapTransition
 		ch.GameModel.AddEntities = true
 		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
+	}
+}
+
+// TransitionRoomResponse contains layout data
+type TransitionRoomResponse struct {
+	nextRoomID                                             rooms.RoomID
+	modX, modY, modXNext, modYNext, playerModX, playerModY float64
+}
+
+func calculateTransitionSlide(
+	roomTransition *rooms.RoomTransition,
+	connectedRooms rooms.ConnectedRooms,
+	currentRoomID rooms.RoomID) TransitionRoomResponse {
+
+	var nextRoomID rooms.RoomID
+	inc := (roomTransition.Start - float64(roomTransition.Timer))
+	incY := inc * (config.MapH / config.TileSize)
+	incX := inc * (config.MapW / config.TileSize)
+	modY := 0.0
+	modYNext := 0.0
+	modX := 0.0
+	modXNext := 0.0
+	playerModX := 0.0
+	playerModY := 0.0
+	playerIncY := ((config.MapH / config.TileSize) - 1) + 7
+	playerIncX := ((config.MapW / config.TileSize) - 1) + 7
+	if roomTransition.Side == bounds.Bottom && connectedRooms.Bottom != 0 {
+		modY = incY
+		modYNext = incY - config.MapH
+		nextRoomID = connectedRooms.Bottom
+		playerModY += playerIncY
+	} else if roomTransition.Side == bounds.Top && connectedRooms.Top != 0 {
+		modY = -incY
+		modYNext = -incY + config.MapH
+		nextRoomID = connectedRooms.Top
+		playerModY -= playerIncY
+	} else if roomTransition.Side == bounds.Left && connectedRooms.Left != 0 {
+		modX = incX
+		modXNext = incX - config.MapW
+		nextRoomID = connectedRooms.Left
+		playerModX += playerIncX
+	} else if roomTransition.Side == bounds.Right && connectedRooms.Right != 0 {
+		modX = -incX
+		modXNext = -incX + config.MapW
+		nextRoomID = connectedRooms.Right
+		playerModX -= playerIncX
+	} else {
+		nextRoomID = 0
+	}
+
+	return TransitionRoomResponse{
+		nextRoomID,
+		modX, modY, modXNext, modYNext, playerModX, playerModY,
 	}
 }
