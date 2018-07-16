@@ -8,14 +8,6 @@ import (
 // Rooms is a type of map that indexes rooms by their ID
 type Rooms map[terraform2d.RoomID]Room
 
-// ConnectedRooms is used to configure adjacent rooms
-type ConnectedRooms struct {
-	Top    terraform2d.RoomID
-	Right  terraform2d.RoomID
-	Bottom terraform2d.RoomID
-	Left   terraform2d.RoomID
-}
-
 // AnimationConfig is a map of animation types to sprite index lists
 type AnimationConfig map[string][]int
 
@@ -67,7 +59,7 @@ type EntityConfig struct {
 // Room represents one map section
 type Room struct {
 	MapName        string
-	ConnectedRooms ConnectedRooms
+	ConnectedRooms terraform2d.ConnectedRooms
 	EntityConfigs  []EntityConfig
 }
 

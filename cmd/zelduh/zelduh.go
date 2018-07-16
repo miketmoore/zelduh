@@ -700,7 +700,7 @@ type TransitionRoomResponse struct {
 
 func calculateTransitionSlide(
 	roomTransition *rooms.RoomTransition,
-	connectedRooms rooms.ConnectedRooms,
+	connectedRooms terraform2d.ConnectedRooms,
 	currentRoomID terraform2d.RoomID) TransitionRoomResponse {
 
 	var nextRoomID terraform2d.RoomID
