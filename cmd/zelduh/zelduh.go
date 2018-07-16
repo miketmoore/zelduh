@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/gamemap"
@@ -24,7 +25,6 @@ import (
 	"github.com/miketmoore/zelduh/gamestate"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/miketmoore/zelduh/tmx"
-	"github.com/miketmoore/zelduh/world"
 	"github.com/nicksnyder/go-i18n/i18n"
 	"golang.org/x/image/colornames"
 )
@@ -33,7 +33,7 @@ var (
 	win       *pixelgl.Window
 	txt       *text.Text
 	t         i18n.TranslateFunc
-	gameWorld world.World
+	gameWorld terraform2d.World
 )
 
 // GameModel contains data used throughout the game
@@ -43,20 +43,35 @@ type GameModel struct {
 	RoomTransition                        rooms.RoomTransition
 	CurrentState                          gamestate.Name
 	Rand                                  *rand.Rand
-	EntitiesMap                           map[entities.EntityID]entities.Entity
+	EntitiesMap                           map[terraform2d.EntityID]entities.Entity
 	Spritesheet                           map[int]*pixel.Sprite
 	Arrow, Bomb, Explosion, Player, Sword entities.Entity
 	Hearts                                []entities.Entity
-	RoomWarps                             map[entities.EntityID]rooms.EntityConfig
+	RoomWarps                             map[terraform2d.EntityID]rooms.EntityConfig
 	AllMapDrawData                        map[string]tmx.MapData
 	HealthSystem                          *systems.Health
 	InputSystem                           *systems.Input
 	SpatialSystem                         *systems.Spatial
 }
 
+// EntityRemover is a concrete terraform2d.EntityRemover
+type EntityRemover struct{}
+
+// Remove removes an entity by category and id
+func (r EntityRemover) Remove(w *terraform2d.World, category terraform2d.EntityCategory, id terraform2d.EntityID) {
+
+}
+
+// RemoveAllEntities removes all entities
+func (r EntityRemover) RemoveAllEntities(w *terraform2d.World) {
+
+}
+
 func run() {
 
-	gameWorld = world.New()
+	entityRemover := EntityRemover{}
+
+	gameWorld = terraform2d.NewWorld(entityRemover)
 
 	gamemap.ProcessMapLayout(roomsMap)
 
@@ -67,7 +82,7 @@ func run() {
 
 	gameModel := GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
-		EntitiesMap:   map[entities.EntityID]entities.Entity{},
+		EntitiesMap:   map[terraform2d.EntityID]entities.Entity{},
 		CurrentState:  gamestate.Start,
 		AddEntities:   true,
 		CurrentRoomID: 1,
@@ -83,7 +98,7 @@ func run() {
 		Sword:     entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
 		Arrow:     entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
-		RoomWarps:      map[entities.EntityID]rooms.EntityConfig{},
+		RoomWarps:      map[terraform2d.EntityID]rooms.EntityConfig{},
 		AllMapDrawData: tmx.BuildMapDrawData(),
 
 		InputSystem:  &systems.Input{Win: win},
@@ -178,7 +193,7 @@ func run() {
 				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
 				gameWorld.AddEntitiesToSystem(obstacles...)
 
-				gameModel.RoomWarps = map[entities.EntityID]rooms.EntityConfig{}
+				gameModel.RoomWarps = map[terraform2d.EntityID]rooms.EntityConfig{}
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
@@ -545,13 +560,13 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side bounds.Bound) {
 }
 
 // OnPlayerCollisionWithCoin handles collision between player and coin
-func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID terraform2d.EntityID) {
 	ch.GameModel.Player.Coins.Coins++
 	gameWorld.Remove(categories.Coin, coinID)
 }
 
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
-func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.EntityID) {
 	// TODO repeat what I did with the enemies
 	ch.GameModel.SpatialSystem.MovePlayerBack()
 	ch.GameModel.Player.Health.Total--
@@ -568,7 +583,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID entities.EntityID
 }
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
-func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID entities.EntityID) {
+func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.EntityID) {
 	fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
 	if !ch.GameModel.Sword.Ignore.Value {
 		dead := false
@@ -596,7 +611,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID entities.EntityID)
 }
 
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
-func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID entities.EntityID) {
+func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID terraform2d.EntityID) {
 	if !ch.GameModel.Arrow.Ignore.Value {
 		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
 		ch.GameModel.Arrow.Ignore.Value = true
@@ -626,14 +641,14 @@ func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
 }
 
 // OnPlayerCollisionWithObstacle handles collision between player and obstacle
-func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID terraform2d.EntityID) {
 	// "Block" by undoing rect
 	ch.GameModel.Player.Spatial.Rect = ch.GameModel.Player.Spatial.PrevRect
 	ch.GameModel.Sword.Spatial.Rect = ch.GameModel.Sword.Spatial.PrevRect
 }
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
-func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID terraform2d.EntityID) {
 	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Player.Movement.Direction)
 	if !moved {
 		ch.GameModel.Player.Spatial.Rect = ch.GameModel.Player.Spatial.PrevRect
@@ -641,7 +656,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID ent
 }
 
 // OnMoveableObstacleCollisionWithSwitch handles collision between moveable obstacle and switch
-func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && !entity.Toggler.Enabled() {
 			entity.Toggler.Toggle()
@@ -650,7 +665,7 @@ func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitc
 }
 
 // OnMoveableObstacleNoCollisionWithSwitch handles *no* collision between moveable obstacle and switch
-func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && entity.Toggler.Enabled() {
 			entity.Toggler.Toggle()
@@ -659,13 +674,13 @@ func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwi
 }
 
 // OnEnemyCollisionWithObstacle handles collision between enemy and obstacle
-func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID entities.EntityID) {
+func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID terraform2d.EntityID) {
 	// Block enemy within the spatial system by reseting current rect to previous rect
 	ch.GameModel.SpatialSystem.UndoEnemyRect(enemyID)
 }
 
 // OnPlayerCollisionWithSwitch handles collision between player and switch
-func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && !entity.Toggler.Enabled() {
 			entity.Toggler.Toggle()
@@ -674,7 +689,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID entiti
 }
 
 // OnPlayerNoCollisionWithSwitch handles *no* collision between player and switch
-func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && entity.Toggler.Enabled() {
 			entity.Toggler.Toggle()
@@ -683,7 +698,7 @@ func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID enti
 }
 
 // OnPlayerCollisionWithWarp handles collision between player and warp
-func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID entities.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID terraform2d.EntityID) {
 	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
 	if ok && !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true

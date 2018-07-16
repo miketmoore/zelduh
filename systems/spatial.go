@@ -4,6 +4,7 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -11,7 +12,7 @@ import (
 )
 
 type spatialEntity struct {
-	ID entities.EntityID
+	ID terraform2d.EntityID
 	*components.Movement
 	*components.Spatial
 	*components.Dash
@@ -32,7 +33,7 @@ type Spatial struct {
 // AddEntity adds an entity to the system
 func (s *Spatial) AddEntity(entity entities.Entity) {
 	r := spatialEntity{
-		ID:       entity.ID,
+		ID:       entity.ID(),
 		Spatial:  entity.Spatial,
 		Movement: entity.Movement,
 	}
@@ -52,7 +53,7 @@ func (s *Spatial) AddEntity(entity entities.Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *Spatial) Remove(category categories.Category, id entities.EntityID) {
+func (s *Spatial) Remove(category categories.Category, id terraform2d.EntityID) {
 	switch category {
 	case categories.Enemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -93,7 +94,7 @@ func (s *Spatial) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *Spatial) MoveMoveableObstacle(obstacleID entities.EntityID, dir direction.Name) bool {
+func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir direction.Name) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.Movement.MovingFromHit {
 		entity.Movement.MovingFromHit = true
@@ -105,7 +106,7 @@ func (s *Spatial) MoveMoveableObstacle(obstacleID entities.EntityID, dir directi
 }
 
 // UndoEnemyRect resets current rect to previous rect
-func (s *Spatial) UndoEnemyRect(enemyID entities.EntityID) {
+func (s *Spatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		enemy.Spatial.Rect = enemy.Spatial.PrevRect
@@ -113,7 +114,7 @@ func (s *Spatial) UndoEnemyRect(enemyID entities.EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit direction.Name) {
+func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit direction.Name) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.Movement.MovingFromHit {
 		enemy.Movement.MovingFromHit = true
@@ -123,7 +124,7 @@ func (s *Spatial) MoveEnemyBack(enemyID entities.EntityID, directionHit directio
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *Spatial) GetEnemySpatial(enemyID entities.EntityID) (*components.Spatial, bool) {
+func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*components.Spatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
 			return enemy.Spatial, true
@@ -133,7 +134,7 @@ func (s *Spatial) GetEnemySpatial(enemyID entities.EntityID) (*components.Spatia
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
-func (s *Spatial) EnemyMovingFromHit(enemyID entities.EntityID) bool {
+func (s *Spatial) EnemyMovingFromHit(enemyID terraform2d.EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
@@ -165,7 +166,7 @@ func (s *Spatial) Update() {
 	}
 }
 
-func (s *Spatial) moveableObstacle(id entities.EntityID) (spatialEntity, bool) {
+func (s *Spatial) moveableObstacle(id terraform2d.EntityID) (spatialEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
 			return *e, true
@@ -174,7 +175,7 @@ func (s *Spatial) moveableObstacle(id entities.EntityID) (spatialEntity, bool) {
 	return spatialEntity{}, false
 }
 
-func (s *Spatial) enemy(id entities.EntityID) (spatialEntity, bool) {
+func (s *Spatial) enemy(id terraform2d.EntityID) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
 			return *e, true

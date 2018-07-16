@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
@@ -11,7 +12,7 @@ import (
 )
 
 type collisionEntity struct {
-	ID entities.EntityID
+	ID terraform2d.EntityID
 	*components.Spatial
 	*components.Invincible
 }
@@ -28,28 +29,28 @@ type Collision struct {
 	moveableObstacles                       []collisionEntity
 	collisionSwitches                       []collisionEntity
 	warps                                   []collisionEntity
-	OnPlayerCollisionWithCoin               func(entities.EntityID)
-	OnPlayerCollisionWithEnemy              func(entities.EntityID)
-	OnSwordCollisionWithEnemy               func(entities.EntityID)
-	OnArrowCollisionWithEnemy               func(entities.EntityID)
+	OnPlayerCollisionWithCoin               func(terraform2d.EntityID)
+	OnPlayerCollisionWithEnemy              func(terraform2d.EntityID)
+	OnSwordCollisionWithEnemy               func(terraform2d.EntityID)
+	OnArrowCollisionWithEnemy               func(terraform2d.EntityID)
 	OnArrowCollisionWithObstacle            func()
-	OnPlayerCollisionWithObstacle           func(entities.EntityID)
-	OnPlayerCollisionWithMoveableObstacle   func(entities.EntityID)
-	OnEnemyCollisionWithObstacle            func(entities.EntityID, entities.EntityID)
-	OnEnemyCollisionWithMoveableObstacle    func(entities.EntityID)
-	OnMoveableObstacleCollisionWithObstacle func(entities.EntityID)
-	OnPlayerCollisionWithSwitch             func(entities.EntityID)
-	OnPlayerNoCollisionWithSwitch           func(entities.EntityID)
+	OnPlayerCollisionWithObstacle           func(terraform2d.EntityID)
+	OnPlayerCollisionWithMoveableObstacle   func(terraform2d.EntityID)
+	OnEnemyCollisionWithObstacle            func(terraform2d.EntityID, terraform2d.EntityID)
+	OnEnemyCollisionWithMoveableObstacle    func(terraform2d.EntityID)
+	OnMoveableObstacleCollisionWithObstacle func(terraform2d.EntityID)
+	OnPlayerCollisionWithSwitch             func(terraform2d.EntityID)
+	OnPlayerNoCollisionWithSwitch           func(terraform2d.EntityID)
 	OnPlayerCollisionWithBounds             func(bounds.Bound)
-	OnMoveableObstacleCollisionWithSwitch   func(entities.EntityID)
-	OnMoveableObstacleNoCollisionWithSwitch func(entities.EntityID)
-	OnPlayerCollisionWithWarp               func(entities.EntityID)
+	OnMoveableObstacleCollisionWithSwitch   func(terraform2d.EntityID)
+	OnMoveableObstacleNoCollisionWithSwitch func(terraform2d.EntityID)
+	OnPlayerCollisionWithWarp               func(terraform2d.EntityID)
 }
 
 // AddEntity adds an entity to the system
 func (s *Collision) AddEntity(entity entities.Entity) {
 	r := collisionEntity{
-		ID:      entity.ID,
+		ID:      entity.ID(),
 		Spatial: entity.Spatial,
 	}
 	switch entity.Category {
@@ -76,7 +77,7 @@ func (s *Collision) AddEntity(entity entities.Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *Collision) Remove(category categories.Category, id entities.EntityID) {
+func (s *Collision) Remove(category categories.Category, id terraform2d.EntityID) {
 	switch category {
 	case categories.Coin:
 		for i := len(s.coins) - 1; i >= 0; i-- {

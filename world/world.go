@@ -1,6 +1,7 @@
 package world
 
 import (
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
@@ -16,7 +17,7 @@ type System interface {
 type World struct {
 	systems      []System
 	SystemsMap   map[string]System
-	lastEntityID entities.EntityID
+	lastEntityID terraform2d.EntityID
 }
 
 // New returns a new World
@@ -52,13 +53,13 @@ func (w *World) Systems() []System {
 }
 
 // NewEntityID generates and returns a new Entity ID
-func (w *World) NewEntityID() entities.EntityID {
+func (w *World) NewEntityID() terraform2d.EntityID {
 	w.lastEntityID++
 	return w.lastEntityID
 }
 
 // Remove removes the specific entity from all systems
-func (w *World) Remove(category categories.Category, id entities.EntityID) {
+func (w *World) Remove(category categories.Category, id terraform2d.EntityID) {
 	switch category {
 	case categories.Coin:
 		for _, sys := range w.systems {
@@ -80,7 +81,7 @@ func (w *World) Remove(category categories.Category, id entities.EntityID) {
 }
 
 // RemoveEnemy removes the enemy from all system
-func (w *World) RemoveEnemy(id entities.EntityID) {
+func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *systems.Spatial:

@@ -3,6 +3,7 @@ package entities
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/config"
@@ -10,12 +11,9 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-// EntityID represents an entity ID
-type EntityID int
-
 // Entity is used to represent each character and tangable "thing" in the game
 type Entity struct {
-	ID       EntityID
+	id       terraform2d.EntityID
 	Category categories.Category
 	*components.Invincible
 	*components.Animation
@@ -31,8 +29,44 @@ type Entity struct {
 	*components.Temporary
 }
 
+// Component returns an entity component by name
+func (e *Entity) Component(name string) interface{} {
+	switch name {
+	case "invincible":
+		return e.Invincible
+	case "animation":
+		return e.Animation
+	case "appearance":
+		return e.Appearance
+	case "coins":
+		return e.Coins
+	case "dash":
+		return e.Dash
+	case "enabled":
+		return e.Enabled
+	case "toggler":
+		return e.Toggler
+	case "health":
+		return e.Health
+	case "ignore":
+		return e.Ignore
+	case "movement":
+		return e.Movement
+	case "spatial":
+		return e.Spatial
+	case "temporary":
+		return e.Temporary
+	}
+	return nil
+}
+
+// ID returns the entity ID
+func (e *Entity) ID() terraform2d.EntityID {
+	return e.id
+}
+
 // BuildEntitiesFromConfigs builds and returns a batch of entities
-func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...rooms.EntityConfig) []Entity {
+func BuildEntitiesFromConfigs(newEntityID func() terraform2d.EntityID, configs ...rooms.EntityConfig) []Entity {
 	batch := []Entity{}
 	for _, config := range configs {
 		entity := BuildEntityFromConfig(config, newEntityID())
@@ -42,9 +76,9 @@ func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...rooms.Enti
 }
 
 // BuildEntityFromConfig builds an entity from a configuration
-func BuildEntityFromConfig(c rooms.EntityConfig, id EntityID) Entity {
+func BuildEntityFromConfig(c rooms.EntityConfig, id terraform2d.EntityID) Entity {
 	entity := Entity{
-		ID:       id,
+		id:       id,
 		Category: c.Category,
 		Spatial: &components.Spatial{
 			Width:  c.W,

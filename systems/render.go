@@ -3,6 +3,7 @@ package systems
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/direction"
@@ -10,7 +11,7 @@ import (
 )
 
 type renderEntity struct {
-	ID       entities.EntityID
+	ID       terraform2d.EntityID
 	Category categories.Category
 	*components.Spatial
 	*components.Appearance
@@ -37,7 +38,7 @@ type Render struct {
 // AddEntity adds an entity to the system
 func (s *Render) AddEntity(entity entities.Entity) {
 	r := renderEntity{
-		ID:        entity.ID,
+		ID:        entity.ID(),
 		Category:  entity.Category,
 		Spatial:   entity.Spatial,
 		Animation: entity.Animation,
@@ -87,7 +88,7 @@ func (s *Render) RemoveAll(category categories.Category) {
 }
 
 // RemoveEntity removes an entity by ID
-func (s *Render) RemoveEntity(id entities.EntityID) {
+func (s *Render) RemoveEntity(id terraform2d.EntityID) {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		if s.entities[i].ID == id {
 			s.entities = append(s.entities[:i], s.entities[i+1:]...)
