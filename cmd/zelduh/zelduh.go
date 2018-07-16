@@ -55,7 +55,7 @@ func run() {
 
 	gameWorld = world.New()
 
-	gamemap.ProcessMapLayout(roomsMap)
+	gamemap.ProcessMapLayout(config.Overworld, roomsMap)
 
 	// Initializations
 	t = initI18n()

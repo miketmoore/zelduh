@@ -2,7 +2,6 @@ package gamemap
 
 import (
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/rooms"
 )
 
@@ -51,8 +50,7 @@ func indexRoom(roomsMap rooms.Rooms, a, b terraform2d.RoomID, dir terraform2d.Di
 }
 
 // ProcessMapLayout processes the game maps
-func ProcessMapLayout(roomsMap rooms.Rooms) {
-	layout := config.Overworld
+func ProcessMapLayout(layout [][]terraform2d.RoomID, roomsMap rooms.Rooms) {
 	// transform multi-dimensional array into map of Room structs, indexed by ID
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
