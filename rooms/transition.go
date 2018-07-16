@@ -1,6 +1,6 @@
 package rooms
 
-import "github.com/miketmoore/zelduh/bounds"
+import "github.com/miketmoore/terraform2d"
 
 // TransitionStyle represents a transition style
 type TransitionStyle string
@@ -15,7 +15,7 @@ const (
 // RoomTransition is used to transition between map room
 type RoomTransition struct {
 	Active bool
-	Side   bounds.Bound
+	Side   terraform2d.Bound
 	Start  float64
 	Timer  int
 	Style  TransitionStyle

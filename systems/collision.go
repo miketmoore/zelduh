@@ -5,7 +5,6 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
@@ -41,7 +40,7 @@ type Collision struct {
 	OnMoveableObstacleCollisionWithObstacle func(terraform2d.EntityID)
 	OnPlayerCollisionWithSwitch             func(terraform2d.EntityID)
 	OnPlayerNoCollisionWithSwitch           func(terraform2d.EntityID)
-	OnPlayerCollisionWithBounds             func(bounds.Bound)
+	OnPlayerCollisionWithBounds             func(terraform2d.Bound)
 	OnMoveableObstacleCollisionWithSwitch   func(terraform2d.EntityID)
 	OnMoveableObstacleNoCollisionWithSwitch func(terraform2d.EntityID)
 	OnPlayerCollisionWithWarp               func(terraform2d.EntityID)
@@ -134,13 +133,13 @@ func (s *Collision) Update() {
 
 	// is player at map edge?
 	if player.Spatial.Rect.Min.Y <= mapBounds.Min.Y {
-		s.OnPlayerCollisionWithBounds(bounds.Bottom)
+		s.OnPlayerCollisionWithBounds(terraform2d.BoundBottom)
 	} else if player.Spatial.Rect.Min.X <= mapBounds.Min.X {
-		s.OnPlayerCollisionWithBounds(bounds.Left)
+		s.OnPlayerCollisionWithBounds(terraform2d.BoundLeft)
 	} else if player.Spatial.Rect.Max.X >= mapBounds.Max.X {
-		s.OnPlayerCollisionWithBounds(bounds.Right)
+		s.OnPlayerCollisionWithBounds(terraform2d.BoundRight)
 	} else if player.Spatial.Rect.Max.Y >= mapBounds.Max.Y {
-		s.OnPlayerCollisionWithBounds(bounds.Top)
+		s.OnPlayerCollisionWithBounds(terraform2d.BoundTop)
 	}
 
 	w, h := player.Spatial.Width, player.Spatial.Height

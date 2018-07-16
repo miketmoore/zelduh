@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/bounds"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
@@ -531,7 +530,7 @@ type CollisionHandler struct {
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
-func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side bounds.Bound) {
+func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side terraform2d.Bound) {
 	if !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Side = side
@@ -716,22 +715,22 @@ func calculateTransitionSlide(
 	playerModY := 0.0
 	playerIncY := ((config.MapH / config.TileSize) - 1) + 7
 	playerIncX := ((config.MapW / config.TileSize) - 1) + 7
-	if roomTransition.Side == bounds.Bottom && connectedRooms.Bottom != 0 {
+	if roomTransition.Side == terraform2d.BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
 		modYNext = incY - config.MapH
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
-	} else if roomTransition.Side == bounds.Top && connectedRooms.Top != 0 {
+	} else if roomTransition.Side == terraform2d.BoundTop && connectedRooms.Top != 0 {
 		modY = -incY
 		modYNext = -incY + config.MapH
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
-	} else if roomTransition.Side == bounds.Left && connectedRooms.Left != 0 {
+	} else if roomTransition.Side == terraform2d.BoundLeft && connectedRooms.Left != 0 {
 		modX = incX
 		modXNext = incX - config.MapW
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
-	} else if roomTransition.Side == bounds.Right && connectedRooms.Right != 0 {
+	} else if roomTransition.Side == terraform2d.BoundRight && connectedRooms.Right != 0 {
 		modX = -incX
 		modXNext = -incX + config.MapW
 		nextRoomID = connectedRooms.Right
