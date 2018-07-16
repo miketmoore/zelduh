@@ -140,7 +140,7 @@ func run() {
 		},
 	)
 
-	gameWorld.AddEntitiesToSystem(
+	gameWorld.AddEntities(
 		gameModel.Player,
 		gameModel.Sword,
 		gameModel.Arrow,
@@ -177,7 +177,7 @@ func run() {
 
 				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
-				gameWorld.AddEntitiesToSystem(obstacles...)
+				gameWorld.AddEntities(obstacles...)
 
 				gameModel.RoomWarps = map[terraform2d.EntityID]rooms.EntityConfig{}
 
@@ -185,7 +185,7 @@ func run() {
 				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
 					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
 					gameModel.EntitiesMap[entity.ID()] = entity
-					gameWorld.AddEntityToSystem(entity)
+					gameWorld.AddEntity(entity)
 
 					switch c.Category {
 					case categories.Warp:
@@ -509,7 +509,7 @@ var roomsMap = rooms.Rooms{
 
 func addUICoin() {
 	coin := entities.BuildEntityFromConfig(entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
-	gameWorld.AddEntityToSystem(coin)
+	gameWorld.AddEntity(coin)
 }
 
 // make sure only correct number of hearts exists in systems
@@ -518,14 +518,14 @@ func addUICoin() {
 func addHearts(hearts []entities.Entity, health int) {
 	for i, entity := range hearts {
 		if i < health {
-			gameWorld.AddEntityToSystem(entity)
+			gameWorld.AddEntity(entity)
 		}
 	}
 }
 
 func dropCoin(v pixel.Vec) {
 	coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
-	gameWorld.AddEntityToSystem(coin)
+	gameWorld.AddEntity(coin)
 }
 
 // CollisionHandler contains collision handlers
@@ -586,7 +586,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.Entity
 				ch.GameModel.Explosion.Temporary.OnExpiration = func() {
 					dropCoin(ch.GameModel.Explosion.Spatial.Rect.Min)
 				}
-				gameWorld.AddEntityToSystem(ch.GameModel.Explosion)
+				gameWorld.AddEntity(ch.GameModel.Explosion)
 				gameWorld.RemoveEnemy(enemyID)
 			} else {
 				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.Movement.Direction)
@@ -613,7 +613,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID terraform2d.Entity
 			ch.GameModel.Explosion.Temporary.OnExpiration = func() {
 				dropCoin(ch.GameModel.Explosion.Spatial.Rect.Min)
 			}
-			gameWorld.AddEntityToSystem(ch.GameModel.Explosion)
+			gameWorld.AddEntity(ch.GameModel.Explosion)
 			gameWorld.RemoveEnemy(enemyID)
 		} else {
 			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.Movement.Direction)
