@@ -90,9 +90,7 @@ func run() {
 		HealthSystem: &systems.Health{},
 
 		Hearts: entities.BuildEntitiesFromConfigs(
-			func() entities.EntityID {
-				return gameWorld.NewEntityID()
-			},
+			gameWorld.NewEntityID,
 			entities.GetPreset("heart")(1.5, 14),
 			entities.GetPreset("heart")(2.15, 14),
 			entities.GetPreset("heart")(2.80, 14),
