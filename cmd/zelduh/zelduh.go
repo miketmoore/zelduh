@@ -128,21 +128,23 @@ func run() {
 		OnPlayerCollisionWithWarp:               collisionHandler.OnPlayerCollisionWithWarp,
 	}
 
-	gameWorld.AddSystem(gameModel.InputSystem)
-	gameWorld.AddSystem(gameModel.HealthSystem)
-	gameWorld.AddSystem(gameModel.SpatialSystem)
-	gameWorld.AddSystem(collisionSystem)
-	gameWorld.AddSystem(&systems.Render{
-		Win:         win,
-		Spritesheet: gameModel.Spritesheet,
-	})
+	gameWorld.AddSystems(
+		gameModel.InputSystem,
+		gameModel.HealthSystem,
+		gameModel.SpatialSystem,
+		collisionSystem,
+		&systems.Render{
+			Win:         win,
+			Spritesheet: gameModel.Spritesheet,
+		},
+	)
 
-	gameWorld.AddEntitiesToSystem([]entities.Entity{
+	gameWorld.AddEntitiesToSystem(
 		gameModel.Player,
 		gameModel.Sword,
 		gameModel.Arrow,
 		gameModel.Bomb,
-	})
+	)
 
 	for !win.Closed() {
 
@@ -174,7 +176,7 @@ func run() {
 
 				// Draw obstacles on appropriate map tiles
 				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
-				gameWorld.AddEntitiesToSystem(obstacles)
+				gameWorld.AddEntitiesToSystem(obstacles...)
 
 				gameModel.RoomWarps = map[entities.EntityID]rooms.EntityConfig{}
 

@@ -32,6 +32,13 @@ func (w *World) AddSystem(sys System) {
 	w.systems = append(w.systems, sys)
 }
 
+// AddSystems adds a batch of systems to the world
+func (w *World) AddSystems(all ...System) {
+	for _, sys := range all {
+		w.AddSystem(sys)
+	}
+}
+
 // Update executes Update on all systems in this World
 func (w *World) Update() {
 	for _, sys := range w.systems {
@@ -140,7 +147,7 @@ func (w *World) AddEntityToSystem(entity entities.Entity) {
 }
 
 // AddEntitiesToSystem adds the entities to their system
-func (w *World) AddEntitiesToSystem(entities []entities.Entity) {
+func (w *World) AddEntitiesToSystem(entities ...entities.Entity) {
 	for _, entity := range entities {
 		w.AddEntityToSystem(entity)
 	}
