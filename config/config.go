@@ -1,6 +1,6 @@
 package config
 
-import "github.com/miketmoore/zelduh/rooms"
+import "github.com/miketmoore/terraform2d"
 
 const (
 	TranslationFile = "i18n/zelduh/en-US.all.json"
@@ -55,12 +55,12 @@ var TilemapFiles = []string{
 
 // Overworld is a multi-dimensional array representing the overworld
 // Each room ID should be unique
-var Overworld = [][]rooms.RoomID{
-	[]rooms.RoomID{1, 10},
-	[]rooms.RoomID{2, 0, 0, 8},
-	[]rooms.RoomID{3, 5, 6, 7},
-	[]rooms.RoomID{9},
-	[]rooms.RoomID{11},
+var Overworld = [][]terraform2d.RoomID{
+	[]terraform2d.RoomID{1, 10},
+	[]terraform2d.RoomID{2, 0, 0, 8},
+	[]terraform2d.RoomID{3, 5, 6, 7},
+	[]terraform2d.RoomID{9},
+	[]terraform2d.RoomID{11},
 }
 
 // NonObstacleSprites defines which sprites are not obstacles

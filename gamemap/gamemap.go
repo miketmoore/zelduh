@@ -6,7 +6,7 @@ import (
 	"github.com/miketmoore/zelduh/rooms"
 )
 
-func indexRoom(roomsMap rooms.Rooms, a, b rooms.RoomID, dir terraform2d.Direction) {
+func indexRoom(roomsMap rooms.Rooms, a, b terraform2d.RoomID, dir terraform2d.Direction) {
 	// fmt.Printf("indexRoom a:%d b:%d dir:%s\n", a, b, dir)
 	roomA, okA := roomsMap[a]
 	roomB, okB := roomsMap[b]

@@ -36,7 +36,7 @@ var (
 // GameModel contains data used throughout the game
 type GameModel struct {
 	AddEntities                           bool
-	CurrentRoomID, NextRoomID             rooms.RoomID
+	CurrentRoomID, NextRoomID             terraform2d.RoomID
 	RoomTransition                        rooms.RoomTransition
 	CurrentState                          terraform2d.State
 	Rand                                  *rand.Rand
@@ -374,7 +374,7 @@ func drawMapBGImage(
 	}
 }
 
-func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID rooms.RoomID, modX, modY float64) []entities.Entity {
+func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID terraform2d.RoomID, modX, modY float64) []entities.Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName]
 	obstacles := []entities.Entity{}
 	mod := 0.5
@@ -694,16 +694,16 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID terraform2d.EntityI
 
 // TransitionRoomResponse contains layout data
 type TransitionRoomResponse struct {
-	nextRoomID                                             rooms.RoomID
+	nextRoomID                                             terraform2d.RoomID
 	modX, modY, modXNext, modYNext, playerModX, playerModY float64
 }
 
 func calculateTransitionSlide(
 	roomTransition *rooms.RoomTransition,
 	connectedRooms rooms.ConnectedRooms,
-	currentRoomID rooms.RoomID) TransitionRoomResponse {
+	currentRoomID terraform2d.RoomID) TransitionRoomResponse {
 
-	var nextRoomID rooms.RoomID
+	var nextRoomID terraform2d.RoomID
 	inc := (roomTransition.Start - float64(roomTransition.Timer))
 	incY := inc * (config.MapH / config.TileSize)
 	incX := inc * (config.MapW / config.TileSize)

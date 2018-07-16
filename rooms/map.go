@@ -5,18 +5,15 @@ import (
 	"github.com/miketmoore/terraform2d"
 )
 
-// RoomID is a room ID
-type RoomID int
-
 // Rooms is a type of map that indexes rooms by their ID
-type Rooms map[RoomID]Room
+type Rooms map[terraform2d.RoomID]Room
 
 // ConnectedRooms is used to configure adjacent rooms
 type ConnectedRooms struct {
-	Top    RoomID
-	Right  RoomID
-	Bottom RoomID
-	Left   RoomID
+	Top    terraform2d.RoomID
+	Right  terraform2d.RoomID
+	Bottom terraform2d.RoomID
+	Left   terraform2d.RoomID
 }
 
 // AnimationConfig is a map of animation types to sprite index lists
@@ -55,7 +52,7 @@ type EntityConfig struct {
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
 	X, Y, W, H                                                    float64
 	SpriteFrames                                                  []int
-	WarpToRoomID                                                  RoomID
+	WarpToRoomID                                                  terraform2d.RoomID
 	PatternName                                                   string
 	Toggled                                                       bool
 	Health                                                        int
