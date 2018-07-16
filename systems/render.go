@@ -12,7 +12,7 @@ import (
 
 type renderEntity struct {
 	ID       terraform2d.EntityID
-	Category categories.Category
+	Category terraform2d.EntityCategory
 	*components.Spatial
 	*components.Appearance
 	*components.Animation
@@ -76,7 +76,7 @@ func (s *Render) AddEntity(entity entities.Entity) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *Render) RemoveAll(category categories.Category) {
+func (s *Render) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
 	case categories.Enemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {

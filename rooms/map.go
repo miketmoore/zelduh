@@ -2,7 +2,7 @@ package rooms
 
 import (
 	"github.com/faiface/pixel/imdraw"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/direction"
 )
 
@@ -52,7 +52,7 @@ type DashConfig struct {
 
 // EntityConfig is used to simplify building entities
 type EntityConfig struct {
-	Category                                                      categories.Category
+	Category                                                      terraform2d.EntityCategory
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
 	X, Y, W, H                                                    float64
 	SpriteFrames                                                  []int

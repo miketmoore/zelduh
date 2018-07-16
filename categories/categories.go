@@ -1,10 +1,11 @@
 package categories
 
-// Category is used to group entities
-type Category uint
+import (
+	"github.com/miketmoore/terraform2d"
+)
 
 const (
-	Player = Category(1 << iota)
+	Player = terraform2d.EntityCategory(1 << iota)
 	Sword
 	Arrow
 	Bomb

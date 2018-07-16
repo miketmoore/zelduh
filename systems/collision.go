@@ -77,7 +77,7 @@ func (s *Collision) AddEntity(entity entities.Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *Collision) Remove(category categories.Category, id terraform2d.EntityID) {
+func (s *Collision) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
 	case categories.Coin:
 		for i := len(s.coins) - 1; i >= 0; i-- {
@@ -97,7 +97,7 @@ func (s *Collision) Remove(category categories.Category, id terraform2d.EntityID
 }
 
 // RemoveAll removes all entities from one category
-func (s *Collision) RemoveAll(category categories.Category) {
+func (s *Collision) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
 	case categories.Enemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {

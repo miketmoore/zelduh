@@ -73,7 +73,7 @@ func (w *World) AddEntities(all ...entities.Entity) {
 }
 
 // Remove removes the specific entity from all systems
-func (w *World) Remove(category categories.Category, id terraform2d.EntityID) {
+func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
 	case categories.Coin:
 		for _, sys := range w.systems {
