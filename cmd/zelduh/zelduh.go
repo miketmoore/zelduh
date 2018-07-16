@@ -13,7 +13,6 @@ import (
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
-	"github.com/miketmoore/zelduh/sprites"
 	"github.com/miketmoore/zelduh/world"
 
 	"github.com/faiface/pixel"
@@ -74,7 +73,7 @@ func run() {
 		RoomTransition: rooms.RoomTransition{
 			Start: float64(config.TileSize),
 		},
-		Spritesheet: sprites.LoadAndBuildSpritesheet(),
+		Spritesheet: terraform2d.LoadAndBuildSpritesheet(config.SpritesheetPath, config.TileSize),
 
 		// Build entities
 		Player:    entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
