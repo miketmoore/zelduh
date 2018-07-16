@@ -89,11 +89,14 @@ func run() {
 		InputSystem:  &systems.Input{Win: win},
 		HealthSystem: &systems.Health{},
 
-		Hearts: []entities.Entity{
-			entities.BuildEntityFromConfig(entities.GetPreset("heart")(1.5, 14), gameWorld.NewEntityID()),
-			entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.15, 14), gameWorld.NewEntityID()),
-			entities.BuildEntityFromConfig(entities.GetPreset("heart")(2.80, 14), gameWorld.NewEntityID()),
-		},
+		Hearts: entities.BuildEntitiesFromConfigs(
+			func() entities.EntityID {
+				return gameWorld.NewEntityID()
+			},
+			entities.GetPreset("heart")(1.5, 14),
+			entities.GetPreset("heart")(2.15, 14),
+			entities.GetPreset("heart")(2.80, 14),
+		),
 	}
 
 	gameModel.SpatialSystem = &systems.Spatial{

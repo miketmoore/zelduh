@@ -31,6 +31,16 @@ type Entity struct {
 	*components.Temporary
 }
 
+// BuildEntitiesFromConfigs builds and returns a batch of entities
+func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...rooms.EntityConfig) []Entity {
+	batch := []Entity{}
+	for _, config := range configs {
+		entity := BuildEntityFromConfig(config, newEntityID())
+		batch = append(batch, entity)
+	}
+	return batch
+}
+
 // BuildEntityFromConfig builds an entity from a configuration
 func BuildEntityFromConfig(c rooms.EntityConfig, id EntityID) Entity {
 	entity := Entity{
