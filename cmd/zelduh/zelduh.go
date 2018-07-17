@@ -11,7 +11,6 @@ import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
-	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/world"
 
@@ -56,7 +55,7 @@ func run() {
 
 	gameWorld = world.New()
 
-	gamemap.ProcessMapLayout(config.Overworld, roomsMap)
+	rooms.ProcessMapLayout(config.Overworld, roomsMap)
 
 	// Initializations
 	t = initI18n()
