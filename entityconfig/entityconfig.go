@@ -1,4 +1,4 @@
-package rooms
+package entityconfig
 
 import (
 	"github.com/faiface/pixel/imdraw"
@@ -35,8 +35,8 @@ type DashConfig struct {
 	SpeedMod          float64
 }
 
-// EntityConfig is used to simplify building entities
-type EntityConfig struct {
+// Config is used to simplify building entities
+type Config struct {
 	Category                                                      terraform2d.EntityCategory
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
 	X, Y, W, H                                                    float64

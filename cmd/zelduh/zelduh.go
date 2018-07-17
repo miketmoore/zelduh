@@ -10,6 +10,7 @@ import (
 
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/config"
+	"github.com/miketmoore/zelduh/entityconfig"
 	"github.com/miketmoore/zelduh/gamemap"
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/world"
@@ -44,7 +45,7 @@ type GameModel struct {
 	Spritesheet                           map[int]*pixel.Sprite
 	Arrow, Bomb, Explosion, Player, Sword entities.Entity
 	Hearts                                []entities.Entity
-	RoomWarps                             map[terraform2d.EntityID]rooms.EntityConfig
+	RoomWarps                             map[terraform2d.EntityID]entityconfig.Config
 	AllMapDrawData                        map[string]terraform2d.MapData
 	HealthSystem                          *systems.Health
 	InputSystem                           *systems.Input
@@ -80,7 +81,7 @@ func run() {
 		Sword:     entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
 		Arrow:     entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
-		RoomWarps:      map[terraform2d.EntityID]rooms.EntityConfig{},
+		RoomWarps:      map[terraform2d.EntityID]entityconfig.Config{},
 		AllMapDrawData: terraform2d.BuildMapDrawData(config.TilemapDir, config.TilemapFiles, config.TileSize),
 
 		InputSystem:  &systems.Input{Win: win},
@@ -179,7 +180,7 @@ func run() {
 				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
 				gameWorld.AddEntities(obstacles...)
 
-				gameModel.RoomWarps = map[terraform2d.EntityID]rooms.EntityConfig{}
+				gameModel.RoomWarps = map[terraform2d.EntityID]entityconfig.Config{}
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].(*rooms.Room).EntityConfigs {
@@ -454,25 +455,25 @@ var roomsMap = rooms.Rooms{
 		entities.WarpStone(3, 7, 6, 5),
 	),
 	5: rooms.NewRoom("rockWithCaveEntrance",
-		rooms.EntityConfig{
+		entityconfig.Config{
 			Category:     categories.Warp,
 			WarpToRoomID: 11,
 			W:            config.TileSize,
 			H:            config.TileSize,
 			X:            (config.TileSize * 7) + config.TileSize/2,
 			Y:            (config.TileSize * 9) + config.TileSize/2,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 30,
 			},
 		},
-		rooms.EntityConfig{
+		entityconfig.Config{
 			Category:     categories.Warp,
 			WarpToRoomID: 11,
 			W:            config.TileSize,
 			H:            config.TileSize,
 			X:            (config.TileSize * 8) + config.TileSize/2,
 			Y:            (config.TileSize * 9) + config.TileSize/2,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 30,
 			},
 		},
@@ -484,25 +485,25 @@ var roomsMap = rooms.Rooms{
 	10: rooms.NewRoom("overworldFourWallsDoorLeft"),
 	11: rooms.NewRoom("dungeonFourDoors",
 		// South door of cave - warp to cave entrance
-		rooms.EntityConfig{
+		entityconfig.Config{
 			Category:     categories.Warp,
 			WarpToRoomID: 5,
 			W:            config.TileSize,
 			H:            config.TileSize,
 			X:            (config.TileSize * 6) + config.TileSize + (config.TileSize / 2.5),
 			Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 15,
 			},
 		},
-		rooms.EntityConfig{
+		entityconfig.Config{
 			Category:     categories.Warp,
 			WarpToRoomID: 5,
 			W:            config.TileSize,
 			H:            config.TileSize,
 			X:            (config.TileSize * 7) + config.TileSize + (config.TileSize / 2.5),
 			Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 15,
 			},
 		},

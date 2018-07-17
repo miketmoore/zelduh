@@ -1,6 +1,9 @@
 package rooms
 
-import "github.com/miketmoore/terraform2d"
+import (
+	"github.com/miketmoore/terraform2d"
+	"github.com/miketmoore/zelduh/entityconfig"
+)
 
 // Rooms is a type of map that indexes rooms by their ID
 type Rooms map[terraform2d.RoomID]terraform2d.Room
@@ -9,7 +12,7 @@ type Rooms map[terraform2d.RoomID]terraform2d.Room
 type Room struct {
 	mapName        string
 	connectedRooms *terraform2d.ConnectedRooms
-	EntityConfigs  []EntityConfig
+	EntityConfigs  []entityconfig.Config
 }
 
 // MapName returns the room's map name
@@ -37,7 +40,7 @@ func (r Room) SetConnectedRoom(direction terraform2d.Direction, id terraform2d.R
 }
 
 // NewRoom builds a new Room
-func NewRoom(name string, entityConfigs ...EntityConfig) *Room {
+func NewRoom(name string, entityConfigs ...entityconfig.Config) *Room {
 	return &Room{
 		mapName:        name,
 		connectedRooms: &terraform2d.ConnectedRooms{},

@@ -7,7 +7,7 @@ import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/config"
-	"github.com/miketmoore/zelduh/rooms"
+	"github.com/miketmoore/zelduh/entityconfig"
 )
 
 // GetPreset gets an entity config preset function by key
@@ -15,13 +15,13 @@ func GetPreset(key string) entityConfigPresetFn {
 	return entityPresets[key]
 }
 
-type entityConfigPresetFn = func(xTiles, yTiles float64) rooms.EntityConfig
+type entityConfigPresetFn = func(xTiles, yTiles float64) entityconfig.Config
 
 var entityPresets = map[string]entityConfigPresetFn{
-	"arrow": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"arrow": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Arrow,
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
 			},
@@ -29,22 +29,22 @@ var entityPresets = map[string]entityConfigPresetFn{
 			H: config.TileSize,
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"up":    terraform2d.GetSet("arrowUp"),
 				"right": terraform2d.GetSet("arrowRight"),
 				"down":  terraform2d.GetSet("arrowDown"),
 				"left":  terraform2d.GetSet("arrowLeft"),
 			},
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 5,
 			},
 			Ignore: true,
 		}
 	},
-	"bomb": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"bomb": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Bomb,
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
 			},
@@ -52,38 +52,38 @@ var entityPresets = map[string]entityConfigPresetFn{
 			H: config.TileSize,
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("bomb"),
 			},
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 5,
 			},
 			Ignore: true,
 		}
 	},
-	"coin": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"coin": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Coin,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("coin"),
 			},
 		}
 	},
-	"explosion": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"explosion": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category:   categories.Explosion,
 			Expiration: 12,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("explosion"),
 			},
 		}
 	},
-	"obstacle": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"obstacle": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Obstacle,
 			W:        config.TileSize,
 			H:        config.TileSize,
@@ -91,31 +91,31 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Y:        config.TileSize * yTiles,
 		}
 	},
-	"player": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"player": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Player,
 			Health:   3,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box:                  imdraw.New(nil),
 				Radius:               15,
 				CollisionWithRectMod: 5,
 			},
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				MaxSpeed:  7.0,
 				Speed:     0.0,
 			},
 			Coins: true,
-			Dash: &rooms.DashConfig{
+			Dash: &entityconfig.DashConfig{
 				Charge:    0,
 				MaxCharge: 50,
 				SpeedMod:  7,
 			},
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"up":               terraform2d.GetSet("playerUp"),
 				"right":            terraform2d.GetSet("playerRight"),
 				"down":             terraform2d.GetSet("playerDown"),
@@ -127,10 +127,10 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"sword": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"sword": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Sword,
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
 			},
@@ -138,31 +138,31 @@ var entityPresets = map[string]entityConfigPresetFn{
 			H: config.TileSize,
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"up":    terraform2d.GetSet("swordUp"),
 				"right": terraform2d.GetSet("swordRight"),
 				"down":  terraform2d.GetSet("swordDown"),
 				"left":  terraform2d.GetSet("swordLeft"),
 			},
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 20,
 			},
 			Ignore: true,
 		}
 	},
-	"eyeburrower": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"eyeburrower": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("eyeburrower"),
 			},
 			Health: 2,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box:    imdraw.New(nil),
 				Radius: 20,
 			},
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction:    terraform2d.DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
@@ -173,35 +173,35 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"heart": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"heart": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Heart,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box: imdraw.New(nil),
 			},
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("heart"),
 			},
 		}
 
 	},
-	"skeleton": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"skeleton": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("skeleton"),
 			},
 			Health: 2,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box:    imdraw.New(nil),
 				Radius: 20,
 			},
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction:    terraform2d.DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
@@ -212,19 +212,19 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"skull": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"skull": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("skull"),
 			},
 			Health: 2,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box:    imdraw.New(nil),
 				Radius: 20,
 			},
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction:    terraform2d.DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
@@ -235,19 +235,19 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"spinner": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"spinner": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("spinner"),
 			},
 			Invincible: true,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box:    imdraw.New(nil),
 				Radius: 20,
 			},
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Direction:    terraform2d.DirectionRight,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
@@ -258,62 +258,62 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"uiCoin": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"uiCoin": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Heart,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box: imdraw.New(nil),
 			},
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("uiCoin"),
 			},
 		}
 	},
-	"warpStone": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"warpStone": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.Warp,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			W:        config.TileSize,
 			H:        config.TileSize,
-			Hitbox: &rooms.HitboxConfig{
+			Hitbox: &entityconfig.HitboxConfig{
 				Box:    imdraw.New(nil),
 				Radius: 20,
 			},
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("warpStone"),
 			},
 		}
 	},
-	"puzzleBox": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"puzzleBox": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.MovableObstacle,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			W:        config.TileSize,
 			H:        config.TileSize,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("puzzleBox"),
 			},
-			Movement: &rooms.MovementConfig{
+			Movement: &entityconfig.MovementConfig{
 				Speed:    1.0,
 				MaxMoves: int(config.TileSize) / 2,
 				MaxSpeed: 2.0,
 			},
 		}
 	},
-	"floorSwitch": func(xTiles, yTiles float64) rooms.EntityConfig {
-		return rooms.EntityConfig{
+	"floorSwitch": func(xTiles, yTiles float64) entityconfig.Config {
+		return entityconfig.Config{
 			Category: categories.CollisionSwitch,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			W:        config.TileSize,
 			H:        config.TileSize,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("floorSwitch"),
 			},
 			Toggleable: true,
@@ -321,14 +321,14 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	// this is an impassable obstacle that can be toggled "remotely"
 	// it has two visual states that coincide with each toggle state
-	"toggleObstacle": func(xTiles, yTiles float64) rooms.EntityConfig {
+	"toggleObstacle": func(xTiles, yTiles float64) entityconfig.Config {
 		// TODO get this working again
-		return rooms.EntityConfig{
+		return entityconfig.Config{
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
 			W: config.TileSize,
 			H: config.TileSize,
-			Animation: rooms.AnimationConfig{
+			Animation: entityconfig.AnimationConfig{
 				"default": terraform2d.GetSet("toggleObstacle"),
 			},
 			// Impassable: true,
@@ -338,7 +338,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 }
 
 // WarpStone returns an entity config for a warp stone
-func WarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) rooms.EntityConfig {
+func WarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) entityconfig.Config {
 	fmt.Printf("presetWarpStone\n")
 	e := entityPresets["warpStone"](X, Y)
 	e.WarpToRoomID = 6
