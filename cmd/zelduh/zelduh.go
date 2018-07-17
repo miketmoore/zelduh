@@ -240,7 +240,7 @@ func run() {
 
 				transitionRoomResp := calculateTransitionSlide(
 					gameModel.RoomTransition,
-					*roomsMap[gameModel.CurrentRoomID].ConnectedRooms(),
+					roomsMap[gameModel.CurrentRoomID].ConnectedRooms(),
 					gameModel.CurrentRoomID,
 				)
 
@@ -704,7 +704,7 @@ type TransitionRoomResponse struct {
 
 func calculateTransitionSlide(
 	roomTransition *terraform2d.RoomTransition,
-	connectedRooms terraform2d.ConnectedRooms,
+	connectedRooms *terraform2d.ConnectedRooms,
 	currentRoomID terraform2d.RoomID) TransitionRoomResponse {
 
 	var nextRoomID terraform2d.RoomID
