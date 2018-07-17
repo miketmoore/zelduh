@@ -244,6 +244,8 @@ func run() {
 					gameModel.CurrentRoomID,
 				)
 
+				// when going from room 2 back to room 1, this does not change to 1
+				fmt.Println("slide transition, setting next room to ", transitionRoomResp.nextRoomID)
 				gameModel.NextRoomID = transitionRoomResp.nextRoomID
 
 				drawMapBGImage(
