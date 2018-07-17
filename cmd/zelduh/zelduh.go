@@ -238,14 +238,11 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
-				fmt.Println("Calling calculateTransitionSlide current ", gameModel.CurrentRoomID)
 				transitionRoomResp := calculateTransitionSlide(
 					gameModel.RoomTransition,
 					*roomsMap[gameModel.CurrentRoomID].ConnectedRooms(),
 					gameModel.CurrentRoomID,
 				)
-
-				fmt.Println("... ", gameModel.CurrentRoomID, gameModel.NextRoomID)
 
 				gameModel.NextRoomID = transitionRoomResp.nextRoomID
 
@@ -539,7 +536,6 @@ type CollisionHandler struct {
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
 func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side terraform2d.Bound) {
 	if !ch.GameModel.RoomTransition.Active {
-		fmt.Println("OnPlayerCollisionWithBounds not active, updating...", side)
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Side = side
 		ch.GameModel.RoomTransition.Style = terraform2d.TransitionSlide
@@ -574,7 +570,6 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.Entit
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.EntityID) {
-	fmt.Printf("SwordCollisionWithEnemy %d\n", enemyID)
 	if !ch.GameModel.Sword.Ignore.Value {
 		dead := false
 		if !ch.GameModel.SpatialSystem.EnemyMovingFromHit(enemyID) {
@@ -606,7 +601,6 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID terraform2d.Entity
 		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
 		ch.GameModel.Arrow.Ignore.Value = true
 		if dead {
-			fmt.Printf("You killed an enemy with an arrow\n")
 			enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
 			ch.GameModel.Explosion.Temporary.Expiration = len(ch.GameModel.Explosion.Animation.Map["default"].Frames)
 			ch.GameModel.Explosion.Spatial = &components.Spatial{
@@ -724,25 +718,21 @@ func calculateTransitionSlide(
 	playerIncY := ((config.MapH / config.TileSize) - 1) + 7
 	playerIncX := ((config.MapW / config.TileSize) - 1) + 7
 	if roomTransition.Side == terraform2d.BoundBottom && connectedRooms.Bottom != 0 {
-		// fmt.Println("calculateTransitionSlide bottom")
 		modY = incY
 		modYNext = incY - config.MapH
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
 	} else if roomTransition.Side == terraform2d.BoundTop && connectedRooms.Top != 0 {
-		// fmt.Println("calculateTransitionSlide top")
 		modY = -incY
 		modYNext = -incY + config.MapH
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
 	} else if roomTransition.Side == terraform2d.BoundLeft && connectedRooms.Left != 0 {
-		// fmt.Println("calculateTransitionSlide left")
 		modX = incX
 		modXNext = incX - config.MapW
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
 	} else if roomTransition.Side == terraform2d.BoundRight && connectedRooms.Right != 0 {
-		// fmt.Println("calculateTransitionSlide right")
 		modX = -incX
 		modXNext = -incX + config.MapW
 		nextRoomID = connectedRooms.Right
@@ -750,7 +740,6 @@ func calculateTransitionSlide(
 	} else {
 		nextRoomID = 0
 	}
-	// fmt.Println("calculateTransitionSlide nextRoomID: ", nextRoomID)
 
 	return TransitionRoomResponse{
 		nextRoomID,

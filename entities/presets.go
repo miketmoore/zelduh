@@ -1,8 +1,6 @@
 package entities
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/categories"
@@ -339,7 +337,6 @@ var entityPresets = map[string]entityConfigPresetFn{
 
 // WarpStone returns an entity config for a warp stone
 func WarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) entityconfig.Config {
-	fmt.Printf("presetWarpStone\n")
 	e := entityPresets["warpStone"](X, Y)
 	e.WarpToRoomID = 6
 	e.Hitbox.Radius = 5
