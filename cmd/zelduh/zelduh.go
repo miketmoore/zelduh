@@ -238,12 +238,10 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
-				connectedRooms := roomsMap[gameModel.CurrentRoomID].ConnectedRooms()
-
-				fmt.Println("Calling calculateTransitionSlide current ", gameModel.CurrentRoomID, connectedRooms)
+				fmt.Println("Calling calculateTransitionSlide current ", gameModel.CurrentRoomID)
 				transitionRoomResp := calculateTransitionSlide(
 					gameModel.RoomTransition,
-					*connectedRooms,
+					*roomsMap[gameModel.CurrentRoomID].ConnectedRooms(),
 					gameModel.CurrentRoomID,
 				)
 
