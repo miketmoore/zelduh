@@ -238,9 +238,20 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
+				currentRoomID := gameModel.CurrentRoomID
+				fmt.Printf("before calculating transition, current:%d next:%d\n", currentRoomID, gameModel.NextRoomID)
+
+				// The connected rooms are wrong when moving from room 2 to 1, it remains as connected rooms of 2
+				connectedRooms := roomsMap[currentRoomID].ConnectedRooms()
+				fmt.Printf("Connected: top:%d right:%d bottom:%d left:%d",
+					connectedRooms.Top,
+					connectedRooms.Right,
+					connectedRooms.Bottom,
+					connectedRooms.Left,
+				)
 				transitionRoomResp := calculateTransitionSlide(
 					gameModel.RoomTransition,
-					roomsMap[gameModel.CurrentRoomID].ConnectedRooms(),
+					*connectedRooms,
 					gameModel.CurrentRoomID,
 				)
 
@@ -704,7 +715,7 @@ type TransitionRoomResponse struct {
 
 func calculateTransitionSlide(
 	roomTransition *terraform2d.RoomTransition,
-	connectedRooms *terraform2d.ConnectedRooms,
+	connectedRooms terraform2d.ConnectedRooms,
 	currentRoomID terraform2d.RoomID) TransitionRoomResponse {
 
 	var nextRoomID terraform2d.RoomID
