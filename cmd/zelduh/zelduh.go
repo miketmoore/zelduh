@@ -162,7 +162,11 @@ func run() {
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-			drawMapBGImage(gameModel.Spritesheet, gameModel.AllMapDrawData, roomsMap[gameModel.CurrentRoomID].MapName, 0, 0)
+			drawMapBGImage(
+				gameModel.Spritesheet,
+				gameModel.AllMapDrawData,
+				roomsMap[gameModel.CurrentRoomID].MapName(),
+				0, 0)
 
 			addHearts(gameModel.Hearts, gameModel.Player.Health.Total)
 
@@ -234,9 +238,11 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 
+				connectedRooms := roomsMap[gameModel.CurrentRoomID].ConnectedRooms()
+
 				transitionRoomResp := calculateTransitionSlide(
 					&gameModel.RoomTransition,
-					roomsMap[gameModel.CurrentRoomID].ConnectedRooms,
+					*connectedRooms,
 					gameModel.CurrentRoomID,
 				)
 
@@ -245,14 +251,14 @@ func run() {
 				drawMapBGImage(
 					gameModel.Spritesheet,
 					gameModel.AllMapDrawData,
-					roomsMap[gameModel.CurrentRoomID].MapName,
+					roomsMap[gameModel.CurrentRoomID].MapName(),
 					transitionRoomResp.modX,
 					transitionRoomResp.modY,
 				)
 				drawMapBGImage(
 					gameModel.Spritesheet,
 					gameModel.AllMapDrawData,
-					roomsMap[gameModel.NextRoomID].MapName,
+					roomsMap[gameModel.NextRoomID].MapName(),
 					transitionRoomResp.modXNext,
 					transitionRoomResp.modYNext,
 				)
@@ -375,7 +381,7 @@ func drawMapBGImage(
 }
 
 func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID terraform2d.RoomID, modX, modY float64) []entities.Entity {
-	d := allMapDrawData[roomsMap[roomID].MapName]
+	d := allMapDrawData[roomsMap[roomID].MapName()]
 	obstacles := []entities.Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {
