@@ -6,7 +6,7 @@ import (
 )
 
 // Rooms is a type of map that indexes rooms by their ID
-type Rooms map[terraform2d.RoomID]*Room
+type Rooms map[terraform2d.RoomID]terraform2d.Room
 
 // AnimationConfig is a map of animation types to sprite index lists
 type AnimationConfig map[string][]int
@@ -64,17 +64,17 @@ type Room struct {
 }
 
 // MapName returns the room's map name
-func (r *Room) MapName() string {
+func (r Room) MapName() string {
 	return r.mapName
 }
 
 // ConnectedRooms returns the room's map name
-func (r *Room) ConnectedRooms() *terraform2d.ConnectedRooms {
+func (r Room) ConnectedRooms() *terraform2d.ConnectedRooms {
 	return r.connectedRooms
 }
 
 // SetConnectedRoom sets the connected room IDs
-func (r *Room) SetConnectedRoom(direction terraform2d.Direction, id terraform2d.RoomID) {
+func (r Room) SetConnectedRoom(direction terraform2d.Direction, id terraform2d.RoomID) {
 	switch direction {
 	case terraform2d.DirectionUp:
 		r.connectedRooms.Top = id

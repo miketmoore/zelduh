@@ -182,7 +182,7 @@ func run() {
 				gameModel.RoomWarps = map[terraform2d.EntityID]rooms.EntityConfig{}
 
 				// Iterate through all entity configurations and build entities and add to systems
-				for _, c := range roomsMap[gameModel.CurrentRoomID].EntityConfigs {
+				for _, c := range roomsMap[gameModel.CurrentRoomID].(*rooms.Room).EntityConfigs {
 					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
 					gameModel.EntitiesMap[entity.ID()] = entity
 					gameWorld.AddEntity(entity)
