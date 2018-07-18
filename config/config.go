@@ -2,10 +2,7 @@ package config
 
 import "github.com/miketmoore/terraform2d"
 
-const (
-	TranslationFile = "i18n/zelduh/en-US.all.json"
-	Lang            = "en-US"
-)
+const TranslationFile = "i18n/zelduh/active.en.toml"
 
 const FrameRate int = 5
 

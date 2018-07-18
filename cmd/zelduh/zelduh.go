@@ -57,7 +57,7 @@ func run() {
 	bundle := &i18n.Bundle{DefaultLanguage: language.English}
 
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	bundle.MustLoadMessageFile("i18n/zelduh/active.en.toml")
+	bundle.MustLoadMessageFile(config.TranslationFile)
 
 	localizer := i18n.NewLocalizer(bundle, "en")
 
