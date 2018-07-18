@@ -117,7 +117,7 @@ func run() {
 		GameModel: &gameModel,
 	}
 
-	collisionSystem := &zelduh.Collision{
+	collisionSystem := &zelduh.SystemCollision{
 		MapBounds: pixel.R(
 			zelduh.MapX,
 			zelduh.MapY,

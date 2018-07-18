@@ -75,7 +75,7 @@ func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.Entit
 	case CategoryCoin:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
-			case *Collision:
+			case *SystemCollision:
 				sys.Remove(CategoryCoin, id)
 			case *Render:
 				sys.RemoveEntity(id)
@@ -97,7 +97,7 @@ func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 		switch sys := sys.(type) {
 		case *Spatial:
 			sys.Remove(CategoryEnemy, id)
-		case *Collision:
+		case *SystemCollision:
 			sys.Remove(CategoryEnemy, id)
 		case *Render:
 			sys.RemoveEntity(id)
@@ -111,7 +111,7 @@ func (w *World) RemoveAllEnemies() {
 		switch sys := system.(type) {
 		case *Spatial:
 			sys.RemoveAll(CategoryEnemy)
-		case *Collision:
+		case *SystemCollision:
 			sys.RemoveAll(CategoryEnemy)
 		case *Render:
 			sys.RemoveAll(CategoryEnemy)
@@ -133,7 +133,7 @@ func (w *World) RemoveAllEntities() {
 func (w *World) RemoveAllMoveableObstacles() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *Collision:
+		case *SystemCollision:
 			sys.RemoveAll(CategoryMovableObstacle)
 		case *Render:
 			sys.RemoveAll(CategoryMovableObstacle)
@@ -145,7 +145,7 @@ func (w *World) RemoveAllMoveableObstacles() {
 func (w *World) RemoveAllCollisionSwitches() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *Collision:
+		case *SystemCollision:
 			sys.RemoveAll(CategoryCollisionSwitch)
 		}
 	}

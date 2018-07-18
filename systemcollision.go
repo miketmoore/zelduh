@@ -13,8 +13,8 @@ type collisionEntity struct {
 	*ComponentInvincible
 }
 
-// Collision is a custom system for detecting collisions and what to do when they occur
-type Collision struct {
+// SystemCollision is a custom system for detecting collisions and what to do when they occur
+type SystemCollision struct {
 	MapBounds                               pixel.Rect
 	player                                  collisionEntity
 	sword                                   collisionEntity
@@ -44,7 +44,7 @@ type Collision struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Collision) AddEntity(entity Entity) {
+func (s *SystemCollision) AddEntity(entity Entity) {
 	r := collisionEntity{
 		ID:               entity.ID(),
 		ComponentSpatial: entity.ComponentSpatial,
@@ -73,7 +73,7 @@ func (s *Collision) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *Collision) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
+func (s *SystemCollision) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
 	case CategoryCoin:
 		for i := len(s.coins) - 1; i >= 0; i-- {
@@ -93,7 +93,7 @@ func (s *Collision) Remove(category terraform2d.EntityCategory, id terraform2d.E
 }
 
 // RemoveAll removes all entities from one category
-func (s *Collision) RemoveAll(category terraform2d.EntityCategory) {
+func (s *SystemCollision) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -122,7 +122,7 @@ func isColliding(r1, r2 pixel.Rect) bool {
 }
 
 // Update checks for collisions
-func (s *Collision) Update() {
+func (s *SystemCollision) Update() {
 
 	player := s.player
 	playerR := s.player.ComponentSpatial.Rect
