@@ -2,7 +2,7 @@ package zelduh
 
 import "github.com/miketmoore/terraform2d"
 
-const TranslationFile = "i18n/zelduh/active.en.toml"
+const TranslationFile = "i18n/en.toml"
 
 const FrameRate int = 5
 
