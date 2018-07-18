@@ -18,8 +18,8 @@ type renderEntity struct {
 	*ComponentTemporary
 }
 
-// Render is a custom system
-type Render struct {
+// SystemRender is a custom system
+type SystemRender struct {
 	Win         *pixelgl.Window
 	Spritesheet map[int]*pixel.Sprite
 
@@ -32,7 +32,7 @@ type Render struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Render) AddEntity(entity Entity) {
+func (s *SystemRender) AddEntity(entity Entity) {
 	r := renderEntity{
 		ID:                 entity.ID(),
 		Category:           entity.Category,
@@ -72,7 +72,7 @@ func (s *Render) AddEntity(entity Entity) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *Render) RemoveAll(category terraform2d.EntityCategory) {
+func (s *SystemRender) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {
@@ -84,7 +84,7 @@ func (s *Render) RemoveAll(category terraform2d.EntityCategory) {
 }
 
 // RemoveEntity removes an entity by ID
-func (s *Render) RemoveEntity(id terraform2d.EntityID) {
+func (s *SystemRender) RemoveEntity(id terraform2d.EntityID) {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		if s.entities[i].ID == id {
 			s.entities = append(s.entities[:i], s.entities[i+1:]...)
@@ -93,14 +93,14 @@ func (s *Render) RemoveEntity(id terraform2d.EntityID) {
 }
 
 // RemoveAllEntities removes all entities
-func (s *Render) RemoveAllEntities() {
+func (s *SystemRender) RemoveAllEntities() {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		s.entities = append(s.entities[:i], s.entities[i+1:]...)
 	}
 }
 
 // Update changes spatial data based on movement data
-func (s *Render) Update() {
+func (s *SystemRender) Update() {
 
 	for _, entity := range s.entities {
 		if entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value {
@@ -140,7 +140,7 @@ func (s *Render) Update() {
 
 }
 
-func (s *Render) animateToggleFrame(entity renderEntity) {
+func (s *SystemRender) animateToggleFrame(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.Map["default"]; animData != nil {
 			var frameIndex int
@@ -160,7 +160,7 @@ func (s *Render) animateToggleFrame(entity renderEntity) {
 	}
 }
 
-func (s *Render) animateDefault(entity renderEntity) {
+func (s *SystemRender) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.Map["default"]; animData != nil {
 			rate := animData.FrameRateCount
@@ -193,7 +193,7 @@ func (s *Render) animateDefault(entity renderEntity) {
 	}
 }
 
-func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity renderEntity) {
+func (s *SystemRender) animateAttackDirection(dir terraform2d.Direction, entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		var animData *ComponentAnimationData
 		switch dir {
@@ -238,7 +238,7 @@ func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity render
 	}
 }
 
-func (s *Render) animateDirections(dir terraform2d.Direction, entity renderEntity) {
+func (s *SystemRender) animateDirections(dir terraform2d.Direction, entity renderEntity) {
 	// if entity.ComponentSpatial.HitBoxRadius > 0 {
 	// 	shape := entity.ComponentSpatial.Shape
 	// 	shape.Clear()

@@ -145,7 +145,7 @@ func run() {
 		gameModel.HealthSystem,
 		gameModel.SpatialSystem,
 		collisionSystem,
-		&zelduh.Render{
+		&zelduh.SystemRender{
 			Win:         win,
 			Spritesheet: gameModel.Spritesheet,
 		},

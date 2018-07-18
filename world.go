@@ -77,14 +77,14 @@ func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.Entit
 			switch sys := sys.(type) {
 			case *SystemCollision:
 				sys.Remove(CategoryCoin, id)
-			case *Render:
+			case *SystemRender:
 				sys.RemoveEntity(id)
 			}
 		}
 	case CategoryHeart:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
-			case *Render:
+			case *SystemRender:
 				sys.RemoveEntity(id)
 			}
 		}
@@ -99,7 +99,7 @@ func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 			sys.Remove(CategoryEnemy, id)
 		case *SystemCollision:
 			sys.Remove(CategoryEnemy, id)
-		case *Render:
+		case *SystemRender:
 			sys.RemoveEntity(id)
 		}
 	}
@@ -113,7 +113,7 @@ func (w *World) RemoveAllEnemies() {
 			sys.RemoveAll(CategoryEnemy)
 		case *SystemCollision:
 			sys.RemoveAll(CategoryEnemy)
-		case *Render:
+		case *SystemRender:
 			sys.RemoveAll(CategoryEnemy)
 		}
 	}
@@ -123,7 +123,7 @@ func (w *World) RemoveAllEnemies() {
 func (w *World) RemoveAllEntities() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *Render:
+		case *SystemRender:
 			sys.RemoveAllEntities()
 		}
 	}
@@ -135,7 +135,7 @@ func (w *World) RemoveAllMoveableObstacles() {
 		switch sys := system.(type) {
 		case *SystemCollision:
 			sys.RemoveAll(CategoryMovableObstacle)
-		case *Render:
+		case *SystemRender:
 			sys.RemoveAll(CategoryMovableObstacle)
 		}
 	}
