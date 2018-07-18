@@ -9,13 +9,13 @@ type healthEntity struct {
 	*ComponentHealth
 }
 
-// Health is a custom system for altering character health
-type Health struct {
+// SystemHealth is a custom system for altering character health
+type SystemHealth struct {
 	entities []healthEntity
 }
 
 // AddEntity adds the entity to the system
-func (s *Health) AddEntity(entity Entity) {
+func (s *SystemHealth) AddEntity(entity Entity) {
 	s.entities = append(s.entities, healthEntity{
 		ID:              entity.ID(),
 		ComponentHealth: entity.ComponentHealth,
@@ -23,7 +23,7 @@ func (s *Health) AddEntity(entity Entity) {
 }
 
 // Hit reduces entity health by d
-func (s *Health) Hit(entityID terraform2d.EntityID, d int) bool {
+func (s *SystemHealth) Hit(entityID terraform2d.EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {
@@ -35,4 +35,4 @@ func (s *Health) Hit(entityID terraform2d.EntityID, d int) bool {
 }
 
 // Update is a no-op
-func (s *Health) Update() {}
+func (s *SystemHealth) Update() {}
