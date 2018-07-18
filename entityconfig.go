@@ -1,4 +1,4 @@
-package entityconfig
+package zelduh
 
 import (
 	"github.com/faiface/pixel/imdraw"

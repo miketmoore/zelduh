@@ -4,7 +4,6 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/entityconfig"
 	"golang.org/x/image/colornames"
 )
 
@@ -32,7 +31,7 @@ func (e *Entity) ID() terraform2d.EntityID {
 }
 
 // BuildEntitiesFromConfigs builds and returns a batch of entities
-func BuildEntitiesFromConfigs(newEntityID func() terraform2d.EntityID, configs ...entityconfig.Config) []Entity {
+func BuildEntitiesFromConfigs(newEntityID func() terraform2d.EntityID, configs ...Config) []Entity {
 	batch := []Entity{}
 	for _, config := range configs {
 		entity := BuildEntityFromConfig(config, newEntityID())
@@ -42,7 +41,7 @@ func BuildEntitiesFromConfigs(newEntityID func() terraform2d.EntityID, configs .
 }
 
 // BuildEntityFromConfig builds an entity from a configuration
-func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entity {
+func BuildEntityFromConfig(c Config, id terraform2d.EntityID) Entity {
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
