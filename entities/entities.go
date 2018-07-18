@@ -6,7 +6,6 @@ import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/components"
-	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
 	"golang.org/x/image/colornames"
 )
@@ -135,7 +134,7 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 		for key, val := range c.Animation {
 			entity.Animation.Map[key] = &components.AnimationData{
 				Frames:    val,
-				FrameRate: config.FrameRate,
+				FrameRate: zelduh.FrameRate,
 			}
 		}
 	} else {

@@ -1,4 +1,4 @@
-package config
+package zelduh
 
 import "github.com/miketmoore/terraform2d"
 

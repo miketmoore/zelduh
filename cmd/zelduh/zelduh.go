@@ -11,7 +11,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
 	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/world"
@@ -57,7 +56,7 @@ func run() {
 	bundle := &i18n.Bundle{DefaultLanguage: language.English}
 
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	bundle.MustLoadMessageFile(config.TranslationFile)
+	bundle.MustLoadMessageFile(zelduh.TranslationFile)
 
 	localizer := i18n.NewLocalizer(bundle, "en")
 
@@ -79,7 +78,7 @@ func run() {
 
 	gameWorld = world.New()
 
-	rooms.ProcessMapLayout(config.Overworld, roomsMap)
+	rooms.ProcessMapLayout(zelduh.Overworld, roomsMap)
 
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(i18nTitle)
@@ -91,9 +90,9 @@ func run() {
 		AddEntities:   true,
 		CurrentRoomID: 1,
 		RoomTransition: &terraform2d.RoomTransition{
-			Start: float64(config.TileSize),
+			Start: float64(zelduh.TileSize),
 		},
-		Spritesheet: terraform2d.LoadAndBuildSpritesheet(config.SpritesheetPath, config.TileSize),
+		Spritesheet: terraform2d.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
 		// Build entities
 		Player:    entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
@@ -103,7 +102,7 @@ func run() {
 		Arrow:     entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
 		RoomWarps:      map[terraform2d.EntityID]entityconfig.Config{},
-		AllMapDrawData: terraform2d.BuildMapDrawData(config.TilemapDir, config.TilemapFiles, config.TileSize),
+		AllMapDrawData: terraform2d.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
 		InputSystem:  &systems.Input{Win: win},
 		HealthSystem: &systems.Health{},
@@ -126,10 +125,10 @@ func run() {
 
 	collisionSystem := &systems.Collision{
 		MapBounds: pixel.R(
-			config.MapX,
-			config.MapY,
-			config.MapX+config.MapW,
-			config.MapY+config.MapH,
+			zelduh.MapX,
+			zelduh.MapY,
+			zelduh.MapX+zelduh.MapW,
+			zelduh.MapY+zelduh.MapH,
 		),
 		OnPlayerCollisionWithBounds:             collisionHandler.OnPlayerCollisionWithBounds,
 		OnPlayerCollisionWithCoin:               collisionHandler.OnPlayerCollisionWithCoin,
@@ -172,7 +171,7 @@ func run() {
 		switch gameModel.CurrentState {
 		case terraform2d.StateStart:
 			win.Clear(colornames.Darkgray)
-			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
+			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 			drawCenterText(i18nTitle, colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
@@ -182,7 +181,7 @@ func run() {
 			gameModel.InputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
-			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
+			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 
 			drawMapBGImage(
 				gameModel.Spritesheet,
@@ -229,7 +228,7 @@ func run() {
 
 		case terraform2d.StatePause:
 			win.Clear(colornames.Darkgray)
-			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
+			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 			drawCenterText(i18nPaused, colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
@@ -240,7 +239,7 @@ func run() {
 			}
 		case terraform2d.StateOver:
 			win.Clear(colornames.Darkgray)
-			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.Black)
+			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
 			drawCenterText(i18nGameOver, colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
@@ -251,7 +250,7 @@ func run() {
 			if gameModel.RoomTransition.Style == terraform2d.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
-				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
+				drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 
 				collisionSystem.RemoveAll(zelduh.CategoryObstacle)
 				gameWorld.RemoveAllEnemies()
@@ -291,15 +290,15 @@ func run() {
 				gameModel.Player.Spatial.Rect = pixel.R(
 					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX,
 					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY,
-					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX+config.TileSize,
-					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY+config.TileSize,
+					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX+zelduh.TileSize,
+					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY+zelduh.TileSize,
 				)
 
 				gameWorld.Update()
 			} else if gameModel.RoomTransition.Style == terraform2d.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
-				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
+				drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 
 				collisionSystem.RemoveAll(zelduh.CategoryObstacle)
 				gameWorld.RemoveAllEnemies()
@@ -335,7 +334,7 @@ func initText(x, y float64, color color.RGBA) *text.Text {
 func initWindow(title string) *pixelgl.Window {
 	cfg := pixelgl.WindowConfig{
 		Title:  title,
-		Bounds: pixel.R(config.WinX, config.WinY, config.WinW, config.WinH),
+		Bounds: pixel.R(zelduh.WinX, zelduh.WinY, zelduh.WinW, zelduh.WinH),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -383,8 +382,8 @@ func drawMapBGImage(
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+config.MapX+modX+config.TileSize/2,
-				vec.Y+config.MapY+modY+config.TileSize/2,
+				vec.X+zelduh.MapX+modX+zelduh.TileSize/2,
+				vec.Y+zelduh.MapY+modY+zelduh.TileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -400,13 +399,13 @@ func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roo
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+config.MapX+modX+config.TileSize/2,
-				vec.Y+config.MapY+modY+config.TileSize/2,
+				vec.X+zelduh.MapX+modX+zelduh.TileSize/2,
+				vec.Y+zelduh.MapY+modY+zelduh.TileSize/2,
 			)
 
-			if _, ok := config.NonObstacleSprites[spriteData.SpriteID]; !ok {
-				x := movedVec.X/config.TileSize - mod
-				y := movedVec.Y/config.TileSize - mod
+			if _, ok := zelduh.NonObstacleSprites[spriteData.SpriteID]; !ok {
+				x := movedVec.X/zelduh.TileSize - mod
+				y := movedVec.Y/zelduh.TileSize - mod
 				id := gameWorld.NewEntityID()
 				obstacle := entities.BuildEntityFromConfig(entities.GetPreset("obstacle")(x, y), id)
 				obstacles = append(obstacles, obstacle)
@@ -420,8 +419,8 @@ func drawMask() {
 	// top
 	s := imdraw.New(nil)
 	s.Color = colornames.White
-	s.Push(pixel.V(0, config.MapY+config.MapH))
-	s.Push(pixel.V(config.WinW, config.MapY+config.MapH+(config.WinH-(config.MapY+config.MapH))))
+	s.Push(pixel.V(0, zelduh.MapY+zelduh.MapH))
+	s.Push(pixel.V(zelduh.WinW, zelduh.MapY+zelduh.MapH+(zelduh.WinH-(zelduh.MapY+zelduh.MapH))))
 	s.Rectangle(0)
 	s.Draw(win)
 
@@ -429,7 +428,7 @@ func drawMask() {
 	s = imdraw.New(nil)
 	s.Color = colornames.White
 	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(config.WinW, (config.WinH - (config.MapY + config.MapH))))
+	s.Push(pixel.V(zelduh.WinW, (zelduh.WinH - (zelduh.MapY + zelduh.MapH))))
 	s.Rectangle(0)
 	s.Draw(win)
 
@@ -437,15 +436,15 @@ func drawMask() {
 	s = imdraw.New(nil)
 	s.Color = colornames.White
 	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(0+config.MapX, config.WinH))
+	s.Push(pixel.V(0+zelduh.MapX, zelduh.WinH))
 	s.Rectangle(0)
 	s.Draw(win)
 
 	// right
 	s = imdraw.New(nil)
 	s.Color = colornames.White
-	s.Push(pixel.V(config.MapX+config.MapW, config.MapY))
-	s.Push(pixel.V(config.WinW, config.WinH))
+	s.Push(pixel.V(zelduh.MapX+zelduh.MapW, zelduh.MapY))
+	s.Push(pixel.V(zelduh.WinW, zelduh.WinH))
 	s.Rectangle(0)
 	s.Draw(win)
 }
@@ -469,10 +468,10 @@ var roomsMap = rooms.Rooms{
 		entityconfig.Config{
 			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 11,
-			W:            config.TileSize,
-			H:            config.TileSize,
-			X:            (config.TileSize * 7) + config.TileSize/2,
-			Y:            (config.TileSize * 9) + config.TileSize/2,
+			W:            zelduh.TileSize,
+			H:            zelduh.TileSize,
+			X:            (zelduh.TileSize * 7) + zelduh.TileSize/2,
+			Y:            (zelduh.TileSize * 9) + zelduh.TileSize/2,
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 30,
 			},
@@ -480,10 +479,10 @@ var roomsMap = rooms.Rooms{
 		entityconfig.Config{
 			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 11,
-			W:            config.TileSize,
-			H:            config.TileSize,
-			X:            (config.TileSize * 8) + config.TileSize/2,
-			Y:            (config.TileSize * 9) + config.TileSize/2,
+			W:            zelduh.TileSize,
+			H:            zelduh.TileSize,
+			X:            (zelduh.TileSize * 8) + zelduh.TileSize/2,
+			Y:            (zelduh.TileSize * 9) + zelduh.TileSize/2,
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 30,
 			},
@@ -499,10 +498,10 @@ var roomsMap = rooms.Rooms{
 		entityconfig.Config{
 			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 5,
-			W:            config.TileSize,
-			H:            config.TileSize,
-			X:            (config.TileSize * 6) + config.TileSize + (config.TileSize / 2.5),
-			Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
+			W:            zelduh.TileSize,
+			H:            zelduh.TileSize,
+			X:            (zelduh.TileSize * 6) + zelduh.TileSize + (zelduh.TileSize / 2.5),
+			Y:            (zelduh.TileSize * 1) + zelduh.TileSize + (zelduh.TileSize / 2.5),
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 15,
 			},
@@ -510,10 +509,10 @@ var roomsMap = rooms.Rooms{
 		entityconfig.Config{
 			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 5,
-			W:            config.TileSize,
-			H:            config.TileSize,
-			X:            (config.TileSize * 7) + config.TileSize + (config.TileSize / 2.5),
-			Y:            (config.TileSize * 1) + config.TileSize + (config.TileSize / 2.5),
+			W:            zelduh.TileSize,
+			H:            zelduh.TileSize,
+			X:            (zelduh.TileSize * 7) + zelduh.TileSize + (zelduh.TileSize / 2.5),
+			Y:            (zelduh.TileSize * 1) + zelduh.TileSize + (zelduh.TileSize / 2.5),
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 15,
 			},
@@ -538,7 +537,7 @@ func addUIHearts(hearts []entities.Entity, health int) {
 }
 
 func dropCoin(v pixel.Vec) {
-	coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/config.TileSize, v.Y/config.TileSize), gameWorld.NewEntityID())
+	coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/zelduh.TileSize, v.Y/zelduh.TileSize), gameWorld.NewEntityID())
 	gameWorld.AddEntity(coin)
 }
 
@@ -591,8 +590,8 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.Entity
 				enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
 				ch.GameModel.Explosion.Temporary.Expiration = len(ch.GameModel.Explosion.Animation.Map["default"].Frames)
 				ch.GameModel.Explosion.Spatial = &components.Spatial{
-					Width:  config.TileSize,
-					Height: config.TileSize,
+					Width:  zelduh.TileSize,
+					Height: zelduh.TileSize,
 					Rect:   enemySpatial.Rect,
 				}
 				ch.GameModel.Explosion.Temporary.OnExpiration = func() {
@@ -617,8 +616,8 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID terraform2d.Entity
 			enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
 			ch.GameModel.Explosion.Temporary.Expiration = len(ch.GameModel.Explosion.Animation.Map["default"].Frames)
 			ch.GameModel.Explosion.Spatial = &components.Spatial{
-				Width:  config.TileSize,
-				Height: config.TileSize,
+				Width:  zelduh.TileSize,
+				Height: zelduh.TileSize,
 				Rect:   enemySpatial.Rect,
 			}
 			ch.GameModel.Explosion.Temporary.OnExpiration = func() {
@@ -720,34 +719,34 @@ func calculateTransitionSlide(
 
 	var nextRoomID terraform2d.RoomID
 	inc := (roomTransition.Start - float64(roomTransition.Timer))
-	incY := inc * (config.MapH / config.TileSize)
-	incX := inc * (config.MapW / config.TileSize)
+	incY := inc * (zelduh.MapH / zelduh.TileSize)
+	incX := inc * (zelduh.MapW / zelduh.TileSize)
 	modY := 0.0
 	modYNext := 0.0
 	modX := 0.0
 	modXNext := 0.0
 	playerModX := 0.0
 	playerModY := 0.0
-	playerIncY := ((config.MapH / config.TileSize) - 1) + 7
-	playerIncX := ((config.MapW / config.TileSize) - 1) + 7
+	playerIncY := ((zelduh.MapH / zelduh.TileSize) - 1) + 7
+	playerIncX := ((zelduh.MapW / zelduh.TileSize) - 1) + 7
 	if roomTransition.Side == terraform2d.BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
-		modYNext = incY - config.MapH
+		modYNext = incY - zelduh.MapH
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
 	} else if roomTransition.Side == terraform2d.BoundTop && connectedRooms.Top != 0 {
 		modY = -incY
-		modYNext = -incY + config.MapH
+		modYNext = -incY + zelduh.MapH
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
 	} else if roomTransition.Side == terraform2d.BoundLeft && connectedRooms.Left != 0 {
 		modX = incX
-		modXNext = incX - config.MapW
+		modXNext = incX - zelduh.MapW
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
 	} else if roomTransition.Side == terraform2d.BoundRight && connectedRooms.Right != 0 {
 		modX = -incX
-		modXNext = -incX + config.MapW
+		modXNext = -incX + zelduh.MapW
 		nextRoomID = connectedRooms.Right
 		playerModX -= playerIncX
 	} else {
