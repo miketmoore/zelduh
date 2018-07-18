@@ -238,24 +238,15 @@ func run() {
 				gameWorld.RemoveAllEntities()
 
 				currentRoomID := gameModel.CurrentRoomID
-				fmt.Printf("before calculating transition, current:%d next:%d\n", currentRoomID, gameModel.NextRoomID)
 
-				// The connected rooms are wrong when moving from room 2 to 1, it remains as connected rooms of 2
 				connectedRooms := roomsMap[currentRoomID].ConnectedRooms()
-				fmt.Printf("Connected: top:%d right:%d bottom:%d left:%d",
-					connectedRooms.Top,
-					connectedRooms.Right,
-					connectedRooms.Bottom,
-					connectedRooms.Left,
-				)
+
 				transitionRoomResp := calculateTransitionSlide(
 					gameModel.RoomTransition,
 					*connectedRooms,
 					gameModel.CurrentRoomID,
 				)
 
-				// when going from room 2 back to room 1, this does not change to 1
-				fmt.Println("slide transition, setting next room to ", transitionRoomResp.nextRoomID)
 				gameModel.NextRoomID = transitionRoomResp.nextRoomID
 
 				drawMapBGImage(
