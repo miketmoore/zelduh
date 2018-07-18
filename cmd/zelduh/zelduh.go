@@ -19,7 +19,6 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -191,7 +190,7 @@ func run() {
 
 			if gameModel.AddEntities {
 				gameModel.AddEntities = false
-				addUIHearts(gameModel.Hearts, gameModel.Player.Health.Total)
+				addUIHearts(gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
 
 				addUICoin()
 
@@ -287,11 +286,11 @@ func run() {
 				drawMask()
 
 				// Move player with map transition
-				gameModel.Player.Spatial.Rect = pixel.R(
-					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX,
-					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY,
-					gameModel.Player.Spatial.Rect.Min.X+transitionRoomResp.playerModX+zelduh.TileSize,
-					gameModel.Player.Spatial.Rect.Min.Y+transitionRoomResp.playerModY+zelduh.TileSize,
+				gameModel.Player.ComponentSpatial.Rect = pixel.R(
+					gameModel.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
+					gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
+					gameModel.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+zelduh.TileSize,
+					gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+zelduh.TileSize,
 				)
 
 				gameWorld.Update()
@@ -560,7 +559,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side terraform2d.Bound) 
 
 // OnPlayerCollisionWithCoin handles collision between player and coin
 func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID terraform2d.EntityID) {
-	ch.GameModel.Player.Coins.Coins++
+	ch.GameModel.Player.ComponentCoins.Coins++
 	gameWorld.Remove(zelduh.CategoryCoin, coinID)
 }
 
@@ -568,39 +567,39 @@ func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID terraform2d.EntityI
 func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.EntityID) {
 	// TODO repeat what I did with the enemies
 	ch.GameModel.SpatialSystem.MovePlayerBack()
-	ch.GameModel.Player.Health.Total--
+	ch.GameModel.Player.ComponentHealth.Total--
 
 	// remove heart entity
 	heartIndex := len(ch.GameModel.Hearts) - 1
 	gameWorld.Remove(zelduh.CategoryHeart, ch.GameModel.Hearts[heartIndex].ID())
 	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
 
-	if ch.GameModel.Player.Health.Total == 0 {
+	if ch.GameModel.Player.ComponentHealth.Total == 0 {
 		ch.GameModel.CurrentState = terraform2d.StateOver
 	}
 }
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.EntityID) {
-	if !ch.GameModel.Sword.Ignore.Value {
+	if !ch.GameModel.Sword.ComponentIgnore.Value {
 		dead := false
 		if !ch.GameModel.SpatialSystem.EnemyMovingFromHit(enemyID) {
 			dead = ch.GameModel.HealthSystem.Hit(enemyID, 1)
 			if dead {
 				enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
-				ch.GameModel.Explosion.Temporary.Expiration = len(ch.GameModel.Explosion.Animation.Map["default"].Frames)
-				ch.GameModel.Explosion.Spatial = &components.Spatial{
+				ch.GameModel.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Explosion.ComponentAnimation.Map["default"].Frames)
+				ch.GameModel.Explosion.ComponentSpatial = &zelduh.ComponentSpatial{
 					Width:  zelduh.TileSize,
 					Height: zelduh.TileSize,
 					Rect:   enemySpatial.Rect,
 				}
-				ch.GameModel.Explosion.Temporary.OnExpiration = func() {
-					dropCoin(ch.GameModel.Explosion.Spatial.Rect.Min)
+				ch.GameModel.Explosion.ComponentTemporary.OnExpiration = func() {
+					dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min)
 				}
 				gameWorld.AddEntity(ch.GameModel.Explosion)
 				gameWorld.RemoveEnemy(enemyID)
 			} else {
-				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.Movement.Direction)
+				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.ComponentMovement.Direction)
 			}
 		}
 
@@ -609,53 +608,53 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.Entity
 
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
 func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID terraform2d.EntityID) {
-	if !ch.GameModel.Arrow.Ignore.Value {
+	if !ch.GameModel.Arrow.ComponentIgnore.Value {
 		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
-		ch.GameModel.Arrow.Ignore.Value = true
+		ch.GameModel.Arrow.ComponentIgnore.Value = true
 		if dead {
 			enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
-			ch.GameModel.Explosion.Temporary.Expiration = len(ch.GameModel.Explosion.Animation.Map["default"].Frames)
-			ch.GameModel.Explosion.Spatial = &components.Spatial{
+			ch.GameModel.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Explosion.ComponentAnimation.Map["default"].Frames)
+			ch.GameModel.Explosion.ComponentSpatial = &zelduh.ComponentSpatial{
 				Width:  zelduh.TileSize,
 				Height: zelduh.TileSize,
 				Rect:   enemySpatial.Rect,
 			}
-			ch.GameModel.Explosion.Temporary.OnExpiration = func() {
-				dropCoin(ch.GameModel.Explosion.Spatial.Rect.Min)
+			ch.GameModel.Explosion.ComponentTemporary.OnExpiration = func() {
+				dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min)
 			}
 			gameWorld.AddEntity(ch.GameModel.Explosion)
 			gameWorld.RemoveEnemy(enemyID)
 		} else {
-			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.Movement.Direction)
+			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.ComponentMovement.Direction)
 		}
 	}
 }
 
 // OnArrowCollisionWithObstacle handles collision between arrow and obstacle
 func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
-	ch.GameModel.Arrow.Movement.RemainingMoves = 0
+	ch.GameModel.Arrow.ComponentMovement.RemainingMoves = 0
 }
 
 // OnPlayerCollisionWithObstacle handles collision between player and obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID terraform2d.EntityID) {
 	// "Block" by undoing rect
-	ch.GameModel.Player.Spatial.Rect = ch.GameModel.Player.Spatial.PrevRect
-	ch.GameModel.Sword.Spatial.Rect = ch.GameModel.Sword.Spatial.PrevRect
+	ch.GameModel.Player.ComponentSpatial.Rect = ch.GameModel.Player.ComponentSpatial.PrevRect
+	ch.GameModel.Sword.ComponentSpatial.Rect = ch.GameModel.Sword.ComponentSpatial.PrevRect
 }
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID terraform2d.EntityID) {
-	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Player.Movement.Direction)
+	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Player.ComponentMovement.Direction)
 	if !moved {
-		ch.GameModel.Player.Spatial.Rect = ch.GameModel.Player.Spatial.PrevRect
+		ch.GameModel.Player.ComponentSpatial.Rect = ch.GameModel.Player.ComponentSpatial.PrevRect
 	}
 }
 
 // OnMoveableObstacleCollisionWithSwitch handles collision between moveable obstacle and switch
 func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
-		if id == collisionSwitchID && !entity.Toggler.Enabled() {
-			entity.Toggler.Toggle()
+		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
+			entity.ComponentToggler.Toggle()
 		}
 	}
 }
@@ -663,8 +662,8 @@ func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitc
 // OnMoveableObstacleNoCollisionWithSwitch handles *no* collision between moveable obstacle and switch
 func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
-		if id == collisionSwitchID && entity.Toggler.Enabled() {
-			entity.Toggler.Toggle()
+		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
+			entity.ComponentToggler.Toggle()
 		}
 	}
 }
@@ -678,8 +677,8 @@ func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID ter
 // OnPlayerCollisionWithSwitch handles collision between player and switch
 func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
-		if id == collisionSwitchID && !entity.Toggler.Enabled() {
-			entity.Toggler.Toggle()
+		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
+			entity.ComponentToggler.Toggle()
 		}
 	}
 }
@@ -687,8 +686,8 @@ func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID terraf
 // OnPlayerNoCollisionWithSwitch handles *no* collision between player and switch
 func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
-		if id == collisionSwitchID && entity.Toggler.Enabled() {
-			entity.Toggler.Toggle()
+		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
+			entity.ComponentToggler.Toggle()
 		}
 	}
 }

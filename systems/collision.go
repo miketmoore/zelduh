@@ -6,14 +6,13 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
 
 type collisionEntity struct {
 	ID terraform2d.EntityID
-	*components.Spatial
-	*components.Invincible
+	*zelduh.ComponentSpatial
+	*zelduh.ComponentInvincible
 }
 
 // Collision is a custom system for detecting collisions and what to do when they occur
@@ -49,8 +48,8 @@ type Collision struct {
 // AddEntity adds an entity to the system
 func (s *Collision) AddEntity(entity entities.Entity) {
 	r := collisionEntity{
-		ID:      entity.ID(),
-		Spatial: entity.Spatial,
+		ID:               entity.ID(),
+		ComponentSpatial: entity.ComponentSpatial,
 	}
 	switch entity.Category {
 	case zelduh.CategoryPlayer:
@@ -66,7 +65,7 @@ func (s *Collision) AddEntity(entity entities.Entity) {
 	case zelduh.CategoryWarp:
 		s.warps = append(s.warps, r)
 	case zelduh.CategoryEnemy:
-		r.Invincible = entity.Invincible
+		r.ComponentInvincible = entity.ComponentInvincible
 		s.enemies = append(s.enemies, r)
 	case zelduh.CategoryCoin:
 		s.coins = append(s.coins, r)
@@ -128,87 +127,87 @@ func isColliding(r1, r2 pixel.Rect) bool {
 func (s *Collision) Update() {
 
 	player := s.player
-	playerR := s.player.Spatial.Rect
+	playerR := s.player.ComponentSpatial.Rect
 	mapBounds := s.MapBounds
 
 	// is player at map edge?
-	if player.Spatial.Rect.Min.Y <= mapBounds.Min.Y {
+	if player.ComponentSpatial.Rect.Min.Y <= mapBounds.Min.Y {
 		s.OnPlayerCollisionWithBounds(terraform2d.BoundBottom)
-	} else if player.Spatial.Rect.Min.X <= mapBounds.Min.X {
+	} else if player.ComponentSpatial.Rect.Min.X <= mapBounds.Min.X {
 		s.OnPlayerCollisionWithBounds(terraform2d.BoundLeft)
-	} else if player.Spatial.Rect.Max.X >= mapBounds.Max.X {
+	} else if player.ComponentSpatial.Rect.Max.X >= mapBounds.Max.X {
 		s.OnPlayerCollisionWithBounds(terraform2d.BoundRight)
-	} else if player.Spatial.Rect.Max.Y >= mapBounds.Max.Y {
+	} else if player.ComponentSpatial.Rect.Max.Y >= mapBounds.Max.Y {
 		s.OnPlayerCollisionWithBounds(terraform2d.BoundTop)
 	}
 
-	w, h := player.Spatial.Width, player.Spatial.Height
+	w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height
 	for _, enemy := range s.enemies {
-		enemyR := enemy.Spatial.Rect
+		enemyR := enemy.ComponentSpatial.Rect
 
 		if isCircleCollision(
-			player.Spatial.HitBoxRadius,
-			enemy.Spatial.HitBoxRadius,
+			player.ComponentSpatial.HitBoxRadius,
+			enemy.ComponentSpatial.HitBoxRadius,
 			w, h, playerR, enemyR) {
 			s.OnPlayerCollisionWithEnemy(enemy.ID)
 		}
 
-		if !enemy.Invincible.Enabled {
+		if !enemy.ComponentInvincible.Enabled {
 			if isCircleCollision(
-				s.sword.Spatial.HitBoxRadius,
-				enemy.Spatial.HitBoxRadius,
-				w, h, s.sword.Spatial.Rect, enemyR) {
+				s.sword.ComponentSpatial.HitBoxRadius,
+				enemy.ComponentSpatial.HitBoxRadius,
+				w, h, s.sword.ComponentSpatial.Rect, enemyR) {
 				s.OnSwordCollisionWithEnemy(enemy.ID)
 			}
 
 			if isCircleCollision(
-				s.arrow.Spatial.HitBoxRadius,
-				enemy.Spatial.HitBoxRadius,
-				w, h, s.arrow.Spatial.Rect, enemyR) {
+				s.arrow.ComponentSpatial.HitBoxRadius,
+				enemy.ComponentSpatial.HitBoxRadius,
+				w, h, s.arrow.ComponentSpatial.Rect, enemyR) {
 				s.OnArrowCollisionWithEnemy(enemy.ID)
 			}
 		}
 	}
 	for _, coin := range s.coins {
-		if isColliding(coin.Spatial.Rect, s.player.Spatial.Rect) {
+		if isColliding(coin.ComponentSpatial.Rect, s.player.ComponentSpatial.Rect) {
 			s.OnPlayerCollisionWithCoin(coin.ID)
 		}
 	}
 
 	for _, obstacle := range s.obstacles {
-		mod := player.Spatial.CollisionWithRectMod
-		if isColliding(obstacle.Spatial.Rect, pixel.R(
-			s.player.Spatial.Rect.Min.X+mod,
-			s.player.Spatial.Rect.Min.Y+mod,
-			s.player.Spatial.Rect.Max.X-mod,
-			s.player.Spatial.Rect.Max.Y-mod,
+		mod := player.ComponentSpatial.CollisionWithRectMod
+		if isColliding(obstacle.ComponentSpatial.Rect, pixel.R(
+			s.player.ComponentSpatial.Rect.Min.X+mod,
+			s.player.ComponentSpatial.Rect.Min.Y+mod,
+			s.player.ComponentSpatial.Rect.Max.X-mod,
+			s.player.ComponentSpatial.Rect.Max.Y-mod,
 		)) {
 			s.OnPlayerCollisionWithObstacle(obstacle.ID)
 		}
 
 		for _, enemy := range s.enemies {
-			mod = enemy.Spatial.CollisionWithRectMod
-			if isColliding(obstacle.Spatial.Rect, pixel.R(
-				enemy.Spatial.Rect.Min.X+mod,
-				enemy.Spatial.Rect.Min.Y+mod,
-				enemy.Spatial.Rect.Max.X-mod,
-				enemy.Spatial.Rect.Max.Y-mod,
+			mod = enemy.ComponentSpatial.CollisionWithRectMod
+			if isColliding(obstacle.ComponentSpatial.Rect, pixel.R(
+				enemy.ComponentSpatial.Rect.Min.X+mod,
+				enemy.ComponentSpatial.Rect.Min.Y+mod,
+				enemy.ComponentSpatial.Rect.Max.X-mod,
+				enemy.ComponentSpatial.Rect.Max.Y-mod,
 			)) {
 				s.OnEnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
 			}
 		}
 
-		if isColliding(obstacle.Spatial.Rect, s.arrow.Spatial.Rect) {
+		if isColliding(obstacle.ComponentSpatial.Rect, s.arrow.ComponentSpatial.Rect) {
 			s.OnArrowCollisionWithObstacle()
 		}
 	}
 	for _, moveableObstacle := range s.moveableObstacles {
-		if isColliding(moveableObstacle.Spatial.Rect, s.player.Spatial.Rect) {
+		if isColliding(moveableObstacle.ComponentSpatial.Rect, s.player.ComponentSpatial.Rect) {
 			s.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 		}
 
 		for _, collisionSwitch := range s.collisionSwitches {
-			if isColliding(moveableObstacle.Spatial.Rect, collisionSwitch.Spatial.Rect) {
+			if isColliding(moveableObstacle.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
 				s.OnMoveableObstacleCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.OnMoveableObstacleNoCollisionWithSwitch(collisionSwitch.ID)
@@ -216,34 +215,34 @@ func (s *Collision) Update() {
 		}
 
 		for _, enemy := range s.enemies {
-			if isColliding(moveableObstacle.Spatial.Rect, enemy.Spatial.Rect) {
+			if isColliding(moveableObstacle.ComponentSpatial.Rect, enemy.ComponentSpatial.Rect) {
 				// s.EnemyCollisionWithMoveableObstacle(enemy.ID)
 			}
 		}
 
 		for _, obstacle := range s.obstacles {
-			if isColliding(moveableObstacle.Spatial.Rect, obstacle.Spatial.Rect) {
+			if isColliding(moveableObstacle.ComponentSpatial.Rect, obstacle.ComponentSpatial.Rect) {
 				// s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
 			}
 		}
 
-		if isColliding(moveableObstacle.Spatial.Rect, s.arrow.Spatial.Rect) {
+		if isColliding(moveableObstacle.ComponentSpatial.Rect, s.arrow.ComponentSpatial.Rect) {
 			s.OnArrowCollisionWithObstacle()
 		}
 	}
 
 	for _, collisionSwitch := range s.collisionSwitches {
-		if collisionSwitch.Spatial.HitBoxRadius > 0 {
+		if collisionSwitch.ComponentSpatial.HitBoxRadius > 0 {
 			if isCircleCollision(
-				s.player.Spatial.HitBoxRadius,
-				collisionSwitch.Spatial.HitBoxRadius,
-				w, h, s.player.Spatial.Rect, collisionSwitch.Spatial.Rect) {
+				s.player.ComponentSpatial.HitBoxRadius,
+				collisionSwitch.ComponentSpatial.HitBoxRadius,
+				w, h, s.player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
 				s.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
 			}
 		} else {
-			if isColliding(s.player.Spatial.Rect, collisionSwitch.Spatial.Rect) {
+			if isColliding(s.player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
 				s.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
@@ -253,7 +252,7 @@ func (s *Collision) Update() {
 	}
 
 	for _, warp := range s.warps {
-		if isColliding(s.player.Spatial.Rect, warp.Spatial.Rect) {
+		if isColliding(s.player.ComponentSpatial.Rect, warp.ComponentSpatial.Rect) {
 			s.OnPlayerCollisionWithWarp(warp.ID)
 		}
 	}

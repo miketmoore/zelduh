@@ -5,7 +5,6 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entityconfig"
 	"golang.org/x/image/colornames"
 )
@@ -14,18 +13,18 @@ import (
 type Entity struct {
 	id       terraform2d.EntityID
 	Category terraform2d.EntityCategory
-	*components.Invincible
-	*components.Animation
-	*components.Appearance
-	*components.Coins
-	*components.Dash
-	*components.Enabled
-	*components.Toggler
-	*components.Health
-	*components.Ignore
-	*components.Movement
-	*components.Spatial
-	*components.Temporary
+	*zelduh.ComponentInvincible
+	*zelduh.ComponentAnimation
+	*zelduh.ComponentAppearance
+	*zelduh.ComponentCoins
+	*zelduh.ComponentDash
+	*zelduh.ComponentEnabled
+	*zelduh.ComponentToggler
+	*zelduh.ComponentHealth
+	*zelduh.ComponentIgnore
+	*zelduh.ComponentMovement
+	*zelduh.ComponentSpatial
+	*zelduh.ComponentTemporary
 }
 
 // ID returns the entity ID
@@ -48,59 +47,59 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
-		Spatial: &components.Spatial{
+		ComponentSpatial: &zelduh.ComponentSpatial{
 			Width:  c.W,
 			Height: c.H,
 			Rect:   pixel.R(c.X, c.Y, c.X+c.W, c.Y+c.H),
 			Shape:  imdraw.New(nil),
 			HitBox: imdraw.New(nil),
 		},
-		Ignore: &components.Ignore{
+		ComponentIgnore: &zelduh.ComponentIgnore{
 			Value: c.Ignore,
 		},
 	}
 
 	if c.Expiration > 0 {
-		entity.Temporary = &components.Temporary{
+		entity.ComponentTemporary = &zelduh.ComponentTemporary{
 			Expiration: c.Expiration,
 		}
 	}
 
 	if c.Category == zelduh.CategoryWarp {
-		entity.Enabled = &components.Enabled{
+		entity.ComponentEnabled = &zelduh.ComponentEnabled{
 			Value: true,
 		}
 	}
 
 	if c.Health > 0 {
-		entity.Health = &components.Health{
+		entity.ComponentHealth = &zelduh.ComponentHealth{
 			Total: c.Health,
 		}
 	}
 
 	if c.Hitbox != nil {
-		entity.Spatial.HitBoxRadius = c.Hitbox.Radius
+		entity.ComponentSpatial.HitBoxRadius = c.Hitbox.Radius
 	}
 
 	if c.Toggleable {
-		entity.Toggler = &components.Toggler{}
+		entity.ComponentToggler = &zelduh.ComponentToggler{}
 		if c.Toggled {
-			entity.Toggler.Toggle()
+			entity.ComponentToggler.Toggle()
 		}
 	}
 
 	if c.Invincible {
-		entity.Invincible = &components.Invincible{
+		entity.ComponentInvincible = &zelduh.ComponentInvincible{
 			Enabled: true,
 		}
 	} else {
-		entity.Invincible = &components.Invincible{
+		entity.ComponentInvincible = &zelduh.ComponentInvincible{
 			Enabled: false,
 		}
 	}
 
 	if c.Movement != nil {
-		entity.Movement = &components.Movement{
+		entity.ComponentMovement = &zelduh.ComponentMovement{
 			Direction:      c.Movement.Direction,
 			MaxSpeed:       c.Movement.MaxSpeed,
 			Speed:          c.Movement.Speed,
@@ -114,13 +113,13 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	}
 
 	if c.Coins {
-		entity.Coins = &components.Coins{
+		entity.ComponentCoins = &zelduh.ComponentCoins{
 			Coins: 0,
 		}
 	}
 
 	if c.Dash != nil {
-		entity.Dash = &components.Dash{
+		entity.ComponentDash = &zelduh.ComponentDash{
 			Charge:    c.Dash.Charge,
 			MaxCharge: c.Dash.MaxCharge,
 			SpeedMod:  c.Dash.SpeedMod,
@@ -128,17 +127,17 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	}
 
 	if c.Animation != nil {
-		entity.Animation = &components.Animation{
-			Map: components.AnimationMap{},
+		entity.ComponentAnimation = &zelduh.ComponentAnimation{
+			Map: zelduh.ComponentAnimationMap{},
 		}
 		for key, val := range c.Animation {
-			entity.Animation.Map[key] = &components.AnimationData{
+			entity.ComponentAnimation.Map[key] = &zelduh.ComponentAnimationData{
 				Frames:    val,
 				FrameRate: zelduh.FrameRate,
 			}
 		}
 	} else {
-		entity.Appearance = &components.Appearance{
+		entity.ComponentAppearance = &zelduh.ComponentAppearance{
 			Color: colornames.Sandybrown,
 		}
 	}

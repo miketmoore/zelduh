@@ -6,15 +6,14 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
 
 type spatialEntity struct {
 	ID terraform2d.EntityID
-	*components.Movement
-	*components.Spatial
-	*components.Dash
+	*zelduh.ComponentMovement
+	*zelduh.ComponentSpatial
+	*zelduh.ComponentDash
 	TotalMoves  int
 	MoveCounter int
 }
@@ -32,13 +31,13 @@ type Spatial struct {
 // AddEntity adds an entity to the system
 func (s *Spatial) AddEntity(entity entities.Entity) {
 	r := spatialEntity{
-		ID:       entity.ID(),
-		Spatial:  entity.Spatial,
-		Movement: entity.Movement,
+		ID:                entity.ID(),
+		ComponentSpatial:  entity.ComponentSpatial,
+		ComponentMovement: entity.ComponentMovement,
 	}
 	switch entity.Category {
 	case zelduh.CategoryPlayer:
-		r.Dash = entity.Dash
+		r.ComponentDash = entity.ComponentDash
 		s.player = r
 	case zelduh.CategorySword:
 		s.sword = r
@@ -78,7 +77,7 @@ func (s *Spatial) RemoveAll(category terraform2d.EntityCategory) {
 func (s *Spatial) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
-	switch player.Movement.Direction {
+	switch player.ComponentMovement.Direction {
 	case terraform2d.DirectionUp:
 		v = pixel.V(0, -48)
 	case terraform2d.DirectionRight:
@@ -88,17 +87,17 @@ func (s *Spatial) MovePlayerBack() {
 	case terraform2d.DirectionLeft:
 		v = pixel.V(48, 0)
 	}
-	player.Spatial.Rect = player.Spatial.PrevRect.Moved(v)
-	player.Spatial.PrevRect = player.Spatial.Rect
+	player.ComponentSpatial.Rect = player.ComponentSpatial.PrevRect.Moved(v)
+	player.ComponentSpatial.PrevRect = player.ComponentSpatial.Rect
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
 func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terraform2d.Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
-	if ok && !entity.Movement.MovingFromHit {
-		entity.Movement.MovingFromHit = true
-		entity.Movement.RemainingMoves = entity.Movement.MaxMoves
-		entity.Movement.Direction = dir
+	if ok && !entity.ComponentMovement.MovingFromHit {
+		entity.ComponentMovement.MovingFromHit = true
+		entity.ComponentMovement.RemainingMoves = entity.ComponentMovement.MaxMoves
+		entity.ComponentMovement.Direction = dir
 		return true
 	}
 	return false
@@ -108,28 +107,28 @@ func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terr
 func (s *Spatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
-		enemy.Spatial.Rect = enemy.Spatial.PrevRect
+		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.PrevRect
 	}
 }
 
 // MoveEnemyBack moves the enemy back
 func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terraform2d.Direction) {
 	enemy, ok := s.enemy(enemyID)
-	if ok && !enemy.Movement.MovingFromHit {
-		enemy.Movement.MovingFromHit = true
-		enemy.Movement.RemainingMoves = enemy.Movement.HitBackMoves
-		enemy.Movement.Direction = directionHit
+	if ok && !enemy.ComponentMovement.MovingFromHit {
+		enemy.ComponentMovement.MovingFromHit = true
+		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.HitBackMoves
+		enemy.ComponentMovement.Direction = directionHit
 	}
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*components.Spatial, bool) {
+func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*zelduh.ComponentSpatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
-			return enemy.Spatial, true
+			return enemy.ComponentSpatial, true
 		}
 	}
-	return &components.Spatial{}, false
+	return &zelduh.ComponentSpatial{}, false
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
@@ -137,7 +136,7 @@ func (s *Spatial) EnemyMovingFromHit(enemyID terraform2d.EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
-			return enemy.Movement.MovingFromHit == true
+			return enemy.ComponentMovement.MovingFromHit == true
 		}
 	}
 	return false
@@ -156,7 +155,7 @@ func (s *Spatial) Update() {
 
 	for i := 0; i < len(s.enemies); i++ {
 		enemy := s.enemies[i]
-		switch enemy.Movement.PatternName {
+		switch enemy.ComponentMovement.PatternName {
 		case "random":
 			s.moveEnemyRandom(enemy)
 		case "left-right":
@@ -200,101 +199,101 @@ func delta(dir terraform2d.Direction, modX, modY float64) pixel.Vec {
 
 func (s *Spatial) moveSword() {
 	sword := s.sword
-	speed := sword.Movement.Speed
-	w := sword.Spatial.Width
-	h := sword.Spatial.Height
+	speed := sword.ComponentMovement.Speed
+	w := sword.ComponentSpatial.Width
+	h := sword.ComponentSpatial.Height
 	if speed > 0 {
-		sword.Spatial.PrevRect = sword.Spatial.Rect
-		v := delta(sword.Movement.Direction, speed+w, speed+h)
-		sword.Spatial.Rect = s.player.Spatial.Rect.Moved(v)
+		sword.ComponentSpatial.PrevRect = sword.ComponentSpatial.Rect
+		v := delta(sword.ComponentMovement.Direction, speed+w, speed+h)
+		sword.ComponentSpatial.Rect = s.player.ComponentSpatial.Rect.Moved(v)
 	} else {
-		sword.Spatial.Rect = s.player.Spatial.Rect
+		sword.ComponentSpatial.Rect = s.player.ComponentSpatial.Rect
 	}
 }
 
 func (s *Spatial) moveArrow() {
 	arrow := s.arrow
-	speed := arrow.Movement.Speed
-	if arrow.Movement.RemainingMoves > 0 {
-		arrow.Spatial.PrevRect = arrow.Spatial.Rect
-		v := delta(arrow.Movement.Direction, speed, speed)
-		arrow.Spatial.Rect = arrow.Spatial.Rect.Moved(v)
+	speed := arrow.ComponentMovement.Speed
+	if arrow.ComponentMovement.RemainingMoves > 0 {
+		arrow.ComponentSpatial.PrevRect = arrow.ComponentSpatial.Rect
+		v := delta(arrow.ComponentMovement.Direction, speed, speed)
+		arrow.ComponentSpatial.Rect = arrow.ComponentSpatial.Rect.Moved(v)
 	} else {
-		arrow.Spatial.Rect = s.player.Spatial.Rect
+		arrow.ComponentSpatial.Rect = s.player.ComponentSpatial.Rect
 	}
 }
 
 func (s *Spatial) movePlayer() {
 	player := s.player
-	speed := player.Movement.Speed
-	if player.Dash.Charge == player.Dash.MaxCharge {
-		speed += player.Dash.SpeedMod
+	speed := player.ComponentMovement.Speed
+	if player.ComponentDash.Charge == player.ComponentDash.MaxCharge {
+		speed += player.ComponentDash.SpeedMod
 	}
 	if speed > 0 {
-		v := delta(player.Movement.Direction, speed, speed)
-		player.Spatial.PrevRect = player.Spatial.Rect
-		player.Spatial.Rect = player.Spatial.Rect.Moved(v)
+		v := delta(player.ComponentMovement.Direction, speed, speed)
+		player.ComponentSpatial.PrevRect = player.ComponentSpatial.Rect
+		player.ComponentSpatial.Rect = player.ComponentSpatial.Rect.Moved(v)
 	}
 }
 
 func (s *Spatial) moveMoveableObstacle(entity *spatialEntity) {
-	if entity.Movement.RemainingMoves > 0 {
-		speed := entity.Movement.MaxSpeed
-		entity.Spatial.PrevRect = entity.Spatial.Rect
-		moveVec := delta(entity.Movement.Direction, speed, speed)
-		entity.Spatial.Rect = entity.Spatial.Rect.Moved(moveVec)
-		entity.Movement.RemainingMoves--
+	if entity.ComponentMovement.RemainingMoves > 0 {
+		speed := entity.ComponentMovement.MaxSpeed
+		entity.ComponentSpatial.PrevRect = entity.ComponentSpatial.Rect
+		moveVec := delta(entity.ComponentMovement.Direction, speed, speed)
+		entity.ComponentSpatial.Rect = entity.ComponentSpatial.Rect.Moved(moveVec)
+		entity.ComponentMovement.RemainingMoves--
 	} else {
-		entity.Movement.MovingFromHit = false
-		entity.Movement.RemainingMoves = 0
+		entity.ComponentMovement.MovingFromHit = false
+		entity.ComponentMovement.RemainingMoves = 0
 	}
 }
 
 func (s *Spatial) moveEnemyRandom(enemy *spatialEntity) {
-	if enemy.Movement.RemainingMoves == 0 {
-		enemy.Movement.MovingFromHit = false
-		enemy.Movement.RemainingMoves = s.Rand.Intn(enemy.Movement.MaxMoves)
-		enemy.Movement.Direction = terraform2d.RandomDirection(s.Rand)
-	} else if enemy.Movement.RemainingMoves > 0 {
+	if enemy.ComponentMovement.RemainingMoves == 0 {
+		enemy.ComponentMovement.MovingFromHit = false
+		enemy.ComponentMovement.RemainingMoves = s.Rand.Intn(enemy.ComponentMovement.MaxMoves)
+		enemy.ComponentMovement.Direction = terraform2d.RandomDirection(s.Rand)
+	} else if enemy.ComponentMovement.RemainingMoves > 0 {
 		var speed float64
-		if enemy.Movement.MovingFromHit {
-			speed = enemy.Movement.HitSpeed
+		if enemy.ComponentMovement.MovingFromHit {
+			speed = enemy.ComponentMovement.HitSpeed
 		} else {
-			speed = enemy.Movement.MaxSpeed
+			speed = enemy.ComponentMovement.MaxSpeed
 		}
-		enemy.Spatial.PrevRect = enemy.Spatial.Rect
-		moveVec := delta(enemy.Movement.Direction, speed, speed)
-		enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
-		enemy.Movement.RemainingMoves--
+		enemy.ComponentSpatial.PrevRect = enemy.ComponentSpatial.Rect
+		moveVec := delta(enemy.ComponentMovement.Direction, speed, speed)
+		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.Rect.Moved(moveVec)
+		enemy.ComponentMovement.RemainingMoves--
 	} else {
-		enemy.Movement.MovingFromHit = false
-		enemy.Movement.RemainingMoves = int(enemy.Spatial.Rect.W())
+		enemy.ComponentMovement.MovingFromHit = false
+		enemy.ComponentMovement.RemainingMoves = int(enemy.ComponentSpatial.Rect.W())
 	}
 }
 
 func (s *Spatial) moveEnemyLeftRight(enemy *spatialEntity) {
-	if enemy.Movement.RemainingMoves == 0 {
-		enemy.Movement.MovingFromHit = false
-		enemy.Movement.RemainingMoves = enemy.Movement.MaxMoves
-		switch enemy.Movement.Direction {
+	if enemy.ComponentMovement.RemainingMoves == 0 {
+		enemy.ComponentMovement.MovingFromHit = false
+		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.MaxMoves
+		switch enemy.ComponentMovement.Direction {
 		case terraform2d.DirectionLeft:
-			enemy.Movement.Direction = terraform2d.DirectionRight
+			enemy.ComponentMovement.Direction = terraform2d.DirectionRight
 		case terraform2d.DirectionRight:
-			enemy.Movement.Direction = terraform2d.DirectionLeft
+			enemy.ComponentMovement.Direction = terraform2d.DirectionLeft
 		}
-	} else if enemy.Movement.RemainingMoves > 0 {
+	} else if enemy.ComponentMovement.RemainingMoves > 0 {
 		var speed float64
-		if enemy.Movement.MovingFromHit {
-			speed = enemy.Movement.HitSpeed
+		if enemy.ComponentMovement.MovingFromHit {
+			speed = enemy.ComponentMovement.HitSpeed
 		} else {
-			speed = enemy.Movement.MaxSpeed
+			speed = enemy.ComponentMovement.MaxSpeed
 		}
-		enemy.Spatial.PrevRect = enemy.Spatial.Rect
-		moveVec := delta(enemy.Movement.Direction, speed, speed)
-		enemy.Spatial.Rect = enemy.Spatial.Rect.Moved(moveVec)
-		enemy.Movement.RemainingMoves--
+		enemy.ComponentSpatial.PrevRect = enemy.ComponentSpatial.Rect
+		moveVec := delta(enemy.ComponentMovement.Direction, speed, speed)
+		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.Rect.Moved(moveVec)
+		enemy.ComponentMovement.RemainingMoves--
 	} else {
-		enemy.Movement.MovingFromHit = false
-		enemy.Movement.RemainingMoves = int(enemy.Spatial.Rect.W())
+		enemy.ComponentMovement.MovingFromHit = false
+		enemy.ComponentMovement.RemainingMoves = int(enemy.ComponentSpatial.Rect.W())
 	}
 }

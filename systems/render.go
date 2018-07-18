@@ -5,20 +5,19 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
 
 type renderEntity struct {
 	ID       terraform2d.EntityID
 	Category terraform2d.EntityCategory
-	*components.Spatial
-	*components.Appearance
-	*components.Animation
-	*components.Movement
-	*components.Ignore
-	*components.Toggler
-	*components.Temporary
+	*zelduh.ComponentSpatial
+	*zelduh.ComponentAppearance
+	*zelduh.ComponentAnimation
+	*zelduh.ComponentMovement
+	*zelduh.ComponentIgnore
+	*zelduh.ComponentToggler
+	*zelduh.ComponentTemporary
 }
 
 // Render is a custom system
@@ -37,13 +36,13 @@ type Render struct {
 // AddEntity adds an entity to the system
 func (s *Render) AddEntity(entity entities.Entity) {
 	r := renderEntity{
-		ID:        entity.ID(),
-		Category:  entity.Category,
-		Spatial:   entity.Spatial,
-		Animation: entity.Animation,
-		Movement:  entity.Movement,
-		Temporary: entity.Temporary,
-		Ignore:    entity.Ignore,
+		ID:                 entity.ID(),
+		Category:           entity.Category,
+		ComponentSpatial:   entity.ComponentSpatial,
+		ComponentAnimation: entity.ComponentAnimation,
+		ComponentMovement:  entity.ComponentMovement,
+		ComponentTemporary: entity.ComponentTemporary,
+		ComponentIgnore:    entity.ComponentIgnore,
 	}
 	switch entity.Category {
 	case zelduh.CategoryPlayer:
@@ -67,8 +66,8 @@ func (s *Render) AddEntity(entity entities.Entity) {
 	case zelduh.CategoryCoin:
 		fallthrough
 	default:
-		if entity.Toggler != nil {
-			r.Toggler = entity.Toggler
+		if entity.ComponentToggler != nil {
+			r.ComponentToggler = entity.ComponentToggler
 		}
 		s.entities = append(s.entities, r)
 	}
@@ -106,16 +105,16 @@ func (s *Render) RemoveAllEntities() {
 func (s *Render) Update() {
 
 	for _, entity := range s.entities {
-		if entity.Ignore != nil && !entity.Ignore.Value {
-			if entity.Temporary != nil {
-				if entity.Temporary.Expiration == 0 {
-					entity.Temporary.OnExpiration()
+		if entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value {
+			if entity.ComponentTemporary != nil {
+				if entity.ComponentTemporary.Expiration == 0 {
+					entity.ComponentTemporary.OnExpiration()
 					s.RemoveEntity(entity.ID)
 				} else {
-					entity.Temporary.Expiration--
+					entity.ComponentTemporary.Expiration--
 				}
 			}
-			if entity.Toggler != nil {
+			if entity.ComponentToggler != nil {
 				s.animateToggleFrame(entity)
 			} else {
 				s.animateDefault(entity)
@@ -127,27 +126,27 @@ func (s *Render) Update() {
 	arrow := s.arrow
 	sword := s.sword
 
-	if !sword.Ignore.Value {
-		s.animateDirections(player.Movement.Direction, sword)
+	if !sword.ComponentIgnore.Value {
+		s.animateDirections(player.ComponentMovement.Direction, sword)
 	}
 
-	if !arrow.Ignore.Value {
-		s.animateDirections(player.Movement.Direction, arrow)
+	if !arrow.ComponentIgnore.Value {
+		s.animateDirections(player.ComponentMovement.Direction, arrow)
 	}
 
-	if sword.Ignore != nil && sword.Ignore.Value && arrow.Ignore.Value {
-		s.animateDirections(player.Movement.Direction, player)
+	if sword.ComponentIgnore != nil && sword.ComponentIgnore.Value && arrow.ComponentIgnore.Value {
+		s.animateDirections(player.ComponentMovement.Direction, player)
 	} else {
-		s.animateAttackDirection(player.Movement.Direction, player)
+		s.animateAttackDirection(player.ComponentMovement.Direction, player)
 	}
 
 }
 
 func (s *Render) animateToggleFrame(entity renderEntity) {
-	if anim := entity.Animation; anim != nil {
+	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.Map["default"]; animData != nil {
 			var frameIndex int
-			if !entity.Toggler.Enabled() {
+			if !entity.ComponentToggler.Enabled() {
 				frameIndex = animData.Frames[0]
 			} else {
 				frameIndex = animData.Frames[1]
@@ -155,8 +154,8 @@ func (s *Render) animateToggleFrame(entity renderEntity) {
 			frame := s.Spritesheet[frameIndex]
 
 			v := pixel.V(
-				entity.Spatial.Rect.Min.X+entity.Spatial.Width/2,
-				entity.Spatial.Rect.Min.Y+entity.Spatial.Height/2,
+				entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
+				entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
 			)
 			frame.Draw(s.Win, pixel.IM.Moved(v))
 		}
@@ -164,7 +163,7 @@ func (s *Render) animateToggleFrame(entity renderEntity) {
 }
 
 func (s *Render) animateDefault(entity renderEntity) {
-	if anim := entity.Animation; anim != nil {
+	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.Map["default"]; animData != nil {
 			rate := animData.FrameRateCount
 			if rate < animData.FrameRate {
@@ -188,8 +187,8 @@ func (s *Render) animateDefault(entity renderEntity) {
 			frame := s.Spritesheet[frameIndex]
 
 			v := pixel.V(
-				entity.Spatial.Rect.Min.X+entity.Spatial.Width/2,
-				entity.Spatial.Rect.Min.Y+entity.Spatial.Height/2,
+				entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
+				entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
 			)
 			frame.Draw(s.Win, pixel.IM.Moved(v))
 		}
@@ -197,8 +196,8 @@ func (s *Render) animateDefault(entity renderEntity) {
 }
 
 func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity renderEntity) {
-	if anim := entity.Animation; anim != nil {
-		var animData *components.AnimationData
+	if anim := entity.ComponentAnimation; anim != nil {
+		var animData *zelduh.ComponentAnimationData
 		switch dir {
 		case terraform2d.DirectionUp:
 			animData = anim.Map["swordAttackUp"]
@@ -231,10 +230,10 @@ func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity render
 		frameIndex := animData.Frames[frameNum]
 		frame := s.Spritesheet[frameIndex]
 
-		rect := entity.Spatial.Rect
+		rect := entity.ComponentSpatial.Rect
 		v := pixel.V(
-			rect.Min.X+entity.Spatial.Width/2,
-			rect.Min.Y+entity.Spatial.Height/2,
+			rect.Min.X+entity.ComponentSpatial.Width/2,
+			rect.Min.Y+entity.ComponentSpatial.Height/2,
 		)
 
 		frame.Draw(s.Win, pixel.IM.Moved(v))
@@ -242,20 +241,20 @@ func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity render
 }
 
 func (s *Render) animateDirections(dir terraform2d.Direction, entity renderEntity) {
-	// if entity.Spatial.HitBoxRadius > 0 {
-	// 	shape := entity.Spatial.Shape
+	// if entity.ComponentSpatial.HitBoxRadius > 0 {
+	// 	shape := entity.ComponentSpatial.Shape
 	// 	shape.Clear()
 	// 	shape.Color = colornames.Yellow
 	// 	shape.Push(pixel.V(
-	// 		entity.Spatial.Rect.Min.X+entity.Spatial.Width/2,
-	// 		entity.Spatial.Rect.Min.Y+entity.Spatial.Height/2,
+	// 		entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
+	// 		entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
 	// 	))
-	// 	// s.Push(entity.Spatial.Rect.Max)
-	// 	shape.Circle(entity.Spatial.HitBoxRadius, 0)
+	// 	// s.Push(entity.ComponentSpatial.Rect.Max)
+	// 	shape.Circle(entity.ComponentSpatial.HitBoxRadius, 0)
 	// 	shape.Draw(s.Win)
 	// }
-	if anim := entity.Animation; anim != nil {
-		var animData *components.AnimationData
+	if anim := entity.ComponentAnimation; anim != nil {
+		var animData *zelduh.ComponentAnimationData
 		switch dir {
 		case terraform2d.DirectionUp:
 			animData = anim.Map["up"]
@@ -288,10 +287,10 @@ func (s *Render) animateDirections(dir terraform2d.Direction, entity renderEntit
 		frameIndex := animData.Frames[frameNum]
 		frame := s.Spritesheet[frameIndex]
 
-		rect := entity.Spatial.Rect
+		rect := entity.ComponentSpatial.Rect
 		v := pixel.V(
-			rect.Min.X+entity.Spatial.Width/2,
-			rect.Min.Y+entity.Spatial.Height/2,
+			rect.Min.X+entity.ComponentSpatial.Width/2,
+			rect.Min.Y+entity.ComponentSpatial.Height/2,
 		)
 
 		frame.Draw(s.Win, pixel.IM.Moved(v))

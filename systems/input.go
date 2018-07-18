@@ -4,14 +4,13 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
 
 type inputEntity struct {
-	*components.Movement
-	*components.Ignore
-	*components.Dash
+	*zelduh.ComponentMovement
+	*zelduh.ComponentIgnore
+	*zelduh.ComponentDash
 }
 
 // Input is a custom system for detecting collisions and what to do when they occur
@@ -36,9 +35,9 @@ func (s *Input) EnablePlayer() {
 // AddEntity adds an entity to the system
 func (s *Input) AddEntity(entity entities.Entity) {
 	r := inputEntity{
-		Movement: entity.Movement,
-		Dash:     entity.Dash,
-		Ignore:   entity.Ignore,
+		ComponentMovement: entity.ComponentMovement,
+		ComponentDash:     entity.ComponentDash,
+		ComponentIgnore:   entity.ComponentIgnore,
 	}
 	switch entity.Category {
 	case zelduh.CategoryPlayer:
@@ -59,62 +58,62 @@ func (s Input) Update() {
 	win := s.Win
 	player := s.playerEntity
 
-	movingSpeed := player.Movement.MaxSpeed
+	movingSpeed := player.ComponentMovement.MaxSpeed
 
-	player.Movement.LastDirection = player.Movement.Direction
+	player.ComponentMovement.LastDirection = player.ComponentMovement.Direction
 	if win.Pressed(pixelgl.KeyUp) {
-		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = terraform2d.DirectionUp
+		player.ComponentMovement.Speed = movingSpeed
+		player.ComponentMovement.Direction = terraform2d.DirectionUp
 	} else if win.Pressed(pixelgl.KeyRight) {
-		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = terraform2d.DirectionRight
+		player.ComponentMovement.Speed = movingSpeed
+		player.ComponentMovement.Direction = terraform2d.DirectionRight
 	} else if win.Pressed(pixelgl.KeyDown) {
-		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = terraform2d.DirectionDown
+		player.ComponentMovement.Speed = movingSpeed
+		player.ComponentMovement.Direction = terraform2d.DirectionDown
 	} else if win.Pressed(pixelgl.KeyLeft) {
-		player.Movement.Speed = movingSpeed
-		player.Movement.Direction = terraform2d.DirectionLeft
+		player.ComponentMovement.Speed = movingSpeed
+		player.ComponentMovement.Direction = terraform2d.DirectionLeft
 	} else {
-		player.Movement.Speed = 0
+		player.ComponentMovement.Speed = 0
 	}
 
 	// attack with sword
-	s.sword.Movement.Direction = player.Movement.Direction
+	s.sword.ComponentMovement.Direction = player.ComponentMovement.Direction
 	if win.Pressed(pixelgl.KeyF) {
-		s.sword.Movement.Speed = 1.0
-		s.sword.Ignore.Value = false
+		s.sword.ComponentMovement.Speed = 1.0
+		s.sword.ComponentIgnore.Value = false
 	} else {
-		s.sword.Movement.Speed = 0
-		s.sword.Ignore.Value = true
+		s.sword.ComponentMovement.Speed = 0
+		s.sword.ComponentIgnore.Value = true
 	}
 
 	// fire arrow
-	if s.arrow.Movement.RemainingMoves == 0 {
-		s.arrow.Movement.Direction = player.Movement.Direction
+	if s.arrow.ComponentMovement.RemainingMoves == 0 {
+		s.arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
 		if win.Pressed(pixelgl.KeyG) {
-			s.arrow.Movement.Speed = 7.0
-			s.arrow.Movement.RemainingMoves = 100
-			s.arrow.Ignore.Value = false
+			s.arrow.ComponentMovement.Speed = 7.0
+			s.arrow.ComponentMovement.RemainingMoves = 100
+			s.arrow.ComponentIgnore.Value = false
 		} else {
-			s.arrow.Movement.Speed = 0
-			s.arrow.Movement.RemainingMoves = 0
-			s.arrow.Ignore.Value = true
+			s.arrow.ComponentMovement.Speed = 0
+			s.arrow.ComponentMovement.RemainingMoves = 0
+			s.arrow.ComponentIgnore.Value = true
 		}
 	} else {
-		s.arrow.Movement.RemainingMoves--
+		s.arrow.ComponentMovement.RemainingMoves--
 	}
 
 	// dashing
 	if !win.Pressed(pixelgl.KeyF) && win.Pressed(pixelgl.KeySpace) {
-		if s.playerEntity.Dash.Charge < s.playerEntity.Dash.MaxCharge {
-			s.playerEntity.Dash.Charge++
-			s.sword.Movement.Speed = 0
-			s.sword.Ignore.Value = true
+		if s.playerEntity.ComponentDash.Charge < s.playerEntity.ComponentDash.MaxCharge {
+			s.playerEntity.ComponentDash.Charge++
+			s.sword.ComponentMovement.Speed = 0
+			s.sword.ComponentIgnore.Value = true
 		} else {
-			s.sword.Movement.Speed = 1.0
-			s.sword.Ignore.Value = false
+			s.sword.ComponentMovement.Speed = 1.0
+			s.sword.ComponentIgnore.Value = false
 		}
 	} else {
-		s.playerEntity.Dash.Charge = 0
+		s.playerEntity.ComponentDash.Charge = 0
 	}
 }
