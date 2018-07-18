@@ -16,8 +16,8 @@ type spatialEntity struct {
 	MoveCounter int
 }
 
-// Spatial is a custom system
-type Spatial struct {
+// SystemSpatial is a custom system
+type SystemSpatial struct {
 	Rand              *rand.Rand
 	player            spatialEntity
 	sword             spatialEntity
@@ -27,7 +27,7 @@ type Spatial struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Spatial) AddEntity(entity Entity) {
+func (s *SystemSpatial) AddEntity(entity Entity) {
 	r := spatialEntity{
 		ID:                entity.ID(),
 		ComponentSpatial:  entity.ComponentSpatial,
@@ -49,7 +49,7 @@ func (s *Spatial) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *Spatial) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
+func (s *SystemSpatial) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -62,7 +62,7 @@ func (s *Spatial) Remove(category terraform2d.EntityCategory, id terraform2d.Ent
 }
 
 // RemoveAll removes all entities from one category
-func (s *Spatial) RemoveAll(category terraform2d.EntityCategory) {
+func (s *SystemSpatial) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -72,7 +72,7 @@ func (s *Spatial) RemoveAll(category terraform2d.EntityCategory) {
 }
 
 // MovePlayerBack moves the player back
-func (s *Spatial) MovePlayerBack() {
+func (s *SystemSpatial) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
 	switch player.ComponentMovement.Direction {
@@ -90,7 +90,7 @@ func (s *Spatial) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terraform2d.Direction) bool {
+func (s *SystemSpatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terraform2d.Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.ComponentMovement.MovingFromHit {
 		entity.ComponentMovement.MovingFromHit = true
@@ -102,7 +102,7 @@ func (s *Spatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terr
 }
 
 // UndoEnemyRect resets current rect to previous rect
-func (s *Spatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
+func (s *SystemSpatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.PrevRect
@@ -110,7 +110,7 @@ func (s *Spatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terraform2d.Direction) {
+func (s *SystemSpatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terraform2d.Direction) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.ComponentMovement.MovingFromHit {
 		enemy.ComponentMovement.MovingFromHit = true
@@ -120,7 +120,7 @@ func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terra
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*ComponentSpatial, bool) {
+func (s *SystemSpatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*ComponentSpatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
 			return enemy.ComponentSpatial, true
@@ -130,7 +130,7 @@ func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*ComponentSpati
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
-func (s *Spatial) EnemyMovingFromHit(enemyID terraform2d.EntityID) bool {
+func (s *SystemSpatial) EnemyMovingFromHit(enemyID terraform2d.EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
@@ -141,7 +141,7 @@ func (s *Spatial) EnemyMovingFromHit(enemyID terraform2d.EntityID) bool {
 }
 
 // Update changes spatial data based on movement data
-func (s *Spatial) Update() {
+func (s *SystemSpatial) Update() {
 	s.movePlayer()
 	s.moveSword()
 	s.moveArrow()
@@ -162,7 +162,7 @@ func (s *Spatial) Update() {
 	}
 }
 
-func (s *Spatial) moveableObstacle(id terraform2d.EntityID) (spatialEntity, bool) {
+func (s *SystemSpatial) moveableObstacle(id terraform2d.EntityID) (spatialEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
 			return *e, true
@@ -171,7 +171,7 @@ func (s *Spatial) moveableObstacle(id terraform2d.EntityID) (spatialEntity, bool
 	return spatialEntity{}, false
 }
 
-func (s *Spatial) enemy(id terraform2d.EntityID) (spatialEntity, bool) {
+func (s *SystemSpatial) enemy(id terraform2d.EntityID) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
 			return *e, true
@@ -195,7 +195,7 @@ func delta(dir terraform2d.Direction, modX, modY float64) pixel.Vec {
 	}
 }
 
-func (s *Spatial) moveSword() {
+func (s *SystemSpatial) moveSword() {
 	sword := s.sword
 	speed := sword.ComponentMovement.Speed
 	w := sword.ComponentSpatial.Width
@@ -209,7 +209,7 @@ func (s *Spatial) moveSword() {
 	}
 }
 
-func (s *Spatial) moveArrow() {
+func (s *SystemSpatial) moveArrow() {
 	arrow := s.arrow
 	speed := arrow.ComponentMovement.Speed
 	if arrow.ComponentMovement.RemainingMoves > 0 {
@@ -221,7 +221,7 @@ func (s *Spatial) moveArrow() {
 	}
 }
 
-func (s *Spatial) movePlayer() {
+func (s *SystemSpatial) movePlayer() {
 	player := s.player
 	speed := player.ComponentMovement.Speed
 	if player.ComponentDash.Charge == player.ComponentDash.MaxCharge {
@@ -234,7 +234,7 @@ func (s *Spatial) movePlayer() {
 	}
 }
 
-func (s *Spatial) moveMoveableObstacle(entity *spatialEntity) {
+func (s *SystemSpatial) moveMoveableObstacle(entity *spatialEntity) {
 	if entity.ComponentMovement.RemainingMoves > 0 {
 		speed := entity.ComponentMovement.MaxSpeed
 		entity.ComponentSpatial.PrevRect = entity.ComponentSpatial.Rect
@@ -247,7 +247,7 @@ func (s *Spatial) moveMoveableObstacle(entity *spatialEntity) {
 	}
 }
 
-func (s *Spatial) moveEnemyRandom(enemy *spatialEntity) {
+func (s *SystemSpatial) moveEnemyRandom(enemy *spatialEntity) {
 	if enemy.ComponentMovement.RemainingMoves == 0 {
 		enemy.ComponentMovement.MovingFromHit = false
 		enemy.ComponentMovement.RemainingMoves = s.Rand.Intn(enemy.ComponentMovement.MaxMoves)
@@ -269,7 +269,7 @@ func (s *Spatial) moveEnemyRandom(enemy *spatialEntity) {
 	}
 }
 
-func (s *Spatial) moveEnemyLeftRight(enemy *spatialEntity) {
+func (s *SystemSpatial) moveEnemyLeftRight(enemy *spatialEntity) {
 	if enemy.ComponentMovement.RemainingMoves == 0 {
 		enemy.ComponentMovement.MovingFromHit = false
 		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.MaxMoves

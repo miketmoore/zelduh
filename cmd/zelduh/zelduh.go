@@ -42,7 +42,7 @@ type GameModel struct {
 	AllMapDrawData                        map[string]terraform2d.MapData
 	HealthSystem                          *zelduh.Health
 	InputSystem                           *zelduh.SystemInput
-	SpatialSystem                         *zelduh.Spatial
+	SpatialSystem                         *zelduh.SystemSpatial
 }
 
 func run() {
@@ -109,7 +109,7 @@ func run() {
 		),
 	}
 
-	gameModel.SpatialSystem = &zelduh.Spatial{
+	gameModel.SpatialSystem = &zelduh.SystemSpatial{
 		Rand: gameModel.Rand,
 	}
 

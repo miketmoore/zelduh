@@ -95,7 +95,7 @@ func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.Entit
 func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
-		case *Spatial:
+		case *SystemSpatial:
 			sys.Remove(CategoryEnemy, id)
 		case *SystemCollision:
 			sys.Remove(CategoryEnemy, id)
@@ -109,7 +109,7 @@ func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 func (w *World) RemoveAllEnemies() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *Spatial:
+		case *SystemSpatial:
 			sys.RemoveAll(CategoryEnemy)
 		case *SystemCollision:
 			sys.RemoveAll(CategoryEnemy)
