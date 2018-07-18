@@ -565,7 +565,6 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.Entit
 	gameWorld.Remove(categories.Heart, ch.GameModel.Hearts[heartIndex].ID())
 	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
 
-	// TODO redraw hearts
 	if ch.GameModel.Player.Health.Total == 0 {
 		ch.GameModel.CurrentState = terraform2d.StateOver
 	}
