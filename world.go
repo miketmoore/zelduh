@@ -1,15 +1,13 @@
-package world
+package zelduh
 
 import (
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/systems"
 )
 
 // System is an interface
 type System interface {
 	Update()
-	AddEntity(zelduh.Entity)
+	AddEntity(Entity)
 }
 
 // World is a world struct
@@ -58,14 +56,14 @@ func (w *World) NewEntityID() terraform2d.EntityID {
 }
 
 // AddEntity adds the entity to it's system
-func (w *World) AddEntity(entity zelduh.Entity) {
+func (w *World) AddEntity(entity Entity) {
 	for _, system := range w.Systems() {
 		system.AddEntity(entity)
 	}
 }
 
 // AddEntities adds the terraform2d to their system
-func (w *World) AddEntities(all ...zelduh.Entity) {
+func (w *World) AddEntities(all ...Entity) {
 	for _, entity := range all {
 		w.AddEntity(entity)
 	}
@@ -74,19 +72,19 @@ func (w *World) AddEntities(all ...zelduh.Entity) {
 // Remove removes the specific entity from all systems
 func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
-	case zelduh.CategoryCoin:
+	case CategoryCoin:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
-			case *systems.Collision:
-				sys.Remove(zelduh.CategoryCoin, id)
-			case *systems.Render:
+			case *Collision:
+				sys.Remove(CategoryCoin, id)
+			case *Render:
 				sys.RemoveEntity(id)
 			}
 		}
-	case zelduh.CategoryHeart:
+	case CategoryHeart:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
-			case *systems.Render:
+			case *Render:
 				sys.RemoveEntity(id)
 			}
 		}
@@ -97,11 +95,11 @@ func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.Entit
 func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
-		case *systems.Spatial:
-			sys.Remove(zelduh.CategoryEnemy, id)
-		case *systems.Collision:
-			sys.Remove(zelduh.CategoryEnemy, id)
-		case *systems.Render:
+		case *Spatial:
+			sys.Remove(CategoryEnemy, id)
+		case *Collision:
+			sys.Remove(CategoryEnemy, id)
+		case *Render:
 			sys.RemoveEntity(id)
 		}
 	}
@@ -111,12 +109,12 @@ func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 func (w *World) RemoveAllEnemies() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *systems.Spatial:
-			sys.RemoveAll(zelduh.CategoryEnemy)
-		case *systems.Collision:
-			sys.RemoveAll(zelduh.CategoryEnemy)
-		case *systems.Render:
-			sys.RemoveAll(zelduh.CategoryEnemy)
+		case *Spatial:
+			sys.RemoveAll(CategoryEnemy)
+		case *Collision:
+			sys.RemoveAll(CategoryEnemy)
+		case *Render:
+			sys.RemoveAll(CategoryEnemy)
 		}
 	}
 }
@@ -125,7 +123,7 @@ func (w *World) RemoveAllEnemies() {
 func (w *World) RemoveAllEntities() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *systems.Render:
+		case *Render:
 			sys.RemoveAllEntities()
 		}
 	}
@@ -135,10 +133,10 @@ func (w *World) RemoveAllEntities() {
 func (w *World) RemoveAllMoveableObstacles() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *systems.Collision:
-			sys.RemoveAll(zelduh.CategoryMovableObstacle)
-		case *systems.Render:
-			sys.RemoveAll(zelduh.CategoryMovableObstacle)
+		case *Collision:
+			sys.RemoveAll(CategoryMovableObstacle)
+		case *Render:
+			sys.RemoveAll(CategoryMovableObstacle)
 		}
 	}
 }
@@ -147,8 +145,8 @@ func (w *World) RemoveAllMoveableObstacles() {
 func (w *World) RemoveAllCollisionSwitches() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *systems.Collision:
-			sys.RemoveAll(zelduh.CategoryCollisionSwitch)
+		case *Collision:
+			sys.RemoveAll(CategoryCollisionSwitch)
 		}
 	}
 }

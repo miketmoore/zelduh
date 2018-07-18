@@ -1,22 +1,21 @@
-package systems
+package zelduh
 
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 )
 
 type renderEntity struct {
 	ID       terraform2d.EntityID
 	Category terraform2d.EntityCategory
-	*zelduh.ComponentSpatial
-	*zelduh.ComponentAppearance
-	*zelduh.ComponentAnimation
-	*zelduh.ComponentMovement
-	*zelduh.ComponentIgnore
-	*zelduh.ComponentToggler
-	*zelduh.ComponentTemporary
+	*ComponentSpatial
+	*ComponentAppearance
+	*ComponentAnimation
+	*ComponentMovement
+	*ComponentIgnore
+	*ComponentToggler
+	*ComponentTemporary
 }
 
 // Render is a custom system
@@ -33,7 +32,7 @@ type Render struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Render) AddEntity(entity zelduh.Entity) {
+func (s *Render) AddEntity(entity Entity) {
 	r := renderEntity{
 		ID:                 entity.ID(),
 		Category:           entity.Category,
@@ -44,25 +43,25 @@ func (s *Render) AddEntity(entity zelduh.Entity) {
 		ComponentIgnore:    entity.ComponentIgnore,
 	}
 	switch entity.Category {
-	case zelduh.CategoryPlayer:
+	case CategoryPlayer:
 		s.player = r
-	case zelduh.CategoryArrow:
+	case CategoryArrow:
 		s.arrow = r
-	case zelduh.CategorySword:
+	case CategorySword:
 		s.sword = r
-	case zelduh.CategoryExplosion:
+	case CategoryExplosion:
 		fallthrough
-	case zelduh.CategoryHeart:
+	case CategoryHeart:
 		fallthrough
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		fallthrough
-	case zelduh.CategoryCollisionSwitch:
+	case CategoryCollisionSwitch:
 		fallthrough
-	case zelduh.CategoryMovableObstacle:
+	case CategoryMovableObstacle:
 		fallthrough
-	case zelduh.CategoryWarp:
+	case CategoryWarp:
 		fallthrough
-	case zelduh.CategoryCoin:
+	case CategoryCoin:
 		fallthrough
 	default:
 		if entity.ComponentToggler != nil {
@@ -75,9 +74,9 @@ func (s *Render) AddEntity(entity zelduh.Entity) {
 // RemoveAll removes all entities from one category
 func (s *Render) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {
-			if s.entities[i].Category == zelduh.CategoryEnemy {
+			if s.entities[i].Category == CategoryEnemy {
 				s.entities = append(s.entities[:i], s.entities[i+1:]...)
 			}
 		}
@@ -196,7 +195,7 @@ func (s *Render) animateDefault(entity renderEntity) {
 
 func (s *Render) animateAttackDirection(dir terraform2d.Direction, entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
-		var animData *zelduh.ComponentAnimationData
+		var animData *ComponentAnimationData
 		switch dir {
 		case terraform2d.DirectionUp:
 			animData = anim.Map["swordAttackUp"]
@@ -253,7 +252,7 @@ func (s *Render) animateDirections(dir terraform2d.Direction, entity renderEntit
 	// 	shape.Draw(s.Win)
 	// }
 	if anim := entity.ComponentAnimation; anim != nil {
-		var animData *zelduh.ComponentAnimationData
+		var animData *ComponentAnimationData
 		switch dir {
 		case terraform2d.DirectionUp:
 			animData = anim.Map["up"]

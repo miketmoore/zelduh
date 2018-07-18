@@ -11,13 +11,11 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/world"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"github.com/miketmoore/zelduh/systems"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/image/colornames"
 	"golang.org/x/text/language"
@@ -26,7 +24,7 @@ import (
 var (
 	win       *pixelgl.Window
 	txt       *text.Text
-	gameWorld world.World
+	gameWorld zelduh.World
 )
 
 // GameModel contains data used throughout the game
@@ -42,9 +40,9 @@ type GameModel struct {
 	Hearts                                []zelduh.Entity
 	RoomWarps                             map[terraform2d.EntityID]zelduh.Config
 	AllMapDrawData                        map[string]terraform2d.MapData
-	HealthSystem                          *systems.Health
-	InputSystem                           *systems.Input
-	SpatialSystem                         *systems.Spatial
+	HealthSystem                          *zelduh.Health
+	InputSystem                           *zelduh.Input
+	SpatialSystem                         *zelduh.Spatial
 }
 
 func run() {
@@ -72,7 +70,7 @@ func run() {
 		},
 	})
 
-	gameWorld = world.New()
+	gameWorld = zelduh.New()
 
 	zelduh.ProcessMapLayout(zelduh.Overworld, roomsMap)
 
@@ -100,8 +98,8 @@ func run() {
 		RoomWarps:      map[terraform2d.EntityID]zelduh.Config{},
 		AllMapDrawData: terraform2d.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
-		InputSystem:  &systems.Input{Win: win},
-		HealthSystem: &systems.Health{},
+		InputSystem:  &zelduh.Input{Win: win},
+		HealthSystem: &zelduh.Health{},
 
 		Hearts: zelduh.BuildEntitiesFromConfigs(
 			gameWorld.NewEntityID,
@@ -111,7 +109,7 @@ func run() {
 		),
 	}
 
-	gameModel.SpatialSystem = &systems.Spatial{
+	gameModel.SpatialSystem = &zelduh.Spatial{
 		Rand: gameModel.Rand,
 	}
 
@@ -119,7 +117,7 @@ func run() {
 		GameModel: &gameModel,
 	}
 
-	collisionSystem := &systems.Collision{
+	collisionSystem := &zelduh.Collision{
 		MapBounds: pixel.R(
 			zelduh.MapX,
 			zelduh.MapY,
@@ -147,7 +145,7 @@ func run() {
 		gameModel.HealthSystem,
 		gameModel.SpatialSystem,
 		collisionSystem,
-		&systems.Render{
+		&zelduh.Render{
 			Win:         win,
 			Spritesheet: gameModel.Spritesheet,
 		},

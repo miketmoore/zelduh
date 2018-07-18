@@ -1,17 +1,16 @@
-package systems
+package zelduh
 
 import (
 	"math"
 
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 )
 
 type collisionEntity struct {
 	ID terraform2d.EntityID
-	*zelduh.ComponentSpatial
-	*zelduh.ComponentInvincible
+	*ComponentSpatial
+	*ComponentInvincible
 }
 
 // Collision is a custom system for detecting collisions and what to do when they occur
@@ -45,30 +44,30 @@ type Collision struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Collision) AddEntity(entity zelduh.Entity) {
+func (s *Collision) AddEntity(entity Entity) {
 	r := collisionEntity{
 		ID:               entity.ID(),
 		ComponentSpatial: entity.ComponentSpatial,
 	}
 	switch entity.Category {
-	case zelduh.CategoryPlayer:
+	case CategoryPlayer:
 		s.player = r
-	case zelduh.CategorySword:
+	case CategorySword:
 		s.sword = r
-	case zelduh.CategoryArrow:
+	case CategoryArrow:
 		s.arrow = r
-	case zelduh.CategoryMovableObstacle:
+	case CategoryMovableObstacle:
 		s.moveableObstacles = append(s.moveableObstacles, r)
-	case zelduh.CategoryCollisionSwitch:
+	case CategoryCollisionSwitch:
 		s.collisionSwitches = append(s.collisionSwitches, r)
-	case zelduh.CategoryWarp:
+	case CategoryWarp:
 		s.warps = append(s.warps, r)
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		r.ComponentInvincible = entity.ComponentInvincible
 		s.enemies = append(s.enemies, r)
-	case zelduh.CategoryCoin:
+	case CategoryCoin:
 		s.coins = append(s.coins, r)
-	case zelduh.CategoryObstacle:
+	case CategoryObstacle:
 		s.obstacles = append(s.obstacles, r)
 	}
 }
@@ -76,14 +75,14 @@ func (s *Collision) AddEntity(entity zelduh.Entity) {
 // Remove removes the entity from the system
 func (s *Collision) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
-	case zelduh.CategoryCoin:
+	case CategoryCoin:
 		for i := len(s.coins) - 1; i >= 0; i-- {
 			coin := s.coins[i]
 			if coin.ID == id {
 				s.coins = append(s.coins[:i], s.coins[i+1:]...)
 			}
 		}
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			enemy := s.enemies[i]
 			if enemy.ID == id {
@@ -96,19 +95,19 @@ func (s *Collision) Remove(category terraform2d.EntityCategory, id terraform2d.E
 // RemoveAll removes all entities from one category
 func (s *Collision) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
 		}
-	case zelduh.CategoryCollisionSwitch:
+	case CategoryCollisionSwitch:
 		for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
 			s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
 		}
-	case zelduh.CategoryMovableObstacle:
+	case CategoryMovableObstacle:
 		for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
 			s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
 		}
-	case zelduh.CategoryObstacle:
+	case CategoryObstacle:
 		for i := len(s.obstacles) - 1; i >= 0; i-- {
 			s.obstacles = append(s.obstacles[:i], s.obstacles[i+1:]...)
 		}

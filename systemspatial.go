@@ -1,18 +1,17 @@
-package systems
+package zelduh
 
 import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 )
 
 type spatialEntity struct {
 	ID terraform2d.EntityID
-	*zelduh.ComponentMovement
-	*zelduh.ComponentSpatial
-	*zelduh.ComponentDash
+	*ComponentMovement
+	*ComponentSpatial
+	*ComponentDash
 	TotalMoves  int
 	MoveCounter int
 }
@@ -28,23 +27,23 @@ type Spatial struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Spatial) AddEntity(entity zelduh.Entity) {
+func (s *Spatial) AddEntity(entity Entity) {
 	r := spatialEntity{
 		ID:                entity.ID(),
 		ComponentSpatial:  entity.ComponentSpatial,
 		ComponentMovement: entity.ComponentMovement,
 	}
 	switch entity.Category {
-	case zelduh.CategoryPlayer:
+	case CategoryPlayer:
 		r.ComponentDash = entity.ComponentDash
 		s.player = r
-	case zelduh.CategorySword:
+	case CategorySword:
 		s.sword = r
-	case zelduh.CategoryArrow:
+	case CategoryArrow:
 		s.arrow = r
-	case zelduh.CategoryMovableObstacle:
+	case CategoryMovableObstacle:
 		s.moveableObstacles = append(s.moveableObstacles, &r)
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		s.enemies = append(s.enemies, &r)
 	}
 }
@@ -52,7 +51,7 @@ func (s *Spatial) AddEntity(entity zelduh.Entity) {
 // Remove removes the entity from the system
 func (s *Spatial) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			enemy := s.enemies[i]
 			if enemy.ID == id {
@@ -65,7 +64,7 @@ func (s *Spatial) Remove(category terraform2d.EntityCategory, id terraform2d.Ent
 // RemoveAll removes all entities from one category
 func (s *Spatial) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
-	case zelduh.CategoryEnemy:
+	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
 		}
@@ -121,13 +120,13 @@ func (s *Spatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terra
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*zelduh.ComponentSpatial, bool) {
+func (s *Spatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*ComponentSpatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
 			return enemy.ComponentSpatial, true
 		}
 	}
-	return &zelduh.ComponentSpatial{}, false
+	return &ComponentSpatial{}, false
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit

@@ -1,15 +1,14 @@
-package systems
+package zelduh
 
 import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 )
 
 type inputEntity struct {
-	*zelduh.ComponentMovement
-	*zelduh.ComponentIgnore
-	*zelduh.ComponentDash
+	*ComponentMovement
+	*ComponentIgnore
+	*ComponentDash
 }
 
 // Input is a custom system for detecting collisions and what to do when they occur
@@ -32,18 +31,18 @@ func (s *Input) EnablePlayer() {
 }
 
 // AddEntity adds an entity to the system
-func (s *Input) AddEntity(entity zelduh.Entity) {
+func (s *Input) AddEntity(entity Entity) {
 	r := inputEntity{
 		ComponentMovement: entity.ComponentMovement,
 		ComponentDash:     entity.ComponentDash,
 		ComponentIgnore:   entity.ComponentIgnore,
 	}
 	switch entity.Category {
-	case zelduh.CategoryPlayer:
+	case CategoryPlayer:
 		s.playerEntity = r
-	case zelduh.CategorySword:
+	case CategorySword:
 		s.sword = r
-	case zelduh.CategoryArrow:
+	case CategoryArrow:
 		s.arrow = r
 	}
 }

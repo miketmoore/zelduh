@@ -1,13 +1,12 @@
-package systems
+package zelduh
 
 import (
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 )
 
 type healthEntity struct {
 	ID terraform2d.EntityID
-	*zelduh.ComponentHealth
+	*ComponentHealth
 }
 
 // Health is a custom system for altering character health
@@ -16,7 +15,7 @@ type Health struct {
 }
 
 // AddEntity adds the entity to the system
-func (s *Health) AddEntity(entity zelduh.Entity) {
+func (s *Health) AddEntity(entity Entity) {
 	s.entities = append(s.entities, healthEntity{
 		ID:              entity.ID(),
 		ComponentHealth: entity.ComponentHealth,
