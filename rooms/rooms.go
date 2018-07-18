@@ -66,7 +66,7 @@ func indexRoom(roomsMap Rooms, a, b terraform2d.RoomID, dir terraform2d.Directio
 			if ok {
 				roomA.SetConnectedRoom(terraform2d.DirectionRight, b)
 				roomsMap[a] = roomA
-				roomA.SetConnectedRoom(terraform2d.DirectionLeft, a)
+				roomB.SetConnectedRoom(terraform2d.DirectionLeft, a)
 				roomsMap[b] = roomB
 			}
 		case terraform2d.DirectionDown:
@@ -75,7 +75,7 @@ func indexRoom(roomsMap Rooms, a, b terraform2d.RoomID, dir terraform2d.Directio
 			if ok {
 				roomA.SetConnectedRoom(terraform2d.DirectionDown, b)
 				roomsMap[a] = roomA
-				roomA.SetConnectedRoom(terraform2d.DirectionUp, a)
+				roomB.SetConnectedRoom(terraform2d.DirectionUp, a)
 				roomsMap[b] = roomB
 			}
 		case terraform2d.DirectionLeft:
@@ -84,7 +84,7 @@ func indexRoom(roomsMap Rooms, a, b terraform2d.RoomID, dir terraform2d.Directio
 			if ok {
 				roomA.SetConnectedRoom(terraform2d.DirectionLeft, b)
 				roomsMap[a] = roomA
-				roomA.SetConnectedRoom(terraform2d.DirectionRight, a)
+				roomB.SetConnectedRoom(terraform2d.DirectionRight, a)
 				roomsMap[b] = roomB
 			}
 		}
