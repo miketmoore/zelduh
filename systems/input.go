@@ -4,7 +4,6 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/entities"
 )
 
 type inputEntity struct {
@@ -33,7 +32,7 @@ func (s *Input) EnablePlayer() {
 }
 
 // AddEntity adds an entity to the system
-func (s *Input) AddEntity(entity entities.Entity) {
+func (s *Input) AddEntity(entity zelduh.Entity) {
 	r := inputEntity{
 		ComponentMovement: entity.ComponentMovement,
 		ComponentDash:     entity.ComponentDash,

@@ -19,7 +19,6 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/image/colornames"
@@ -39,10 +38,10 @@ type GameModel struct {
 	RoomTransition                        *terraform2d.RoomTransition
 	CurrentState                          terraform2d.State
 	Rand                                  *rand.Rand
-	EntitiesMap                           map[terraform2d.EntityID]entities.Entity
+	EntitiesMap                           map[terraform2d.EntityID]zelduh.Entity
 	Spritesheet                           map[int]*pixel.Sprite
-	Arrow, Bomb, Explosion, Player, Sword entities.Entity
-	Hearts                                []entities.Entity
+	Arrow, Bomb, Explosion, Player, Sword zelduh.Entity
+	Hearts                                []zelduh.Entity
 	RoomWarps                             map[terraform2d.EntityID]entityconfig.Config
 	AllMapDrawData                        map[string]terraform2d.MapData
 	HealthSystem                          *systems.Health
@@ -84,7 +83,7 @@ func run() {
 
 	gameModel := GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
-		EntitiesMap:   map[terraform2d.EntityID]entities.Entity{},
+		EntitiesMap:   map[terraform2d.EntityID]zelduh.Entity{},
 		CurrentState:  terraform2d.StateStart,
 		AddEntities:   true,
 		CurrentRoomID: 1,
@@ -94,11 +93,11 @@ func run() {
 		Spritesheet: terraform2d.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
 		// Build entities
-		Player:    entities.BuildEntityFromConfig(entities.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
-		Bomb:      entities.BuildEntityFromConfig(entities.GetPreset("bomb")(0, 0), gameWorld.NewEntityID()),
-		Explosion: entities.BuildEntityFromConfig(entities.GetPreset("explosion")(0, 0), gameWorld.NewEntityID()),
-		Sword:     entities.BuildEntityFromConfig(entities.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
-		Arrow:     entities.BuildEntityFromConfig(entities.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
+		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
+		Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), gameWorld.NewEntityID()),
+		Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), gameWorld.NewEntityID()),
+		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
+		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
 		RoomWarps:      map[terraform2d.EntityID]entityconfig.Config{},
 		AllMapDrawData: terraform2d.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
@@ -106,11 +105,11 @@ func run() {
 		InputSystem:  &systems.Input{Win: win},
 		HealthSystem: &systems.Health{},
 
-		Hearts: entities.BuildEntitiesFromConfigs(
+		Hearts: zelduh.BuildEntitiesFromConfigs(
 			gameWorld.NewEntityID,
-			entities.GetPreset("heart")(1.5, 14),
-			entities.GetPreset("heart")(2.15, 14),
-			entities.GetPreset("heart")(2.80, 14),
+			zelduh.GetPreset("heart")(1.5, 14),
+			zelduh.GetPreset("heart")(2.15, 14),
+			zelduh.GetPreset("heart")(2.80, 14),
 		),
 	}
 
@@ -202,7 +201,7 @@ func run() {
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].(*rooms.Room).EntityConfigs {
-					entity := entities.BuildEntityFromConfig(c, gameWorld.NewEntityID())
+					entity := zelduh.BuildEntityFromConfig(c, gameWorld.NewEntityID())
 					gameModel.EntitiesMap[entity.ID()] = entity
 					gameWorld.AddEntity(entity)
 
@@ -390,9 +389,9 @@ func drawMapBGImage(
 	}
 }
 
-func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID terraform2d.RoomID, modX, modY float64) []entities.Entity {
+func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID terraform2d.RoomID, modX, modY float64) []zelduh.Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName()]
-	obstacles := []entities.Entity{}
+	obstacles := []zelduh.Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
@@ -406,7 +405,7 @@ func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roo
 				x := movedVec.X/zelduh.TileSize - mod
 				y := movedVec.Y/zelduh.TileSize - mod
 				id := gameWorld.NewEntityID()
-				obstacle := entities.BuildEntityFromConfig(entities.GetPreset("obstacle")(x, y), id)
+				obstacle := zelduh.BuildEntityFromConfig(zelduh.GetPreset("obstacle")(x, y), id)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
@@ -450,18 +449,18 @@ func drawMask() {
 
 var roomsMap = rooms.Rooms{
 	1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
-		entities.GetPreset("puzzleBox")(5, 5),
-		entities.GetPreset("floorSwitch")(5, 6),
-		entities.GetPreset("toggleObstacle")(10, 7),
+		zelduh.GetPreset("puzzleBox")(5, 5),
+		zelduh.GetPreset("floorSwitch")(5, 6),
+		zelduh.GetPreset("toggleObstacle")(10, 7),
 	),
 	2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
-		entities.GetPreset("skull")(5, 5),
-		entities.GetPreset("skeleton")(11, 9),
-		entities.GetPreset("spinner")(7, 9),
-		entities.GetPreset("eyeburrower")(8, 9),
+		zelduh.GetPreset("skull")(5, 5),
+		zelduh.GetPreset("skeleton")(11, 9),
+		zelduh.GetPreset("spinner")(7, 9),
+		zelduh.GetPreset("eyeburrower")(8, 9),
 	),
 	3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom",
-		entities.WarpStone(3, 7, 6, 5),
+		zelduh.WarpStone(3, 7, 6, 5),
 	),
 	5: rooms.NewRoom("rockWithCaveEntrance",
 		entityconfig.Config{
@@ -520,14 +519,14 @@ var roomsMap = rooms.Rooms{
 }
 
 func addUICoin() {
-	coin := entities.BuildEntityFromConfig(entities.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
+	coin := zelduh.BuildEntityFromConfig(zelduh.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
 	gameWorld.AddEntity(coin)
 }
 
 // make sure only correct number of hearts exists in systems
 // so, if health is reduced, need to remove a heart entity from the systems,
 // the correct one... last one
-func addUIHearts(hearts []entities.Entity, health int) {
+func addUIHearts(hearts []zelduh.Entity, health int) {
 	for i, entity := range hearts {
 		if i < health {
 			gameWorld.AddEntity(entity)
@@ -536,7 +535,7 @@ func addUIHearts(hearts []entities.Entity, health int) {
 }
 
 func dropCoin(v pixel.Vec) {
-	coin := entities.BuildEntityFromConfig(entities.GetPreset("coin")(v.X/zelduh.TileSize, v.Y/zelduh.TileSize), gameWorld.NewEntityID())
+	coin := zelduh.BuildEntityFromConfig(zelduh.GetPreset("coin")(v.X/zelduh.TileSize, v.Y/zelduh.TileSize), gameWorld.NewEntityID())
 	gameWorld.AddEntity(coin)
 }
 

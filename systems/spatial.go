@@ -6,7 +6,6 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/entities"
 )
 
 type spatialEntity struct {
@@ -29,7 +28,7 @@ type Spatial struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Spatial) AddEntity(entity entities.Entity) {
+func (s *Spatial) AddEntity(entity zelduh.Entity) {
 	r := spatialEntity{
 		ID:                entity.ID(),
 		ComponentSpatial:  entity.ComponentSpatial,

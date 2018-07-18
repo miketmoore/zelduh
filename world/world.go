@@ -3,14 +3,13 @@ package world
 import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
 )
 
 // System is an interface
 type System interface {
 	Update()
-	AddEntity(entities.Entity)
+	AddEntity(zelduh.Entity)
 }
 
 // World is a world struct
@@ -59,14 +58,14 @@ func (w *World) NewEntityID() terraform2d.EntityID {
 }
 
 // AddEntity adds the entity to it's system
-func (w *World) AddEntity(entity entities.Entity) {
+func (w *World) AddEntity(entity zelduh.Entity) {
 	for _, system := range w.Systems() {
 		system.AddEntity(entity)
 	}
 }
 
 // AddEntities adds the terraform2d to their system
-func (w *World) AddEntities(all ...entities.Entity) {
+func (w *World) AddEntities(all ...zelduh.Entity) {
 	for _, entity := range all {
 		w.AddEntity(entity)
 	}

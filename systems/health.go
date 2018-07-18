@@ -3,7 +3,6 @@ package systems
 import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/entities"
 )
 
 type healthEntity struct {
@@ -17,7 +16,7 @@ type Health struct {
 }
 
 // AddEntity adds the entity to the system
-func (s *Health) AddEntity(entity entities.Entity) {
+func (s *Health) AddEntity(entity zelduh.Entity) {
 	s.entities = append(s.entities, healthEntity{
 		ID:              entity.ID(),
 		ComponentHealth: entity.ComponentHealth,

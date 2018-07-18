@@ -6,7 +6,6 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/entities"
 )
 
 type collisionEntity struct {
@@ -46,7 +45,7 @@ type Collision struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *Collision) AddEntity(entity entities.Entity) {
+func (s *Collision) AddEntity(entity zelduh.Entity) {
 	r := collisionEntity{
 		ID:               entity.ID(),
 		ComponentSpatial: entity.ComponentSpatial,

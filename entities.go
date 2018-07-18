@@ -1,10 +1,9 @@
-package entities
+package zelduh
 
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/entityconfig"
 	"golang.org/x/image/colornames"
 )
@@ -13,18 +12,18 @@ import (
 type Entity struct {
 	id       terraform2d.EntityID
 	Category terraform2d.EntityCategory
-	*zelduh.ComponentInvincible
-	*zelduh.ComponentAnimation
-	*zelduh.ComponentAppearance
-	*zelduh.ComponentCoins
-	*zelduh.ComponentDash
-	*zelduh.ComponentEnabled
-	*zelduh.ComponentToggler
-	*zelduh.ComponentHealth
-	*zelduh.ComponentIgnore
-	*zelduh.ComponentMovement
-	*zelduh.ComponentSpatial
-	*zelduh.ComponentTemporary
+	*ComponentInvincible
+	*ComponentAnimation
+	*ComponentAppearance
+	*ComponentCoins
+	*ComponentDash
+	*ComponentEnabled
+	*ComponentToggler
+	*ComponentHealth
+	*ComponentIgnore
+	*ComponentMovement
+	*ComponentSpatial
+	*ComponentTemporary
 }
 
 // ID returns the entity ID
@@ -47,32 +46,32 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
-		ComponentSpatial: &zelduh.ComponentSpatial{
+		ComponentSpatial: &ComponentSpatial{
 			Width:  c.W,
 			Height: c.H,
 			Rect:   pixel.R(c.X, c.Y, c.X+c.W, c.Y+c.H),
 			Shape:  imdraw.New(nil),
 			HitBox: imdraw.New(nil),
 		},
-		ComponentIgnore: &zelduh.ComponentIgnore{
+		ComponentIgnore: &ComponentIgnore{
 			Value: c.Ignore,
 		},
 	}
 
 	if c.Expiration > 0 {
-		entity.ComponentTemporary = &zelduh.ComponentTemporary{
+		entity.ComponentTemporary = &ComponentTemporary{
 			Expiration: c.Expiration,
 		}
 	}
 
-	if c.Category == zelduh.CategoryWarp {
-		entity.ComponentEnabled = &zelduh.ComponentEnabled{
+	if c.Category == CategoryWarp {
+		entity.ComponentEnabled = &ComponentEnabled{
 			Value: true,
 		}
 	}
 
 	if c.Health > 0 {
-		entity.ComponentHealth = &zelduh.ComponentHealth{
+		entity.ComponentHealth = &ComponentHealth{
 			Total: c.Health,
 		}
 	}
@@ -82,24 +81,24 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	}
 
 	if c.Toggleable {
-		entity.ComponentToggler = &zelduh.ComponentToggler{}
+		entity.ComponentToggler = &ComponentToggler{}
 		if c.Toggled {
 			entity.ComponentToggler.Toggle()
 		}
 	}
 
 	if c.Invincible {
-		entity.ComponentInvincible = &zelduh.ComponentInvincible{
+		entity.ComponentInvincible = &ComponentInvincible{
 			Enabled: true,
 		}
 	} else {
-		entity.ComponentInvincible = &zelduh.ComponentInvincible{
+		entity.ComponentInvincible = &ComponentInvincible{
 			Enabled: false,
 		}
 	}
 
 	if c.Movement != nil {
-		entity.ComponentMovement = &zelduh.ComponentMovement{
+		entity.ComponentMovement = &ComponentMovement{
 			Direction:      c.Movement.Direction,
 			MaxSpeed:       c.Movement.MaxSpeed,
 			Speed:          c.Movement.Speed,
@@ -113,13 +112,13 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	}
 
 	if c.Coins {
-		entity.ComponentCoins = &zelduh.ComponentCoins{
+		entity.ComponentCoins = &ComponentCoins{
 			Coins: 0,
 		}
 	}
 
 	if c.Dash != nil {
-		entity.ComponentDash = &zelduh.ComponentDash{
+		entity.ComponentDash = &ComponentDash{
 			Charge:    c.Dash.Charge,
 			MaxCharge: c.Dash.MaxCharge,
 			SpeedMod:  c.Dash.SpeedMod,
@@ -127,17 +126,17 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 	}
 
 	if c.Animation != nil {
-		entity.ComponentAnimation = &zelduh.ComponentAnimation{
-			Map: zelduh.ComponentAnimationMap{},
+		entity.ComponentAnimation = &ComponentAnimation{
+			Map: ComponentAnimationMap{},
 		}
 		for key, val := range c.Animation {
-			entity.ComponentAnimation.Map[key] = &zelduh.ComponentAnimationData{
+			entity.ComponentAnimation.Map[key] = &ComponentAnimationData{
 				Frames:    val,
-				FrameRate: zelduh.FrameRate,
+				FrameRate: FrameRate,
 			}
 		}
 	} else {
-		entity.ComponentAppearance = &zelduh.ComponentAppearance{
+		entity.ComponentAppearance = &ComponentAppearance{
 			Color: colornames.Sandybrown,
 		}
 	}
