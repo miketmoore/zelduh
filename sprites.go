@@ -1,7 +1,7 @@
-package sprites
+package zelduh
 
-// GetSet returns a sprite set by key
-func GetSet(key string) []int {
+// GetSpriteSet returns a sprite set by key
+func GetSpriteSet(key string) []int {
 	return spriteSets[key]
 }
 

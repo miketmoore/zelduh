@@ -5,7 +5,6 @@ import (
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/entityconfig"
-	"github.com/miketmoore/zelduh/sprites"
 )
 
 // GetPreset gets an entity config preset function by key
@@ -28,10 +27,10 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X: zelduh.TileSize * xTiles,
 			Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"up":    sprites.GetSet("arrowUp"),
-				"right": sprites.GetSet("arrowRight"),
-				"down":  sprites.GetSet("arrowDown"),
-				"left":  sprites.GetSet("arrowLeft"),
+				"up":    zelduh.GetSpriteSet("arrowUp"),
+				"right": zelduh.GetSpriteSet("arrowRight"),
+				"down":  zelduh.GetSpriteSet("arrowDown"),
+				"left":  zelduh.GetSpriteSet("arrowLeft"),
 			},
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 5,
@@ -51,7 +50,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X: zelduh.TileSize * xTiles,
 			Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("bomb"),
+				"default": zelduh.GetSpriteSet("bomb"),
 			},
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 5,
@@ -67,7 +66,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X:        zelduh.TileSize * xTiles,
 			Y:        zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("coin"),
+				"default": zelduh.GetSpriteSet("coin"),
 			},
 		}
 	},
@@ -76,7 +75,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category:   zelduh.CategoryExplosion,
 			Expiration: 12,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("explosion"),
+				"default": zelduh.GetSpriteSet("explosion"),
 			},
 		}
 	},
@@ -114,14 +113,14 @@ var entityPresets = map[string]entityConfigPresetFn{
 				SpeedMod:  7,
 			},
 			Animation: entityconfig.AnimationConfig{
-				"up":               sprites.GetSet("playerUp"),
-				"right":            sprites.GetSet("playerRight"),
-				"down":             sprites.GetSet("playerDown"),
-				"left":             sprites.GetSet("playerLeft"),
-				"swordAttackUp":    sprites.GetSet("playerSwordUp"),
-				"swordAttackRight": sprites.GetSet("playerSwordRight"),
-				"swordAttackLeft":  sprites.GetSet("playerSwordLeft"),
-				"swordAttackDown":  sprites.GetSet("playerSwordDown"),
+				"up":               zelduh.GetSpriteSet("playerUp"),
+				"right":            zelduh.GetSpriteSet("playerRight"),
+				"down":             zelduh.GetSpriteSet("playerDown"),
+				"left":             zelduh.GetSpriteSet("playerLeft"),
+				"swordAttackUp":    zelduh.GetSpriteSet("playerSwordUp"),
+				"swordAttackRight": zelduh.GetSpriteSet("playerSwordRight"),
+				"swordAttackLeft":  zelduh.GetSpriteSet("playerSwordLeft"),
+				"swordAttackDown":  zelduh.GetSpriteSet("playerSwordDown"),
 			},
 		}
 	},
@@ -137,10 +136,10 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X: zelduh.TileSize * xTiles,
 			Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"up":    sprites.GetSet("swordUp"),
-				"right": sprites.GetSet("swordRight"),
-				"down":  sprites.GetSet("swordDown"),
-				"left":  sprites.GetSet("swordLeft"),
+				"up":    zelduh.GetSpriteSet("swordUp"),
+				"right": zelduh.GetSpriteSet("swordRight"),
+				"down":  zelduh.GetSpriteSet("swordDown"),
+				"left":  zelduh.GetSpriteSet("swordLeft"),
 			},
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 20,
@@ -153,7 +152,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: zelduh.CategoryEnemy,
 			W:        zelduh.TileSize, H: zelduh.TileSize, X: zelduh.TileSize * xTiles, Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("eyeburrower"),
+				"default": zelduh.GetSpriteSet("eyeburrower"),
 			},
 			Health: 2,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -182,7 +181,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Box: imdraw.New(nil),
 			},
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("heart"),
+				"default": zelduh.GetSpriteSet("heart"),
 			},
 		}
 
@@ -192,7 +191,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: zelduh.CategoryEnemy,
 			W:        zelduh.TileSize, H: zelduh.TileSize, X: zelduh.TileSize * xTiles, Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("skeleton"),
+				"default": zelduh.GetSpriteSet("skeleton"),
 			},
 			Health: 2,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -215,7 +214,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: zelduh.CategoryEnemy,
 			W:        zelduh.TileSize, H: zelduh.TileSize, X: zelduh.TileSize * xTiles, Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("skull"),
+				"default": zelduh.GetSpriteSet("skull"),
 			},
 			Health: 2,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -238,7 +237,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: zelduh.CategoryEnemy,
 			W:        zelduh.TileSize, H: zelduh.TileSize, X: zelduh.TileSize * xTiles, Y: zelduh.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("spinner"),
+				"default": zelduh.GetSpriteSet("spinner"),
 			},
 			Invincible: true,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -267,7 +266,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Box: imdraw.New(nil),
 			},
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("uiCoin"),
+				"default": zelduh.GetSpriteSet("uiCoin"),
 			},
 		}
 	},
@@ -283,7 +282,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("warpStone"),
+				"default": zelduh.GetSpriteSet("warpStone"),
 			},
 		}
 	},
@@ -295,7 +294,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			W:        zelduh.TileSize,
 			H:        zelduh.TileSize,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("puzzleBox"),
+				"default": zelduh.GetSpriteSet("puzzleBox"),
 			},
 			Movement: &entityconfig.MovementConfig{
 				Speed:    1.0,
@@ -312,7 +311,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			W:        zelduh.TileSize,
 			H:        zelduh.TileSize,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("floorSwitch"),
+				"default": zelduh.GetSpriteSet("floorSwitch"),
 			},
 			Toggleable: true,
 		}
@@ -327,7 +326,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			W: zelduh.TileSize,
 			H: zelduh.TileSize,
 			Animation: entityconfig.AnimationConfig{
-				"default": sprites.GetSet("toggleObstacle"),
+				"default": zelduh.GetSpriteSet("toggleObstacle"),
 			},
 			// Impassable: true,
 			Toggleable: true,
