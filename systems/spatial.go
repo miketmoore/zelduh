@@ -5,7 +5,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
@@ -37,16 +37,16 @@ func (s *Spatial) AddEntity(entity entities.Entity) {
 		Movement: entity.Movement,
 	}
 	switch entity.Category {
-	case categories.Player:
+	case zelduh.CategoryPlayer:
 		r.Dash = entity.Dash
 		s.player = r
-	case categories.Sword:
+	case zelduh.CategorySword:
 		s.sword = r
-	case categories.Arrow:
+	case zelduh.CategoryArrow:
 		s.arrow = r
-	case categories.MovableObstacle:
+	case zelduh.CategoryMovableObstacle:
 		s.moveableObstacles = append(s.moveableObstacles, &r)
-	case categories.Enemy:
+	case zelduh.CategoryEnemy:
 		s.enemies = append(s.enemies, &r)
 	}
 }
@@ -54,7 +54,7 @@ func (s *Spatial) AddEntity(entity entities.Entity) {
 // Remove removes the entity from the system
 func (s *Spatial) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
-	case categories.Enemy:
+	case zelduh.CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			enemy := s.enemies[i]
 			if enemy.ID == id {
@@ -67,7 +67,7 @@ func (s *Spatial) Remove(category terraform2d.EntityCategory, id terraform2d.Ent
 // RemoveAll removes all entities from one category
 func (s *Spatial) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
-	case categories.Enemy:
+	case zelduh.CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
 		}

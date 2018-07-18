@@ -2,7 +2,7 @@ package world
 
 import (
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
 )
@@ -75,16 +75,16 @@ func (w *World) AddEntities(all ...entities.Entity) {
 // Remove removes the specific entity from all systems
 func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
 	switch category {
-	case categories.Coin:
+	case zelduh.CategoryCoin:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
 			case *systems.Collision:
-				sys.Remove(categories.Coin, id)
+				sys.Remove(zelduh.CategoryCoin, id)
 			case *systems.Render:
 				sys.RemoveEntity(id)
 			}
 		}
-	case categories.Heart:
+	case zelduh.CategoryHeart:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
 			case *systems.Render:
@@ -99,9 +99,9 @@ func (w *World) RemoveEnemy(id terraform2d.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *systems.Spatial:
-			sys.Remove(categories.Enemy, id)
+			sys.Remove(zelduh.CategoryEnemy, id)
 		case *systems.Collision:
-			sys.Remove(categories.Enemy, id)
+			sys.Remove(zelduh.CategoryEnemy, id)
 		case *systems.Render:
 			sys.RemoveEntity(id)
 		}
@@ -113,11 +113,11 @@ func (w *World) RemoveAllEnemies() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *systems.Spatial:
-			sys.RemoveAll(categories.Enemy)
+			sys.RemoveAll(zelduh.CategoryEnemy)
 		case *systems.Collision:
-			sys.RemoveAll(categories.Enemy)
+			sys.RemoveAll(zelduh.CategoryEnemy)
 		case *systems.Render:
-			sys.RemoveAll(categories.Enemy)
+			sys.RemoveAll(zelduh.CategoryEnemy)
 		}
 	}
 }
@@ -137,9 +137,9 @@ func (w *World) RemoveAllMoveableObstacles() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
-			sys.RemoveAll(categories.MovableObstacle)
+			sys.RemoveAll(zelduh.CategoryMovableObstacle)
 		case *systems.Render:
-			sys.RemoveAll(categories.MovableObstacle)
+			sys.RemoveAll(zelduh.CategoryMovableObstacle)
 		}
 	}
 }
@@ -149,7 +149,7 @@ func (w *World) RemoveAllCollisionSwitches() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *systems.Collision:
-			sys.RemoveAll(categories.CollisionSwitch)
+			sys.RemoveAll(zelduh.CategoryCollisionSwitch)
 		}
 	}
 }

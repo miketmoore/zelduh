@@ -10,6 +10,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/miketmoore/terraform2d"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
 	"github.com/miketmoore/zelduh/rooms"
@@ -19,7 +20,6 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
@@ -209,7 +209,7 @@ func run() {
 					gameWorld.AddEntity(entity)
 
 					switch c.Category {
-					case categories.Warp:
+					case zelduh.CategoryWarp:
 						gameModel.RoomWarps[entity.ID()] = c
 					}
 				}
@@ -253,7 +253,7 @@ func run() {
 				win.Clear(colornames.Darkgray)
 				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-				collisionSystem.RemoveAll(categories.Obstacle)
+				collisionSystem.RemoveAll(zelduh.CategoryObstacle)
 				gameWorld.RemoveAllEnemies()
 				gameWorld.RemoveAllCollisionSwitches()
 				gameWorld.RemoveAllMoveableObstacles()
@@ -301,7 +301,7 @@ func run() {
 				win.Clear(colornames.Darkgray)
 				drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
 
-				collisionSystem.RemoveAll(categories.Obstacle)
+				collisionSystem.RemoveAll(zelduh.CategoryObstacle)
 				gameWorld.RemoveAllEnemies()
 				gameWorld.RemoveAllCollisionSwitches()
 				gameWorld.RemoveAllMoveableObstacles()
@@ -467,7 +467,7 @@ var roomsMap = rooms.Rooms{
 	),
 	5: rooms.NewRoom("rockWithCaveEntrance",
 		entityconfig.Config{
-			Category:     categories.Warp,
+			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 11,
 			W:            config.TileSize,
 			H:            config.TileSize,
@@ -478,7 +478,7 @@ var roomsMap = rooms.Rooms{
 			},
 		},
 		entityconfig.Config{
-			Category:     categories.Warp,
+			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 11,
 			W:            config.TileSize,
 			H:            config.TileSize,
@@ -497,7 +497,7 @@ var roomsMap = rooms.Rooms{
 	11: rooms.NewRoom("dungeonFourDoors",
 		// South door of cave - warp to cave entrance
 		entityconfig.Config{
-			Category:     categories.Warp,
+			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 5,
 			W:            config.TileSize,
 			H:            config.TileSize,
@@ -508,7 +508,7 @@ var roomsMap = rooms.Rooms{
 			},
 		},
 		entityconfig.Config{
-			Category:     categories.Warp,
+			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 5,
 			W:            config.TileSize,
 			H:            config.TileSize,
@@ -562,7 +562,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side terraform2d.Bound) 
 // OnPlayerCollisionWithCoin handles collision between player and coin
 func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID terraform2d.EntityID) {
 	ch.GameModel.Player.Coins.Coins++
-	gameWorld.Remove(categories.Coin, coinID)
+	gameWorld.Remove(zelduh.CategoryCoin, coinID)
 }
 
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
@@ -573,7 +573,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.Entit
 
 	// remove heart entity
 	heartIndex := len(ch.GameModel.Hearts) - 1
-	gameWorld.Remove(categories.Heart, ch.GameModel.Hearts[heartIndex].ID())
+	gameWorld.Remove(zelduh.CategoryHeart, ch.GameModel.Hearts[heartIndex].ID())
 	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
 
 	if ch.GameModel.Player.Health.Total == 0 {

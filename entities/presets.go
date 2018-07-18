@@ -3,7 +3,7 @@ package entities
 import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
 	"github.com/miketmoore/zelduh/sprites"
@@ -19,7 +19,7 @@ type entityConfigPresetFn = func(xTiles, yTiles float64) entityconfig.Config
 var entityPresets = map[string]entityConfigPresetFn{
 	"arrow": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Arrow,
+			Category: zelduh.CategoryArrow,
 			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
@@ -42,7 +42,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"bomb": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Bomb,
+			Category: zelduh.CategoryBomb,
 			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
@@ -62,7 +62,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"coin": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Coin,
+			Category: zelduh.CategoryCoin,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
@@ -74,7 +74,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"explosion": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category:   categories.Explosion,
+			Category:   zelduh.CategoryExplosion,
 			Expiration: 12,
 			Animation: entityconfig.AnimationConfig{
 				"default": sprites.GetSet("explosion"),
@@ -83,7 +83,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"obstacle": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Obstacle,
+			Category: zelduh.CategoryObstacle,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
@@ -92,7 +92,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"player": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Player,
+			Category: zelduh.CategoryPlayer,
 			Health:   3,
 			W:        config.TileSize,
 			H:        config.TileSize,
@@ -128,7 +128,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"sword": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Sword,
+			Category: zelduh.CategorySword,
 			Movement: &entityconfig.MovementConfig{
 				Direction: terraform2d.DirectionDown,
 				Speed:     0.0,
@@ -151,7 +151,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"eyeburrower": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Enemy,
+			Category: zelduh.CategoryEnemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
 				"default": sprites.GetSet("eyeburrower"),
@@ -174,7 +174,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"heart": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Heart,
+			Category: zelduh.CategoryHeart,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
@@ -190,7 +190,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"skeleton": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Enemy,
+			Category: zelduh.CategoryEnemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
 				"default": sprites.GetSet("skeleton"),
@@ -213,7 +213,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"skull": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Enemy,
+			Category: zelduh.CategoryEnemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
 				"default": sprites.GetSet("skull"),
@@ -236,7 +236,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"spinner": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Enemy,
+			Category: zelduh.CategoryEnemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
 				"default": sprites.GetSet("spinner"),
@@ -259,7 +259,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"uiCoin": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Heart,
+			Category: zelduh.CategoryHeart,
 			W:        config.TileSize,
 			H:        config.TileSize,
 			X:        config.TileSize * xTiles,
@@ -274,7 +274,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"warpStone": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.Warp,
+			Category: zelduh.CategoryWarp,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			W:        config.TileSize,
@@ -290,7 +290,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"puzzleBox": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.MovableObstacle,
+			Category: zelduh.CategoryMovableObstacle,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			W:        config.TileSize,
@@ -307,7 +307,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	"floorSwitch": func(xTiles, yTiles float64) entityconfig.Config {
 		return entityconfig.Config{
-			Category: categories.CollisionSwitch,
+			Category: zelduh.CategoryCollisionSwitch,
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			W:        config.TileSize,

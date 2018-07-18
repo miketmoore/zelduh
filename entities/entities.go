@@ -4,7 +4,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
@@ -67,7 +67,7 @@ func BuildEntityFromConfig(c entityconfig.Config, id terraform2d.EntityID) Entit
 		}
 	}
 
-	if c.Category == categories.Warp {
+	if c.Category == zelduh.CategoryWarp {
 		entity.Enabled = &components.Enabled{
 			Value: true,
 		}

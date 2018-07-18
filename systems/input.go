@@ -3,7 +3,7 @@ package systems
 import (
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
@@ -41,11 +41,11 @@ func (s *Input) AddEntity(entity entities.Entity) {
 		Ignore:   entity.Ignore,
 	}
 	switch entity.Category {
-	case categories.Player:
+	case zelduh.CategoryPlayer:
 		s.playerEntity = r
-	case categories.Sword:
+	case zelduh.CategorySword:
 		s.sword = r
-	case categories.Arrow:
+	case zelduh.CategoryArrow:
 		s.arrow = r
 	}
 }

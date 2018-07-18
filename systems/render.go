@@ -4,7 +4,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh/categories"
+	"github.com/miketmoore/zelduh"
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 )
@@ -46,25 +46,25 @@ func (s *Render) AddEntity(entity entities.Entity) {
 		Ignore:    entity.Ignore,
 	}
 	switch entity.Category {
-	case categories.Player:
+	case zelduh.CategoryPlayer:
 		s.player = r
-	case categories.Arrow:
+	case zelduh.CategoryArrow:
 		s.arrow = r
-	case categories.Sword:
+	case zelduh.CategorySword:
 		s.sword = r
-	case categories.Explosion:
+	case zelduh.CategoryExplosion:
 		fallthrough
-	case categories.Heart:
+	case zelduh.CategoryHeart:
 		fallthrough
-	case categories.Enemy:
+	case zelduh.CategoryEnemy:
 		fallthrough
-	case categories.CollisionSwitch:
+	case zelduh.CategoryCollisionSwitch:
 		fallthrough
-	case categories.MovableObstacle:
+	case zelduh.CategoryMovableObstacle:
 		fallthrough
-	case categories.Warp:
+	case zelduh.CategoryWarp:
 		fallthrough
-	case categories.Coin:
+	case zelduh.CategoryCoin:
 		fallthrough
 	default:
 		if entity.Toggler != nil {
@@ -77,9 +77,9 @@ func (s *Render) AddEntity(entity entities.Entity) {
 // RemoveAll removes all entities from one category
 func (s *Render) RemoveAll(category terraform2d.EntityCategory) {
 	switch category {
-	case categories.Enemy:
+	case zelduh.CategoryEnemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {
-			if s.entities[i].Category == categories.Enemy {
+			if s.entities[i].Category == zelduh.CategoryEnemy {
 				s.entities = append(s.entities[:i], s.entities[i+1:]...)
 			}
 		}
