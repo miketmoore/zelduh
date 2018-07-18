@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
@@ -22,14 +23,15 @@ import (
 	"github.com/miketmoore/zelduh/components"
 	"github.com/miketmoore/zelduh/entities"
 	"github.com/miketmoore/zelduh/systems"
-	"github.com/nicksnyder/go-i18n/i18n"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/image/colornames"
+	"golang.org/x/text/language"
 )
 
 var (
-	win       *pixelgl.Window
-	txt       *text.Text
-	t         i18n.TranslateFunc
+	win *pixelgl.Window
+	txt *text.Text
+	// t         i18n.TranslateFunc
 	gameWorld world.World
 )
 
@@ -53,14 +55,35 @@ type GameModel struct {
 
 func run() {
 
+	bundle := &i18n.Bundle{DefaultLanguage: language.English}
+
+	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
+	bundle.MustLoadMessageFile("i18n/zelduh/active.en.toml")
+
+	localizer := i18n.NewLocalizer(bundle, "en")
+
+	i18nTitle := localizer.MustLocalize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{
+			ID: "Title",
+		},
+	})
+	i18nPaused := localizer.MustLocalize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{
+			ID: "Paused",
+		},
+	})
+	i18nGameOver := localizer.MustLocalize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{
+			ID: "GameOver",
+		},
+	})
+
 	gameWorld = world.New()
 
 	rooms.ProcessMapLayout(config.Overworld, roomsMap)
 
-	// Initializations
-	t = initI18n()
 	txt = initText(20, 50, colornames.Black)
-	win = initWindow(t("title"))
+	win = initWindow(i18nTitle)
 
 	gameModel := GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -151,7 +174,7 @@ func run() {
 		case terraform2d.StateStart:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
-			drawCenterText(t("title"), colornames.Black)
+			drawCenterText(i18nTitle, colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				gameModel.CurrentState = terraform2d.StateGame
@@ -208,7 +231,7 @@ func run() {
 		case terraform2d.StatePause:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.White)
-			drawCenterText(t("paused"), colornames.Black)
+			drawCenterText(i18nPaused, colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
 				gameModel.CurrentState = terraform2d.StateGame
@@ -219,7 +242,7 @@ func run() {
 		case terraform2d.StateOver:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(config.MapX, config.MapY, config.MapW, config.MapH, colornames.Black)
-			drawCenterText(t("gameOver"), colornames.White)
+			drawCenterText(i18nGameOver, colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				gameModel.CurrentState = terraform2d.StateStart
@@ -301,17 +324,6 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
-}
-
-func initI18n() i18n.TranslateFunc {
-	i18n.LoadTranslationFile(config.TranslationFile)
-	T, err := i18n.Tfunc(config.Lang)
-	if err != nil {
-		fmt.Println("Initializing i18n failed:")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	return T
 }
 
 func initText(x, y float64, color color.RGBA) *text.Text {
