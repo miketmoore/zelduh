@@ -6,6 +6,7 @@ import (
 	"github.com/miketmoore/zelduh/categories"
 	"github.com/miketmoore/zelduh/config"
 	"github.com/miketmoore/zelduh/entityconfig"
+	"github.com/miketmoore/zelduh/sprites"
 )
 
 // GetPreset gets an entity config preset function by key
@@ -28,10 +29,10 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"up":    terraform2d.GetSet("arrowUp"),
-				"right": terraform2d.GetSet("arrowRight"),
-				"down":  terraform2d.GetSet("arrowDown"),
-				"left":  terraform2d.GetSet("arrowLeft"),
+				"up":    sprites.GetSet("arrowUp"),
+				"right": sprites.GetSet("arrowRight"),
+				"down":  sprites.GetSet("arrowDown"),
+				"left":  sprites.GetSet("arrowLeft"),
 			},
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 5,
@@ -51,7 +52,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("bomb"),
+				"default": sprites.GetSet("bomb"),
 			},
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 5,
@@ -67,7 +68,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X:        config.TileSize * xTiles,
 			Y:        config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("coin"),
+				"default": sprites.GetSet("coin"),
 			},
 		}
 	},
@@ -76,7 +77,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category:   categories.Explosion,
 			Expiration: 12,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("explosion"),
+				"default": sprites.GetSet("explosion"),
 			},
 		}
 	},
@@ -114,14 +115,14 @@ var entityPresets = map[string]entityConfigPresetFn{
 				SpeedMod:  7,
 			},
 			Animation: entityconfig.AnimationConfig{
-				"up":               terraform2d.GetSet("playerUp"),
-				"right":            terraform2d.GetSet("playerRight"),
-				"down":             terraform2d.GetSet("playerDown"),
-				"left":             terraform2d.GetSet("playerLeft"),
-				"swordAttackUp":    terraform2d.GetSet("playerSwordUp"),
-				"swordAttackRight": terraform2d.GetSet("playerSwordRight"),
-				"swordAttackLeft":  terraform2d.GetSet("playerSwordLeft"),
-				"swordAttackDown":  terraform2d.GetSet("playerSwordDown"),
+				"up":               sprites.GetSet("playerUp"),
+				"right":            sprites.GetSet("playerRight"),
+				"down":             sprites.GetSet("playerDown"),
+				"left":             sprites.GetSet("playerLeft"),
+				"swordAttackUp":    sprites.GetSet("playerSwordUp"),
+				"swordAttackRight": sprites.GetSet("playerSwordRight"),
+				"swordAttackLeft":  sprites.GetSet("playerSwordLeft"),
+				"swordAttackDown":  sprites.GetSet("playerSwordDown"),
 			},
 		}
 	},
@@ -137,10 +138,10 @@ var entityPresets = map[string]entityConfigPresetFn{
 			X: config.TileSize * xTiles,
 			Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"up":    terraform2d.GetSet("swordUp"),
-				"right": terraform2d.GetSet("swordRight"),
-				"down":  terraform2d.GetSet("swordDown"),
-				"left":  terraform2d.GetSet("swordLeft"),
+				"up":    sprites.GetSet("swordUp"),
+				"right": sprites.GetSet("swordRight"),
+				"down":  sprites.GetSet("swordDown"),
+				"left":  sprites.GetSet("swordLeft"),
 			},
 			Hitbox: &entityconfig.HitboxConfig{
 				Radius: 20,
@@ -153,7 +154,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("eyeburrower"),
+				"default": sprites.GetSet("eyeburrower"),
 			},
 			Health: 2,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -182,7 +183,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Box: imdraw.New(nil),
 			},
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("heart"),
+				"default": sprites.GetSet("heart"),
 			},
 		}
 
@@ -192,7 +193,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("skeleton"),
+				"default": sprites.GetSet("skeleton"),
 			},
 			Health: 2,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -215,7 +216,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("skull"),
+				"default": sprites.GetSet("skull"),
 			},
 			Health: 2,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -238,7 +239,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Category: categories.Enemy,
 			W:        config.TileSize, H: config.TileSize, X: config.TileSize * xTiles, Y: config.TileSize * yTiles,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("spinner"),
+				"default": sprites.GetSet("spinner"),
 			},
 			Invincible: true,
 			Hitbox: &entityconfig.HitboxConfig{
@@ -267,7 +268,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Box: imdraw.New(nil),
 			},
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("uiCoin"),
+				"default": sprites.GetSet("uiCoin"),
 			},
 		}
 	},
@@ -283,7 +284,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("warpStone"),
+				"default": sprites.GetSet("warpStone"),
 			},
 		}
 	},
@@ -295,7 +296,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			W:        config.TileSize,
 			H:        config.TileSize,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("puzzleBox"),
+				"default": sprites.GetSet("puzzleBox"),
 			},
 			Movement: &entityconfig.MovementConfig{
 				Speed:    1.0,
@@ -312,7 +313,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			W:        config.TileSize,
 			H:        config.TileSize,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("floorSwitch"),
+				"default": sprites.GetSet("floorSwitch"),
 			},
 			Toggleable: true,
 		}
@@ -327,7 +328,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 			W: config.TileSize,
 			H: config.TileSize,
 			Animation: entityconfig.AnimationConfig{
-				"default": terraform2d.GetSet("toggleObstacle"),
+				"default": sprites.GetSet("toggleObstacle"),
 			},
 			// Impassable: true,
 			Toggleable: true,
