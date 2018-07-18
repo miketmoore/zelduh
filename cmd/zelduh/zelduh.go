@@ -29,9 +29,8 @@ import (
 )
 
 var (
-	win *pixelgl.Window
-	txt *text.Text
-	// t         i18n.TranslateFunc
+	win       *pixelgl.Window
+	txt       *text.Text
 	gameWorld world.World
 )
 
