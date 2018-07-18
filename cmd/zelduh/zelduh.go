@@ -168,10 +168,9 @@ func run() {
 				roomsMap[gameModel.CurrentRoomID].MapName(),
 				0, 0)
 
-			addHearts(gameModel.Hearts, gameModel.Player.Health.Total)
-
 			if gameModel.AddEntities {
 				gameModel.AddEntities = false
+				addHearts(gameModel.Hearts, gameModel.Player.Health.Total)
 
 				addUICoin()
 
