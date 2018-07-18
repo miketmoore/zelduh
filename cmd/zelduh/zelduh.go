@@ -11,7 +11,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
-	"github.com/miketmoore/zelduh/rooms"
 	"github.com/miketmoore/zelduh/world"
 
 	"github.com/faiface/pixel"
@@ -75,7 +74,7 @@ func run() {
 
 	gameWorld = world.New()
 
-	rooms.ProcessMapLayout(zelduh.Overworld, roomsMap)
+	zelduh.ProcessMapLayout(zelduh.Overworld, roomsMap)
 
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(i18nTitle)
@@ -199,7 +198,7 @@ func run() {
 				gameModel.RoomWarps = map[terraform2d.EntityID]zelduh.Config{}
 
 				// Iterate through all entity configurations and build entities and add to systems
-				for _, c := range roomsMap[gameModel.CurrentRoomID].(*rooms.Room).EntityConfigs {
+				for _, c := range roomsMap[gameModel.CurrentRoomID].(*zelduh.Room).EntityConfigs {
 					entity := zelduh.BuildEntityFromConfig(c, gameWorld.NewEntityID())
 					gameModel.EntitiesMap[entity.ID()] = entity
 					gameWorld.AddEntity(entity)
@@ -446,22 +445,22 @@ func drawMask() {
 	s.Draw(win)
 }
 
-var roomsMap = rooms.Rooms{
-	1: rooms.NewRoom("overworldFourWallsDoorBottomRight",
+var roomsMap = zelduh.Rooms{
+	1: zelduh.NewRoom("overworldFourWallsDoorBottomRight",
 		zelduh.GetPreset("puzzleBox")(5, 5),
 		zelduh.GetPreset("floorSwitch")(5, 6),
 		zelduh.GetPreset("toggleObstacle")(10, 7),
 	),
-	2: rooms.NewRoom("overworldFourWallsDoorTopBottom",
+	2: zelduh.NewRoom("overworldFourWallsDoorTopBottom",
 		zelduh.GetPreset("skull")(5, 5),
 		zelduh.GetPreset("skeleton")(11, 9),
 		zelduh.GetPreset("spinner")(7, 9),
 		zelduh.GetPreset("eyeburrower")(8, 9),
 	),
-	3: rooms.NewRoom("overworldFourWallsDoorRightTopBottom",
+	3: zelduh.NewRoom("overworldFourWallsDoorRightTopBottom",
 		zelduh.WarpStone(3, 7, 6, 5),
 	),
-	5: rooms.NewRoom("rockWithCaveEntrance",
+	5: zelduh.NewRoom("rockWithCaveEntrance",
 		zelduh.Config{
 			Category:     zelduh.CategoryWarp,
 			WarpToRoomID: 11,
@@ -485,12 +484,12 @@ var roomsMap = rooms.Rooms{
 			},
 		},
 	),
-	6:  rooms.NewRoom("rockPathLeftRightEntrance"),
-	7:  rooms.NewRoom("overworldFourWallsDoorLeftTop"),
-	8:  rooms.NewRoom("overworldFourWallsDoorBottom"),
-	9:  rooms.NewRoom("overworldFourWallsDoorTop"),
-	10: rooms.NewRoom("overworldFourWallsDoorLeft"),
-	11: rooms.NewRoom("dungeonFourDoors",
+	6:  zelduh.NewRoom("rockPathLeftRightEntrance"),
+	7:  zelduh.NewRoom("overworldFourWallsDoorLeftTop"),
+	8:  zelduh.NewRoom("overworldFourWallsDoorBottom"),
+	9:  zelduh.NewRoom("overworldFourWallsDoorTop"),
+	10: zelduh.NewRoom("overworldFourWallsDoorLeft"),
+	11: zelduh.NewRoom("dungeonFourDoors",
 		// South door of cave - warp to cave entrance
 		zelduh.Config{
 			Category:     zelduh.CategoryWarp,

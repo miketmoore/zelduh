@@ -1,8 +1,7 @@
-package rooms
+package zelduh
 
 import (
 	"github.com/miketmoore/terraform2d"
-	"github.com/miketmoore/zelduh"
 )
 
 // Rooms is a type of map that indexes rooms by their ID
@@ -12,7 +11,7 @@ type Rooms map[terraform2d.RoomID]terraform2d.Room
 type Room struct {
 	mapName        string
 	connectedRooms *terraform2d.ConnectedRooms
-	EntityConfigs  []zelduh.Config
+	EntityConfigs  []Config
 }
 
 // MapName returns the room's map name
@@ -40,7 +39,7 @@ func (r Room) SetConnectedRoom(direction terraform2d.Direction, id terraform2d.R
 }
 
 // NewRoom builds a new Room
-func NewRoom(name string, entityConfigs ...zelduh.Config) *Room {
+func NewRoom(name string, entityConfigs ...Config) *Room {
 	return &Room{
 		mapName:        name,
 		connectedRooms: &terraform2d.ConnectedRooms{},
