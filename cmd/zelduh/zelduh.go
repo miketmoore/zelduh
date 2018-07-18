@@ -170,7 +170,7 @@ func run() {
 
 			if gameModel.AddEntities {
 				gameModel.AddEntities = false
-				addHearts(gameModel.Hearts, gameModel.Player.Health.Total)
+				addUIHearts(gameModel.Hearts, gameModel.Player.Health.Total)
 
 				addUICoin()
 
@@ -527,7 +527,7 @@ func addUICoin() {
 // make sure only correct number of hearts exists in systems
 // so, if health is reduced, need to remove a heart entity from the systems,
 // the correct one... last one
-func addHearts(hearts []entities.Entity, health int) {
+func addUIHearts(hearts []entities.Entity, health int) {
 	for i, entity := range hearts {
 		if i < health {
 			gameWorld.AddEntity(entity)
