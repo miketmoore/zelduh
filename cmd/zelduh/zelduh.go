@@ -41,7 +41,7 @@ type GameModel struct {
 	RoomWarps                             map[terraform2d.EntityID]zelduh.Config
 	AllMapDrawData                        map[string]terraform2d.MapData
 	HealthSystem                          *zelduh.Health
-	InputSystem                           *zelduh.Input
+	InputSystem                           *zelduh.SystemInput
 	SpatialSystem                         *zelduh.Spatial
 }
 
@@ -98,7 +98,7 @@ func run() {
 		RoomWarps:      map[terraform2d.EntityID]zelduh.Config{},
 		AllMapDrawData: terraform2d.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
-		InputSystem:  &zelduh.Input{Win: win},
+		InputSystem:  &zelduh.SystemInput{Win: win},
 		HealthSystem: &zelduh.Health{},
 
 		Hearts: zelduh.BuildEntitiesFromConfigs(
