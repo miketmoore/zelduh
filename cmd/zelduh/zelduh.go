@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/BurntSushi/toml"
 	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
 
@@ -16,9 +15,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/image/colornames"
-	"golang.org/x/text/language"
 )
 
 var (
@@ -47,35 +44,27 @@ type GameModel struct {
 
 func run() {
 
-	bundle := &i18n.Bundle{DefaultLanguage: language.English}
-
-	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	bundle.MustLoadMessageFile(zelduh.TranslationFile)
-
-	localizer := i18n.NewLocalizer(bundle, "en")
-
-	i18nTitle := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID: "Title",
+	localeMsgs := map[string]map[string]string{
+		"en": map[string]string{
+			"gameTitle":             "Zelduh",
+			"pauseScreenMessage":    "Paused",
+			"gameOverScreenMessage": "Game Over",
 		},
-	})
-	i18nPaused := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID: "Paused",
+		"es": map[string]string{
+			"gameTitle":             "Zelduh",
+			"pauseScreenMessage":    "Paused",
+			"gameOverScreenMessage": "Game Over",
 		},
-	})
-	i18nGameOver := localizer.MustLocalize(&i18n.LocalizeConfig{
-		DefaultMessage: &i18n.Message{
-			ID: "GameOver",
-		},
-	})
+	}
+
+	currLocaleMsgs := localeMsgs["en"]
 
 	gameWorld = zelduh.New()
 
 	zelduh.ProcessMapLayout(zelduh.Overworld, roomsMap)
 
 	txt = initText(20, 50, colornames.Black)
-	win = initWindow(i18nTitle)
+	win = initWindow(currLocaleMsgs["gameTitle"])
 
 	gameModel := GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -166,7 +155,7 @@ func run() {
 		case terraform2d.StateStart:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-			drawCenterText(i18nTitle, colornames.Black)
+			drawCenterText(currLocaleMsgs["gameTitle"], colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				gameModel.CurrentState = terraform2d.StateGame
@@ -223,7 +212,7 @@ func run() {
 		case terraform2d.StatePause:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-			drawCenterText(i18nPaused, colornames.Black)
+			drawCenterText(currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
 				gameModel.CurrentState = terraform2d.StateGame
@@ -234,7 +223,7 @@ func run() {
 		case terraform2d.StateOver:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
-			drawCenterText(i18nGameOver, colornames.White)
+			drawCenterText(currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
 				gameModel.CurrentState = terraform2d.StateStart
