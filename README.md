@@ -17,3 +17,13 @@ go get -u github.com/miketmoore/zelduh/...
 ```
 go run cmd/zelduh/zelduh.go
 ```
+
+## Controls
+
+| Action | Keys |
+| ---- | ---- |
+| Confirm/Next | Enter |
+| Walk | W, A, S, D |
+| Sword | F | 
+| Arrow | G |
+| Dash | F + Space | 
