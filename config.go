@@ -69,11 +69,11 @@ var TilemapFiles = []string{
 // Overworld is a multi-dimensional array representing the overworld
 // Each room ID should be unique
 var Overworld = [][]terraform2d.RoomID{
-	[]terraform2d.RoomID{1, 10},
-	[]terraform2d.RoomID{2, 0, 0, 8},
-	[]terraform2d.RoomID{3, 5, 6, 7},
-	[]terraform2d.RoomID{9},
-	[]terraform2d.RoomID{11},
+	{1, 10},
+	{2, 0, 0, 8},
+	{3, 5, 6, 7},
+	{9},
+	{11},
 }
 
 // NonObstacleSprites defines which sprites are not obstacles
