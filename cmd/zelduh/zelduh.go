@@ -45,12 +45,12 @@ type GameModel struct {
 func run() {
 
 	localeMsgs := map[string]map[string]string{
-		"en": map[string]string{
+		"en": {
 			"gameTitle":             "Zelduh",
 			"pauseScreenMessage":    "Paused",
 			"gameOverScreenMessage": "Game Over",
 		},
-		"es": map[string]string{
+		"es": {
 			"gameTitle":             "Zelduh",
 			"pauseScreenMessage":    "Paused",
 			"gameOverScreenMessage": "Game Over",
