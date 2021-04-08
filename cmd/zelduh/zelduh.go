@@ -2,24 +2,17 @@ package main
 
 import (
 	"fmt"
-	"image/color"
 	_ "image/png"
 	"math/rand"
 	"os"
 	"time"
 
 	"github.com/miketmoore/zelduh"
+	"golang.org/x/image/colornames"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
-	"golang.org/x/image/colornames"
-)
-
-var (
-	win       *pixelgl.Window
-	txt       *text.Text
-	gameWorld zelduh.World
 )
 
 // Map of RoomID to a Room configuration
@@ -112,12 +105,27 @@ func run() {
 
 	currLocaleMsgs := localeMsgs["en"]
 
-	gameWorld = zelduh.New()
+	gameWorld := zelduh.New()
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, roomsMap)
 
-	txt = initText(20, 50, colornames.Black)
-	win = initWindow(currLocaleMsgs["gameTitle"])
+	// Initialize text
+	orig := pixel.V(20, 50)
+	txt := text.New(orig, text.Atlas7x13)
+	txt.Color = colornames.Black
+
+	// Initialize window
+	cfg := pixelgl.WindowConfig{
+		Title:  currLocaleMsgs["gameTitle"],
+		Bounds: pixel.R(zelduh.WinX, zelduh.WinY, zelduh.WinW, zelduh.WinH),
+		VSync:  true,
+	}
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		fmt.Println("Initializing GUI window failed:")
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	gameModel := zelduh.GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -203,7 +211,10 @@ func run() {
 
 	for !win.Closed() {
 
-		allowQuit()
+		// Quit application when user input matches
+		if win.JustPressed(pixelgl.KeyQ) {
+			os.Exit(1)
+		}
 
 		switch gameModel.CurrentState {
 		case zelduh.StateStart:
@@ -225,32 +236,4 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
-}
-
-func initText(x, y float64, color color.RGBA) *text.Text {
-	orig := pixel.V(x, y)
-	txt := text.New(orig, text.Atlas7x13)
-	txt.Color = color
-	return txt
-}
-
-func initWindow(title string) *pixelgl.Window {
-	cfg := pixelgl.WindowConfig{
-		Title:  title,
-		Bounds: pixel.R(zelduh.WinX, zelduh.WinY, zelduh.WinW, zelduh.WinH),
-		VSync:  true,
-	}
-	win, err := pixelgl.NewWindow(cfg)
-	if err != nil {
-		fmt.Println("Initializing GUI window failed:")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	return win
-}
-
-func allowQuit() {
-	if win.JustPressed(pixelgl.KeyQ) {
-		os.Exit(1)
-	}
 }
