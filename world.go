@@ -14,7 +14,7 @@ type World struct {
 }
 
 // New returns a new World
-func New() World {
+func NewWorld() World {
 	return World{
 		lastEntityID: 0,
 		SystemsMap:   map[string]System{},

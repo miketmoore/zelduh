@@ -19,7 +19,7 @@ func run() {
 
 	currLocaleMsgs := zelduh.LocaleMessages["en"]
 
-	gameWorld := zelduh.New()
+	gameWorld := zelduh.NewWorld()
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, zelduh.RoomsMap)
 
@@ -29,12 +29,13 @@ func run() {
 	txt.Color = colornames.Black
 
 	// Initialize window
-	cfg := pixelgl.WindowConfig{
-		Title:  currLocaleMsgs["gameTitle"],
-		Bounds: pixel.R(zelduh.WinX, zelduh.WinY, zelduh.WinW, zelduh.WinH),
-		VSync:  true,
-	}
-	win, err := pixelgl.NewWindow(cfg)
+	win, err := pixelgl.NewWindow(
+		pixelgl.WindowConfig{
+			Title:  currLocaleMsgs["gameTitle"],
+			Bounds: pixel.R(zelduh.WinX, zelduh.WinY, zelduh.WinW, zelduh.WinH),
+			VSync:  true,
+		},
+	)
 	if err != nil {
 		fmt.Println("Initializing GUI window failed:")
 		fmt.Println(err)
