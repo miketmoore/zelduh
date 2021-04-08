@@ -58,11 +58,6 @@ func run() {
 		Rand: gameModel.Rand,
 	}
 
-	collisionHandler := zelduh.CollisionHandler{
-		GameModel:      &gameModel,
-		SystemsManager: &systemsManager,
-	}
-
 	collisionSystem := &zelduh.SystemCollision{
 		MapBounds: pixel.R(
 			zelduh.MapX,
@@ -70,20 +65,10 @@ func run() {
 			zelduh.MapX+zelduh.MapW,
 			zelduh.MapY+zelduh.MapH,
 		),
-		OnPlayerCollisionWithBounds:             collisionHandler.OnPlayerCollisionWithBounds,
-		OnPlayerCollisionWithCoin:               collisionHandler.OnPlayerCollisionWithCoin,
-		OnPlayerCollisionWithEnemy:              collisionHandler.OnPlayerCollisionWithEnemy,
-		OnSwordCollisionWithEnemy:               collisionHandler.OnSwordCollisionWithEnemy,
-		OnArrowCollisionWithEnemy:               collisionHandler.OnArrowCollisionWithEnemy,
-		OnArrowCollisionWithObstacle:            collisionHandler.OnArrowCollisionWithObstacle,
-		OnPlayerCollisionWithObstacle:           collisionHandler.OnPlayerCollisionWithObstacle,
-		OnPlayerCollisionWithMoveableObstacle:   collisionHandler.OnPlayerCollisionWithMoveableObstacle,
-		OnMoveableObstacleCollisionWithSwitch:   collisionHandler.OnMoveableObstacleCollisionWithSwitch,
-		OnMoveableObstacleNoCollisionWithSwitch: collisionHandler.OnMoveableObstacleNoCollisionWithSwitch,
-		OnEnemyCollisionWithObstacle:            collisionHandler.OnEnemyCollisionWithObstacle,
-		OnPlayerCollisionWithSwitch:             collisionHandler.OnPlayerCollisionWithSwitch,
-		OnPlayerNoCollisionWithSwitch:           collisionHandler.OnPlayerNoCollisionWithSwitch,
-		OnPlayerCollisionWithWarp:               collisionHandler.OnPlayerCollisionWithWarp,
+		CollisionHandler: zelduh.CollisionHandler{
+			GameModel:      &gameModel,
+			SystemsManager: &systemsManager,
+		},
 	}
 
 	systemsManager.AddSystems(
