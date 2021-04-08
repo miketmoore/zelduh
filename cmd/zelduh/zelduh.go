@@ -43,6 +43,7 @@ type GameModel struct {
 
 func run() {
 
+	// Just a stub for now since English is the only language supported at this time
 	localeMsgs := map[string]map[string]string{
 		"en": {
 			"gameTitle":             "Zelduh",
@@ -60,7 +61,7 @@ func run() {
 
 	gameWorld = zelduh.New()
 
-	zelduh.ProcessMapLayout(zelduh.Overworld, roomsMap)
+	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, roomsMap)
 
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(currLocaleMsgs["gameTitle"])

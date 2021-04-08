@@ -105,9 +105,8 @@ func indexRoom(roomsMap Rooms, a, b RoomID, dir Direction) {
 
 }
 
-// ProcessMapLayout processes the game maps
-func ProcessMapLayout(layout [][]RoomID, roomsMap Rooms) {
-	// transform multi-dimensional array into map of Room structs, indexed by ID
+// BuildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
+func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
 			roomID := layout[row][col]
