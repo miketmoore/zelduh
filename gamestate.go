@@ -13,7 +13,7 @@ const (
 
 type GameStateManager struct {
 	GameModel       *GameModel
-	GameWorld       *World
+	SystemsManager  *SystemsManager
 	UI              UI
 	LocaleMessages  map[string]string
 	CollisionSystem *SystemCollision
@@ -21,14 +21,14 @@ type GameStateManager struct {
 
 func NewGameStateManager(
 	gameModel *GameModel,
-	gameWorld *World,
+	systemsManager *SystemsManager,
 	ui UI,
 	localeMessages map[string]string,
 	collisionSystem *SystemCollision,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:       gameModel,
-		GameWorld:       gameWorld,
+		SystemsManager:  systemsManager,
 		UI:              ui,
 		LocaleMessages:  localeMessages,
 		CollisionSystem: collisionSystem,
@@ -40,12 +40,12 @@ func (g *GameStateManager) Update() {
 	case StateStart:
 		GameStateStart(g.UI, g.LocaleMessages, g.GameModel)
 	case StateGame:
-		GameStateGame(g.UI, g.GameModel, RoomsMap, g.GameWorld)
+		GameStateGame(g.UI, g.GameModel, RoomsMap, g.SystemsManager)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameModel)
 	case StateOver:
 		GameStateOver(g.UI, g.LocaleMessages, g.GameModel)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.GameWorld, RoomsMap, g.CollisionSystem, g.GameModel)
+		GameStateMapTransition(g.UI, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel)
 	}
 }

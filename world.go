@@ -6,67 +6,67 @@ type System interface {
 	AddEntity(Entity)
 }
 
-// World is a world struct
-type World struct {
+// SystemsManager is a world struct
+type SystemsManager struct {
 	systems      []System
 	SystemsMap   map[string]System
 	lastEntityID EntityID
 }
 
-// New returns a new World
-func NewWorld() World {
-	return World{
+// NewSystemsManager returns a new SystemsManager
+func NewSystemsManager() SystemsManager {
+	return SystemsManager{
 		lastEntityID: 0,
 		SystemsMap:   map[string]System{},
 	}
 }
 
-// AddSystem adds a System to the World
-func (w *World) AddSystem(sys System) {
+// AddSystem adds a System to the SystemsManager
+func (w *SystemsManager) AddSystem(sys System) {
 	w.systems = append(w.systems, sys)
 }
 
 // AddSystems adds a batch of systems to the world
-func (w *World) AddSystems(all ...System) {
+func (w *SystemsManager) AddSystems(all ...System) {
 	for _, sys := range all {
 		w.AddSystem(sys)
 	}
 }
 
-// Update executes Update on all systems in this World
-func (w *World) Update() {
+// Update executes Update on all systems in this SystemsManager
+func (w *SystemsManager) Update() {
 	for _, sys := range w.systems {
 		sys.Update()
 	}
 }
 
-// Systems returns the systems in this World
-func (w *World) Systems() []System {
+// Systems returns the systems in this SystemsManager
+func (w *SystemsManager) Systems() []System {
 	return w.systems
 }
 
 // NewEntityID generates and returns a new Entity ID
-func (w *World) NewEntityID() EntityID {
+func (w *SystemsManager) NewEntityID() EntityID {
 	w.lastEntityID++
 	return w.lastEntityID
 }
 
 // AddEntity adds the entity to it's system
-func (w *World) AddEntity(entity Entity) {
+func (w *SystemsManager) AddEntity(entity Entity) {
 	for _, system := range w.Systems() {
 		system.AddEntity(entity)
 	}
 }
 
 // AddEntities adds the entities to their system
-func (w *World) AddEntities(all ...Entity) {
+func (w *SystemsManager) AddEntities(all ...Entity) {
 	for _, entity := range all {
 		w.AddEntity(entity)
 	}
 }
 
 // Remove removes the specific entity from all systems
-func (w *World) Remove(category EntityCategory, id EntityID) {
+func (w *SystemsManager) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryCoin:
 		for _, sys := range w.systems {
@@ -88,7 +88,7 @@ func (w *World) Remove(category EntityCategory, id EntityID) {
 }
 
 // RemoveEnemy removes the enemy from all system
-func (w *World) RemoveEnemy(id EntityID) {
+func (w *SystemsManager) RemoveEnemy(id EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *SystemSpatial:
@@ -102,7 +102,7 @@ func (w *World) RemoveEnemy(id EntityID) {
 }
 
 // RemoveAllEnemies removes all enemies from all systems
-func (w *World) RemoveAllEnemies() {
+func (w *SystemsManager) RemoveAllEnemies() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *SystemSpatial:
@@ -116,7 +116,7 @@ func (w *World) RemoveAllEnemies() {
 }
 
 // RemoveAllEntities removes all entities from systems
-func (w *World) RemoveAllEntities() {
+func (w *SystemsManager) RemoveAllEntities() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *SystemRender:
@@ -126,7 +126,7 @@ func (w *World) RemoveAllEntities() {
 }
 
 // RemoveAllMoveableObstacles removes all moveable obstacles from systems
-func (w *World) RemoveAllMoveableObstacles() {
+func (w *SystemsManager) RemoveAllMoveableObstacles() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *SystemCollision:
@@ -138,7 +138,7 @@ func (w *World) RemoveAllMoveableObstacles() {
 }
 
 // RemoveAllCollisionSwitches removes all collision switches from systems
-func (w *World) RemoveAllCollisionSwitches() {
+func (w *SystemsManager) RemoveAllCollisionSwitches() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
 		case *SystemCollision:

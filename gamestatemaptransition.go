@@ -5,7 +5,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateMapTransition(ui UI, gameWorld *World, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
+func GameStateMapTransition(ui UI, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
 	gameModel.InputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
@@ -13,10 +13,10 @@ func GameStateMapTransition(ui UI, gameWorld *World, roomsMap Rooms, collisionSy
 		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
-		gameWorld.RemoveAllEnemies()
-		gameWorld.RemoveAllCollisionSwitches()
-		gameWorld.RemoveAllMoveableObstacles()
-		gameWorld.RemoveAllEntities()
+		systemsManager.RemoveAllEnemies()
+		systemsManager.RemoveAllCollisionSwitches()
+		systemsManager.RemoveAllMoveableObstacles()
+		systemsManager.RemoveAllEntities()
 
 		currentRoomID := gameModel.CurrentRoomID
 
@@ -56,17 +56,17 @@ func GameStateMapTransition(ui UI, gameWorld *World, roomsMap Rooms, collisionSy
 			gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+TileSize,
 		)
 
-		gameWorld.Update()
+		systemsManager.Update()
 	} else if gameModel.RoomTransition.Style == TransitionWarp && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
 		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
-		gameWorld.RemoveAllEnemies()
-		gameWorld.RemoveAllCollisionSwitches()
-		gameWorld.RemoveAllMoveableObstacles()
-		gameWorld.RemoveAllEntities()
+		systemsManager.RemoveAllEnemies()
+		systemsManager.RemoveAllCollisionSwitches()
+		systemsManager.RemoveAllMoveableObstacles()
+		systemsManager.RemoveAllEntities()
 	} else {
 		gameModel.CurrentState = StateGame
 		if gameModel.NextRoomID != 0 {

@@ -90,23 +90,23 @@ func DrawMapBackgroundImage(
 	}
 }
 
-func AddUICoin(gameWorld *World) {
-	coin := BuildEntityFromConfig(GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
-	gameWorld.AddEntity(coin)
+func AddUICoin(systemsManager *SystemsManager) {
+	coin := BuildEntityFromConfig(GetPreset("uiCoin")(4, 14), systemsManager.NewEntityID())
+	systemsManager.AddEntity(coin)
 }
 
 // make sure only correct number of hearts exists in systems
 // so, if health is reduced, need to remove a heart entity from the systems,
 // the correct one... last one
-func AddUIHearts(gameWorld *World, hearts []Entity, health int) {
+func AddUIHearts(systemsManager *SystemsManager, hearts []Entity, health int) {
 	for i, entity := range hearts {
 		if i < health {
-			gameWorld.AddEntity(entity)
+			systemsManager.AddEntity(entity)
 		}
 	}
 }
 
-func DrawObstaclesPerMapTiles(gameWorld *World, roomsMap Rooms, allMapDrawData map[string]MapData, roomID RoomID, modX, modY float64) []Entity {
+func DrawObstaclesPerMapTiles(systemsManager *SystemsManager, roomsMap Rooms, allMapDrawData map[string]MapData, roomID RoomID, modX, modY float64) []Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName()]
 	obstacles := []Entity{}
 	mod := 0.5
@@ -121,7 +121,7 @@ func DrawObstaclesPerMapTiles(gameWorld *World, roomsMap Rooms, allMapDrawData m
 			if _, ok := NonObstacleSprites[spriteData.SpriteID]; !ok {
 				x := movedVec.X/TileSize - mod
 				y := movedVec.Y/TileSize - mod
-				id := gameWorld.NewEntityID()
+				id := systemsManager.NewEntityID()
 				obstacle := BuildEntityFromConfig(GetPreset("obstacle")(x, y), id)
 				obstacles = append(obstacles, obstacle)
 			}

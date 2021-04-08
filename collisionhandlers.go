@@ -4,8 +4,8 @@ import "github.com/faiface/pixel"
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
-	GameModel *GameModel
-	GameWorld *World
+	GameModel      *GameModel
+	SystemsManager *SystemsManager
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -23,7 +23,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
 // OnPlayerCollisionWithCoin handles collision between player and coin
 func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
 	ch.GameModel.Player.ComponentCoins.Coins++
-	ch.GameWorld.Remove(CategoryCoin, coinID)
+	ch.SystemsManager.Remove(CategoryCoin, coinID)
 }
 
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
@@ -34,7 +34,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 
 	// remove heart entity
 	heartIndex := len(ch.GameModel.Hearts) - 1
-	ch.GameWorld.Remove(CategoryHeart, ch.GameModel.Hearts[heartIndex].ID())
+	ch.SystemsManager.Remove(CategoryHeart, ch.GameModel.Hearts[heartIndex].ID())
 	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
 
 	if ch.GameModel.Player.ComponentHealth.Total == 0 {
@@ -42,9 +42,9 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	}
 }
 
-func dropCoin(v pixel.Vec, gameWorld *World) {
-	coin := BuildEntityFromConfig(GetPreset("coin")(v.X/TileSize, v.Y/TileSize), gameWorld.NewEntityID())
-	gameWorld.AddEntity(coin)
+func dropCoin(v pixel.Vec, systemsManager *SystemsManager) {
+	coin := BuildEntityFromConfig(GetPreset("coin")(v.X/TileSize, v.Y/TileSize), systemsManager.NewEntityID())
+	systemsManager.AddEntity(coin)
 }
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
@@ -62,10 +62,10 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 					Rect:   enemySpatial.Rect,
 				}
 				ch.GameModel.Explosion.ComponentTemporary.OnExpiration = func() {
-					dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min, ch.GameWorld)
+					dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
 				}
-				ch.GameWorld.AddEntity(ch.GameModel.Explosion)
-				ch.GameWorld.RemoveEnemy(enemyID)
+				ch.SystemsManager.AddEntity(ch.GameModel.Explosion)
+				ch.SystemsManager.RemoveEnemy(enemyID)
 			} else {
 				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.ComponentMovement.Direction)
 			}
@@ -88,10 +88,10 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 				Rect:   enemySpatial.Rect,
 			}
 			ch.GameModel.Explosion.ComponentTemporary.OnExpiration = func() {
-				dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min, ch.GameWorld)
+				dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
 			}
-			ch.GameWorld.AddEntity(ch.GameModel.Explosion)
-			ch.GameWorld.RemoveEnemy(enemyID)
+			ch.SystemsManager.AddEntity(ch.GameModel.Explosion)
+			ch.SystemsManager.RemoveEnemy(enemyID)
 		} else {
 			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.ComponentMovement.Direction)
 		}

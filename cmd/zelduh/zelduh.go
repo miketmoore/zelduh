@@ -16,7 +16,7 @@ func run() {
 
 	currLocaleMsgs := zelduh.LocaleMessages["en"]
 
-	gameWorld := zelduh.NewWorld()
+	systemsManager := zelduh.NewSystemsManager()
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, zelduh.RoomsMap)
 
@@ -34,11 +34,11 @@ func run() {
 		Spritesheet: zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
 		// Build entities
-		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
-		Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), gameWorld.NewEntityID()),
-		Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), gameWorld.NewEntityID()),
-		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
-		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
+		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
+		Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID()),
+		Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), systemsManager.NewEntityID()),
+		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), systemsManager.NewEntityID()),
+		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), systemsManager.NewEntityID()),
 
 		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
@@ -47,7 +47,7 @@ func run() {
 		HealthSystem: &zelduh.SystemHealth{},
 
 		Hearts: zelduh.BuildEntitiesFromConfigs(
-			gameWorld.NewEntityID,
+			systemsManager.NewEntityID,
 			zelduh.GetPreset("heart")(1.5, 14),
 			zelduh.GetPreset("heart")(2.15, 14),
 			zelduh.GetPreset("heart")(2.80, 14),
@@ -59,8 +59,8 @@ func run() {
 	}
 
 	collisionHandler := zelduh.CollisionHandler{
-		GameModel: &gameModel,
-		GameWorld: &gameWorld,
+		GameModel:      &gameModel,
+		SystemsManager: &systemsManager,
 	}
 
 	collisionSystem := &zelduh.SystemCollision{
@@ -86,7 +86,7 @@ func run() {
 		OnPlayerCollisionWithWarp:               collisionHandler.OnPlayerCollisionWithWarp,
 	}
 
-	gameWorld.AddSystems(
+	systemsManager.AddSystems(
 		gameModel.InputSystem,
 		gameModel.HealthSystem,
 		gameModel.SpatialSystem,
@@ -97,7 +97,7 @@ func run() {
 		},
 	)
 
-	gameWorld.AddEntities(
+	systemsManager.AddEntities(
 		gameModel.Player,
 		gameModel.Sword,
 		gameModel.Arrow,
@@ -106,7 +106,7 @@ func run() {
 
 	gameStateManager := zelduh.NewGameStateManager(
 		&gameModel,
-		&gameWorld,
+		&systemsManager,
 		ui,
 		currLocaleMsgs,
 		collisionSystem,

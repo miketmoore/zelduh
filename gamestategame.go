@@ -5,7 +5,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, gameWorld *World) {
+func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, systemsManager *SystemsManager) {
 	gameModel.InputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -20,21 +20,21 @@ func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, gameWorld *World
 
 	if gameModel.AddEntities {
 		gameModel.AddEntities = false
-		AddUIHearts(gameWorld, gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
+		AddUIHearts(systemsManager, gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
 
-		AddUICoin(gameWorld)
+		AddUICoin(systemsManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(gameWorld, roomsMap, gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
-		gameWorld.AddEntities(obstacles...)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
+		systemsManager.AddEntities(obstacles...)
 
 		gameModel.RoomWarps = map[EntityID]Config{}
 
 		// Iterate through all entity configurations and build entities and add to systems
 		for _, c := range roomsMap[gameModel.CurrentRoomID].(*Room).EntityConfigs {
-			entity := BuildEntityFromConfig(c, gameWorld.NewEntityID())
+			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID())
 			gameModel.EntitiesMap[entity.ID()] = entity
-			gameWorld.AddEntity(entity)
+			systemsManager.AddEntity(entity)
 
 			switch c.Category {
 			case CategoryWarp:
@@ -45,7 +45,7 @@ func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, gameWorld *World
 
 	DrawMask(ui.Window)
 
-	gameWorld.Update()
+	systemsManager.Update()
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {
 		gameModel.CurrentState = StatePause
