@@ -227,141 +227,13 @@ func run() {
 		case zelduh.StateStart:
 			gameStateStart(currLocaleMsgs, &gameModel)
 		case zelduh.StateGame:
-			gameModel.InputSystem.EnablePlayer()
-
-			win.Clear(colornames.Darkgray)
-			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-
-			drawMapBGImage(
-				gameModel.Spritesheet,
-				gameModel.AllMapDrawData,
-				roomsMap[gameModel.CurrentRoomID].MapName(),
-				0, 0)
-
-			if gameModel.AddEntities {
-				gameModel.AddEntities = false
-				addUIHearts(gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
-
-				addUICoin()
-
-				// Draw obstacles on appropriate map tiles
-				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
-				gameWorld.AddEntities(obstacles...)
-
-				gameModel.RoomWarps = map[zelduh.EntityID]zelduh.Config{}
-
-				// Iterate through all entity configurations and build entities and add to systems
-				for _, c := range roomsMap[gameModel.CurrentRoomID].(*zelduh.Room).EntityConfigs {
-					entity := zelduh.BuildEntityFromConfig(c, gameWorld.NewEntityID())
-					gameModel.EntitiesMap[entity.ID()] = entity
-					gameWorld.AddEntity(entity)
-
-					switch c.Category {
-					case zelduh.CategoryWarp:
-						gameModel.RoomWarps[entity.ID()] = c
-					}
-				}
-			}
-
-			drawMask()
-
-			gameWorld.Update()
-
-			if win.JustPressed(pixelgl.KeyP) {
-				gameModel.CurrentState = zelduh.StatePause
-			}
-
-			if win.JustPressed(pixelgl.KeyX) {
-				gameModel.CurrentState = zelduh.StateOver
-			}
-
+			gameStateGame(&gameModel)
 		case zelduh.StatePause:
-			win.Clear(colornames.Darkgray)
-			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-			drawCenterText(currLocaleMsgs["pauseScreenMessage"], colornames.Black)
-
-			if win.JustPressed(pixelgl.KeyP) {
-				gameModel.CurrentState = zelduh.StateGame
-			}
-			if win.JustPressed(pixelgl.KeyEscape) {
-				gameModel.CurrentState = zelduh.StateStart
-			}
+			gameStatePause(currLocaleMsgs, &gameModel)
 		case zelduh.StateOver:
-			win.Clear(colornames.Darkgray)
-			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
-			drawCenterText(currLocaleMsgs["gameOverScreenMessage"], colornames.White)
-
-			if win.JustPressed(pixelgl.KeyEnter) {
-				gameModel.CurrentState = zelduh.StateStart
-			}
+			gameStateOver(currLocaleMsgs, &gameModel)
 		case zelduh.StateMapTransition:
-			gameModel.InputSystem.DisablePlayer()
-			if gameModel.RoomTransition.Style == zelduh.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
-				gameModel.RoomTransition.Timer--
-				win.Clear(colornames.Darkgray)
-				drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-
-				collisionSystem.RemoveAll(zelduh.CategoryObstacle)
-				gameWorld.RemoveAllEnemies()
-				gameWorld.RemoveAllCollisionSwitches()
-				gameWorld.RemoveAllMoveableObstacles()
-				gameWorld.RemoveAllEntities()
-
-				currentRoomID := gameModel.CurrentRoomID
-
-				connectedRooms := roomsMap[currentRoomID].ConnectedRooms()
-
-				transitionRoomResp := calculateTransitionSlide(
-					gameModel.RoomTransition,
-					*connectedRooms,
-					gameModel.CurrentRoomID,
-				)
-
-				gameModel.NextRoomID = transitionRoomResp.nextRoomID
-
-				drawMapBGImage(
-					gameModel.Spritesheet,
-					gameModel.AllMapDrawData,
-					roomsMap[gameModel.CurrentRoomID].MapName(),
-					transitionRoomResp.modX,
-					transitionRoomResp.modY,
-				)
-				drawMapBGImage(
-					gameModel.Spritesheet,
-					gameModel.AllMapDrawData,
-					roomsMap[gameModel.NextRoomID].MapName(),
-					transitionRoomResp.modXNext,
-					transitionRoomResp.modYNext,
-				)
-				drawMask()
-
-				// Move player with map transition
-				gameModel.Player.ComponentSpatial.Rect = pixel.R(
-					gameModel.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
-					gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
-					gameModel.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+zelduh.TileSize,
-					gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+zelduh.TileSize,
-				)
-
-				gameWorld.Update()
-			} else if gameModel.RoomTransition.Style == zelduh.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
-				gameModel.RoomTransition.Timer--
-				win.Clear(colornames.Darkgray)
-				drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-
-				collisionSystem.RemoveAll(zelduh.CategoryObstacle)
-				gameWorld.RemoveAllEnemies()
-				gameWorld.RemoveAllCollisionSwitches()
-				gameWorld.RemoveAllMoveableObstacles()
-				gameWorld.RemoveAllEntities()
-			} else {
-				gameModel.CurrentState = zelduh.StateGame
-				if gameModel.NextRoomID != 0 {
-					gameModel.CurrentRoomID = gameModel.NextRoomID
-				}
-				gameModel.RoomTransition.Active = false
-			}
-
+			gameStateMapTransition(collisionSystem, &gameModel)
 		}
 
 		win.Update()
@@ -376,6 +248,148 @@ func gameStateStart(currLocaleMsgs map[string]string, gameModel *GameModel) {
 
 	if win.JustPressed(pixelgl.KeyEnter) {
 		gameModel.CurrentState = zelduh.StateGame
+	}
+}
+
+func gameStateGame(gameModel *GameModel) {
+	gameModel.InputSystem.EnablePlayer()
+
+	win.Clear(colornames.Darkgray)
+	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+
+	drawMapBGImage(
+		gameModel.Spritesheet,
+		gameModel.AllMapDrawData,
+		roomsMap[gameModel.CurrentRoomID].MapName(),
+		0, 0)
+
+	if gameModel.AddEntities {
+		gameModel.AddEntities = false
+		addUIHearts(gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
+
+		addUICoin()
+
+		// Draw obstacles on appropriate map tiles
+		obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
+		gameWorld.AddEntities(obstacles...)
+
+		gameModel.RoomWarps = map[zelduh.EntityID]zelduh.Config{}
+
+		// Iterate through all entity configurations and build entities and add to systems
+		for _, c := range roomsMap[gameModel.CurrentRoomID].(*zelduh.Room).EntityConfigs {
+			entity := zelduh.BuildEntityFromConfig(c, gameWorld.NewEntityID())
+			gameModel.EntitiesMap[entity.ID()] = entity
+			gameWorld.AddEntity(entity)
+
+			switch c.Category {
+			case zelduh.CategoryWarp:
+				gameModel.RoomWarps[entity.ID()] = c
+			}
+		}
+	}
+
+	drawMask()
+
+	gameWorld.Update()
+
+	if win.JustPressed(pixelgl.KeyP) {
+		gameModel.CurrentState = zelduh.StatePause
+	}
+
+	if win.JustPressed(pixelgl.KeyX) {
+		gameModel.CurrentState = zelduh.StateOver
+	}
+}
+
+func gameStatePause(currLocaleMsgs map[string]string, gameModel *GameModel) {
+	win.Clear(colornames.Darkgray)
+	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+	drawCenterText(currLocaleMsgs["pauseScreenMessage"], colornames.Black)
+
+	if win.JustPressed(pixelgl.KeyP) {
+		gameModel.CurrentState = zelduh.StateGame
+	}
+	if win.JustPressed(pixelgl.KeyEscape) {
+		gameModel.CurrentState = zelduh.StateStart
+	}
+}
+
+func gameStateOver(currLocaleMsgs map[string]string, gameModel *GameModel) {
+	win.Clear(colornames.Darkgray)
+	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
+	drawCenterText(currLocaleMsgs["gameOverScreenMessage"], colornames.White)
+
+	if win.JustPressed(pixelgl.KeyEnter) {
+		gameModel.CurrentState = zelduh.StateStart
+	}
+}
+
+func gameStateMapTransition(collisionSystem *zelduh.SystemCollision, gameModel *GameModel) {
+	gameModel.InputSystem.DisablePlayer()
+	if gameModel.RoomTransition.Style == zelduh.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
+		gameModel.RoomTransition.Timer--
+		win.Clear(colornames.Darkgray)
+		drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+
+		collisionSystem.RemoveAll(zelduh.CategoryObstacle)
+		gameWorld.RemoveAllEnemies()
+		gameWorld.RemoveAllCollisionSwitches()
+		gameWorld.RemoveAllMoveableObstacles()
+		gameWorld.RemoveAllEntities()
+
+		currentRoomID := gameModel.CurrentRoomID
+
+		connectedRooms := roomsMap[currentRoomID].ConnectedRooms()
+
+		transitionRoomResp := calculateTransitionSlide(
+			gameModel.RoomTransition,
+			*connectedRooms,
+			gameModel.CurrentRoomID,
+		)
+
+		gameModel.NextRoomID = transitionRoomResp.nextRoomID
+
+		drawMapBGImage(
+			gameModel.Spritesheet,
+			gameModel.AllMapDrawData,
+			roomsMap[gameModel.CurrentRoomID].MapName(),
+			transitionRoomResp.modX,
+			transitionRoomResp.modY,
+		)
+		drawMapBGImage(
+			gameModel.Spritesheet,
+			gameModel.AllMapDrawData,
+			roomsMap[gameModel.NextRoomID].MapName(),
+			transitionRoomResp.modXNext,
+			transitionRoomResp.modYNext,
+		)
+		drawMask()
+
+		// Move player with map transition
+		gameModel.Player.ComponentSpatial.Rect = pixel.R(
+			gameModel.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
+			gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
+			gameModel.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+zelduh.TileSize,
+			gameModel.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+zelduh.TileSize,
+		)
+
+		gameWorld.Update()
+	} else if gameModel.RoomTransition.Style == zelduh.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
+		gameModel.RoomTransition.Timer--
+		win.Clear(colornames.Darkgray)
+		drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+
+		collisionSystem.RemoveAll(zelduh.CategoryObstacle)
+		gameWorld.RemoveAllEnemies()
+		gameWorld.RemoveAllCollisionSwitches()
+		gameWorld.RemoveAllMoveableObstacles()
+		gameWorld.RemoveAllEntities()
+	} else {
+		gameModel.CurrentState = zelduh.StateGame
+		if gameModel.NextRoomID != 0 {
+			gameModel.CurrentRoomID = gameModel.NextRoomID
+		}
+		gameModel.RoomTransition.Active = false
 	}
 }
 
