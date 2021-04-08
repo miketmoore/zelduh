@@ -104,6 +104,14 @@ func run() {
 		gameModel.Bomb,
 	)
 
+	gameStateManager := zelduh.NewGameStateManager(
+		&gameModel,
+		&gameWorld,
+		ui,
+		currLocaleMsgs,
+		collisionSystem,
+	)
+
 	for !ui.Window.Closed() {
 
 		// Quit application when user input matches
@@ -111,18 +119,7 @@ func run() {
 			os.Exit(1)
 		}
 
-		switch gameModel.CurrentState {
-		case zelduh.StateStart:
-			zelduh.GameStateStart(ui, currLocaleMsgs, &gameModel)
-		case zelduh.StateGame:
-			zelduh.GameStateGame(ui, &gameModel, zelduh.RoomsMap, &gameWorld)
-		case zelduh.StatePause:
-			zelduh.GameStatePause(ui, currLocaleMsgs, &gameModel)
-		case zelduh.StateOver:
-			zelduh.GameStateOver(ui, currLocaleMsgs, &gameModel)
-		case zelduh.StateMapTransition:
-			zelduh.GameStateMapTransition(ui, &gameWorld, zelduh.RoomsMap, collisionSystem, &gameModel)
-		}
+		gameStateManager.Update()
 
 		ui.Window.Update()
 
