@@ -225,13 +225,7 @@ func run() {
 
 		switch gameModel.CurrentState {
 		case zelduh.StateStart:
-			win.Clear(colornames.Darkgray)
-			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-			drawCenterText(currLocaleMsgs["gameTitle"], colornames.Black)
-
-			if win.JustPressed(pixelgl.KeyEnter) {
-				gameModel.CurrentState = zelduh.StateGame
-			}
+			gameStateStart(currLocaleMsgs, &gameModel)
 		case zelduh.StateGame:
 			gameModel.InputSystem.EnablePlayer()
 
@@ -372,6 +366,16 @@ func run() {
 
 		win.Update()
 
+	}
+}
+
+func gameStateStart(currLocaleMsgs map[string]string, gameModel *GameModel) {
+	win.Clear(colornames.Darkgray)
+	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+	drawCenterText(currLocaleMsgs["gameTitle"], colornames.Black)
+
+	if win.JustPressed(pixelgl.KeyEnter) {
+		gameModel.CurrentState = zelduh.StateGame
 	}
 }
 
