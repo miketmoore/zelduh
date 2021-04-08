@@ -11,7 +11,6 @@ import (
 	"github.com/miketmoore/zelduh"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
 	"golang.org/x/image/colornames"
@@ -22,24 +21,6 @@ var (
 	txt       *text.Text
 	gameWorld zelduh.World
 )
-
-// GameModel contains data used throughout the game
-type GameModel struct {
-	AddEntities                           bool
-	CurrentRoomID, NextRoomID             zelduh.RoomID
-	RoomTransition                        *zelduh.RoomTransition
-	CurrentState                          zelduh.State
-	Rand                                  *rand.Rand
-	EntitiesMap                           map[zelduh.EntityID]zelduh.Entity
-	Spritesheet                           map[int]*pixel.Sprite
-	Arrow, Bomb, Explosion, Player, Sword zelduh.Entity
-	Hearts                                []zelduh.Entity
-	RoomWarps                             map[zelduh.EntityID]zelduh.Config
-	AllMapDrawData                        map[string]zelduh.MapData
-	HealthSystem                          *zelduh.SystemHealth
-	InputSystem                           *zelduh.SystemInput
-	SpatialSystem                         *zelduh.SystemSpatial
-}
 
 // Map of RoomID to a Room configuration
 var roomsMap = zelduh.Rooms{
@@ -138,7 +119,7 @@ func run() {
 	txt = initText(20, 50, colornames.Black)
 	win = initWindow(currLocaleMsgs["gameTitle"])
 
-	gameModel := GameModel{
+	gameModel := zelduh.GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
 		EntitiesMap:   map[zelduh.EntityID]zelduh.Entity{},
 		CurrentState:  zelduh.StateStart,
@@ -225,9 +206,9 @@ func run() {
 
 		switch gameModel.CurrentState {
 		case zelduh.StateStart:
-			gameStateStart(win, currLocaleMsgs, &gameModel)
+			zelduh.GameStateStart(win, txt, currLocaleMsgs, &gameModel)
 		case zelduh.StateGame:
-			gameStateGame(&gameModel)
+			zelduh.GameStateGame(win, &gameModel, roomsMap, &gameWorld)
 		case zelduh.StatePause:
 			gameStatePause(currLocaleMsgs, &gameModel)
 		case zelduh.StateOver:
@@ -241,65 +222,7 @@ func run() {
 	}
 }
 
-func gameStateStart(win *pixelgl.Window, currLocaleMsgs map[string]string, gameModel *GameModel) {
-	zelduh.DrawScreenStart(win, txt, currLocaleMsgs)
-
-	if win.JustPressed(pixelgl.KeyEnter) {
-		gameModel.CurrentState = zelduh.StateGame
-	}
-}
-
-func gameStateGame(gameModel *GameModel) {
-	gameModel.InputSystem.EnablePlayer()
-
-	win.Clear(colornames.Darkgray)
-	zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-
-	drawMapBGImage(
-		gameModel.Spritesheet,
-		gameModel.AllMapDrawData,
-		roomsMap[gameModel.CurrentRoomID].MapName(),
-		0, 0)
-
-	if gameModel.AddEntities {
-		gameModel.AddEntities = false
-		addUIHearts(gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
-
-		addUICoin()
-
-		// Draw obstacles on appropriate map tiles
-		obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
-		gameWorld.AddEntities(obstacles...)
-
-		gameModel.RoomWarps = map[zelduh.EntityID]zelduh.Config{}
-
-		// Iterate through all entity configurations and build entities and add to systems
-		for _, c := range roomsMap[gameModel.CurrentRoomID].(*zelduh.Room).EntityConfigs {
-			entity := zelduh.BuildEntityFromConfig(c, gameWorld.NewEntityID())
-			gameModel.EntitiesMap[entity.ID()] = entity
-			gameWorld.AddEntity(entity)
-
-			switch c.Category {
-			case zelduh.CategoryWarp:
-				gameModel.RoomWarps[entity.ID()] = c
-			}
-		}
-	}
-
-	drawMask()
-
-	gameWorld.Update()
-
-	if win.JustPressed(pixelgl.KeyP) {
-		gameModel.CurrentState = zelduh.StatePause
-	}
-
-	if win.JustPressed(pixelgl.KeyX) {
-		gameModel.CurrentState = zelduh.StateOver
-	}
-}
-
-func gameStatePause(currLocaleMsgs map[string]string, gameModel *GameModel) {
+func gameStatePause(currLocaleMsgs map[string]string, gameModel *zelduh.GameModel) {
 	win.Clear(colornames.Darkgray)
 	zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 	zelduh.DrawCenterText(win, txt, currLocaleMsgs["pauseScreenMessage"], colornames.Black)
@@ -312,7 +235,7 @@ func gameStatePause(currLocaleMsgs map[string]string, gameModel *GameModel) {
 	}
 }
 
-func gameStateOver(currLocaleMsgs map[string]string, gameModel *GameModel) {
+func gameStateOver(currLocaleMsgs map[string]string, gameModel *zelduh.GameModel) {
 	win.Clear(colornames.Darkgray)
 	zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
 	zelduh.DrawCenterText(win, txt, currLocaleMsgs["gameOverScreenMessage"], colornames.White)
@@ -322,7 +245,7 @@ func gameStateOver(currLocaleMsgs map[string]string, gameModel *GameModel) {
 	}
 }
 
-func gameStateMapTransition(collisionSystem *zelduh.SystemCollision, gameModel *GameModel) {
+func gameStateMapTransition(collisionSystem *zelduh.SystemCollision, gameModel *zelduh.GameModel) {
 	gameModel.InputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == zelduh.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
@@ -347,21 +270,23 @@ func gameStateMapTransition(collisionSystem *zelduh.SystemCollision, gameModel *
 
 		gameModel.NextRoomID = transitionRoomResp.nextRoomID
 
-		drawMapBGImage(
+		zelduh.DrawMapBackgroundImage(
+			win,
 			gameModel.Spritesheet,
 			gameModel.AllMapDrawData,
 			roomsMap[gameModel.CurrentRoomID].MapName(),
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
 		)
-		drawMapBGImage(
+		zelduh.DrawMapBackgroundImage(
+			win,
 			gameModel.Spritesheet,
 			gameModel.AllMapDrawData,
 			roomsMap[gameModel.NextRoomID].MapName(),
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 		)
-		drawMask()
+		zelduh.DrawMask(win)
 
 		// Move player with map transition
 		gameModel.Player.ComponentSpatial.Rect = pixel.R(
@@ -423,103 +348,6 @@ func allowQuit() {
 	}
 }
 
-func drawMapBGImage(
-	spritesheet map[int]*pixel.Sprite,
-	allMapDrawData map[string]zelduh.MapData,
-	name string,
-	modX, modY float64) {
-
-	d := allMapDrawData[name]
-	for _, spriteData := range d.Data {
-		if spriteData.SpriteID != 0 {
-			sprite := spritesheet[spriteData.SpriteID]
-
-			vec := spriteData.Rect.Min
-
-			movedVec := pixel.V(
-				vec.X+zelduh.MapX+modX+zelduh.TileSize/2,
-				vec.Y+zelduh.MapY+modY+zelduh.TileSize/2,
-			)
-			matrix := pixel.IM.Moved(movedVec)
-			sprite.Draw(win, matrix)
-		}
-	}
-}
-
-func drawObstaclesPerMapTiles(allMapDrawData map[string]zelduh.MapData, roomID zelduh.RoomID, modX, modY float64) []zelduh.Entity {
-	d := allMapDrawData[roomsMap[roomID].MapName()]
-	obstacles := []zelduh.Entity{}
-	mod := 0.5
-	for _, spriteData := range d.Data {
-		if spriteData.SpriteID != 0 {
-			vec := spriteData.Rect.Min
-			movedVec := pixel.V(
-				vec.X+zelduh.MapX+modX+zelduh.TileSize/2,
-				vec.Y+zelduh.MapY+modY+zelduh.TileSize/2,
-			)
-
-			if _, ok := zelduh.NonObstacleSprites[spriteData.SpriteID]; !ok {
-				x := movedVec.X/zelduh.TileSize - mod
-				y := movedVec.Y/zelduh.TileSize - mod
-				id := gameWorld.NewEntityID()
-				obstacle := zelduh.BuildEntityFromConfig(zelduh.GetPreset("obstacle")(x, y), id)
-				obstacles = append(obstacles, obstacle)
-			}
-		}
-	}
-	return obstacles
-}
-
-func drawMask() {
-	// top
-	s := imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(0, zelduh.MapY+zelduh.MapH))
-	s.Push(pixel.V(zelduh.WinW, zelduh.MapY+zelduh.MapH+(zelduh.WinH-(zelduh.MapY+zelduh.MapH))))
-	s.Rectangle(0)
-	s.Draw(win)
-
-	// bottom
-	s = imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(zelduh.WinW, (zelduh.WinH - (zelduh.MapY + zelduh.MapH))))
-	s.Rectangle(0)
-	s.Draw(win)
-
-	// left
-	s = imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(0+zelduh.MapX, zelduh.WinH))
-	s.Rectangle(0)
-	s.Draw(win)
-
-	// right
-	s = imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(zelduh.MapX+zelduh.MapW, zelduh.MapY))
-	s.Push(pixel.V(zelduh.WinW, zelduh.WinH))
-	s.Rectangle(0)
-	s.Draw(win)
-}
-
-func addUICoin() {
-	coin := zelduh.BuildEntityFromConfig(zelduh.GetPreset("uiCoin")(4, 14), gameWorld.NewEntityID())
-	gameWorld.AddEntity(coin)
-}
-
-// make sure only correct number of hearts exists in systems
-// so, if health is reduced, need to remove a heart entity from the systems,
-// the correct one... last one
-func addUIHearts(hearts []zelduh.Entity, health int) {
-	for i, entity := range hearts {
-		if i < health {
-			gameWorld.AddEntity(entity)
-		}
-	}
-}
-
 func dropCoin(v pixel.Vec) {
 	coin := zelduh.BuildEntityFromConfig(zelduh.GetPreset("coin")(v.X/zelduh.TileSize, v.Y/zelduh.TileSize), gameWorld.NewEntityID())
 	gameWorld.AddEntity(coin)
@@ -527,7 +355,7 @@ func dropCoin(v pixel.Vec) {
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
-	GameModel *GameModel
+	GameModel *zelduh.GameModel
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
