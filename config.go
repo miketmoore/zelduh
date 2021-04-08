@@ -88,3 +88,89 @@ var NonObstacleSprites = map[int]bool{
 	136: true,
 	137: true,
 }
+
+// Map of RoomID to a Room configuration
+var RoomsMap = Rooms{
+	1: NewRoom("overworldFourWallsDoorBottomRight",
+		GetPreset("puzzleBox")(5, 5),
+		GetPreset("floorSwitch")(5, 6),
+		GetPreset("toggleObstacle")(10, 7),
+	),
+	2: NewRoom("overworldFourWallsDoorTopBottom",
+		GetPreset("skull")(5, 5),
+		GetPreset("skeleton")(11, 9),
+		GetPreset("spinner")(7, 9),
+		GetPreset("eyeburrower")(8, 9),
+	),
+	3: NewRoom("overworldFourWallsDoorRightTopBottom",
+		WarpStone(3, 7, 6, 5),
+	),
+	5: NewRoom("rockWithCaveEntrance",
+		Config{
+			Category:     CategoryWarp,
+			WarpToRoomID: 11,
+			W:            TileSize,
+			H:            TileSize,
+			X:            (TileSize * 7) + TileSize/2,
+			Y:            (TileSize * 9) + TileSize/2,
+			Hitbox: &HitboxConfig{
+				Radius: 30,
+			},
+		},
+		Config{
+			Category:     CategoryWarp,
+			WarpToRoomID: 11,
+			W:            TileSize,
+			H:            TileSize,
+			X:            (TileSize * 8) + TileSize/2,
+			Y:            (TileSize * 9) + TileSize/2,
+			Hitbox: &HitboxConfig{
+				Radius: 30,
+			},
+		},
+	),
+	6:  NewRoom("rockPathLeftRightEntrance"),
+	7:  NewRoom("overworldFourWallsDoorLeftTop"),
+	8:  NewRoom("overworldFourWallsDoorBottom"),
+	9:  NewRoom("overworldFourWallsDoorTop"),
+	10: NewRoom("overworldFourWallsDoorLeft"),
+	11: NewRoom("dungeonFourDoors",
+		// South door of cave - warp to cave entrance
+		Config{
+			Category:     CategoryWarp,
+			WarpToRoomID: 5,
+			W:            TileSize,
+			H:            TileSize,
+			X:            (TileSize * 6) + TileSize + (TileSize / 2.5),
+			Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
+			Hitbox: &HitboxConfig{
+				Radius: 15,
+			},
+		},
+		Config{
+			Category:     CategoryWarp,
+			WarpToRoomID: 5,
+			W:            TileSize,
+			H:            TileSize,
+			X:            (TileSize * 7) + TileSize + (TileSize / 2.5),
+			Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
+			Hitbox: &HitboxConfig{
+				Radius: 15,
+			},
+		},
+	),
+}
+
+// Just a stub for now since English is the only language supported at this time
+var LocaleMessages = map[string]map[string]string{
+	"en": {
+		"gameTitle":             "Zelduh",
+		"pauseScreenMessage":    "Paused",
+		"gameOverScreenMessage": "Game Over",
+	},
+	"es": {
+		"gameTitle":             "Zelduh",
+		"pauseScreenMessage":    "Paused",
+		"gameOverScreenMessage": "Game Over",
+	},
+}
