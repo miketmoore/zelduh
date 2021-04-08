@@ -225,7 +225,7 @@ func run() {
 
 		switch gameModel.CurrentState {
 		case zelduh.StateStart:
-			gameStateStart(currLocaleMsgs, &gameModel)
+			gameStateStart(win, currLocaleMsgs, &gameModel)
 		case zelduh.StateGame:
 			gameStateGame(&gameModel)
 		case zelduh.StatePause:
@@ -241,10 +241,8 @@ func run() {
 	}
 }
 
-func gameStateStart(currLocaleMsgs map[string]string, gameModel *GameModel) {
-	win.Clear(colornames.Darkgray)
-	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-	drawCenterText(currLocaleMsgs["gameTitle"], colornames.Black)
+func gameStateStart(win *pixelgl.Window, currLocaleMsgs map[string]string, gameModel *GameModel) {
+	zelduh.DrawScreenStart(win, txt, currLocaleMsgs)
 
 	if win.JustPressed(pixelgl.KeyEnter) {
 		gameModel.CurrentState = zelduh.StateGame
@@ -255,7 +253,7 @@ func gameStateGame(gameModel *GameModel) {
 	gameModel.InputSystem.EnablePlayer()
 
 	win.Clear(colornames.Darkgray)
-	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+	zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 
 	drawMapBGImage(
 		gameModel.Spritesheet,
@@ -303,8 +301,8 @@ func gameStateGame(gameModel *GameModel) {
 
 func gameStatePause(currLocaleMsgs map[string]string, gameModel *GameModel) {
 	win.Clear(colornames.Darkgray)
-	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
-	drawCenterText(currLocaleMsgs["pauseScreenMessage"], colornames.Black)
+	zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+	zelduh.DrawCenterText(win, txt, currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 
 	if win.JustPressed(pixelgl.KeyP) {
 		gameModel.CurrentState = zelduh.StateGame
@@ -316,8 +314,8 @@ func gameStatePause(currLocaleMsgs map[string]string, gameModel *GameModel) {
 
 func gameStateOver(currLocaleMsgs map[string]string, gameModel *GameModel) {
 	win.Clear(colornames.Darkgray)
-	drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
-	drawCenterText(currLocaleMsgs["gameOverScreenMessage"], colornames.White)
+	zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
+	zelduh.DrawCenterText(win, txt, currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 
 	if win.JustPressed(pixelgl.KeyEnter) {
 		gameModel.CurrentState = zelduh.StateStart
@@ -329,7 +327,7 @@ func gameStateMapTransition(collisionSystem *zelduh.SystemCollision, gameModel *
 	if gameModel.RoomTransition.Style == zelduh.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
 		win.Clear(colornames.Darkgray)
-		drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+		zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 
 		collisionSystem.RemoveAll(zelduh.CategoryObstacle)
 		gameWorld.RemoveAllEnemies()
@@ -377,7 +375,7 @@ func gameStateMapTransition(collisionSystem *zelduh.SystemCollision, gameModel *
 	} else if gameModel.RoomTransition.Style == zelduh.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
 		win.Clear(colornames.Darkgray)
-		drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
+		zelduh.DrawMapBackground(win, zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 
 		collisionSystem.RemoveAll(zelduh.CategoryObstacle)
 		gameWorld.RemoveAllEnemies()
@@ -423,22 +421,6 @@ func allowQuit() {
 	if win.JustPressed(pixelgl.KeyQ) {
 		os.Exit(1)
 	}
-}
-
-func drawCenterText(s string, c color.RGBA) {
-	txt.Clear()
-	txt.Color = c
-	fmt.Fprintln(txt, s)
-	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
-}
-
-func drawMapBG(x, y, w, h float64, color color.Color) {
-	s := imdraw.New(nil)
-	s.Color = color
-	s.Push(pixel.V(x, y))
-	s.Push(pixel.V(x+w, y+h))
-	s.Rectangle(0)
-	s.Draw(win)
 }
 
 func drawMapBGImage(
