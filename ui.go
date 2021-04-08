@@ -3,6 +3,7 @@ package zelduh
 import (
 	"fmt"
 	"image/color"
+	"os"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -10,6 +11,38 @@ import (
 	"github.com/faiface/pixel/text"
 	"golang.org/x/image/colornames"
 )
+
+type UI struct {
+	Window *pixelgl.Window
+	Text   *text.Text
+}
+
+func NewUI(currLocaleMsgs map[string]string) UI {
+
+	// Initialize text
+	orig := pixel.V(20, 50)
+	txt := text.New(orig, text.Atlas7x13)
+	txt.Color = colornames.Black
+
+	// Initialize window
+	win, err := pixelgl.NewWindow(
+		pixelgl.WindowConfig{
+			Title:  currLocaleMsgs["gameTitle"],
+			Bounds: pixel.R(WinX, WinY, WinW, WinH),
+			VSync:  true,
+		},
+	)
+	if err != nil {
+		fmt.Println("Initializing GUI window failed:")
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	return UI{
+		Window: win,
+		Text:   txt,
+	}
+}
 
 func DrawCenterText(win *pixelgl.Window, txt *text.Text, s string, c color.RGBA) {
 	txt.Clear()

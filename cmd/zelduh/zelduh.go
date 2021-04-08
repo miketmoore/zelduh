@@ -1,18 +1,15 @@
 package main
 
 import (
-	"fmt"
 	_ "image/png"
 	"math/rand"
 	"os"
 	"time"
 
 	"github.com/miketmoore/zelduh"
-	"golang.org/x/image/colornames"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/faiface/pixel/text"
 )
 
 func run() {
@@ -23,24 +20,7 @@ func run() {
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, zelduh.RoomsMap)
 
-	// Initialize text
-	orig := pixel.V(20, 50)
-	txt := text.New(orig, text.Atlas7x13)
-	txt.Color = colornames.Black
-
-	// Initialize window
-	win, err := pixelgl.NewWindow(
-		pixelgl.WindowConfig{
-			Title:  currLocaleMsgs["gameTitle"],
-			Bounds: pixel.R(zelduh.WinX, zelduh.WinY, zelduh.WinW, zelduh.WinH),
-			VSync:  true,
-		},
-	)
-	if err != nil {
-		fmt.Println("Initializing GUI window failed:")
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	ui := zelduh.NewUI(currLocaleMsgs)
 
 	gameModel := zelduh.GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -63,7 +43,7 @@ func run() {
 		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
-		InputSystem:  &zelduh.SystemInput{Win: win},
+		InputSystem:  &zelduh.SystemInput{Win: ui.Window},
 		HealthSystem: &zelduh.SystemHealth{},
 
 		Hearts: zelduh.BuildEntitiesFromConfigs(
@@ -112,7 +92,7 @@ func run() {
 		gameModel.SpatialSystem,
 		collisionSystem,
 		&zelduh.SystemRender{
-			Win:         win,
+			Win:         ui.Window,
 			Spritesheet: gameModel.Spritesheet,
 		},
 	)
@@ -124,27 +104,27 @@ func run() {
 		gameModel.Bomb,
 	)
 
-	for !win.Closed() {
+	for !ui.Window.Closed() {
 
 		// Quit application when user input matches
-		if win.JustPressed(pixelgl.KeyQ) {
+		if ui.Window.JustPressed(pixelgl.KeyQ) {
 			os.Exit(1)
 		}
 
 		switch gameModel.CurrentState {
 		case zelduh.StateStart:
-			zelduh.GameStateStart(win, txt, currLocaleMsgs, &gameModel)
+			zelduh.GameStateStart(ui, currLocaleMsgs, &gameModel)
 		case zelduh.StateGame:
-			zelduh.GameStateGame(win, &gameModel, zelduh.RoomsMap, &gameWorld)
+			zelduh.GameStateGame(ui, &gameModel, zelduh.RoomsMap, &gameWorld)
 		case zelduh.StatePause:
-			zelduh.GameStatePause(win, txt, currLocaleMsgs, &gameModel)
+			zelduh.GameStatePause(ui, currLocaleMsgs, &gameModel)
 		case zelduh.StateOver:
-			zelduh.GameStateOver(win, txt, currLocaleMsgs, &gameModel)
+			zelduh.GameStateOver(ui, currLocaleMsgs, &gameModel)
 		case zelduh.StateMapTransition:
-			zelduh.GameStateMapTransition(win, &gameWorld, zelduh.RoomsMap, collisionSystem, &gameModel)
+			zelduh.GameStateMapTransition(ui, &gameWorld, zelduh.RoomsMap, collisionSystem, &gameModel)
 		}
 
-		win.Update()
+		ui.Window.Update()
 
 	}
 }

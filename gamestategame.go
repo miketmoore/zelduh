@@ -5,14 +5,14 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(win *pixelgl.Window, gameModel *GameModel, roomsMap Rooms, gameWorld *World) {
+func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, gameWorld *World) {
 	gameModel.InputSystem.EnablePlayer()
 
-	win.Clear(colornames.Darkgray)
-	DrawMapBackground(win, MapX, MapY, MapW, MapH, colornames.White)
+	ui.Window.Clear(colornames.Darkgray)
+	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
 	DrawMapBackgroundImage(
-		win,
+		ui.Window,
 		gameModel.Spritesheet,
 		gameModel.AllMapDrawData,
 		roomsMap[gameModel.CurrentRoomID].MapName(),
@@ -43,15 +43,15 @@ func GameStateGame(win *pixelgl.Window, gameModel *GameModel, roomsMap Rooms, ga
 		}
 	}
 
-	DrawMask(win)
+	DrawMask(ui.Window)
 
 	gameWorld.Update()
 
-	if win.JustPressed(pixelgl.KeyP) {
+	if ui.Window.JustPressed(pixelgl.KeyP) {
 		gameModel.CurrentState = StatePause
 	}
 
-	if win.JustPressed(pixelgl.KeyX) {
+	if ui.Window.JustPressed(pixelgl.KeyX) {
 		gameModel.CurrentState = StateOver
 	}
 }

@@ -2,16 +2,15 @@ package zelduh
 
 import (
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
 )
 
-func GameStateMapTransition(win *pixelgl.Window, gameWorld *World, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
+func GameStateMapTransition(ui UI, gameWorld *World, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
 	gameModel.InputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
-		win.Clear(colornames.Darkgray)
-		DrawMapBackground(win, MapX, MapY, MapW, MapH, colornames.White)
+		ui.Window.Clear(colornames.Darkgray)
+		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
 		gameWorld.RemoveAllEnemies()
@@ -32,7 +31,7 @@ func GameStateMapTransition(win *pixelgl.Window, gameWorld *World, roomsMap Room
 		gameModel.NextRoomID = transitionRoomResp.nextRoomID
 
 		DrawMapBackgroundImage(
-			win,
+			ui.Window,
 			gameModel.Spritesheet,
 			gameModel.AllMapDrawData,
 			roomsMap[gameModel.CurrentRoomID].MapName(),
@@ -40,14 +39,14 @@ func GameStateMapTransition(win *pixelgl.Window, gameWorld *World, roomsMap Room
 			transitionRoomResp.modY,
 		)
 		DrawMapBackgroundImage(
-			win,
+			ui.Window,
 			gameModel.Spritesheet,
 			gameModel.AllMapDrawData,
 			roomsMap[gameModel.NextRoomID].MapName(),
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 		)
-		DrawMask(win)
+		DrawMask(ui.Window)
 
 		// Move player with map transition
 		gameModel.Player.ComponentSpatial.Rect = pixel.R(
@@ -60,8 +59,8 @@ func GameStateMapTransition(win *pixelgl.Window, gameWorld *World, roomsMap Room
 		gameWorld.Update()
 	} else if gameModel.RoomTransition.Style == TransitionWarp && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
-		win.Clear(colornames.Darkgray)
-		DrawMapBackground(win, MapX, MapY, MapW, MapH, colornames.White)
+		ui.Window.Clear(colornames.Darkgray)
+		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
 		gameWorld.RemoveAllEnemies()
