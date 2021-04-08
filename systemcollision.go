@@ -4,11 +4,10 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
-	"github.com/miketmoore/terraform2d"
 )
 
 type collisionEntity struct {
-	ID terraform2d.EntityID
+	ID EntityID
 	*ComponentSpatial
 	*ComponentInvincible
 }
@@ -25,22 +24,22 @@ type SystemCollision struct {
 	moveableObstacles                       []collisionEntity
 	collisionSwitches                       []collisionEntity
 	warps                                   []collisionEntity
-	OnPlayerCollisionWithCoin               func(terraform2d.EntityID)
-	OnPlayerCollisionWithEnemy              func(terraform2d.EntityID)
-	OnSwordCollisionWithEnemy               func(terraform2d.EntityID)
-	OnArrowCollisionWithEnemy               func(terraform2d.EntityID)
+	OnPlayerCollisionWithCoin               func(EntityID)
+	OnPlayerCollisionWithEnemy              func(EntityID)
+	OnSwordCollisionWithEnemy               func(EntityID)
+	OnArrowCollisionWithEnemy               func(EntityID)
 	OnArrowCollisionWithObstacle            func()
-	OnPlayerCollisionWithObstacle           func(terraform2d.EntityID)
-	OnPlayerCollisionWithMoveableObstacle   func(terraform2d.EntityID)
-	OnEnemyCollisionWithObstacle            func(terraform2d.EntityID, terraform2d.EntityID)
-	OnEnemyCollisionWithMoveableObstacle    func(terraform2d.EntityID)
-	OnMoveableObstacleCollisionWithObstacle func(terraform2d.EntityID)
-	OnPlayerCollisionWithSwitch             func(terraform2d.EntityID)
-	OnPlayerNoCollisionWithSwitch           func(terraform2d.EntityID)
-	OnPlayerCollisionWithBounds             func(terraform2d.Bound)
-	OnMoveableObstacleCollisionWithSwitch   func(terraform2d.EntityID)
-	OnMoveableObstacleNoCollisionWithSwitch func(terraform2d.EntityID)
-	OnPlayerCollisionWithWarp               func(terraform2d.EntityID)
+	OnPlayerCollisionWithObstacle           func(EntityID)
+	OnPlayerCollisionWithMoveableObstacle   func(EntityID)
+	OnEnemyCollisionWithObstacle            func(EntityID, EntityID)
+	OnEnemyCollisionWithMoveableObstacle    func(EntityID)
+	OnMoveableObstacleCollisionWithObstacle func(EntityID)
+	OnPlayerCollisionWithSwitch             func(EntityID)
+	OnPlayerNoCollisionWithSwitch           func(EntityID)
+	OnPlayerCollisionWithBounds             func(Bound)
+	OnMoveableObstacleCollisionWithSwitch   func(EntityID)
+	OnMoveableObstacleNoCollisionWithSwitch func(EntityID)
+	OnPlayerCollisionWithWarp               func(EntityID)
 }
 
 // AddEntity adds an entity to the system
@@ -73,7 +72,7 @@ func (s *SystemCollision) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *SystemCollision) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
+func (s *SystemCollision) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryCoin:
 		for i := len(s.coins) - 1; i >= 0; i-- {
@@ -93,7 +92,7 @@ func (s *SystemCollision) Remove(category terraform2d.EntityCategory, id terrafo
 }
 
 // RemoveAll removes all entities from one category
-func (s *SystemCollision) RemoveAll(category terraform2d.EntityCategory) {
+func (s *SystemCollision) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -130,13 +129,13 @@ func (s *SystemCollision) Update() {
 
 	// is player at map edge?
 	if player.ComponentSpatial.Rect.Min.Y <= mapBounds.Min.Y {
-		s.OnPlayerCollisionWithBounds(terraform2d.BoundBottom)
+		s.OnPlayerCollisionWithBounds(BoundBottom)
 	} else if player.ComponentSpatial.Rect.Min.X <= mapBounds.Min.X {
-		s.OnPlayerCollisionWithBounds(terraform2d.BoundLeft)
+		s.OnPlayerCollisionWithBounds(BoundLeft)
 	} else if player.ComponentSpatial.Rect.Max.X >= mapBounds.Max.X {
-		s.OnPlayerCollisionWithBounds(terraform2d.BoundRight)
+		s.OnPlayerCollisionWithBounds(BoundRight)
 	} else if player.ComponentSpatial.Rect.Max.Y >= mapBounds.Max.Y {
-		s.OnPlayerCollisionWithBounds(terraform2d.BoundTop)
+		s.OnPlayerCollisionWithBounds(BoundTop)
 	}
 
 	w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height

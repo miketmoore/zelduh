@@ -2,7 +2,6 @@ package zelduh
 
 import (
 	"github.com/faiface/pixel/imdraw"
-	"github.com/miketmoore/terraform2d"
 )
 
 // GetPreset gets an entity config preset function by key
@@ -17,7 +16,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 		return Config{
 			Category: CategoryArrow,
 			Movement: &MovementConfig{
-				Direction: terraform2d.DirectionDown,
+				Direction: DirectionDown,
 				Speed:     0.0,
 			},
 			W: TileSize,
@@ -40,7 +39,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 		return Config{
 			Category: CategoryBomb,
 			Movement: &MovementConfig{
-				Direction: terraform2d.DirectionDown,
+				Direction: DirectionDown,
 				Speed:     0.0,
 			},
 			W: TileSize,
@@ -100,7 +99,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				CollisionWithRectMod: 5,
 			},
 			Movement: &MovementConfig{
-				Direction: terraform2d.DirectionDown,
+				Direction: DirectionDown,
 				MaxSpeed:  7.0,
 				Speed:     0.0,
 			},
@@ -126,7 +125,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 		return Config{
 			Category: CategorySword,
 			Movement: &MovementConfig{
-				Direction: terraform2d.DirectionDown,
+				Direction: DirectionDown,
 				Speed:     0.0,
 			},
 			W: TileSize,
@@ -158,7 +157,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &MovementConfig{
-				Direction:    terraform2d.DirectionDown,
+				Direction:    DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
@@ -197,7 +196,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &MovementConfig{
-				Direction:    terraform2d.DirectionDown,
+				Direction:    DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
@@ -220,7 +219,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &MovementConfig{
-				Direction:    terraform2d.DirectionDown,
+				Direction:    DirectionDown,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,
@@ -243,7 +242,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 				Radius: 20,
 			},
 			Movement: &MovementConfig{
-				Direction:    terraform2d.DirectionRight,
+				Direction:    DirectionRight,
 				Speed:        1.0,
 				MaxSpeed:     1.0,
 				HitSpeed:     10.0,

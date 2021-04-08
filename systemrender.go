@@ -3,12 +3,11 @@ package zelduh
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/miketmoore/terraform2d"
 )
 
 type renderEntity struct {
-	ID       terraform2d.EntityID
-	Category terraform2d.EntityCategory
+	ID       EntityID
+	Category EntityCategory
 	*ComponentSpatial
 	*ComponentAppearance
 	*ComponentAnimation
@@ -72,7 +71,7 @@ func (s *SystemRender) AddEntity(entity Entity) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *SystemRender) RemoveAll(category terraform2d.EntityCategory) {
+func (s *SystemRender) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {
@@ -84,7 +83,7 @@ func (s *SystemRender) RemoveAll(category terraform2d.EntityCategory) {
 }
 
 // RemoveEntity removes an entity by ID
-func (s *SystemRender) RemoveEntity(id terraform2d.EntityID) {
+func (s *SystemRender) RemoveEntity(id EntityID) {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		if s.entities[i].ID == id {
 			s.entities = append(s.entities[:i], s.entities[i+1:]...)
@@ -193,17 +192,17 @@ func (s *SystemRender) animateDefault(entity renderEntity) {
 	}
 }
 
-func (s *SystemRender) animateAttackDirection(dir terraform2d.Direction, entity renderEntity) {
+func (s *SystemRender) animateAttackDirection(dir Direction, entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		var animData *ComponentAnimationData
 		switch dir {
-		case terraform2d.DirectionUp:
+		case DirectionUp:
 			animData = anim.Map["swordAttackUp"]
-		case terraform2d.DirectionRight:
+		case DirectionRight:
 			animData = anim.Map["swordAttackRight"]
-		case terraform2d.DirectionDown:
+		case DirectionDown:
 			animData = anim.Map["swordAttackDown"]
-		case terraform2d.DirectionLeft:
+		case DirectionLeft:
 			animData = anim.Map["swordAttackLeft"]
 		}
 
@@ -238,7 +237,7 @@ func (s *SystemRender) animateAttackDirection(dir terraform2d.Direction, entity 
 	}
 }
 
-func (s *SystemRender) animateDirections(dir terraform2d.Direction, entity renderEntity) {
+func (s *SystemRender) animateDirections(dir Direction, entity renderEntity) {
 	// if entity.ComponentSpatial.HitBoxRadius > 0 {
 	// 	shape := entity.ComponentSpatial.Shape
 	// 	shape.Clear()
@@ -254,13 +253,13 @@ func (s *SystemRender) animateDirections(dir terraform2d.Direction, entity rende
 	if anim := entity.ComponentAnimation; anim != nil {
 		var animData *ComponentAnimationData
 		switch dir {
-		case terraform2d.DirectionUp:
+		case DirectionUp:
 			animData = anim.Map["up"]
-		case terraform2d.DirectionRight:
+		case DirectionRight:
 			animData = anim.Map["right"]
-		case terraform2d.DirectionDown:
+		case DirectionDown:
 			animData = anim.Map["down"]
-		case terraform2d.DirectionLeft:
+		case DirectionLeft:
 			animData = anim.Map["left"]
 		}
 

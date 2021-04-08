@@ -1,11 +1,7 @@
 package zelduh
 
-import (
-	"github.com/miketmoore/terraform2d"
-)
-
 type healthEntity struct {
-	ID terraform2d.EntityID
+	ID EntityID
 	*ComponentHealth
 }
 
@@ -23,7 +19,7 @@ func (s *SystemHealth) AddEntity(entity Entity) {
 }
 
 // Hit reduces entity health by d
-func (s *SystemHealth) Hit(entityID terraform2d.EntityID, d int) bool {
+func (s *SystemHealth) Hit(entityID EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {

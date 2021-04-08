@@ -3,14 +3,25 @@ package zelduh
 import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
-	"github.com/miketmoore/terraform2d"
 	"golang.org/x/image/colornames"
 )
 
+// Entity is an interface for implementing concrete "things" in the game. TODO rename...
+type Entityer interface {
+	ID() EntityID
+	Category() EntityCategory
+}
+
+// EntityCategory is used to group entities
+type EntityCategory uint
+
+// EntityID represents an entity ID
+type EntityID int
+
 // Entity is used to represent each character and tangable "thing" in the game
 type Entity struct {
-	id       terraform2d.EntityID
-	Category terraform2d.EntityCategory
+	id       EntityID
+	Category EntityCategory
 	*ComponentInvincible
 	*ComponentAnimation
 	*ComponentAppearance
@@ -26,12 +37,12 @@ type Entity struct {
 }
 
 // ID returns the entity ID
-func (e *Entity) ID() terraform2d.EntityID {
+func (e *Entity) ID() EntityID {
 	return e.id
 }
 
 // BuildEntitiesFromConfigs builds and returns a batch of entities
-func BuildEntitiesFromConfigs(newEntityID func() terraform2d.EntityID, configs ...Config) []Entity {
+func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...Config) []Entity {
 	batch := []Entity{}
 	for _, config := range configs {
 		entity := BuildEntityFromConfig(config, newEntityID())
@@ -41,7 +52,7 @@ func BuildEntitiesFromConfigs(newEntityID func() terraform2d.EntityID, configs .
 }
 
 // BuildEntityFromConfig builds an entity from a configuration
-func BuildEntityFromConfig(c Config, id terraform2d.EntityID) Entity {
+func BuildEntityFromConfig(c Config, id EntityID) Entity {
 	entity := Entity{
 		id:       id,
 		Category: c.Category,

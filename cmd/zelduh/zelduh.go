@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/miketmoore/terraform2d"
 	"github.com/miketmoore/zelduh"
 
 	"github.com/faiface/pixel"
@@ -27,16 +26,16 @@ var (
 // GameModel contains data used throughout the game
 type GameModel struct {
 	AddEntities                           bool
-	CurrentRoomID, NextRoomID             terraform2d.RoomID
-	RoomTransition                        *terraform2d.RoomTransition
-	CurrentState                          terraform2d.State
+	CurrentRoomID, NextRoomID             zelduh.RoomID
+	RoomTransition                        *zelduh.RoomTransition
+	CurrentState                          zelduh.State
 	Rand                                  *rand.Rand
-	EntitiesMap                           map[terraform2d.EntityID]zelduh.Entity
+	EntitiesMap                           map[zelduh.EntityID]zelduh.Entity
 	Spritesheet                           map[int]*pixel.Sprite
 	Arrow, Bomb, Explosion, Player, Sword zelduh.Entity
 	Hearts                                []zelduh.Entity
-	RoomWarps                             map[terraform2d.EntityID]zelduh.Config
-	AllMapDrawData                        map[string]terraform2d.MapData
+	RoomWarps                             map[zelduh.EntityID]zelduh.Config
+	AllMapDrawData                        map[string]zelduh.MapData
 	HealthSystem                          *zelduh.SystemHealth
 	InputSystem                           *zelduh.SystemInput
 	SpatialSystem                         *zelduh.SystemSpatial
@@ -68,14 +67,14 @@ func run() {
 
 	gameModel := GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
-		EntitiesMap:   map[terraform2d.EntityID]zelduh.Entity{},
-		CurrentState:  terraform2d.StateStart,
+		EntitiesMap:   map[zelduh.EntityID]zelduh.Entity{},
+		CurrentState:  zelduh.StateStart,
 		AddEntities:   true,
 		CurrentRoomID: 1,
-		RoomTransition: &terraform2d.RoomTransition{
+		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
-		Spritesheet: terraform2d.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
+		Spritesheet: zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
 		// Build entities
 		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), gameWorld.NewEntityID()),
@@ -84,8 +83,8 @@ func run() {
 		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), gameWorld.NewEntityID()),
 		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), gameWorld.NewEntityID()),
 
-		RoomWarps:      map[terraform2d.EntityID]zelduh.Config{},
-		AllMapDrawData: terraform2d.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
+		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
+		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
 		InputSystem:  &zelduh.SystemInput{Win: win},
 		HealthSystem: &zelduh.SystemHealth{},
@@ -152,15 +151,15 @@ func run() {
 		allowQuit()
 
 		switch gameModel.CurrentState {
-		case terraform2d.StateStart:
+		case zelduh.StateStart:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 			drawCenterText(currLocaleMsgs["gameTitle"], colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				gameModel.CurrentState = terraform2d.StateGame
+				gameModel.CurrentState = zelduh.StateGame
 			}
-		case terraform2d.StateGame:
+		case zelduh.StateGame:
 			gameModel.InputSystem.EnablePlayer()
 
 			win.Clear(colornames.Darkgray)
@@ -182,7 +181,7 @@ func run() {
 				obstacles := drawObstaclesPerMapTiles(gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
 				gameWorld.AddEntities(obstacles...)
 
-				gameModel.RoomWarps = map[terraform2d.EntityID]zelduh.Config{}
+				gameModel.RoomWarps = map[zelduh.EntityID]zelduh.Config{}
 
 				// Iterate through all entity configurations and build entities and add to systems
 				for _, c := range roomsMap[gameModel.CurrentRoomID].(*zelduh.Room).EntityConfigs {
@@ -202,35 +201,35 @@ func run() {
 			gameWorld.Update()
 
 			if win.JustPressed(pixelgl.KeyP) {
-				gameModel.CurrentState = terraform2d.StatePause
+				gameModel.CurrentState = zelduh.StatePause
 			}
 
 			if win.JustPressed(pixelgl.KeyX) {
-				gameModel.CurrentState = terraform2d.StateOver
+				gameModel.CurrentState = zelduh.StateOver
 			}
 
-		case terraform2d.StatePause:
+		case zelduh.StatePause:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
 			drawCenterText(currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 
 			if win.JustPressed(pixelgl.KeyP) {
-				gameModel.CurrentState = terraform2d.StateGame
+				gameModel.CurrentState = zelduh.StateGame
 			}
 			if win.JustPressed(pixelgl.KeyEscape) {
-				gameModel.CurrentState = terraform2d.StateStart
+				gameModel.CurrentState = zelduh.StateStart
 			}
-		case terraform2d.StateOver:
+		case zelduh.StateOver:
 			win.Clear(colornames.Darkgray)
 			drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.Black)
 			drawCenterText(currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 
 			if win.JustPressed(pixelgl.KeyEnter) {
-				gameModel.CurrentState = terraform2d.StateStart
+				gameModel.CurrentState = zelduh.StateStart
 			}
-		case terraform2d.StateMapTransition:
+		case zelduh.StateMapTransition:
 			gameModel.InputSystem.DisablePlayer()
-			if gameModel.RoomTransition.Style == terraform2d.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
+			if gameModel.RoomTransition.Style == zelduh.TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
@@ -278,7 +277,7 @@ func run() {
 				)
 
 				gameWorld.Update()
-			} else if gameModel.RoomTransition.Style == terraform2d.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
+			} else if gameModel.RoomTransition.Style == zelduh.TransitionWarp && gameModel.RoomTransition.Timer > 0 {
 				gameModel.RoomTransition.Timer--
 				win.Clear(colornames.Darkgray)
 				drawMapBG(zelduh.MapX, zelduh.MapY, zelduh.MapW, zelduh.MapH, colornames.White)
@@ -289,7 +288,7 @@ func run() {
 				gameWorld.RemoveAllMoveableObstacles()
 				gameWorld.RemoveAllEntities()
 			} else {
-				gameModel.CurrentState = terraform2d.StateGame
+				gameModel.CurrentState = zelduh.StateGame
 				if gameModel.NextRoomID != 0 {
 					gameModel.CurrentRoomID = gameModel.NextRoomID
 				}
@@ -353,7 +352,7 @@ func drawMapBG(x, y, w, h float64, color color.Color) {
 
 func drawMapBGImage(
 	spritesheet map[int]*pixel.Sprite,
-	allMapDrawData map[string]terraform2d.MapData,
+	allMapDrawData map[string]zelduh.MapData,
 	name string,
 	modX, modY float64) {
 
@@ -374,7 +373,7 @@ func drawMapBGImage(
 	}
 }
 
-func drawObstaclesPerMapTiles(allMapDrawData map[string]terraform2d.MapData, roomID terraform2d.RoomID, modX, modY float64) []zelduh.Entity {
+func drawObstaclesPerMapTiles(allMapDrawData map[string]zelduh.MapData, roomID zelduh.RoomID, modX, modY float64) []zelduh.Entity {
 	d := allMapDrawData[roomsMap[roomID].MapName()]
 	obstacles := []zelduh.Entity{}
 	mod := 0.5
@@ -530,25 +529,25 @@ type CollisionHandler struct {
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
-func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side terraform2d.Bound) {
+func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side zelduh.Bound) {
 	if !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Side = side
-		ch.GameModel.RoomTransition.Style = terraform2d.TransitionSlide
+		ch.GameModel.RoomTransition.Style = zelduh.TransitionSlide
 		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
-		ch.GameModel.CurrentState = terraform2d.StateMapTransition
+		ch.GameModel.CurrentState = zelduh.StateMapTransition
 		ch.GameModel.AddEntities = true
 	}
 }
 
 // OnPlayerCollisionWithCoin handles collision between player and coin
-func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID zelduh.EntityID) {
 	ch.GameModel.Player.ComponentCoins.Coins++
 	gameWorld.Remove(zelduh.CategoryCoin, coinID)
 }
 
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
-func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID zelduh.EntityID) {
 	// TODO repeat what I did with the enemies
 	ch.GameModel.SpatialSystem.MovePlayerBack()
 	ch.GameModel.Player.ComponentHealth.Total--
@@ -559,12 +558,12 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID terraform2d.Entit
 	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
 
 	if ch.GameModel.Player.ComponentHealth.Total == 0 {
-		ch.GameModel.CurrentState = terraform2d.StateOver
+		ch.GameModel.CurrentState = zelduh.StateOver
 	}
 }
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
-func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID zelduh.EntityID) {
 	if !ch.GameModel.Sword.ComponentIgnore.Value {
 		dead := false
 		if !ch.GameModel.SpatialSystem.EnemyMovingFromHit(enemyID) {
@@ -591,7 +590,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID terraform2d.Entity
 }
 
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
-func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID zelduh.EntityID) {
 	if !ch.GameModel.Arrow.ComponentIgnore.Value {
 		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
 		ch.GameModel.Arrow.ComponentIgnore.Value = true
@@ -620,14 +619,14 @@ func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
 }
 
 // OnPlayerCollisionWithObstacle handles collision between player and obstacle
-func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID zelduh.EntityID) {
 	// "Block" by undoing rect
 	ch.GameModel.Player.ComponentSpatial.Rect = ch.GameModel.Player.ComponentSpatial.PrevRect
 	ch.GameModel.Sword.ComponentSpatial.Rect = ch.GameModel.Sword.ComponentSpatial.PrevRect
 }
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
-func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID zelduh.EntityID) {
 	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Player.ComponentMovement.Direction)
 	if !moved {
 		ch.GameModel.Player.ComponentSpatial.Rect = ch.GameModel.Player.ComponentSpatial.PrevRect
@@ -635,7 +634,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID ter
 }
 
 // OnMoveableObstacleCollisionWithSwitch handles collision between moveable obstacle and switch
-func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID zelduh.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
@@ -644,7 +643,7 @@ func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitc
 }
 
 // OnMoveableObstacleNoCollisionWithSwitch handles *no* collision between moveable obstacle and switch
-func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID zelduh.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
@@ -653,13 +652,13 @@ func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwi
 }
 
 // OnEnemyCollisionWithObstacle handles collision between enemy and obstacle
-func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID zelduh.EntityID) {
 	// Block enemy within the spatial system by reseting current rect to previous rect
 	ch.GameModel.SpatialSystem.UndoEnemyRect(enemyID)
 }
 
 // OnPlayerCollisionWithSwitch handles collision between player and switch
-func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID zelduh.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
@@ -668,7 +667,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID terraf
 }
 
 // OnPlayerNoCollisionWithSwitch handles *no* collision between player and switch
-func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID zelduh.EntityID) {
 	for id, entity := range ch.GameModel.EntitiesMap {
 		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
@@ -677,13 +676,13 @@ func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID terr
 }
 
 // OnPlayerCollisionWithWarp handles collision between player and warp
-func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID terraform2d.EntityID) {
+func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID zelduh.EntityID) {
 	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
 	if ok && !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true
-		ch.GameModel.RoomTransition.Style = terraform2d.TransitionWarp
+		ch.GameModel.RoomTransition.Style = zelduh.TransitionWarp
 		ch.GameModel.RoomTransition.Timer = 1
-		ch.GameModel.CurrentState = terraform2d.StateMapTransition
+		ch.GameModel.CurrentState = zelduh.StateMapTransition
 		ch.GameModel.AddEntities = true
 		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
 	}
@@ -691,16 +690,16 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID terraform2d.EntityI
 
 // TransitionRoomResponse contains layout data
 type TransitionRoomResponse struct {
-	nextRoomID                                             terraform2d.RoomID
+	nextRoomID                                             zelduh.RoomID
 	modX, modY, modXNext, modYNext, playerModX, playerModY float64
 }
 
 func calculateTransitionSlide(
-	roomTransition *terraform2d.RoomTransition,
-	connectedRooms terraform2d.ConnectedRooms,
-	currentRoomID terraform2d.RoomID) TransitionRoomResponse {
+	roomTransition *zelduh.RoomTransition,
+	connectedRooms zelduh.ConnectedRooms,
+	currentRoomID zelduh.RoomID) TransitionRoomResponse {
 
-	var nextRoomID terraform2d.RoomID
+	var nextRoomID zelduh.RoomID
 	inc := (roomTransition.Start - float64(roomTransition.Timer))
 	incY := inc * (zelduh.MapH / zelduh.TileSize)
 	incX := inc * (zelduh.MapW / zelduh.TileSize)
@@ -712,22 +711,22 @@ func calculateTransitionSlide(
 	playerModY := 0.0
 	playerIncY := ((zelduh.MapH / zelduh.TileSize) - 1) + 7
 	playerIncX := ((zelduh.MapW / zelduh.TileSize) - 1) + 7
-	if roomTransition.Side == terraform2d.BoundBottom && connectedRooms.Bottom != 0 {
+	if roomTransition.Side == zelduh.BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
 		modYNext = incY - zelduh.MapH
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
-	} else if roomTransition.Side == terraform2d.BoundTop && connectedRooms.Top != 0 {
+	} else if roomTransition.Side == zelduh.BoundTop && connectedRooms.Top != 0 {
 		modY = -incY
 		modYNext = -incY + zelduh.MapH
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
-	} else if roomTransition.Side == terraform2d.BoundLeft && connectedRooms.Left != 0 {
+	} else if roomTransition.Side == zelduh.BoundLeft && connectedRooms.Left != 0 {
 		modX = incX
 		modXNext = incX - zelduh.MapW
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
-	} else if roomTransition.Side == terraform2d.BoundRight && connectedRooms.Right != 0 {
+	} else if roomTransition.Side == zelduh.BoundRight && connectedRooms.Right != 0 {
 		modX = -incX
 		modXNext = -incX + zelduh.MapW
 		nextRoomID = connectedRooms.Right

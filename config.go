@@ -1,7 +1,5 @@
 package zelduh
 
-import "github.com/miketmoore/terraform2d"
-
 // FrameRate is used to determine which sprite to use for animations
 const FrameRate int = 5
 
@@ -68,7 +66,7 @@ var TilemapFiles = []string{
 
 // Overworld is a multi-dimensional array representing the overworld
 // Each room ID should be unique
-var Overworld = [][]terraform2d.RoomID{
+var Overworld = [][]RoomID{
 	{1, 10},
 	{2, 0, 0, 8},
 	{3, 5, 6, 7},

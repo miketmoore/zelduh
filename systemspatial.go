@@ -4,11 +4,10 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
-	"github.com/miketmoore/terraform2d"
 )
 
 type spatialEntity struct {
-	ID terraform2d.EntityID
+	ID EntityID
 	*ComponentMovement
 	*ComponentSpatial
 	*ComponentDash
@@ -49,7 +48,7 @@ func (s *SystemSpatial) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *SystemSpatial) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
+func (s *SystemSpatial) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -62,7 +61,7 @@ func (s *SystemSpatial) Remove(category terraform2d.EntityCategory, id terraform
 }
 
 // RemoveAll removes all entities from one category
-func (s *SystemSpatial) RemoveAll(category terraform2d.EntityCategory) {
+func (s *SystemSpatial) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -76,13 +75,13 @@ func (s *SystemSpatial) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
 	switch player.ComponentMovement.Direction {
-	case terraform2d.DirectionUp:
+	case DirectionUp:
 		v = pixel.V(0, -48)
-	case terraform2d.DirectionRight:
+	case DirectionRight:
 		v = pixel.V(-48, 0)
-	case terraform2d.DirectionDown:
+	case DirectionDown:
 		v = pixel.V(0, 48)
-	case terraform2d.DirectionLeft:
+	case DirectionLeft:
 		v = pixel.V(48, 0)
 	}
 	player.ComponentSpatial.Rect = player.ComponentSpatial.PrevRect.Moved(v)
@@ -90,7 +89,7 @@ func (s *SystemSpatial) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *SystemSpatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, dir terraform2d.Direction) bool {
+func (s *SystemSpatial) MoveMoveableObstacle(obstacleID EntityID, dir Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.ComponentMovement.MovingFromHit {
 		entity.ComponentMovement.MovingFromHit = true
@@ -102,7 +101,7 @@ func (s *SystemSpatial) MoveMoveableObstacle(obstacleID terraform2d.EntityID, di
 }
 
 // UndoEnemyRect resets current rect to previous rect
-func (s *SystemSpatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
+func (s *SystemSpatial) UndoEnemyRect(enemyID EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.PrevRect
@@ -110,7 +109,7 @@ func (s *SystemSpatial) UndoEnemyRect(enemyID terraform2d.EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *SystemSpatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit terraform2d.Direction) {
+func (s *SystemSpatial) MoveEnemyBack(enemyID EntityID, directionHit Direction) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.ComponentMovement.MovingFromHit {
 		enemy.ComponentMovement.MovingFromHit = true
@@ -120,7 +119,7 @@ func (s *SystemSpatial) MoveEnemyBack(enemyID terraform2d.EntityID, directionHit
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *SystemSpatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*ComponentSpatial, bool) {
+func (s *SystemSpatial) GetEnemySpatial(enemyID EntityID) (*ComponentSpatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
 			return enemy.ComponentSpatial, true
@@ -130,7 +129,7 @@ func (s *SystemSpatial) GetEnemySpatial(enemyID terraform2d.EntityID) (*Componen
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
-func (s *SystemSpatial) EnemyMovingFromHit(enemyID terraform2d.EntityID) bool {
+func (s *SystemSpatial) EnemyMovingFromHit(enemyID EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
@@ -162,7 +161,7 @@ func (s *SystemSpatial) Update() {
 	}
 }
 
-func (s *SystemSpatial) moveableObstacle(id terraform2d.EntityID) (spatialEntity, bool) {
+func (s *SystemSpatial) moveableObstacle(id EntityID) (spatialEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
 			return *e, true
@@ -171,7 +170,7 @@ func (s *SystemSpatial) moveableObstacle(id terraform2d.EntityID) (spatialEntity
 	return spatialEntity{}, false
 }
 
-func (s *SystemSpatial) enemy(id terraform2d.EntityID) (spatialEntity, bool) {
+func (s *SystemSpatial) enemy(id EntityID) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
 			return *e, true
@@ -180,15 +179,15 @@ func (s *SystemSpatial) enemy(id terraform2d.EntityID) (spatialEntity, bool) {
 	return spatialEntity{}, false
 }
 
-func delta(dir terraform2d.Direction, modX, modY float64) pixel.Vec {
+func delta(dir Direction, modX, modY float64) pixel.Vec {
 	switch dir {
-	case terraform2d.DirectionUp:
+	case DirectionUp:
 		return pixel.V(0, modY)
-	case terraform2d.DirectionRight:
+	case DirectionRight:
 		return pixel.V(modX, 0)
-	case terraform2d.DirectionDown:
+	case DirectionDown:
 		return pixel.V(0, -modY)
-	case terraform2d.DirectionLeft:
+	case DirectionLeft:
 		return pixel.V(-modX, 0)
 	default:
 		return pixel.V(0, 0)
@@ -251,7 +250,7 @@ func (s *SystemSpatial) moveEnemyRandom(enemy *spatialEntity) {
 	if enemy.ComponentMovement.RemainingMoves == 0 {
 		enemy.ComponentMovement.MovingFromHit = false
 		enemy.ComponentMovement.RemainingMoves = s.Rand.Intn(enemy.ComponentMovement.MaxMoves)
-		enemy.ComponentMovement.Direction = terraform2d.RandomDirection(s.Rand)
+		enemy.ComponentMovement.Direction = RandomDirection(s.Rand)
 	} else if enemy.ComponentMovement.RemainingMoves > 0 {
 		var speed float64
 		if enemy.ComponentMovement.MovingFromHit {
@@ -274,10 +273,10 @@ func (s *SystemSpatial) moveEnemyLeftRight(enemy *spatialEntity) {
 		enemy.ComponentMovement.MovingFromHit = false
 		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.MaxMoves
 		switch enemy.ComponentMovement.Direction {
-		case terraform2d.DirectionLeft:
-			enemy.ComponentMovement.Direction = terraform2d.DirectionRight
-		case terraform2d.DirectionRight:
-			enemy.ComponentMovement.Direction = terraform2d.DirectionLeft
+		case DirectionLeft:
+			enemy.ComponentMovement.Direction = DirectionRight
+		case DirectionRight:
+			enemy.ComponentMovement.Direction = DirectionLeft
 		}
 	} else if enemy.ComponentMovement.RemainingMoves > 0 {
 		var speed float64

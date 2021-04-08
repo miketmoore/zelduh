@@ -5,7 +5,6 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
-	"github.com/miketmoore/terraform2d"
 )
 
 // ComponentAppearance contains data about visual appearance
@@ -62,8 +61,8 @@ type ComponentInvincible struct {
 
 // ComponentMovement contains data about movement
 type ComponentMovement struct {
-	LastDirection  terraform2d.Direction
-	Direction      terraform2d.Direction
+	LastDirection  Direction
+	Direction      Direction
 	MaxSpeed       float64
 	Speed          float64
 	MaxMoves       int

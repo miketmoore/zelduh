@@ -2,7 +2,6 @@ package zelduh
 
 import (
 	"github.com/faiface/pixel/imdraw"
-	"github.com/miketmoore/terraform2d"
 )
 
 // AnimationConfig is a map of animation types to sprite index lists
@@ -10,8 +9,8 @@ type AnimationConfig map[string][]int
 
 // MovementConfig is used to configure an entity's Movement component
 type MovementConfig struct {
-	LastDirection  terraform2d.Direction
-	Direction      terraform2d.Direction
+	LastDirection  Direction
+	Direction      Direction
 	MaxSpeed       float64
 	Speed          float64
 	MaxMoves       int
@@ -37,11 +36,11 @@ type DashConfig struct {
 
 // Config is used to simplify building entities
 type Config struct {
-	Category                                                      terraform2d.EntityCategory
+	Category                                                      EntityCategory
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
 	X, Y, W, H                                                    float64
 	SpriteFrames                                                  []int
-	WarpToRoomID                                                  terraform2d.RoomID
+	WarpToRoomID                                                  RoomID
 	PatternName                                                   string
 	Toggled                                                       bool
 	Health                                                        int

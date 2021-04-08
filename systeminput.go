@@ -2,7 +2,6 @@ package zelduh
 
 import (
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/miketmoore/terraform2d"
 )
 
 type inputEntity struct {
@@ -61,16 +60,16 @@ func (s SystemInput) Update() {
 	player.ComponentMovement.LastDirection = player.ComponentMovement.Direction
 	if win.Pressed(pixelgl.KeyUp) {
 		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = terraform2d.DirectionUp
+		player.ComponentMovement.Direction = DirectionUp
 	} else if win.Pressed(pixelgl.KeyRight) {
 		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = terraform2d.DirectionRight
+		player.ComponentMovement.Direction = DirectionRight
 	} else if win.Pressed(pixelgl.KeyDown) {
 		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = terraform2d.DirectionDown
+		player.ComponentMovement.Direction = DirectionDown
 	} else if win.Pressed(pixelgl.KeyLeft) {
 		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = terraform2d.DirectionLeft
+		player.ComponentMovement.Direction = DirectionLeft
 	} else {
 		player.ComponentMovement.Speed = 0
 	}

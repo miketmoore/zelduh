@@ -1,9 +1,5 @@
 package zelduh
 
-import (
-	"github.com/miketmoore/terraform2d"
-)
-
 // System is an interface
 type System interface {
 	Update()
@@ -14,7 +10,7 @@ type System interface {
 type World struct {
 	systems      []System
 	SystemsMap   map[string]System
-	lastEntityID terraform2d.EntityID
+	lastEntityID EntityID
 }
 
 // New returns a new World
@@ -50,7 +46,7 @@ func (w *World) Systems() []System {
 }
 
 // NewEntityID generates and returns a new Entity ID
-func (w *World) NewEntityID() terraform2d.EntityID {
+func (w *World) NewEntityID() EntityID {
 	w.lastEntityID++
 	return w.lastEntityID
 }
@@ -62,7 +58,7 @@ func (w *World) AddEntity(entity Entity) {
 	}
 }
 
-// AddEntities adds the terraform2d to their system
+// AddEntities adds the entities to their system
 func (w *World) AddEntities(all ...Entity) {
 	for _, entity := range all {
 		w.AddEntity(entity)
@@ -70,7 +66,7 @@ func (w *World) AddEntities(all ...Entity) {
 }
 
 // Remove removes the specific entity from all systems
-func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.EntityID) {
+func (w *World) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryCoin:
 		for _, sys := range w.systems {
@@ -92,7 +88,7 @@ func (w *World) Remove(category terraform2d.EntityCategory, id terraform2d.Entit
 }
 
 // RemoveEnemy removes the enemy from all system
-func (w *World) RemoveEnemy(id terraform2d.EntityID) {
+func (w *World) RemoveEnemy(id EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *SystemSpatial:
