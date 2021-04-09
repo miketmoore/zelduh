@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	_ "image/png"
 	"math/rand"
 	"os"
@@ -14,7 +15,11 @@ import (
 
 func run() {
 
-	currLocaleMsgs := zelduh.LocaleMessages["en"]
+	currLocaleMsgs, err := zelduh.GetLocaleMessageMapByLanguage("en")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 
 	systemsManager := zelduh.NewSystemsManager()
 

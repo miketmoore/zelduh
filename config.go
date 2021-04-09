@@ -160,17 +160,3 @@ var RoomsMap = Rooms{
 		},
 	),
 }
-
-// Just a stub for now since English is the only language supported at this time
-var LocaleMessages = map[string]map[string]string{
-	"en": {
-		"gameTitle":             "Zelduh",
-		"pauseScreenMessage":    "Paused",
-		"gameOverScreenMessage": "Game Over",
-	},
-	"es": {
-		"gameTitle":             "Zelduh",
-		"pauseScreenMessage":    "Paused",
-		"gameOverScreenMessage": "Game Over",
-	},
-}

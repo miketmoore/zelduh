@@ -15,7 +15,7 @@ type GameStateManager struct {
 	GameModel       *GameModel
 	SystemsManager  *SystemsManager
 	UI              UI
-	LocaleMessages  map[string]string
+	LocaleMessages  LocaleMessagesMap
 	CollisionSystem *SystemCollision
 }
 
@@ -23,7 +23,7 @@ func NewGameStateManager(
 	gameModel *GameModel,
 	systemsManager *SystemsManager,
 	ui UI,
-	localeMessages map[string]string,
+	localeMessages LocaleMessagesMap,
 	collisionSystem *SystemCollision,
 ) GameStateManager {
 	return GameStateManager{

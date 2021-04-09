@@ -5,7 +5,7 @@ import (
 )
 
 // GameStateStart handles functionality for the game "start" state
-func GameStateStart(ui UI, currLocaleMsgs map[string]string, gameModel *GameModel) {
+func GameStateStart(ui UI, currLocaleMsgs LocaleMessagesMap, gameModel *GameModel) {
 	DrawScreenStart(ui.Window, ui.Text, currLocaleMsgs)
 
 	if ui.Window.JustPressed(pixelgl.KeyEnter) {

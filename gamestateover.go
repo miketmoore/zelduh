@@ -5,7 +5,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateOver(ui UI, currLocaleMsgs map[string]string, gameModel *GameModel) {
+func GameStateOver(ui UI, currLocaleMsgs LocaleMessagesMap, gameModel *GameModel) {
 	ui.Window.Clear(colornames.Darkgray)
 	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.Black)
 	DrawCenterText(ui.Window, ui.Text, currLocaleMsgs["gameOverScreenMessage"], colornames.White)

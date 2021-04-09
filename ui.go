@@ -17,7 +17,7 @@ type UI struct {
 	Text   *text.Text
 }
 
-func NewUI(currLocaleMsgs map[string]string) UI {
+func NewUI(currLocaleMsgs LocaleMessagesMap) UI {
 
 	// Initialize text
 	orig := pixel.V(20, 50)
@@ -60,7 +60,7 @@ func DrawMapBackground(win *pixelgl.Window, x, y, w, h float64, color color.Colo
 	s.Draw(win)
 }
 
-func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs map[string]string) {
+func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap) {
 	win.Clear(colornames.Darkgray)
 	DrawMapBackground(win, MapX, MapY, MapW, MapH, colornames.White)
 	DrawCenterText(win, txt, currLocaleMsgs["gameTitle"], colornames.Black)
