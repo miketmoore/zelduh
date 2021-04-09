@@ -5,8 +5,8 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateMapTransition(ui UI, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
-	gameModel.InputSystem.DisablePlayer()
+func GameStateMapTransition(ui UI, inputSystem *SystemInput, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
+	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)

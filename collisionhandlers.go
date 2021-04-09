@@ -6,6 +6,8 @@ import "github.com/faiface/pixel"
 type CollisionHandler struct {
 	GameModel      *GameModel
 	SystemsManager *SystemsManager
+	HealthSystem   *SystemHealth
+	SpatialSystem  *SystemSpatial
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -29,7 +31,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
 func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	// TODO repeat what I did with the enemies
-	ch.GameModel.SpatialSystem.MovePlayerBack()
+	ch.SpatialSystem.MovePlayerBack()
 	ch.GameModel.Entities.Player.ComponentHealth.Total--
 
 	// remove heart entity
@@ -51,10 +53,10 @@ func dropCoin(v pixel.Vec, systemsManager *SystemsManager) {
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 	if !ch.GameModel.Entities.Sword.ComponentIgnore.Value {
 		dead := false
-		if !ch.GameModel.SpatialSystem.EnemyMovingFromHit(enemyID) {
-			dead = ch.GameModel.HealthSystem.Hit(enemyID, 1)
+		if !ch.SpatialSystem.EnemyMovingFromHit(enemyID) {
+			dead = ch.HealthSystem.Hit(enemyID, 1)
 			if dead {
-				enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
+				enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
 				ch.GameModel.Entities.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Entities.Explosion.ComponentAnimation.Map["default"].Frames)
 				ch.GameModel.Entities.Explosion.ComponentSpatial = &ComponentSpatial{
 					Width:  TileSize,
@@ -67,7 +69,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 				ch.SystemsManager.AddEntity(ch.GameModel.Entities.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
 			} else {
-				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
+				ch.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
 			}
 		}
 
@@ -77,10 +79,10 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
 func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 	if !ch.GameModel.Entities.Arrow.ComponentIgnore.Value {
-		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
+		dead := ch.HealthSystem.Hit(enemyID, 1)
 		ch.GameModel.Entities.Arrow.ComponentIgnore.Value = true
 		if dead {
-			enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
+			enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
 			ch.GameModel.Entities.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Entities.Explosion.ComponentAnimation.Map["default"].Frames)
 			ch.GameModel.Entities.Explosion.ComponentSpatial = &ComponentSpatial{
 				Width:  TileSize,
@@ -93,7 +95,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 			ch.SystemsManager.AddEntity(ch.GameModel.Entities.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)
 		} else {
-			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
+			ch.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
 		}
 	}
 }
@@ -112,7 +114,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID EntityID) {
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID EntityID) {
-	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
+	moved := ch.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
 	if !moved {
 		ch.GameModel.Entities.Player.ComponentSpatial.Rect = ch.GameModel.Entities.Player.ComponentSpatial.PrevRect
 	}
@@ -139,7 +141,7 @@ func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwi
 // OnEnemyCollisionWithObstacle handles collision between enemy and obstacle
 func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID EntityID) {
 	// Block enemy within the spatial system by reseting current rect to previous rect
-	ch.GameModel.SpatialSystem.UndoEnemyRect(enemyID)
+	ch.SpatialSystem.UndoEnemyRect(enemyID)
 }
 
 // OnPlayerCollisionWithSwitch handles collision between player and switch

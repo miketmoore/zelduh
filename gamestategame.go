@@ -5,8 +5,8 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, systemsManager *SystemsManager) {
-	gameModel.InputSystem.EnablePlayer()
+func GameStateGame(ui UI, gameModel *GameModel, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
+	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
 	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
