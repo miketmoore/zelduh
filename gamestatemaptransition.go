@@ -5,7 +5,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateMapTransition(ui UI, inputSystem *SystemInput, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
+func GameStateMapTransition(ui UI, spritesheet map[int]*pixel.Sprite, inputSystem *SystemInput, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
 	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
@@ -32,7 +32,7 @@ func GameStateMapTransition(ui UI, inputSystem *SystemInput, systemsManager *Sys
 
 		DrawMapBackgroundImage(
 			ui.Window,
-			gameModel.Spritesheet,
+			spritesheet,
 			gameModel.AllMapDrawData,
 			roomsMap[gameModel.CurrentRoomID].MapName(),
 			transitionRoomResp.modX,
@@ -40,7 +40,7 @@ func GameStateMapTransition(ui UI, inputSystem *SystemInput, systemsManager *Sys
 		)
 		DrawMapBackgroundImage(
 			ui.Window,
-			gameModel.Spritesheet,
+			spritesheet,
 			gameModel.AllMapDrawData,
 			roomsMap[gameModel.NextRoomID].MapName(),
 			transitionRoomResp.modXNext,

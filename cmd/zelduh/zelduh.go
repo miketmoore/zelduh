@@ -36,7 +36,6 @@ func run() {
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
-		Spritesheet: zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
 		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
@@ -79,6 +78,8 @@ func run() {
 
 	inputSystem := &zelduh.SystemInput{Win: ui.Window}
 
+	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize)
+
 	systemsManager.AddSystems(
 		inputSystem,
 		healthSystem,
@@ -86,7 +87,7 @@ func run() {
 		collisionSystem,
 		&zelduh.SystemRender{
 			Win:         ui.Window,
-			Spritesheet: gameModel.Spritesheet,
+			Spritesheet: spritesheet,
 		},
 	)
 
@@ -104,6 +105,7 @@ func run() {
 		currLocaleMsgs,
 		collisionSystem,
 		inputSystem,
+		spritesheet,
 	)
 
 	for !ui.Window.Closed() {

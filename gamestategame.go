@@ -1,11 +1,12 @@
 package zelduh
 
 import (
+	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, gameModel *GameModel, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
+func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -13,7 +14,7 @@ func GameStateGame(ui UI, gameModel *GameModel, inputSystem *SystemInput, roomsM
 
 	DrawMapBackgroundImage(
 		ui.Window,
-		gameModel.Spritesheet,
+		spritesheet,
 		gameModel.AllMapDrawData,
 		roomsMap[gameModel.CurrentRoomID].MapName(),
 		0, 0)

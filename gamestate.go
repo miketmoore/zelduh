@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/faiface/pixel"
+
 // State is a type of game state
 type State string
 
@@ -18,6 +20,7 @@ type GameStateManager struct {
 	LocaleMessages  LocaleMessagesMap
 	CollisionSystem *SystemCollision
 	InputSystem     *SystemInput
+	Spritesheet     map[int]*pixel.Sprite
 }
 
 func NewGameStateManager(
@@ -27,6 +30,7 @@ func NewGameStateManager(
 	localeMessages LocaleMessagesMap,
 	collisionSystem *SystemCollision,
 	inputSystem *SystemInput,
+	spritesheet map[int]*pixel.Sprite,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:       gameModel,
@@ -35,6 +39,7 @@ func NewGameStateManager(
 		LocaleMessages:  localeMessages,
 		CollisionSystem: collisionSystem,
 		InputSystem:     inputSystem,
+		Spritesheet:     spritesheet,
 	}
 }
 
@@ -43,12 +48,12 @@ func (g *GameStateManager) Update() {
 	case StateStart:
 		GameStateStart(g.UI, g.LocaleMessages, g.GameModel)
 	case StateGame:
-		GameStateGame(g.UI, g.GameModel, g.InputSystem, RoomsMap, g.SystemsManager)
+		GameStateGame(g.UI, g.Spritesheet, g.GameModel, g.InputSystem, RoomsMap, g.SystemsManager)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameModel)
 	case StateOver:
 		GameStateOver(g.UI, g.LocaleMessages, g.GameModel)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel)
+		GameStateMapTransition(g.UI, g.Spritesheet, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel)
 	}
 }
