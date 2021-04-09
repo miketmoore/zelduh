@@ -20,7 +20,7 @@ func GameStateGame(ui UI, gameModel *GameModel, roomsMap Rooms, systemsManager *
 
 	if gameModel.AddEntities {
 		gameModel.AddEntities = false
-		AddUIHearts(systemsManager, gameModel.Hearts, gameModel.Player.ComponentHealth.Total)
+		AddUIHearts(systemsManager, gameModel.Entities.Hearts, gameModel.Entities.Player.ComponentHealth.Total)
 
 		AddUICoin(systemsManager)
 

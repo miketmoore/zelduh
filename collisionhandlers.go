@@ -22,7 +22,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
 
 // OnPlayerCollisionWithCoin handles collision between player and coin
 func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
-	ch.GameModel.Player.ComponentCoins.Coins++
+	ch.GameModel.Entities.Player.ComponentCoins.Coins++
 	ch.SystemsManager.Remove(CategoryCoin, coinID)
 }
 
@@ -30,14 +30,14 @@ func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
 func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	// TODO repeat what I did with the enemies
 	ch.GameModel.SpatialSystem.MovePlayerBack()
-	ch.GameModel.Player.ComponentHealth.Total--
+	ch.GameModel.Entities.Player.ComponentHealth.Total--
 
 	// remove heart entity
-	heartIndex := len(ch.GameModel.Hearts) - 1
-	ch.SystemsManager.Remove(CategoryHeart, ch.GameModel.Hearts[heartIndex].ID())
-	ch.GameModel.Hearts = append(ch.GameModel.Hearts[:heartIndex], ch.GameModel.Hearts[heartIndex+1:]...)
+	heartIndex := len(ch.GameModel.Entities.Hearts) - 1
+	ch.SystemsManager.Remove(CategoryHeart, ch.GameModel.Entities.Hearts[heartIndex].ID())
+	ch.GameModel.Entities.Hearts = append(ch.GameModel.Entities.Hearts[:heartIndex], ch.GameModel.Entities.Hearts[heartIndex+1:]...)
 
-	if ch.GameModel.Player.ComponentHealth.Total == 0 {
+	if ch.GameModel.Entities.Player.ComponentHealth.Total == 0 {
 		ch.GameModel.CurrentState = StateOver
 	}
 }
@@ -49,25 +49,25 @@ func dropCoin(v pixel.Vec, systemsManager *SystemsManager) {
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
-	if !ch.GameModel.Sword.ComponentIgnore.Value {
+	if !ch.GameModel.Entities.Sword.ComponentIgnore.Value {
 		dead := false
 		if !ch.GameModel.SpatialSystem.EnemyMovingFromHit(enemyID) {
 			dead = ch.GameModel.HealthSystem.Hit(enemyID, 1)
 			if dead {
 				enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
-				ch.GameModel.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Explosion.ComponentAnimation.Map["default"].Frames)
-				ch.GameModel.Explosion.ComponentSpatial = &ComponentSpatial{
+				ch.GameModel.Entities.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Entities.Explosion.ComponentAnimation.Map["default"].Frames)
+				ch.GameModel.Entities.Explosion.ComponentSpatial = &ComponentSpatial{
 					Width:  TileSize,
 					Height: TileSize,
 					Rect:   enemySpatial.Rect,
 				}
-				ch.GameModel.Explosion.ComponentTemporary.OnExpiration = func() {
-					dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+				ch.GameModel.Entities.Explosion.ComponentTemporary.OnExpiration = func() {
+					dropCoin(ch.GameModel.Entities.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
 				}
-				ch.SystemsManager.AddEntity(ch.GameModel.Explosion)
+				ch.SystemsManager.AddEntity(ch.GameModel.Entities.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
 			} else {
-				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.ComponentMovement.Direction)
+				ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
 			}
 		}
 
@@ -76,45 +76,45 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
 func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
-	if !ch.GameModel.Arrow.ComponentIgnore.Value {
+	if !ch.GameModel.Entities.Arrow.ComponentIgnore.Value {
 		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
-		ch.GameModel.Arrow.ComponentIgnore.Value = true
+		ch.GameModel.Entities.Arrow.ComponentIgnore.Value = true
 		if dead {
 			enemySpatial, _ := ch.GameModel.SpatialSystem.GetEnemySpatial(enemyID)
-			ch.GameModel.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Explosion.ComponentAnimation.Map["default"].Frames)
-			ch.GameModel.Explosion.ComponentSpatial = &ComponentSpatial{
+			ch.GameModel.Entities.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Entities.Explosion.ComponentAnimation.Map["default"].Frames)
+			ch.GameModel.Entities.Explosion.ComponentSpatial = &ComponentSpatial{
 				Width:  TileSize,
 				Height: TileSize,
 				Rect:   enemySpatial.Rect,
 			}
-			ch.GameModel.Explosion.ComponentTemporary.OnExpiration = func() {
-				dropCoin(ch.GameModel.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+			ch.GameModel.Entities.Explosion.ComponentTemporary.OnExpiration = func() {
+				dropCoin(ch.GameModel.Entities.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
 			}
-			ch.SystemsManager.AddEntity(ch.GameModel.Explosion)
+			ch.SystemsManager.AddEntity(ch.GameModel.Entities.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)
 		} else {
-			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Player.ComponentMovement.Direction)
+			ch.GameModel.SpatialSystem.MoveEnemyBack(enemyID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
 		}
 	}
 }
 
 // OnArrowCollisionWithObstacle handles collision between arrow and obstacle
 func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
-	ch.GameModel.Arrow.ComponentMovement.RemainingMoves = 0
+	ch.GameModel.Entities.Arrow.ComponentMovement.RemainingMoves = 0
 }
 
 // OnPlayerCollisionWithObstacle handles collision between player and obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID EntityID) {
 	// "Block" by undoing rect
-	ch.GameModel.Player.ComponentSpatial.Rect = ch.GameModel.Player.ComponentSpatial.PrevRect
-	ch.GameModel.Sword.ComponentSpatial.Rect = ch.GameModel.Sword.ComponentSpatial.PrevRect
+	ch.GameModel.Entities.Player.ComponentSpatial.Rect = ch.GameModel.Entities.Player.ComponentSpatial.PrevRect
+	ch.GameModel.Entities.Sword.ComponentSpatial.Rect = ch.GameModel.Entities.Sword.ComponentSpatial.PrevRect
 }
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID EntityID) {
-	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Player.ComponentMovement.Direction)
+	moved := ch.GameModel.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.GameModel.Entities.Player.ComponentMovement.Direction)
 	if !moved {
-		ch.GameModel.Player.ComponentSpatial.Rect = ch.GameModel.Player.ComponentSpatial.PrevRect
+		ch.GameModel.Entities.Player.ComponentSpatial.Rect = ch.GameModel.Entities.Player.ComponentSpatial.PrevRect
 	}
 }
 
