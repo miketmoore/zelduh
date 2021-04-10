@@ -22,6 +22,7 @@ type GameStateManager struct {
 	InputSystem     *SystemInput
 	Spritesheet     map[int]*pixel.Sprite
 	EntitiesMap     EntityByEntityID
+	AllMapDrawData  map[string]MapData
 }
 
 func NewGameStateManager(
@@ -33,6 +34,7 @@ func NewGameStateManager(
 	inputSystem *SystemInput,
 	spritesheet map[int]*pixel.Sprite,
 	entitiesMap EntityByEntityID,
+	allMapDrawData map[string]MapData,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:       gameModel,
@@ -43,6 +45,7 @@ func NewGameStateManager(
 		InputSystem:     inputSystem,
 		Spritesheet:     spritesheet,
 		EntitiesMap:     entitiesMap,
+		AllMapDrawData:  allMapDrawData,
 	}
 }
 
@@ -51,12 +54,12 @@ func (g *GameStateManager) Update() {
 	case StateStart:
 		GameStateStart(g.UI, g.LocaleMessages, g.GameModel)
 	case StateGame:
-		GameStateGame(g.UI, g.Spritesheet, g.GameModel, g.EntitiesMap, g.InputSystem, RoomsMap, g.SystemsManager)
+		GameStateGame(g.UI, g.Spritesheet, g.GameModel, g.EntitiesMap, g.AllMapDrawData, g.InputSystem, RoomsMap, g.SystemsManager)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameModel)
 	case StateOver:
 		GameStateOver(g.UI, g.LocaleMessages, g.GameModel)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.Spritesheet, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel)
+		GameStateMapTransition(g.UI, g.Spritesheet, g.AllMapDrawData, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel)
 	}
 }

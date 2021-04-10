@@ -27,6 +27,8 @@ func run() {
 
 	ui := zelduh.NewUI(currLocaleMsgs)
 
+	allMapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
+
 	gameModel := zelduh.GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
 		CurrentState:  zelduh.StateStart,
@@ -36,8 +38,7 @@ func run() {
 			Start: float64(zelduh.TileSize),
 		},
 
-		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
-		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
+		RoomWarps: map[zelduh.EntityID]zelduh.Config{},
 
 		Entities: zelduh.Entities{
 			Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
@@ -109,6 +110,7 @@ func run() {
 		inputSystem,
 		spritesheet,
 		entitiesMap,
+		allMapDrawData,
 	)
 
 	for !ui.Window.Closed() {

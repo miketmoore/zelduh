@@ -6,7 +6,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, entitiesMap EntityByEntityID, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
+func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, entitiesMap EntityByEntityID, allMapDrawData map[string]MapData, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -15,7 +15,7 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameMode
 	DrawMapBackgroundImage(
 		ui.Window,
 		spritesheet,
-		gameModel.AllMapDrawData,
+		allMapDrawData,
 		roomsMap[gameModel.CurrentRoomID].MapName(),
 		0, 0)
 
@@ -26,7 +26,7 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameMode
 		AddUICoin(systemsManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, allMapDrawData, gameModel.CurrentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
 		gameModel.RoomWarps = map[EntityID]Config{}

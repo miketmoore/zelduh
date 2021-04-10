@@ -13,7 +13,6 @@ type GameModel struct {
 	Rand                      *rand.Rand
 	Entities                  Entities
 	RoomWarps                 map[EntityID]Config
-	AllMapDrawData            map[string]MapData
 }
 
 type Entities struct {
