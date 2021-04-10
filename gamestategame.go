@@ -6,7 +6,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
+func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, entitiesMap EntityByEntityID, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -34,7 +34,7 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameMode
 		// Iterate through all entity configurations and build entities and add to systems
 		for _, c := range roomsMap[gameModel.CurrentRoomID].(*Room).EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID())
-			gameModel.EntitiesMap[entity.ID()] = entity
+			entitiesMap[entity.ID()] = entity
 			systemsManager.AddEntity(entity)
 
 			switch c.Category {

@@ -29,7 +29,6 @@ func run() {
 
 	gameModel := zelduh.GameModel{
 		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
-		EntitiesMap:   map[zelduh.EntityID]zelduh.Entity{},
 		CurrentState:  zelduh.StateStart,
 		AddEntities:   true,
 		CurrentRoomID: 1,
@@ -61,6 +60,8 @@ func run() {
 		Rand: gameModel.Rand,
 	}
 
+	entitiesMap := zelduh.NewEntityByEntityIDMap()
+
 	collisionSystem := &zelduh.SystemCollision{
 		MapBounds: pixel.R(
 			zelduh.MapX,
@@ -73,6 +74,7 @@ func run() {
 			SystemsManager: &systemsManager,
 			HealthSystem:   healthSystem,
 			SpatialSystem:  spatialSystem,
+			EntitiesMap:    entitiesMap,
 		},
 	}
 
@@ -106,6 +108,7 @@ func run() {
 		collisionSystem,
 		inputSystem,
 		spritesheet,
+		entitiesMap,
 	)
 
 	for !ui.Window.Closed() {

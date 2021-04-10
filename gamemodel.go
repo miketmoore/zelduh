@@ -11,7 +11,6 @@ type GameModel struct {
 	RoomTransition            *RoomTransition
 	CurrentState              State
 	Rand                      *rand.Rand
-	EntitiesMap               map[EntityID]Entity
 	Entities                  Entities
 	RoomWarps                 map[EntityID]Config
 	AllMapDrawData            map[string]MapData
