@@ -5,12 +5,12 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateOver(ui UI, currLocaleMsgs LocaleMessagesMap, gameModel *GameModel) {
+func GameStateOver(ui UI, currLocaleMsgs LocaleMessagesMap, gameModel *GameModel, gameStateManager *GameStateManager) {
 	ui.Window.Clear(colornames.Darkgray)
 	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.Black)
 	DrawCenterText(ui.Window, ui.Text, currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 
 	if ui.Window.JustPressed(pixelgl.KeyEnter) {
-		gameModel.CurrentState = StateStart
+		gameStateManager.CurrentState = StateStart
 	}
 }

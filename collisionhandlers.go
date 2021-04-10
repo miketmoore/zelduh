@@ -4,13 +4,14 @@ import "github.com/faiface/pixel"
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
-	GameModel      *GameModel
-	SystemsManager *SystemsManager
-	HealthSystem   *SystemHealth
-	SpatialSystem  *SystemSpatial
-	EntitiesMap    EntityByEntityID
-	RoomWarps      map[EntityID]Config
-	Entities       Entities
+	GameModel        *GameModel
+	SystemsManager   *SystemsManager
+	HealthSystem     *SystemHealth
+	SpatialSystem    *SystemSpatial
+	EntitiesMap      EntityByEntityID
+	RoomWarps        map[EntityID]Config
+	Entities         Entities
+	GameStateManager GameStateManager
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -20,7 +21,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
 		ch.GameModel.RoomTransition.Side = side
 		ch.GameModel.RoomTransition.Style = TransitionSlide
 		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
-		ch.GameModel.CurrentState = StateMapTransition
+		ch.GameStateManager.CurrentState = StateMapTransition
 		ch.SystemsManager.SetShouldAddEntities(true)
 	}
 }
@@ -43,7 +44,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	ch.Entities.Hearts = append(ch.Entities.Hearts[:heartIndex], ch.Entities.Hearts[heartIndex+1:]...)
 
 	if ch.Entities.Player.ComponentHealth.Total == 0 {
-		ch.GameModel.CurrentState = StateOver
+		ch.GameStateManager.CurrentState = StateOver
 	}
 }
 
@@ -172,7 +173,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Style = TransitionWarp
 		ch.GameModel.RoomTransition.Timer = 1
-		ch.GameModel.CurrentState = StateMapTransition
+		ch.GameStateManager.CurrentState = StateMapTransition
 		ch.SystemsManager.SetShouldAddEntities(true)
 		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
 	}

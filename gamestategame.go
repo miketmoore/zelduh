@@ -6,7 +6,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, entities Entities, roomWarps map[EntityID]Config, entitiesMap EntityByEntityID, allMapDrawData map[string]MapData, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
+func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, entities Entities, roomWarps map[EntityID]Config, entitiesMap EntityByEntityID, allMapDrawData map[string]MapData, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager, gameStateManager *GameStateManager) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -47,10 +47,10 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameMode
 	systemsManager.Update()
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {
-		gameModel.CurrentState = StatePause
+		gameStateManager.CurrentState = StatePause
 	}
 
 	if ui.Window.JustPressed(pixelgl.KeyX) {
-		gameModel.CurrentState = StateOver
+		gameStateManager.CurrentState = StateOver
 	}
 }

@@ -4,5 +4,4 @@ package zelduh
 type GameModel struct {
 	CurrentRoomID, NextRoomID RoomID
 	RoomTransition            *RoomTransition
-	CurrentState              State
 }

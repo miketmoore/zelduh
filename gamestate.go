@@ -14,17 +14,19 @@ const (
 )
 
 type GameStateManager struct {
-	GameModel       *GameModel
-	SystemsManager  *SystemsManager
-	UI              UI
-	LocaleMessages  LocaleMessagesMap
-	CollisionSystem *SystemCollision
-	InputSystem     *SystemInput
-	Spritesheet     map[int]*pixel.Sprite
-	EntitiesMap     EntityByEntityID
-	AllMapDrawData  map[string]MapData
-	RoomWarps       map[EntityID]Config
-	Entities        Entities
+	GameModel        *GameModel
+	SystemsManager   *SystemsManager
+	GameStateManager *GameStateManager
+	UI               UI
+	LocaleMessages   LocaleMessagesMap
+	CollisionSystem  *SystemCollision
+	InputSystem      *SystemInput
+	Spritesheet      map[int]*pixel.Sprite
+	EntitiesMap      EntityByEntityID
+	AllMapDrawData   map[string]MapData
+	RoomWarps        map[EntityID]Config
+	Entities         Entities
+	CurrentState     State
 }
 
 func NewGameStateManager(
@@ -52,20 +54,21 @@ func NewGameStateManager(
 		AllMapDrawData:  allMapDrawData,
 		RoomWarps:       roomWarps,
 		Entities:        entities,
+		CurrentState:    StateStart,
 	}
 }
 
 func (g *GameStateManager) Update() {
-	switch g.GameModel.CurrentState {
+	switch g.CurrentState {
 	case StateStart:
-		GameStateStart(g.UI, g.LocaleMessages, g.GameModel)
+		GameStateStart(g.UI, g.LocaleMessages, g.GameModel, g.GameStateManager)
 	case StateGame:
-		GameStateGame(g.UI, g.Spritesheet, g.GameModel, g.Entities, g.RoomWarps, g.EntitiesMap, g.AllMapDrawData, g.InputSystem, RoomsMap, g.SystemsManager)
+		GameStateGame(g.UI, g.Spritesheet, g.GameModel, g.Entities, g.RoomWarps, g.EntitiesMap, g.AllMapDrawData, g.InputSystem, RoomsMap, g.SystemsManager, g.GameStateManager)
 	case StatePause:
-		GameStatePause(g.UI, g.LocaleMessages, g.GameModel)
+		GameStatePause(g.UI, g.LocaleMessages, g.GameModel, g.GameStateManager)
 	case StateOver:
-		GameStateOver(g.UI, g.LocaleMessages, g.GameModel)
+		GameStateOver(g.UI, g.LocaleMessages, g.GameModel, g.GameStateManager)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.Spritesheet, g.Entities, g.AllMapDrawData, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel)
+		GameStateMapTransition(g.UI, g.Spritesheet, g.Entities, g.AllMapDrawData, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel, g.GameStateManager)
 	}
 }

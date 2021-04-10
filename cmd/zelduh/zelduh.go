@@ -30,7 +30,6 @@ func run() {
 	allMapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
 	gameModel := zelduh.GameModel{
-		CurrentState:  zelduh.StateStart,
 		CurrentRoomID: 1,
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
