@@ -1,16 +1,11 @@
 package zelduh
 
-import (
-	"math/rand"
-)
-
 // GameModel contains data used throughout the game
 type GameModel struct {
 	AddEntities               bool
 	CurrentRoomID, NextRoomID RoomID
 	RoomTransition            *RoomTransition
 	CurrentState              State
-	Rand                      *rand.Rand
 }
 
 type Entities struct {

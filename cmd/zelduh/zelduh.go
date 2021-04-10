@@ -30,7 +30,6 @@ func run() {
 	allMapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
 	gameModel := zelduh.GameModel{
-		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
 		CurrentState:  zelduh.StateStart,
 		AddEntities:   true,
 		CurrentRoomID: 1,
@@ -56,7 +55,7 @@ func run() {
 	healthSystem := &zelduh.SystemHealth{}
 
 	spatialSystem := &zelduh.SystemSpatial{
-		Rand: gameModel.Rand,
+		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
 	entitiesMap := zelduh.NewEntityByEntityIDMap()
