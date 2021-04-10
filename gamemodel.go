@@ -12,7 +12,6 @@ type GameModel struct {
 	CurrentState              State
 	Rand                      *rand.Rand
 	Entities                  Entities
-	RoomWarps                 map[EntityID]Config
 }
 
 type Entities struct {

@@ -6,7 +6,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, entitiesMap EntityByEntityID, allMapDrawData map[string]MapData, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
+func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameModel, roomWarps map[EntityID]Config, entitiesMap EntityByEntityID, allMapDrawData map[string]MapData, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -29,8 +29,6 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameMode
 		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, allMapDrawData, gameModel.CurrentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
-		gameModel.RoomWarps = map[EntityID]Config{}
-
 		// Iterate through all entity configurations and build entities and add to systems
 		for _, c := range roomsMap[gameModel.CurrentRoomID].(*Room).EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID())
@@ -39,7 +37,7 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, gameModel *GameMode
 
 			switch c.Category {
 			case CategoryWarp:
-				gameModel.RoomWarps[entity.ID()] = c
+				roomWarps[entity.ID()] = c
 			}
 		}
 	}

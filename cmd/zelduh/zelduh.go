@@ -38,8 +38,6 @@ func run() {
 			Start: float64(zelduh.TileSize),
 		},
 
-		RoomWarps: map[zelduh.EntityID]zelduh.Config{},
-
 		Entities: zelduh.Entities{
 			Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
 			Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID()),
@@ -63,6 +61,8 @@ func run() {
 
 	entitiesMap := zelduh.NewEntityByEntityIDMap()
 
+	roomWarps := map[zelduh.EntityID]zelduh.Config{}
+
 	collisionSystem := &zelduh.SystemCollision{
 		MapBounds: pixel.R(
 			zelduh.MapX,
@@ -76,6 +76,7 @@ func run() {
 			HealthSystem:   healthSystem,
 			SpatialSystem:  spatialSystem,
 			EntitiesMap:    entitiesMap,
+			RoomWarps:      roomWarps,
 		},
 	}
 
@@ -111,6 +112,7 @@ func run() {
 		spritesheet,
 		entitiesMap,
 		allMapDrawData,
+		roomWarps,
 	)
 
 	for !ui.Window.Closed() {

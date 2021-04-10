@@ -9,6 +9,7 @@ type CollisionHandler struct {
 	HealthSystem   *SystemHealth
 	SpatialSystem  *SystemSpatial
 	EntitiesMap    EntityByEntityID
+	RoomWarps      map[EntityID]Config
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -165,7 +166,7 @@ func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID Enti
 
 // OnPlayerCollisionWithWarp handles collision between player and warp
 func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
-	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
+	entityConfig, ok := ch.RoomWarps[warpID]
 	if ok && !ch.GameModel.RoomTransition.Active {
 		ch.GameModel.RoomTransition.Active = true
 		ch.GameModel.RoomTransition.Style = TransitionWarp
