@@ -42,6 +42,15 @@ func NewEntityByEntityIDMap() EntityByEntityID {
 	return map[EntityID]Entity{}
 }
 
+type Entities struct {
+	Player    Entity
+	Bomb      Entity
+	Explosion Entity
+	Sword     Entity
+	Arrow     Entity
+	Hearts    []Entity
+}
+
 // ID returns the entity ID
 func (e *Entity) ID() EntityID {
 	return e.id

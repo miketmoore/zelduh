@@ -7,12 +7,3 @@ type GameModel struct {
 	RoomTransition            *RoomTransition
 	CurrentState              State
 }
-
-type Entities struct {
-	Player    Entity
-	Bomb      Entity
-	Explosion Entity
-	Sword     Entity
-	Arrow     Entity
-	Hearts    []Entity
-}
