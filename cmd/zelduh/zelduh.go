@@ -31,7 +31,6 @@ func run() {
 
 	gameModel := zelduh.GameModel{
 		CurrentState:  zelduh.StateStart,
-		AddEntities:   true,
 		CurrentRoomID: 1,
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),

@@ -8,22 +8,32 @@ type System interface {
 
 // SystemsManager is a world struct
 type SystemsManager struct {
-	systems      []System
-	SystemsMap   map[string]System
-	lastEntityID EntityID
+	systems           []System
+	SystemsMap        map[string]System
+	lastEntityID      EntityID
+	shouldAddEntities bool
 }
 
 // NewSystemsManager returns a new SystemsManager
 func NewSystemsManager() SystemsManager {
 	return SystemsManager{
-		lastEntityID: 0,
-		SystemsMap:   map[string]System{},
+		lastEntityID:      0,
+		SystemsMap:        map[string]System{},
+		shouldAddEntities: true,
 	}
 }
 
 // AddSystem adds a System to the SystemsManager
 func (w *SystemsManager) AddSystem(sys System) {
 	w.systems = append(w.systems, sys)
+}
+
+func (w *SystemsManager) SetShouldAddEntities(value bool) {
+	w.shouldAddEntities = value
+}
+
+func (w *SystemsManager) GetShouldAddEntities() bool {
+	return w.shouldAddEntities
 }
 
 // AddSystems adds a batch of systems to the world

@@ -21,7 +21,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
 		ch.GameModel.RoomTransition.Style = TransitionSlide
 		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
 		ch.GameModel.CurrentState = StateMapTransition
-		ch.GameModel.AddEntities = true
+		ch.SystemsManager.SetShouldAddEntities(true)
 	}
 }
 
@@ -173,7 +173,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 		ch.GameModel.RoomTransition.Style = TransitionWarp
 		ch.GameModel.RoomTransition.Timer = 1
 		ch.GameModel.CurrentState = StateMapTransition
-		ch.GameModel.AddEntities = true
+		ch.SystemsManager.SetShouldAddEntities(true)
 		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
 	}
 }
