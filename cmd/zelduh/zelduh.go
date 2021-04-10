@@ -37,20 +37,20 @@ func run() {
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
+	}
 
-		Entities: zelduh.Entities{
-			Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
-			Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID()),
-			Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), systemsManager.NewEntityID()),
-			Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), systemsManager.NewEntityID()),
-			Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), systemsManager.NewEntityID()),
-			Hearts: zelduh.BuildEntitiesFromConfigs(
-				systemsManager.NewEntityID,
-				zelduh.GetPreset("heart")(1.5, 14),
-				zelduh.GetPreset("heart")(2.15, 14),
-				zelduh.GetPreset("heart")(2.80, 14),
-			),
-		},
+	entities := zelduh.Entities{
+		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
+		Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID()),
+		Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), systemsManager.NewEntityID()),
+		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), systemsManager.NewEntityID()),
+		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), systemsManager.NewEntityID()),
+		Hearts: zelduh.BuildEntitiesFromConfigs(
+			systemsManager.NewEntityID,
+			zelduh.GetPreset("heart")(1.5, 14),
+			zelduh.GetPreset("heart")(2.15, 14),
+			zelduh.GetPreset("heart")(2.80, 14),
+		),
 	}
 
 	healthSystem := &zelduh.SystemHealth{}
@@ -77,6 +77,7 @@ func run() {
 			SpatialSystem:  spatialSystem,
 			EntitiesMap:    entitiesMap,
 			RoomWarps:      roomWarps,
+			Entities:       entities,
 		},
 	}
 
@@ -96,10 +97,10 @@ func run() {
 	)
 
 	systemsManager.AddEntities(
-		gameModel.Entities.Player,
-		gameModel.Entities.Sword,
-		gameModel.Entities.Arrow,
-		gameModel.Entities.Bomb,
+		entities.Player,
+		entities.Sword,
+		entities.Arrow,
+		entities.Bomb,
 	)
 
 	gameStateManager := zelduh.NewGameStateManager(
@@ -113,6 +114,7 @@ func run() {
 		entitiesMap,
 		allMapDrawData,
 		roomWarps,
+		entities,
 	)
 
 	for !ui.Window.Closed() {

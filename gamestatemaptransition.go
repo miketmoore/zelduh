@@ -5,7 +5,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateMapTransition(ui UI, spritesheet map[int]*pixel.Sprite, allMapDrawData map[string]MapData, inputSystem *SystemInput, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
+func GameStateMapTransition(ui UI, spritesheet map[int]*pixel.Sprite, entities Entities, allMapDrawData map[string]MapData, inputSystem *SystemInput, systemsManager *SystemsManager, roomsMap Rooms, collisionSystem *SystemCollision, gameModel *GameModel) {
 	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
 		gameModel.RoomTransition.Timer--
@@ -49,11 +49,11 @@ func GameStateMapTransition(ui UI, spritesheet map[int]*pixel.Sprite, allMapDraw
 		DrawMask(ui.Window)
 
 		// Move player with map transition
-		gameModel.Entities.Player.ComponentSpatial.Rect = pixel.R(
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+TileSize,
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+TileSize,
+		entities.Player.ComponentSpatial.Rect = pixel.R(
+			entities.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
+			entities.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
+			entities.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+TileSize,
+			entities.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+TileSize,
 		)
 
 		systemsManager.Update()

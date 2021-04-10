@@ -11,7 +11,6 @@ type GameModel struct {
 	RoomTransition            *RoomTransition
 	CurrentState              State
 	Rand                      *rand.Rand
-	Entities                  Entities
 }
 
 type Entities struct {
