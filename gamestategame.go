@@ -6,18 +6,34 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, roomData *RoomData, entities Entities, roomWarps map[EntityID]EntityConfig, entitiesMap EntityByEntityID, allMapDrawData map[string]MapData, inputSystem *SystemInput, roomsMap Rooms, systemsManager *SystemsManager, gameStateManager *GameStateManager) {
+func GameStateGame(
+	ui UI,
+	mapConfig MapConfig,
+	windowConfig WindowConfig,
+	spritesheet map[int]*pixel.Sprite,
+	roomData *RoomData,
+	entities Entities,
+	roomWarps map[EntityID]EntityConfig,
+	entitiesMap EntityByEntityID,
+	allMapDrawData map[string]MapData,
+	inputSystem *SystemInput,
+	roomsMap Rooms,
+	systemsManager *SystemsManager,
+	gameStateManager *GameStateManager,
+) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
-	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
+	DrawMapBackground(ui.Window, mapConfig, colornames.White)
 
 	DrawMapBackgroundImage(
 		ui.Window,
 		spritesheet,
 		allMapDrawData,
 		roomsMap[roomData.CurrentRoomID].MapName(),
-		0, 0)
+		0, 0,
+		mapConfig,
+	)
 
 	if systemsManager.GetShouldAddEntities() {
 		systemsManager.SetShouldAddEntities(false)
@@ -26,7 +42,7 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, roomData *RoomData,
 		AddUICoin(systemsManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, allMapDrawData, roomData.CurrentRoomID, 0, 0)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, allMapDrawData, roomData.CurrentRoomID, 0, 0, mapConfig)
 		systemsManager.AddEntities(obstacles...)
 
 		// Iterate through all entity configurations and build entities and add to systems
@@ -42,7 +58,7 @@ func GameStateGame(ui UI, spritesheet map[int]*pixel.Sprite, roomData *RoomData,
 		}
 	}
 
-	DrawMask(ui.Window)
+	DrawMask(ui.Window, windowConfig, mapConfig)
 
 	systemsManager.Update()
 

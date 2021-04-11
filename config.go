@@ -6,34 +6,6 @@ const FrameRate int = 5
 // TileSize defines the width and height of a tile
 const TileSize float64 = 48
 
-const (
-	// WinX is the x coordinate of the window
-	WinX float64 = 0
-
-	// WinY is the y coordinate of the window
-	WinY float64 = 0
-
-	// WinW is the width of the window
-	WinW float64 = 800
-
-	// WinH is the height of the window
-	WinH float64 = 800
-)
-
-const (
-	// MapW is the width of the game map
-	MapW float64 = 672 // 48 * 14
-
-	// MapH is the height of the game map
-	MapH float64 = 576 // 48 * 12
-
-	// MapX is the x coordinate of the game map
-	MapX = (WinW - MapW) / 2
-
-	// MapY is the y coordinate of the game map
-	MapY = (WinH - MapH) / 2
-)
-
 // SpritesheetPath is the file path for the spritesheet
 const SpritesheetPath string = "assets/spritesheet.png"
 

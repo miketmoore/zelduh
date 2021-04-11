@@ -28,6 +28,8 @@ type GameStateManager struct {
 	Entities              Entities
 	CurrentState          State
 	RoomData              *RoomData
+	MapConfig             MapConfig
+	WindowConfig          WindowConfig
 }
 
 func NewGameStateManager(
@@ -43,6 +45,8 @@ func NewGameStateManager(
 	roomWarps map[EntityID]EntityConfig,
 	entities Entities,
 	roomData *RoomData,
+	mapConfig MapConfig,
+	windowConfig WindowConfig,
 ) GameStateManager {
 	return GameStateManager{
 		RoomTransitionManager: roomTransitionManager,
@@ -58,20 +62,36 @@ func NewGameStateManager(
 		Entities:              entities,
 		CurrentState:          StateStart,
 		RoomData:              roomData,
+		MapConfig:             mapConfig,
+		WindowConfig:          windowConfig,
 	}
 }
 
 func (g *GameStateManager) Update() {
 	switch g.CurrentState {
 	case StateStart:
-		GameStateStart(g.UI, g.LocaleMessages, g.GameStateManager)
+		GameStateStart(g.UI, g.LocaleMessages, g.GameStateManager, g.MapConfig)
 	case StateGame:
-		GameStateGame(g.UI, g.Spritesheet, g.RoomData, g.Entities, g.RoomWarps, g.EntitiesMap, g.AllMapDrawData, g.InputSystem, RoomsMap, g.SystemsManager, g.GameStateManager)
+		GameStateGame(g.UI, g.MapConfig, g.WindowConfig, g.Spritesheet, g.RoomData, g.Entities, g.RoomWarps, g.EntitiesMap, g.AllMapDrawData, g.InputSystem, RoomsMap, g.SystemsManager, g.GameStateManager)
 	case StatePause:
-		GameStatePause(g.UI, g.LocaleMessages, g.GameStateManager)
+		GameStatePause(g.UI, g.LocaleMessages, g.GameStateManager, g.MapConfig)
 	case StateOver:
-		GameStateOver(g.UI, g.LocaleMessages, g.GameStateManager)
+		GameStateOver(g.UI, g.LocaleMessages, g.GameStateManager, g.MapConfig)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.Spritesheet, g.Entities, g.AllMapDrawData, g.InputSystem, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameStateManager, g.RoomData, g.RoomTransitionManager)
+		GameStateMapTransition(
+			g.UI,
+			g.Spritesheet,
+			g.Entities,
+			g.AllMapDrawData,
+			g.InputSystem,
+			g.SystemsManager,
+			RoomsMap,
+			g.CollisionSystem,
+			g.GameStateManager,
+			g.RoomData,
+			g.RoomTransitionManager,
+			g.WindowConfig,
+			g.MapConfig,
+		)
 	}
 }

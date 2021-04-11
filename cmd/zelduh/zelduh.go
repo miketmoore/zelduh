@@ -15,6 +15,31 @@ import (
 
 func run() {
 
+	const frameRate int = 5
+	const tileSize float64 = 48
+
+	var windowConfig zelduh.WindowConfig = zelduh.WindowConfig{
+		X:      0,
+		Y:      0,
+		Width:  800,
+		Height: 800,
+	}
+
+	var mapConfig zelduh.MapConfig = zelduh.MapConfig{
+		Width:  tileSize * 14,
+		Height: tileSize * 12,
+	}
+
+	mapConfig.X = (windowConfig.Width - mapConfig.Width) / 2
+	mapConfig.Y = (windowConfig.Height - mapConfig.Height) / 2
+
+	mapBoundsConfig := zelduh.Rectangle{
+		X:      mapConfig.X,
+		Y:      mapConfig.Y,
+		Width:  mapConfig.X + mapConfig.Width,
+		Height: mapConfig.Y + mapConfig.Height,
+	}
+
 	currLocaleMsgs, err := zelduh.GetLocaleMessageMapByLanguage("en")
 	if err != nil {
 		fmt.Println(err)
@@ -25,7 +50,7 @@ func run() {
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, zelduh.RoomsMap)
 
-	ui := zelduh.NewUI(currLocaleMsgs)
+	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
 	allMapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
@@ -59,10 +84,10 @@ func run() {
 
 	collisionSystem := &zelduh.SystemCollision{
 		MapBounds: pixel.R(
-			zelduh.MapX,
-			zelduh.MapY,
-			zelduh.MapX+zelduh.MapW,
-			zelduh.MapY+zelduh.MapH,
+			mapBoundsConfig.X,
+			mapBoundsConfig.Y,
+			mapBoundsConfig.Width,
+			mapBoundsConfig.Height,
 		),
 		CollisionHandler: zelduh.CollisionHandler{
 			RoomTransitionManager: &roomTransitionManager,
@@ -110,6 +135,8 @@ func run() {
 		roomWarps,
 		entities,
 		&roomData,
+		mapConfig,
+		windowConfig,
 	)
 
 	for !ui.Window.Closed() {
