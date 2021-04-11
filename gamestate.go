@@ -30,6 +30,7 @@ type GameStateManager struct {
 	RoomData              *RoomData
 	MapConfig             MapConfig
 	WindowConfig          WindowConfig
+	FrameRate             int
 }
 
 func NewGameStateManager(
@@ -47,6 +48,7 @@ func NewGameStateManager(
 	roomData *RoomData,
 	mapConfig MapConfig,
 	windowConfig WindowConfig,
+	frameRate int,
 ) GameStateManager {
 	return GameStateManager{
 		RoomTransitionManager: roomTransitionManager,
@@ -64,6 +66,7 @@ func NewGameStateManager(
 		RoomData:              roomData,
 		MapConfig:             mapConfig,
 		WindowConfig:          windowConfig,
+		FrameRate:             frameRate,
 	}
 }
 
@@ -72,7 +75,22 @@ func (g *GameStateManager) Update() {
 	case StateStart:
 		GameStateStart(g.UI, g.LocaleMessages, g.GameStateManager, g.MapConfig)
 	case StateGame:
-		GameStateGame(g.UI, g.MapConfig, g.WindowConfig, g.Spritesheet, g.RoomData, g.Entities, g.RoomWarps, g.EntitiesMap, g.AllMapDrawData, g.InputSystem, RoomsMap, g.SystemsManager, g.GameStateManager)
+		GameStateGame(
+			g.UI,
+			g.MapConfig,
+			g.WindowConfig,
+			g.Spritesheet,
+			g.RoomData,
+			g.Entities,
+			g.RoomWarps,
+			g.EntitiesMap,
+			g.AllMapDrawData,
+			g.InputSystem,
+			RoomsMap,
+			g.SystemsManager,
+			g.GameStateManager,
+			g.FrameRate,
+		)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameStateManager, g.MapConfig)
 	case StateOver:

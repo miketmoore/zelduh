@@ -7,3 +7,5 @@ type Rectangle struct {
 type MapConfig Rectangle
 
 type WindowConfig Rectangle
+
+type MapBoundsConfig Rectangle

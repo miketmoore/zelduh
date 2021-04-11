@@ -9,7 +9,6 @@ import (
 
 	"github.com/miketmoore/zelduh"
 
-	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -18,7 +17,9 @@ const spritesheetPath = "assets/spritesheet.png"
 
 func run() {
 
+	// frameRate is used to determine which sprite to use for animations
 	const frameRate int = 5
+
 	const tileSize float64 = 48
 
 	var windowConfig zelduh.WindowConfig = zelduh.WindowConfig{
@@ -36,7 +37,7 @@ func run() {
 	mapConfig.X = (windowConfig.Width - mapConfig.Width) / 2
 	mapConfig.Y = (windowConfig.Height - mapConfig.Height) / 2
 
-	mapBoundsConfig := zelduh.Rectangle{
+	mapBoundsConfig := zelduh.MapBoundsConfig{
 		X:      mapConfig.X,
 		Y:      mapConfig.Y,
 		Width:  mapConfig.X + mapConfig.Width,
@@ -62,13 +63,14 @@ func run() {
 	roomTransitionManager := zelduh.NewRoomTransitionManager()
 
 	entities := zelduh.Entities{
-		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
-		Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID()),
-		Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), systemsManager.NewEntityID()),
-		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), systemsManager.NewEntityID()),
-		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), systemsManager.NewEntityID()),
+		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID(), frameRate),
+		Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID(), frameRate),
+		Explosion: zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), systemsManager.NewEntityID(), frameRate),
+		Sword:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), systemsManager.NewEntityID(), frameRate),
+		Arrow:     zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), systemsManager.NewEntityID(), frameRate),
 		Hearts: zelduh.BuildEntitiesFromConfigs(
 			systemsManager.NewEntityID,
+			frameRate,
 			zelduh.GetPreset("heart")(1.5, 14),
 			zelduh.GetPreset("heart")(2.15, 14),
 			zelduh.GetPreset("heart")(2.80, 14),
@@ -85,23 +87,16 @@ func run() {
 
 	roomWarps := map[zelduh.EntityID]zelduh.EntityConfig{}
 
-	collisionSystem := &zelduh.SystemCollision{
-		MapBounds: pixel.R(
-			mapBoundsConfig.X,
-			mapBoundsConfig.Y,
-			mapBoundsConfig.Width,
-			mapBoundsConfig.Height,
-		),
-		CollisionHandler: zelduh.CollisionHandler{
-			RoomTransitionManager: &roomTransitionManager,
-			SystemsManager:        &systemsManager,
-			HealthSystem:          healthSystem,
-			SpatialSystem:         spatialSystem,
-			EntitiesMap:           entitiesMap,
-			RoomWarps:             roomWarps,
-			Entities:              entities,
-		},
-	}
+	collisionSystem := zelduh.NewSystemCollision(
+		mapBoundsConfig,
+		&roomTransitionManager,
+		&systemsManager,
+		healthSystem,
+		spatialSystem,
+		entitiesMap,
+		roomWarps,
+		entities,
+	)
 
 	inputSystem := &zelduh.SystemInput{Win: ui.Window}
 
@@ -111,7 +106,7 @@ func run() {
 		inputSystem,
 		healthSystem,
 		spatialSystem,
-		collisionSystem,
+		&collisionSystem,
 		&zelduh.SystemRender{
 			Win:         ui.Window,
 			Spritesheet: spritesheet,
@@ -130,7 +125,7 @@ func run() {
 		&systemsManager,
 		ui,
 		currLocaleMsgs,
-		collisionSystem,
+		&collisionSystem,
 		inputSystem,
 		spritesheet,
 		entitiesMap,
@@ -140,6 +135,7 @@ func run() {
 		&roomData,
 		mapConfig,
 		windowConfig,
+		frameRate,
 	)
 
 	for !ui.Window.Closed() {

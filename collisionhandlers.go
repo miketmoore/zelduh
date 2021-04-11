@@ -1,6 +1,8 @@
 package zelduh
 
-import "github.com/faiface/pixel"
+import (
+	"github.com/faiface/pixel"
+)
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
@@ -13,6 +15,7 @@ type CollisionHandler struct {
 	Entities              Entities
 	GameStateManager      GameStateManager
 	RoomData              RoomData
+	FrameRate             int
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -46,8 +49,8 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	}
 }
 
-func dropCoin(v pixel.Vec, systemsManager *SystemsManager) {
-	coin := BuildEntityFromConfig(GetPreset("coin")(v.X/TileSize, v.Y/TileSize), systemsManager.NewEntityID())
+func dropCoin(v pixel.Vec, systemsManager *SystemsManager, frameRate int) {
+	coin := BuildEntityFromConfig(GetPreset("coin")(v.X/TileSize, v.Y/TileSize), systemsManager.NewEntityID(), frameRate)
 	systemsManager.AddEntity(coin)
 }
 
@@ -66,7 +69,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 					Rect:   enemySpatial.Rect,
 				}
 				ch.Entities.Explosion.ComponentTemporary.OnExpiration = func() {
-					dropCoin(ch.Entities.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+					dropCoin(ch.Entities.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.FrameRate)
 				}
 				ch.SystemsManager.AddEntity(ch.Entities.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
@@ -92,7 +95,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 				Rect:   enemySpatial.Rect,
 			}
 			ch.Entities.Explosion.ComponentTemporary.OnExpiration = func() {
-				dropCoin(ch.Entities.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+				dropCoin(ch.Entities.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.FrameRate)
 			}
 			ch.SystemsManager.AddEntity(ch.Entities.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)

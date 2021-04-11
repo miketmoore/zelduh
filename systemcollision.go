@@ -27,6 +27,35 @@ type SystemCollision struct {
 	CollisionHandler  CollisionHandler
 }
 
+func NewSystemCollision(
+	mapBoundsConfig MapBoundsConfig,
+	roomTransitionManager *RoomTransitionManager,
+	systemsManager *SystemsManager,
+	healthSystem *SystemHealth,
+	spatialSystem *SystemSpatial,
+	entitiesMap EntityByEntityID,
+	roomWarps map[EntityID]EntityConfig,
+	entities Entities,
+) SystemCollision {
+	return SystemCollision{
+		MapBounds: pixel.R(
+			mapBoundsConfig.X,
+			mapBoundsConfig.Y,
+			mapBoundsConfig.Width,
+			mapBoundsConfig.Height,
+		),
+		CollisionHandler: CollisionHandler{
+			RoomTransitionManager: roomTransitionManager,
+			SystemsManager:        systemsManager,
+			HealthSystem:          healthSystem,
+			SpatialSystem:         spatialSystem,
+			EntitiesMap:           entitiesMap,
+			RoomWarps:             roomWarps,
+			Entities:              entities,
+		},
+	}
+}
+
 // AddEntity adds an entity to the system
 func (s *SystemCollision) AddEntity(entity Entity) {
 	r := collisionEntity{
