@@ -14,13 +14,13 @@ func GameStateMapTransition(
 	systemsManager *SystemsManager,
 	roomsMap Rooms,
 	collisionSystem *SystemCollision,
-	gameModel *GameModel,
 	gameStateManager *GameStateManager,
 	roomData *RoomData,
+	roomTransitionManager *RoomTransitionManager,
 ) {
 	inputSystem.DisablePlayer()
-	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
-		gameModel.RoomTransition.Timer--
+	if roomTransitionManager.Style() == TransitionSlide && roomTransitionManager.Timer() > 0 {
+		roomTransitionManager.DecrementTimer()
 		ui.Window.Clear(colornames.Darkgray)
 		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
@@ -35,7 +35,7 @@ func GameStateMapTransition(
 		connectedRooms := roomsMap[currentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
-			gameModel.RoomTransition,
+			roomTransitionManager,
 			*connectedRooms,
 			roomData.CurrentRoomID,
 		)
@@ -69,8 +69,8 @@ func GameStateMapTransition(
 		)
 
 		systemsManager.Update()
-	} else if gameModel.RoomTransition.Style == TransitionWarp && gameModel.RoomTransition.Timer > 0 {
-		gameModel.RoomTransition.Timer--
+	} else if roomTransitionManager.Style() == TransitionWarp && roomTransitionManager.Timer() > 0 {
+		roomTransitionManager.DecrementTimer()
 		ui.Window.Clear(colornames.Darkgray)
 		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
@@ -84,7 +84,7 @@ func GameStateMapTransition(
 		if roomData.NextRoomID != 0 {
 			roomData.CurrentRoomID = roomData.NextRoomID
 		}
-		gameModel.RoomTransition.Active = false
+		roomTransitionManager.SetActive(false)
 	}
 }
 
@@ -94,12 +94,12 @@ type transitionRoomResponse struct {
 }
 
 func calculateTransitionSlide(
-	roomTransition *RoomTransition,
+	roomTransitionManager *RoomTransitionManager,
 	connectedRooms ConnectedRooms,
 	currentRoomID RoomID) transitionRoomResponse {
 
 	var nextRoomID RoomID
-	inc := (roomTransition.Start - float64(roomTransition.Timer))
+	inc := (roomTransitionManager.Start() - float64(roomTransitionManager.Timer()))
 	incY := inc * (MapH / TileSize)
 	incX := inc * (MapW / TileSize)
 	modY := 0.0
@@ -110,22 +110,25 @@ func calculateTransitionSlide(
 	playerModY := 0.0
 	playerIncY := ((MapH / TileSize) - 1) + 7
 	playerIncX := ((MapW / TileSize) - 1) + 7
-	if roomTransition.Side == BoundBottom && connectedRooms.Bottom != 0 {
+
+	side := roomTransitionManager.Side()
+
+	if side == BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
 		modYNext = incY - MapH
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
-	} else if roomTransition.Side == BoundTop && connectedRooms.Top != 0 {
+	} else if side == BoundTop && connectedRooms.Top != 0 {
 		modY = -incY
 		modYNext = -incY + MapH
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
-	} else if roomTransition.Side == BoundLeft && connectedRooms.Left != 0 {
+	} else if side == BoundLeft && connectedRooms.Left != 0 {
 		modX = incX
 		modXNext = incX - MapW
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
-	} else if roomTransition.Side == BoundRight && connectedRooms.Right != 0 {
+	} else if side == BoundRight && connectedRooms.Right != 0 {
 		modX = -incX
 		modXNext = -incX + MapW
 		nextRoomID = connectedRooms.Right

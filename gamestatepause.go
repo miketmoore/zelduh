@@ -5,7 +5,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStatePause(ui UI, currLocaleMsgs LocaleMessagesMap, gameModel *GameModel, gameStateManager *GameStateManager) {
+func GameStatePause(ui UI, currLocaleMsgs LocaleMessagesMap, gameStateManager *GameStateManager) {
 	ui.Window.Clear(colornames.Darkgray)
 	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 	DrawCenterText(ui.Window, ui.Text, currLocaleMsgs["pauseScreenMessage"], colornames.Black)

@@ -4,24 +4,21 @@ import "github.com/faiface/pixel"
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
-	GameModel        *GameModel
-	SystemsManager   *SystemsManager
-	HealthSystem     *SystemHealth
-	SpatialSystem    *SystemSpatial
-	EntitiesMap      EntityByEntityID
-	RoomWarps        map[EntityID]Config
-	Entities         Entities
-	GameStateManager GameStateManager
-	RoomData         RoomData
+	RoomTransitionManager *RoomTransitionManager
+	SystemsManager        *SystemsManager
+	HealthSystem          *SystemHealth
+	SpatialSystem         *SystemSpatial
+	EntitiesMap           EntityByEntityID
+	RoomWarps             map[EntityID]Config
+	Entities              Entities
+	GameStateManager      GameStateManager
+	RoomData              RoomData
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
 func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
-	if !ch.GameModel.RoomTransition.Active {
-		ch.GameModel.RoomTransition.Active = true
-		ch.GameModel.RoomTransition.Side = side
-		ch.GameModel.RoomTransition.Style = TransitionSlide
-		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
+	if !ch.RoomTransitionManager.Active() {
+		ch.RoomTransitionManager.SetSlideStart(side)
 		ch.GameStateManager.CurrentState = StateMapTransition
 		ch.SystemsManager.SetShouldAddEntities(true)
 	}
@@ -170,10 +167,8 @@ func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID Enti
 // OnPlayerCollisionWithWarp handles collision between player and warp
 func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 	entityConfig, ok := ch.RoomWarps[warpID]
-	if ok && !ch.GameModel.RoomTransition.Active {
-		ch.GameModel.RoomTransition.Active = true
-		ch.GameModel.RoomTransition.Style = TransitionWarp
-		ch.GameModel.RoomTransition.Timer = 1
+	if ok && !ch.RoomTransitionManager.Active() {
+		ch.RoomTransitionManager.SetWarp()
 		ch.GameStateManager.CurrentState = StateMapTransition
 		ch.SystemsManager.SetShouldAddEntities(true)
 		ch.RoomData.NextRoomID = entityConfig.WarpToRoomID

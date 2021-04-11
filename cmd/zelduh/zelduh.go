@@ -31,11 +31,7 @@ func run() {
 
 	roomData := zelduh.NewRoomData()
 
-	gameModel := zelduh.GameModel{
-		RoomTransition: &zelduh.RoomTransition{
-			Start: float64(zelduh.TileSize),
-		},
-	}
+	roomTransitionManager := zelduh.NewRoomTransitionManager()
 
 	entities := zelduh.Entities{
 		Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
@@ -69,13 +65,13 @@ func run() {
 			zelduh.MapY+zelduh.MapH,
 		),
 		CollisionHandler: zelduh.CollisionHandler{
-			GameModel:      &gameModel,
-			SystemsManager: &systemsManager,
-			HealthSystem:   healthSystem,
-			SpatialSystem:  spatialSystem,
-			EntitiesMap:    entitiesMap,
-			RoomWarps:      roomWarps,
-			Entities:       entities,
+			RoomTransitionManager: &roomTransitionManager,
+			SystemsManager:        &systemsManager,
+			HealthSystem:          healthSystem,
+			SpatialSystem:         spatialSystem,
+			EntitiesMap:           entitiesMap,
+			RoomWarps:             roomWarps,
+			Entities:              entities,
 		},
 	}
 
@@ -102,7 +98,7 @@ func run() {
 	)
 
 	gameStateManager := zelduh.NewGameStateManager(
-		&gameModel,
+		&roomTransitionManager,
 		&systemsManager,
 		ui,
 		currLocaleMsgs,
