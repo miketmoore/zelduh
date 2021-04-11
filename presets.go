@@ -9,11 +9,11 @@ func GetPreset(key string) entityConfigPresetFn {
 	return entityPresets[key]
 }
 
-type entityConfigPresetFn = func(xTiles, yTiles float64) Config
+type entityConfigPresetFn = func(xTiles, yTiles float64) EntityConfig
 
 var entityPresets = map[string]entityConfigPresetFn{
-	"arrow": func(xTiles, yTiles float64) Config {
-		return Config{
+	"arrow": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryArrow,
 			Movement: &MovementConfig{
 				Direction: DirectionDown,
@@ -35,8 +35,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Ignore: true,
 		}
 	},
-	"bomb": func(xTiles, yTiles float64) Config {
-		return Config{
+	"bomb": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryBomb,
 			Movement: &MovementConfig{
 				Direction: DirectionDown,
@@ -55,8 +55,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Ignore: true,
 		}
 	},
-	"coin": func(xTiles, yTiles float64) Config {
-		return Config{
+	"coin": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryCoin,
 			W:        TileSize,
 			H:        TileSize,
@@ -67,8 +67,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"explosion": func(xTiles, yTiles float64) Config {
-		return Config{
+	"explosion": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category:   CategoryExplosion,
 			Expiration: 12,
 			Animation: AnimationConfig{
@@ -76,8 +76,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"obstacle": func(xTiles, yTiles float64) Config {
-		return Config{
+	"obstacle": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryObstacle,
 			W:        TileSize,
 			H:        TileSize,
@@ -85,8 +85,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Y:        TileSize * yTiles,
 		}
 	},
-	"player": func(xTiles, yTiles float64) Config {
-		return Config{
+	"player": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryPlayer,
 			Health:   3,
 			W:        TileSize,
@@ -121,8 +121,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"sword": func(xTiles, yTiles float64) Config {
-		return Config{
+	"sword": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategorySword,
 			Movement: &MovementConfig{
 				Direction: DirectionDown,
@@ -144,8 +144,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			Ignore: true,
 		}
 	},
-	"eyeburrower": func(xTiles, yTiles float64) Config {
-		return Config{
+	"eyeburrower": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryEnemy,
 			W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
 			Animation: AnimationConfig{
@@ -167,8 +167,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"heart": func(xTiles, yTiles float64) Config {
-		return Config{
+	"heart": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryHeart,
 			W:        TileSize,
 			H:        TileSize,
@@ -183,8 +183,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 		}
 
 	},
-	"skeleton": func(xTiles, yTiles float64) Config {
-		return Config{
+	"skeleton": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryEnemy,
 			W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
 			Animation: AnimationConfig{
@@ -206,8 +206,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"skull": func(xTiles, yTiles float64) Config {
-		return Config{
+	"skull": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryEnemy,
 			W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
 			Animation: AnimationConfig{
@@ -229,8 +229,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"spinner": func(xTiles, yTiles float64) Config {
-		return Config{
+	"spinner": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryEnemy,
 			W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
 			Animation: AnimationConfig{
@@ -252,8 +252,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"uiCoin": func(xTiles, yTiles float64) Config {
-		return Config{
+	"uiCoin": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryHeart,
 			W:        TileSize,
 			H:        TileSize,
@@ -267,8 +267,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"warpStone": func(xTiles, yTiles float64) Config {
-		return Config{
+	"warpStone": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryWarp,
 			X:        TileSize * xTiles,
 			Y:        TileSize * yTiles,
@@ -283,8 +283,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"puzzleBox": func(xTiles, yTiles float64) Config {
-		return Config{
+	"puzzleBox": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryMovableObstacle,
 			X:        TileSize * xTiles,
 			Y:        TileSize * yTiles,
@@ -300,8 +300,8 @@ var entityPresets = map[string]entityConfigPresetFn{
 			},
 		}
 	},
-	"floorSwitch": func(xTiles, yTiles float64) Config {
-		return Config{
+	"floorSwitch": func(xTiles, yTiles float64) EntityConfig {
+		return EntityConfig{
 			Category: CategoryCollisionSwitch,
 			X:        TileSize * xTiles,
 			Y:        TileSize * yTiles,
@@ -315,9 +315,9 @@ var entityPresets = map[string]entityConfigPresetFn{
 	},
 	// this is an impassable obstacle that can be toggled "remotely"
 	// it has two visual states that coincide with each toggle state
-	"toggleObstacle": func(xTiles, yTiles float64) Config {
+	"toggleObstacle": func(xTiles, yTiles float64) EntityConfig {
 		// TODO get this working again
-		return Config{
+		return EntityConfig{
 			X: TileSize * xTiles,
 			Y: TileSize * yTiles,
 			W: TileSize,
@@ -332,7 +332,7 @@ var entityPresets = map[string]entityConfigPresetFn{
 }
 
 // WarpStone returns an entity config for a warp stone
-func WarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) Config {
+func WarpStone(X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
 	e := entityPresets["warpStone"](X, Y)
 	e.WarpToRoomID = 6
 	e.Hitbox.Radius = 5

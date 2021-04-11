@@ -55,7 +55,7 @@ func run() {
 
 	entitiesMap := zelduh.NewEntityByEntityIDMap()
 
-	roomWarps := map[zelduh.EntityID]zelduh.Config{}
+	roomWarps := map[zelduh.EntityID]zelduh.EntityConfig{}
 
 	collisionSystem := &zelduh.SystemCollision{
 		MapBounds: pixel.R(

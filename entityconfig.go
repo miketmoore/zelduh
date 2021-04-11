@@ -34,8 +34,8 @@ type DashConfig struct {
 	SpeedMod          float64
 }
 
-// Config is used to simplify building entities
-type Config struct {
+// EntityConfig is used to simplify building entities
+type EntityConfig struct {
 	Category                                                      EntityCategory
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
 	X, Y, W, H                                                    float64

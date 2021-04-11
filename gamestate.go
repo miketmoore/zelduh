@@ -24,7 +24,7 @@ type GameStateManager struct {
 	Spritesheet           map[int]*pixel.Sprite
 	EntitiesMap           EntityByEntityID
 	AllMapDrawData        map[string]MapData
-	RoomWarps             map[EntityID]Config
+	RoomWarps             map[EntityID]EntityConfig
 	Entities              Entities
 	CurrentState          State
 	RoomData              *RoomData
@@ -40,7 +40,7 @@ func NewGameStateManager(
 	spritesheet map[int]*pixel.Sprite,
 	entitiesMap EntityByEntityID,
 	allMapDrawData map[string]MapData,
-	roomWarps map[EntityID]Config,
+	roomWarps map[EntityID]EntityConfig,
 	entities Entities,
 	roomData *RoomData,
 ) GameStateManager {

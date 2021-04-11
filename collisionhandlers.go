@@ -9,7 +9,7 @@ type CollisionHandler struct {
 	HealthSystem          *SystemHealth
 	SpatialSystem         *SystemSpatial
 	EntitiesMap           EntityByEntityID
-	RoomWarps             map[EntityID]Config
+	RoomWarps             map[EntityID]EntityConfig
 	Entities              Entities
 	GameStateManager      GameStateManager
 	RoomData              RoomData

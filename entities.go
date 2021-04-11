@@ -57,7 +57,7 @@ func (e *Entity) ID() EntityID {
 }
 
 // BuildEntitiesFromConfigs builds and returns a batch of entities
-func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...Config) []Entity {
+func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...EntityConfig) []Entity {
 	batch := []Entity{}
 	for _, config := range configs {
 		entity := BuildEntityFromConfig(config, newEntityID())
@@ -67,7 +67,7 @@ func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...Config) []
 }
 
 // BuildEntityFromConfig builds an entity from a configuration
-func BuildEntityFromConfig(c Config, id EntityID) Entity {
+func BuildEntityFromConfig(c EntityConfig, id EntityID) Entity {
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
