@@ -9,9 +9,6 @@ const TileSize float64 = 48
 // SpritesheetPath is the file path for the spritesheet
 const SpritesheetPath string = "assets/spritesheet.png"
 
-// TilemapDir is the directory where the tilemap files are located
-const TilemapDir = "assets/tilemaps/"
-
 // TilemapFiles is a list of tilemap filenames
 var TilemapFiles = []string{
 	"overworldOpen",

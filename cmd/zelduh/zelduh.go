@@ -13,6 +13,8 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
+const tilemapDir = "assets/tilemaps/"
+
 func run() {
 
 	const frameRate int = 5
@@ -52,7 +54,7 @@ func run() {
 
 	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
-	allMapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
+	allMapDrawData := zelduh.BuildMapDrawData(tilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
 	roomData := zelduh.NewRoomData()
 
