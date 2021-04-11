@@ -14,6 +14,7 @@ import (
 )
 
 const tilemapDir = "assets/tilemaps/"
+const spritesheetPath = "assets/spritesheet.png"
 
 func run() {
 
@@ -104,7 +105,7 @@ func run() {
 
 	inputSystem := &zelduh.SystemInput{Win: ui.Window}
 
-	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize)
+	spritesheet := zelduh.LoadAndBuildSpritesheet(spritesheetPath, zelduh.TileSize)
 
 	systemsManager.AddSystems(
 		inputSystem,

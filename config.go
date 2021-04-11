@@ -6,9 +6,6 @@ const FrameRate int = 5
 // TileSize defines the width and height of a tile
 const TileSize float64 = 48
 
-// SpritesheetPath is the file path for the spritesheet
-const SpritesheetPath string = "assets/spritesheet.png"
-
 // TilemapFiles is a list of tilemap filenames
 var TilemapFiles = []string{
 	"overworldOpen",
