@@ -12,6 +12,7 @@ type CollisionHandler struct {
 	RoomWarps        map[EntityID]Config
 	Entities         Entities
 	GameStateManager GameStateManager
+	RoomData         RoomData
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -175,6 +176,6 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 		ch.GameModel.RoomTransition.Timer = 1
 		ch.GameStateManager.CurrentState = StateMapTransition
 		ch.SystemsManager.SetShouldAddEntities(true)
-		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
+		ch.RoomData.NextRoomID = entityConfig.WarpToRoomID
 	}
 }

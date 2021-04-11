@@ -29,8 +29,9 @@ func run() {
 
 	allMapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
+	roomData := zelduh.NewRoomData()
+
 	gameModel := zelduh.GameModel{
-		CurrentRoomID: 1,
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
@@ -112,6 +113,7 @@ func run() {
 		allMapDrawData,
 		roomWarps,
 		entities,
+		&roomData,
 	)
 
 	for !ui.Window.Closed() {

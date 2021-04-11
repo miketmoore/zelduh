@@ -3,6 +3,16 @@ package zelduh
 // RoomID is a room ID
 type RoomID int
 
+type RoomData struct {
+	CurrentRoomID, NextRoomID RoomID
+}
+
+func NewRoomData() RoomData {
+	return RoomData{
+		CurrentRoomID: 1,
+	}
+}
+
 // ConnectedRooms is used to configure adjacent rooms
 type ConnectedRooms struct {
 	Top    RoomID

@@ -16,6 +16,7 @@ func GameStateMapTransition(
 	collisionSystem *SystemCollision,
 	gameModel *GameModel,
 	gameStateManager *GameStateManager,
+	roomData *RoomData,
 ) {
 	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
@@ -29,23 +30,23 @@ func GameStateMapTransition(
 		systemsManager.RemoveAllMoveableObstacles()
 		systemsManager.RemoveAllEntities()
 
-		currentRoomID := gameModel.CurrentRoomID
+		currentRoomID := roomData.CurrentRoomID
 
 		connectedRooms := roomsMap[currentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
 			gameModel.RoomTransition,
 			*connectedRooms,
-			gameModel.CurrentRoomID,
+			roomData.CurrentRoomID,
 		)
 
-		gameModel.NextRoomID = transitionRoomResp.nextRoomID
+		roomData.NextRoomID = transitionRoomResp.nextRoomID
 
 		DrawMapBackgroundImage(
 			ui.Window,
 			spritesheet,
 			allMapDrawData,
-			roomsMap[gameModel.CurrentRoomID].MapName(),
+			roomsMap[roomData.CurrentRoomID].MapName(),
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
 		)
@@ -53,7 +54,7 @@ func GameStateMapTransition(
 			ui.Window,
 			spritesheet,
 			allMapDrawData,
-			roomsMap[gameModel.NextRoomID].MapName(),
+			roomsMap[roomData.NextRoomID].MapName(),
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 		)
@@ -80,8 +81,8 @@ func GameStateMapTransition(
 		systemsManager.RemoveAllEntities()
 	} else {
 		gameStateManager.CurrentState = StateGame
-		if gameModel.NextRoomID != 0 {
-			gameModel.CurrentRoomID = gameModel.NextRoomID
+		if roomData.NextRoomID != 0 {
+			roomData.CurrentRoomID = roomData.NextRoomID
 		}
 		gameModel.RoomTransition.Active = false
 	}
