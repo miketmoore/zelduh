@@ -25,7 +25,7 @@ type Rooms map[RoomID]Roomer
 type Room struct {
 	mapName        string
 	connectedRooms *ConnectedRooms
-	EntityConfigs  []Config
+	EntityConfigs  []EntityConfig
 }
 
 // MapName returns the room's map name
@@ -53,7 +53,7 @@ func (r Room) SetConnectedRoom(direction Direction, id RoomID) {
 }
 
 // NewRoom builds a new Room
-func NewRoom(name string, entityConfigs ...Config) *Room {
+func NewRoom(name string, entityConfigs ...EntityConfig) *Room {
 	return &Room{
 		mapName:        name,
 		connectedRooms: &ConnectedRooms{},

@@ -106,7 +106,7 @@ var RoomsMap = Rooms{
 		WarpStone(3, 7, 6, 5),
 	),
 	5: NewRoom("rockWithCaveEntrance",
-		Config{
+		EntityConfig{
 			Category:     CategoryWarp,
 			WarpToRoomID: 11,
 			W:            TileSize,
@@ -117,7 +117,7 @@ var RoomsMap = Rooms{
 				Radius: 30,
 			},
 		},
-		Config{
+		EntityConfig{
 			Category:     CategoryWarp,
 			WarpToRoomID: 11,
 			W:            TileSize,
@@ -136,7 +136,7 @@ var RoomsMap = Rooms{
 	10: NewRoom("overworldFourWallsDoorLeft"),
 	11: NewRoom("dungeonFourDoors",
 		// South door of cave - warp to cave entrance
-		Config{
+		EntityConfig{
 			Category:     CategoryWarp,
 			WarpToRoomID: 5,
 			W:            TileSize,
@@ -147,7 +147,7 @@ var RoomsMap = Rooms{
 				Radius: 15,
 			},
 		},
-		Config{
+		EntityConfig{
 			Category:     CategoryWarp,
 			WarpToRoomID: 5,
 			W:            TileSize,

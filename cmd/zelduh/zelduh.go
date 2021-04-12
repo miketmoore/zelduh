@@ -39,7 +39,7 @@ func run() {
 		},
 		Spritesheet: zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
-		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
+		RoomWarps:      map[zelduh.EntityID]zelduh.EntityConfig{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
 		Entities: zelduh.Entities{

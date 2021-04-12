@@ -10,7 +10,7 @@ type GameModel struct {
 	EntitiesMap    map[EntityID]Entity
 	Spritesheet    map[int]*pixel.Sprite
 	Entities       Entities
-	RoomWarps      map[EntityID]Config
+	RoomWarps      map[EntityID]EntityConfig
 	AllMapDrawData map[string]MapData
 }
 

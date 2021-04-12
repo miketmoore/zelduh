@@ -37,7 +37,7 @@ func GameStateGame(
 		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, gameModel.AllMapDrawData, currentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
-		gameModel.RoomWarps = map[EntityID]Config{}
+		gameModel.RoomWarps = map[EntityID]EntityConfig{}
 
 		// Iterate through all entity configurations and build entities and add to systems
 		for _, c := range roomsMap[*currentRoomID].(*Room).EntityConfigs {
