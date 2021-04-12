@@ -106,8 +106,8 @@ func AddUIHearts(systemsManager *SystemsManager, hearts []Entity, health int) {
 	}
 }
 
-func DrawObstaclesPerMapTiles(systemsManager *SystemsManager, roomsMap Rooms, allMapDrawData map[string]MapData, roomID RoomID, modX, modY float64) []Entity {
-	d := allMapDrawData[roomsMap[roomID].MapName()]
+func DrawObstaclesPerMapTiles(systemsManager *SystemsManager, roomsMap Rooms, allMapDrawData map[string]MapData, roomID *RoomID, modX, modY float64) []Entity {
+	d := allMapDrawData[roomsMap[*roomID].MapName()]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {

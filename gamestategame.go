@@ -12,6 +12,7 @@ func GameStateGame(
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,
+	currentRoomID *RoomID,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -22,7 +23,7 @@ func GameStateGame(
 		ui.Window,
 		gameModel.Spritesheet,
 		gameModel.AllMapDrawData,
-		roomsMap[gameModel.CurrentRoomID].MapName(),
+		roomsMap[*currentRoomID].MapName(),
 		0, 0)
 
 	if *shouldAddEntities {
@@ -32,13 +33,13 @@ func GameStateGame(
 		AddUICoin(systemsManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, gameModel.AllMapDrawData, gameModel.CurrentRoomID, 0, 0)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, gameModel.AllMapDrawData, currentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
 		gameModel.RoomWarps = map[EntityID]Config{}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		for _, c := range roomsMap[gameModel.CurrentRoomID].(*Room).EntityConfigs {
+		for _, c := range roomsMap[*currentRoomID].(*Room).EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID())
 			gameModel.EntitiesMap[entity.ID()] = entity
 			systemsManager.AddEntity(entity)

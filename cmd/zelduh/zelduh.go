@@ -28,11 +28,12 @@ func run() {
 	ui := zelduh.NewUI(currLocaleMsgs)
 
 	shouldAddEntities := true
+	var currentRoomID zelduh.RoomID = 1
+	var nextRoomID zelduh.RoomID
 
 	gameModel := zelduh.GameModel{
-		EntitiesMap:   map[zelduh.EntityID]zelduh.Entity{},
-		CurrentState:  zelduh.StateStart,
-		CurrentRoomID: 1,
+		EntitiesMap:  map[zelduh.EntityID]zelduh.Entity{},
+		CurrentState: zelduh.StateStart,
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
@@ -106,6 +107,8 @@ func run() {
 		collisionSystem,
 		inputSystem,
 		&shouldAddEntities,
+		&currentRoomID,
+		&nextRoomID,
 	)
 
 	for !ui.Window.Closed() {

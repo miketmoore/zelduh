@@ -12,13 +12,14 @@ const (
 )
 
 type GameStateManager struct {
-	GameModel         *GameModel
-	SystemsManager    *SystemsManager
-	UI                UI
-	LocaleMessages    LocaleMessagesMap
-	CollisionSystem   *CollisionSystem
-	InputSystem       *InputSystem
-	ShouldAddEntities *bool
+	GameModel                 *GameModel
+	SystemsManager            *SystemsManager
+	UI                        UI
+	LocaleMessages            LocaleMessagesMap
+	CollisionSystem           *CollisionSystem
+	InputSystem               *InputSystem
+	ShouldAddEntities         *bool
+	CurrentRoomID, NextRoomID *RoomID
 }
 
 func NewGameStateManager(
@@ -29,6 +30,8 @@ func NewGameStateManager(
 	collisionSystem *CollisionSystem,
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,
+	currentRoomID *RoomID,
+	nextRoomID *RoomID,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:         gameModel,
@@ -38,6 +41,8 @@ func NewGameStateManager(
 		CollisionSystem:   collisionSystem,
 		InputSystem:       inputSystem,
 		ShouldAddEntities: shouldAddEntities,
+		CurrentRoomID:     currentRoomID,
+		NextRoomID:        nextRoomID,
 	}
 }
 
@@ -46,12 +51,12 @@ func (g *GameStateManager) Update() {
 	case StateStart:
 		GameStateStart(g.UI, g.LocaleMessages, g.GameModel)
 	case StateGame:
-		GameStateGame(g.UI, g.GameModel, RoomsMap, g.SystemsManager, g.InputSystem, g.ShouldAddEntities)
+		GameStateGame(g.UI, g.GameModel, RoomsMap, g.SystemsManager, g.InputSystem, g.ShouldAddEntities, g.CurrentRoomID)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameModel)
 	case StateOver:
 		GameStateOver(g.UI, g.LocaleMessages, g.GameModel)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel, g.InputSystem)
+		GameStateMapTransition(g.UI, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel, g.InputSystem, g.CurrentRoomID, g.NextRoomID)
 	}
 }

@@ -11,6 +11,7 @@ type CollisionHandler struct {
 	SpatialSystem     *SpatialSystem
 	HealthSystem      *HealthSystem
 	ShouldAddEntities *bool
+	NextRoomID        *RoomID
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -174,6 +175,6 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 		ch.GameModel.RoomTransition.Timer = 1
 		ch.GameModel.CurrentState = StateMapTransition
 		*ch.ShouldAddEntities = true
-		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
+		*ch.NextRoomID = entityConfig.WarpToRoomID
 	}
 }
