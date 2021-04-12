@@ -9,6 +9,8 @@ import (
 	"github.com/faiface/pixel"
 )
 
+type Spritesheet map[int]*pixel.Sprite
+
 func loadPicture(path string) pixel.Picture {
 	file, err := os.Open(path)
 	if err != nil {

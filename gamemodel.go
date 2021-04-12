@@ -1,14 +1,9 @@
 package zelduh
 
-import (
-	"github.com/faiface/pixel"
-)
-
 // GameModel contains data used throughout the game
 type GameModel struct {
 	RoomTransition *RoomTransition
 	EntitiesMap    map[EntityID]Entity
-	Spritesheet    map[int]*pixel.Sprite
 	Entities       Entities
 	RoomWarps      map[EntityID]EntityConfig
 	AllMapDrawData map[string]MapData

@@ -31,13 +31,13 @@ func run() {
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
+	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize)
 
 	gameModel := zelduh.GameModel{
 		EntitiesMap: map[zelduh.EntityID]zelduh.Entity{},
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
-		Spritesheet: zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize),
 
 		RoomWarps:      map[zelduh.EntityID]zelduh.EntityConfig{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
@@ -89,7 +89,7 @@ func run() {
 		collisionSystem,
 		&zelduh.RenderSystem{
 			Win:         ui.Window,
-			Spritesheet: gameModel.Spritesheet,
+			Spritesheet: spritesheet,
 		},
 	)
 
@@ -111,6 +111,7 @@ func run() {
 		&currentRoomID,
 		&nextRoomID,
 		&currentState,
+		spritesheet,
 	)
 
 	for !ui.Window.Closed() {

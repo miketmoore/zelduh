@@ -14,6 +14,7 @@ func GameStateGame(
 	shouldAddEntities *bool,
 	currentRoomID *RoomID,
 	currentState *State,
+	spritesheet Spritesheet,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -22,7 +23,7 @@ func GameStateGame(
 
 	DrawMapBackgroundImage(
 		ui.Window,
-		gameModel.Spritesheet,
+		spritesheet,
 		gameModel.AllMapDrawData,
 		roomsMap[*currentRoomID].MapName(),
 		0, 0)
