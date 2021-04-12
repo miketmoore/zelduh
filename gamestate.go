@@ -16,8 +16,8 @@ type GameStateManager struct {
 	SystemsManager  *SystemsManager
 	UI              UI
 	LocaleMessages  LocaleMessagesMap
-	CollisionSystem *SystemCollision
-	InputSystem     *SystemInput
+	CollisionSystem *CollisionSystem
+	InputSystem     *InputSystem
 }
 
 func NewGameStateManager(
@@ -25,8 +25,8 @@ func NewGameStateManager(
 	systemsManager *SystemsManager,
 	ui UI,
 	localeMessages LocaleMessagesMap,
-	collisionSystem *SystemCollision,
-	inputSystem *SystemInput,
+	collisionSystem *CollisionSystem,
+	inputSystem *InputSystem,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:       gameModel,

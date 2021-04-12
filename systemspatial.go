@@ -15,8 +15,8 @@ type spatialEntity struct {
 	MoveCounter int
 }
 
-// SystemSpatial is a custom system
-type SystemSpatial struct {
+// SpatialSystem is a custom system
+type SpatialSystem struct {
 	Rand              *rand.Rand
 	player            spatialEntity
 	sword             spatialEntity
@@ -26,7 +26,7 @@ type SystemSpatial struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *SystemSpatial) AddEntity(entity Entity) {
+func (s *SpatialSystem) AddEntity(entity Entity) {
 	r := spatialEntity{
 		ID:                entity.ID(),
 		ComponentSpatial:  entity.ComponentSpatial,
@@ -48,7 +48,7 @@ func (s *SystemSpatial) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *SystemSpatial) Remove(category EntityCategory, id EntityID) {
+func (s *SpatialSystem) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -61,7 +61,7 @@ func (s *SystemSpatial) Remove(category EntityCategory, id EntityID) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *SystemSpatial) RemoveAll(category EntityCategory) {
+func (s *SpatialSystem) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -71,7 +71,7 @@ func (s *SystemSpatial) RemoveAll(category EntityCategory) {
 }
 
 // MovePlayerBack moves the player back
-func (s *SystemSpatial) MovePlayerBack() {
+func (s *SpatialSystem) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
 	switch player.ComponentMovement.Direction {
@@ -89,7 +89,7 @@ func (s *SystemSpatial) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *SystemSpatial) MoveMoveableObstacle(obstacleID EntityID, dir Direction) bool {
+func (s *SpatialSystem) MoveMoveableObstacle(obstacleID EntityID, dir Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.ComponentMovement.MovingFromHit {
 		entity.ComponentMovement.MovingFromHit = true
@@ -101,7 +101,7 @@ func (s *SystemSpatial) MoveMoveableObstacle(obstacleID EntityID, dir Direction)
 }
 
 // UndoEnemyRect resets current rect to previous rect
-func (s *SystemSpatial) UndoEnemyRect(enemyID EntityID) {
+func (s *SpatialSystem) UndoEnemyRect(enemyID EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.PrevRect
@@ -109,7 +109,7 @@ func (s *SystemSpatial) UndoEnemyRect(enemyID EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *SystemSpatial) MoveEnemyBack(enemyID EntityID, directionHit Direction) {
+func (s *SpatialSystem) MoveEnemyBack(enemyID EntityID, directionHit Direction) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.ComponentMovement.MovingFromHit {
 		enemy.ComponentMovement.MovingFromHit = true
@@ -119,7 +119,7 @@ func (s *SystemSpatial) MoveEnemyBack(enemyID EntityID, directionHit Direction) 
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *SystemSpatial) GetEnemySpatial(enemyID EntityID) (*ComponentSpatial, bool) {
+func (s *SpatialSystem) GetEnemySpatial(enemyID EntityID) (*ComponentSpatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
 			return enemy.ComponentSpatial, true
@@ -129,7 +129,7 @@ func (s *SystemSpatial) GetEnemySpatial(enemyID EntityID) (*ComponentSpatial, bo
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
-func (s *SystemSpatial) EnemyMovingFromHit(enemyID EntityID) bool {
+func (s *SpatialSystem) EnemyMovingFromHit(enemyID EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
@@ -140,7 +140,7 @@ func (s *SystemSpatial) EnemyMovingFromHit(enemyID EntityID) bool {
 }
 
 // Update changes spatial data based on movement data
-func (s *SystemSpatial) Update() {
+func (s *SpatialSystem) Update() {
 	s.movePlayer()
 	s.moveSword()
 	s.moveArrow()
@@ -161,7 +161,7 @@ func (s *SystemSpatial) Update() {
 	}
 }
 
-func (s *SystemSpatial) moveableObstacle(id EntityID) (spatialEntity, bool) {
+func (s *SpatialSystem) moveableObstacle(id EntityID) (spatialEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
 			return *e, true
@@ -170,7 +170,7 @@ func (s *SystemSpatial) moveableObstacle(id EntityID) (spatialEntity, bool) {
 	return spatialEntity{}, false
 }
 
-func (s *SystemSpatial) enemy(id EntityID) (spatialEntity, bool) {
+func (s *SpatialSystem) enemy(id EntityID) (spatialEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
 			return *e, true
@@ -194,7 +194,7 @@ func delta(dir Direction, modX, modY float64) pixel.Vec {
 	}
 }
 
-func (s *SystemSpatial) moveSword() {
+func (s *SpatialSystem) moveSword() {
 	sword := s.sword
 	speed := sword.ComponentMovement.Speed
 	w := sword.ComponentSpatial.Width
@@ -208,7 +208,7 @@ func (s *SystemSpatial) moveSword() {
 	}
 }
 
-func (s *SystemSpatial) moveArrow() {
+func (s *SpatialSystem) moveArrow() {
 	arrow := s.arrow
 	speed := arrow.ComponentMovement.Speed
 	if arrow.ComponentMovement.RemainingMoves > 0 {
@@ -220,7 +220,7 @@ func (s *SystemSpatial) moveArrow() {
 	}
 }
 
-func (s *SystemSpatial) movePlayer() {
+func (s *SpatialSystem) movePlayer() {
 	player := s.player
 	speed := player.ComponentMovement.Speed
 	if player.ComponentDash.Charge == player.ComponentDash.MaxCharge {
@@ -233,7 +233,7 @@ func (s *SystemSpatial) movePlayer() {
 	}
 }
 
-func (s *SystemSpatial) moveMoveableObstacle(entity *spatialEntity) {
+func (s *SpatialSystem) moveMoveableObstacle(entity *spatialEntity) {
 	if entity.ComponentMovement.RemainingMoves > 0 {
 		speed := entity.ComponentMovement.MaxSpeed
 		entity.ComponentSpatial.PrevRect = entity.ComponentSpatial.Rect
@@ -246,7 +246,7 @@ func (s *SystemSpatial) moveMoveableObstacle(entity *spatialEntity) {
 	}
 }
 
-func (s *SystemSpatial) moveEnemyRandom(enemy *spatialEntity) {
+func (s *SpatialSystem) moveEnemyRandom(enemy *spatialEntity) {
 	if enemy.ComponentMovement.RemainingMoves == 0 {
 		enemy.ComponentMovement.MovingFromHit = false
 		enemy.ComponentMovement.RemainingMoves = s.Rand.Intn(enemy.ComponentMovement.MaxMoves)
@@ -268,7 +268,7 @@ func (s *SystemSpatial) moveEnemyRandom(enemy *spatialEntity) {
 	}
 }
 
-func (s *SystemSpatial) moveEnemyLeftRight(enemy *spatialEntity) {
+func (s *SpatialSystem) moveEnemyLeftRight(enemy *spatialEntity) {
 	if enemy.ComponentMovement.RemainingMoves == 0 {
 		enemy.ComponentMovement.MovingFromHit = false
 		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.MaxMoves

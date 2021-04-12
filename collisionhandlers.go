@@ -8,7 +8,7 @@ import (
 type CollisionHandler struct {
 	GameModel      *GameModel
 	SystemsManager *SystemsManager
-	SpatialSystem  *SystemSpatial
+	SpatialSystem  *SpatialSystem
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds

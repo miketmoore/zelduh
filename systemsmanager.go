@@ -71,16 +71,16 @@ func (w *SystemsManager) Remove(category EntityCategory, id EntityID) {
 	case CategoryCoin:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
-			case *SystemCollision:
+			case *CollisionSystem:
 				sys.Remove(CategoryCoin, id)
-			case *SystemRender:
+			case *RenderSystem:
 				sys.RemoveEntity(id)
 			}
 		}
 	case CategoryHeart:
 		for _, sys := range w.systems {
 			switch sys := sys.(type) {
-			case *SystemRender:
+			case *RenderSystem:
 				sys.RemoveEntity(id)
 			}
 		}
@@ -91,11 +91,11 @@ func (w *SystemsManager) Remove(category EntityCategory, id EntityID) {
 func (w *SystemsManager) RemoveEnemy(id EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
-		case *SystemSpatial:
+		case *SpatialSystem:
 			sys.Remove(CategoryEnemy, id)
-		case *SystemCollision:
+		case *CollisionSystem:
 			sys.Remove(CategoryEnemy, id)
-		case *SystemRender:
+		case *RenderSystem:
 			sys.RemoveEntity(id)
 		}
 	}
@@ -105,11 +105,11 @@ func (w *SystemsManager) RemoveEnemy(id EntityID) {
 func (w *SystemsManager) RemoveAllEnemies() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *SystemSpatial:
+		case *SpatialSystem:
 			sys.RemoveAll(CategoryEnemy)
-		case *SystemCollision:
+		case *CollisionSystem:
 			sys.RemoveAll(CategoryEnemy)
-		case *SystemRender:
+		case *RenderSystem:
 			sys.RemoveAll(CategoryEnemy)
 		}
 	}
@@ -119,7 +119,7 @@ func (w *SystemsManager) RemoveAllEnemies() {
 func (w *SystemsManager) RemoveAllEntities() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *SystemRender:
+		case *RenderSystem:
 			sys.RemoveAllEntities()
 		}
 	}
@@ -129,9 +129,9 @@ func (w *SystemsManager) RemoveAllEntities() {
 func (w *SystemsManager) RemoveAllMoveableObstacles() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *SystemCollision:
+		case *CollisionSystem:
 			sys.RemoveAll(CategoryMovableObstacle)
-		case *SystemRender:
+		case *RenderSystem:
 			sys.RemoveAll(CategoryMovableObstacle)
 		}
 	}
@@ -141,7 +141,7 @@ func (w *SystemsManager) RemoveAllMoveableObstacles() {
 func (w *SystemsManager) RemoveAllCollisionSwitches() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *SystemCollision:
+		case *CollisionSystem:
 			sys.RemoveAll(CategoryCollisionSwitch)
 		}
 	}

@@ -17,8 +17,8 @@ type renderEntity struct {
 	*ComponentTemporary
 }
 
-// SystemRender is a custom system
-type SystemRender struct {
+// RenderSystem is a custom system
+type RenderSystem struct {
 	Win         *pixelgl.Window
 	Spritesheet map[int]*pixel.Sprite
 
@@ -31,7 +31,7 @@ type SystemRender struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *SystemRender) AddEntity(entity Entity) {
+func (s *RenderSystem) AddEntity(entity Entity) {
 	r := renderEntity{
 		ID:                 entity.ID(),
 		Category:           entity.Category,
@@ -71,7 +71,7 @@ func (s *SystemRender) AddEntity(entity Entity) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *SystemRender) RemoveAll(category EntityCategory) {
+func (s *RenderSystem) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {
@@ -83,7 +83,7 @@ func (s *SystemRender) RemoveAll(category EntityCategory) {
 }
 
 // RemoveEntity removes an entity by ID
-func (s *SystemRender) RemoveEntity(id EntityID) {
+func (s *RenderSystem) RemoveEntity(id EntityID) {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		if s.entities[i].ID == id {
 			s.entities = append(s.entities[:i], s.entities[i+1:]...)
@@ -92,14 +92,14 @@ func (s *SystemRender) RemoveEntity(id EntityID) {
 }
 
 // RemoveAllEntities removes all entities
-func (s *SystemRender) RemoveAllEntities() {
+func (s *RenderSystem) RemoveAllEntities() {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		s.entities = append(s.entities[:i], s.entities[i+1:]...)
 	}
 }
 
 // Update changes spatial data based on movement data
-func (s *SystemRender) Update() {
+func (s *RenderSystem) Update() {
 
 	for _, entity := range s.entities {
 		if entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value {
@@ -139,7 +139,7 @@ func (s *SystemRender) Update() {
 
 }
 
-func (s *SystemRender) animateToggleFrame(entity renderEntity) {
+func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.Map["default"]; animData != nil {
 			var frameIndex int
@@ -159,7 +159,7 @@ func (s *SystemRender) animateToggleFrame(entity renderEntity) {
 	}
 }
 
-func (s *SystemRender) animateDefault(entity renderEntity) {
+func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.Map["default"]; animData != nil {
 			rate := animData.FrameRateCount
@@ -192,7 +192,7 @@ func (s *SystemRender) animateDefault(entity renderEntity) {
 	}
 }
 
-func (s *SystemRender) animateAttackDirection(dir Direction, entity renderEntity) {
+func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		var animData *ComponentAnimationData
 		switch dir {
@@ -237,7 +237,7 @@ func (s *SystemRender) animateAttackDirection(dir Direction, entity renderEntity
 	}
 }
 
-func (s *SystemRender) animateDirections(dir Direction, entity renderEntity) {
+func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 	// if entity.ComponentSpatial.HitBoxRadius > 0 {
 	// 	shape := entity.ComponentSpatial.Shape
 	// 	shape.Clear()

@@ -9,9 +9,9 @@ func GameStateMapTransition(
 	ui UI,
 	systemsManager *SystemsManager,
 	roomsMap Rooms,
-	collisionSystem *SystemCollision,
+	collisionSystem *CollisionSystem,
 	gameModel *GameModel,
-	inputSystem *SystemInput,
+	inputSystem *InputSystem,
 ) {
 	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {

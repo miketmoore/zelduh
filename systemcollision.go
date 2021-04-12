@@ -12,8 +12,8 @@ type collisionEntity struct {
 	*ComponentInvincible
 }
 
-// SystemCollision is a custom system for detecting collisions and what to do when they occur
-type SystemCollision struct {
+// CollisionSystem is a custom system for detecting collisions and what to do when they occur
+type CollisionSystem struct {
 	MapBounds         pixel.Rect
 	player            collisionEntity
 	sword             collisionEntity
@@ -28,7 +28,7 @@ type SystemCollision struct {
 }
 
 // AddEntity adds an entity to the system
-func (s *SystemCollision) AddEntity(entity Entity) {
+func (s *CollisionSystem) AddEntity(entity Entity) {
 	r := collisionEntity{
 		ID:               entity.ID(),
 		ComponentSpatial: entity.ComponentSpatial,
@@ -57,7 +57,7 @@ func (s *SystemCollision) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *SystemCollision) Remove(category EntityCategory, id EntityID) {
+func (s *CollisionSystem) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryCoin:
 		for i := len(s.coins) - 1; i >= 0; i-- {
@@ -77,7 +77,7 @@ func (s *SystemCollision) Remove(category EntityCategory, id EntityID) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *SystemCollision) RemoveAll(category EntityCategory) {
+func (s *CollisionSystem) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -106,7 +106,7 @@ func isColliding(r1, r2 pixel.Rect) bool {
 }
 
 // Update checks for collisions
-func (s *SystemCollision) Update() {
+func (s *CollisionSystem) Update() {
 
 	player := s.player
 	playerR := s.player.ComponentSpatial.Rect

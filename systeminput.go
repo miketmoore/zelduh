@@ -10,8 +10,8 @@ type inputEntity struct {
 	*ComponentDash
 }
 
-// SystemInput is a custom system for detecting collisions and what to do when they occur
-type SystemInput struct {
+// InputSystem is a custom system for detecting collisions and what to do when they occur
+type InputSystem struct {
 	Win           *pixelgl.Window
 	playerEntity  inputEntity
 	playerEnabled bool
@@ -20,17 +20,17 @@ type SystemInput struct {
 }
 
 // DisablePlayer disables player input
-func (s *SystemInput) DisablePlayer() {
+func (s *InputSystem) DisablePlayer() {
 	s.playerEnabled = false
 }
 
 // EnablePlayer enables player input
-func (s *SystemInput) EnablePlayer() {
+func (s *InputSystem) EnablePlayer() {
 	s.playerEnabled = true
 }
 
 // AddEntity adds an entity to the system
-func (s *SystemInput) AddEntity(entity Entity) {
+func (s *InputSystem) AddEntity(entity Entity) {
 	r := inputEntity{
 		ComponentMovement: entity.ComponentMovement,
 		ComponentDash:     entity.ComponentDash,
@@ -47,7 +47,7 @@ func (s *SystemInput) AddEntity(entity Entity) {
 }
 
 // Update checks for player input
-func (s SystemInput) Update() {
+func (s InputSystem) Update() {
 	if !s.playerEnabled {
 		return
 	}

@@ -10,7 +10,7 @@ func GameStateGame(
 	gameModel *GameModel,
 	roomsMap Rooms,
 	systemsManager *SystemsManager,
-	inputSystem *SystemInput,
+	inputSystem *InputSystem,
 ) {
 	inputSystem.EnablePlayer()
 

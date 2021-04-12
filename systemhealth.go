@@ -5,13 +5,13 @@ type healthEntity struct {
 	*ComponentHealth
 }
 
-// SystemHealth is a custom system for altering character health
-type SystemHealth struct {
+// HealthSystem is a custom system for altering character health
+type HealthSystem struct {
 	entities []healthEntity
 }
 
 // AddEntity adds the entity to the system
-func (s *SystemHealth) AddEntity(entity Entity) {
+func (s *HealthSystem) AddEntity(entity Entity) {
 	s.entities = append(s.entities, healthEntity{
 		ID:              entity.ID(),
 		ComponentHealth: entity.ComponentHealth,
@@ -19,7 +19,7 @@ func (s *SystemHealth) AddEntity(entity Entity) {
 }
 
 // Hit reduces entity health by d
-func (s *SystemHealth) Hit(entityID EntityID, d int) bool {
+func (s *HealthSystem) Hit(entityID EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {
@@ -31,4 +31,4 @@ func (s *SystemHealth) Hit(entityID EntityID, d int) bool {
 }
 
 // Update is a no-op
-func (s *SystemHealth) Update() {}
+func (s *HealthSystem) Update() {}
