@@ -28,7 +28,6 @@ func run() {
 	ui := zelduh.NewUI(currLocaleMsgs)
 
 	gameModel := zelduh.GameModel{
-		Rand:          rand.New(rand.NewSource(time.Now().UnixNano())),
 		EntitiesMap:   map[zelduh.EntityID]zelduh.Entity{},
 		CurrentState:  zelduh.StateStart,
 		AddEntities:   true,
@@ -60,7 +59,7 @@ func run() {
 	}
 
 	gameModel.SpatialSystem = &zelduh.SystemSpatial{
-		Rand: gameModel.Rand,
+		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
 	collisionSystem := &zelduh.SystemCollision{

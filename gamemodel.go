@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"math/rand"
-
 	"github.com/faiface/pixel"
 )
 
@@ -12,7 +10,6 @@ type GameModel struct {
 	CurrentRoomID, NextRoomID RoomID
 	RoomTransition            *RoomTransition
 	CurrentState              State
-	Rand                      *rand.Rand
 	EntitiesMap               map[EntityID]Entity
 	Spritesheet               map[int]*pixel.Sprite
 	Entities                  Entities
