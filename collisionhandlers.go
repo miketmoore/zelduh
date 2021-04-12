@@ -9,6 +9,7 @@ type CollisionHandler struct {
 	GameModel      *GameModel
 	SystemsManager *SystemsManager
 	SpatialSystem  *SpatialSystem
+	HealthSystem   *HealthSystem
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -55,7 +56,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 	if !ch.GameModel.Entities.Sword.ComponentIgnore.Value {
 		dead := false
 		if !ch.SpatialSystem.EnemyMovingFromHit(enemyID) {
-			dead = ch.GameModel.HealthSystem.Hit(enemyID, 1)
+			dead = ch.HealthSystem.Hit(enemyID, 1)
 			if dead {
 				enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
 				ch.GameModel.Entities.Explosion.ComponentTemporary.Expiration = len(ch.GameModel.Entities.Explosion.ComponentAnimation.Map["default"].Frames)
@@ -80,7 +81,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
 func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 	if !ch.GameModel.Entities.Arrow.ComponentIgnore.Value {
-		dead := ch.GameModel.HealthSystem.Hit(enemyID, 1)
+		dead := ch.HealthSystem.Hit(enemyID, 1)
 		ch.GameModel.Entities.Arrow.ComponentIgnore.Value = true
 		if dead {
 			enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)

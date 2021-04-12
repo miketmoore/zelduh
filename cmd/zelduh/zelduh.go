@@ -40,8 +40,6 @@ func run() {
 		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
-		HealthSystem: &zelduh.HealthSystem{},
-
 		Entities: zelduh.Entities{
 			Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
 			Bomb:      zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID()),
@@ -61,6 +59,8 @@ func run() {
 		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
+	healthSystem := &zelduh.HealthSystem{}
+
 	collisionSystem := &zelduh.CollisionSystem{
 		MapBounds: pixel.R(
 			zelduh.MapX,
@@ -72,6 +72,7 @@ func run() {
 			GameModel:      &gameModel,
 			SystemsManager: &systemsManager,
 			SpatialSystem:  &spatialSystem,
+			HealthSystem:   healthSystem,
 		},
 	}
 
@@ -79,7 +80,7 @@ func run() {
 
 	systemsManager.AddSystems(
 		inputSystem,
-		gameModel.HealthSystem,
+		healthSystem,
 		&spatialSystem,
 		collisionSystem,
 		&zelduh.RenderSystem{

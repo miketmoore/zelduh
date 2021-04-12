@@ -15,7 +15,6 @@ type GameModel struct {
 	Entities                  Entities
 	RoomWarps                 map[EntityID]Config
 	AllMapDrawData            map[string]MapData
-	HealthSystem              *HealthSystem
 }
 
 type Entities struct {
