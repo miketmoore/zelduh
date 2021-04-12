@@ -16,7 +16,6 @@ type GameModel struct {
 	RoomWarps                 map[EntityID]Config
 	AllMapDrawData            map[string]MapData
 	HealthSystem              *SystemHealth
-	InputSystem               *SystemInput
 }
 
 type Entities struct {

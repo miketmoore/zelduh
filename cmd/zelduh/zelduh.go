@@ -40,7 +40,6 @@ func run() {
 		RoomWarps:      map[zelduh.EntityID]zelduh.Config{},
 		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
 
-		InputSystem:  &zelduh.SystemInput{Win: ui.Window},
 		HealthSystem: &zelduh.SystemHealth{},
 
 		Entities: zelduh.Entities{
@@ -76,8 +75,10 @@ func run() {
 		},
 	}
 
+	inputSystem := &zelduh.SystemInput{Win: ui.Window}
+
 	systemsManager.AddSystems(
-		gameModel.InputSystem,
+		inputSystem,
 		gameModel.HealthSystem,
 		&spatialSystem,
 		collisionSystem,
@@ -100,6 +101,7 @@ func run() {
 		ui,
 		currLocaleMsgs,
 		collisionSystem,
+		inputSystem,
 	)
 
 	for !ui.Window.Closed() {
