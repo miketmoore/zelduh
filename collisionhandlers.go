@@ -6,10 +6,11 @@ import (
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
-	GameModel      *GameModel
-	SystemsManager *SystemsManager
-	SpatialSystem  *SpatialSystem
-	HealthSystem   *HealthSystem
+	GameModel         *GameModel
+	SystemsManager    *SystemsManager
+	SpatialSystem     *SpatialSystem
+	HealthSystem      *HealthSystem
+	ShouldAddEntities *bool
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -20,7 +21,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
 		ch.GameModel.RoomTransition.Style = TransitionSlide
 		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
 		ch.GameModel.CurrentState = StateMapTransition
-		ch.GameModel.AddEntities = true
+		*ch.ShouldAddEntities = true
 	}
 }
 
@@ -172,7 +173,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 		ch.GameModel.RoomTransition.Style = TransitionWarp
 		ch.GameModel.RoomTransition.Timer = 1
 		ch.GameModel.CurrentState = StateMapTransition
-		ch.GameModel.AddEntities = true
+		*ch.ShouldAddEntities = true
 		ch.GameModel.NextRoomID = entityConfig.WarpToRoomID
 	}
 }

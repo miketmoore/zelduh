@@ -11,6 +11,7 @@ func GameStateGame(
 	roomsMap Rooms,
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,
+	shouldAddEntities *bool,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -24,8 +25,8 @@ func GameStateGame(
 		roomsMap[gameModel.CurrentRoomID].MapName(),
 		0, 0)
 
-	if gameModel.AddEntities {
-		gameModel.AddEntities = false
+	if *shouldAddEntities {
+		*shouldAddEntities = false
 		AddUIHearts(systemsManager, gameModel.Entities.Hearts, gameModel.Entities.Player.ComponentHealth.Total)
 
 		AddUICoin(systemsManager)

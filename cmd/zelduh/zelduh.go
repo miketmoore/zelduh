@@ -27,10 +27,11 @@ func run() {
 
 	ui := zelduh.NewUI(currLocaleMsgs)
 
+	shouldAddEntities := true
+
 	gameModel := zelduh.GameModel{
 		EntitiesMap:   map[zelduh.EntityID]zelduh.Entity{},
 		CurrentState:  zelduh.StateStart,
-		AddEntities:   true,
 		CurrentRoomID: 1,
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
@@ -69,10 +70,11 @@ func run() {
 			zelduh.MapY+zelduh.MapH,
 		),
 		CollisionHandler: zelduh.CollisionHandler{
-			GameModel:      &gameModel,
-			SystemsManager: &systemsManager,
-			SpatialSystem:  &spatialSystem,
-			HealthSystem:   healthSystem,
+			GameModel:         &gameModel,
+			SystemsManager:    &systemsManager,
+			SpatialSystem:     &spatialSystem,
+			HealthSystem:      healthSystem,
+			ShouldAddEntities: &shouldAddEntities,
 		},
 	}
 
@@ -103,6 +105,7 @@ func run() {
 		currLocaleMsgs,
 		collisionSystem,
 		inputSystem,
+		&shouldAddEntities,
 	)
 
 	for !ui.Window.Closed() {

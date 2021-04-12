@@ -12,12 +12,13 @@ const (
 )
 
 type GameStateManager struct {
-	GameModel       *GameModel
-	SystemsManager  *SystemsManager
-	UI              UI
-	LocaleMessages  LocaleMessagesMap
-	CollisionSystem *CollisionSystem
-	InputSystem     *InputSystem
+	GameModel         *GameModel
+	SystemsManager    *SystemsManager
+	UI                UI
+	LocaleMessages    LocaleMessagesMap
+	CollisionSystem   *CollisionSystem
+	InputSystem       *InputSystem
+	ShouldAddEntities *bool
 }
 
 func NewGameStateManager(
@@ -27,14 +28,16 @@ func NewGameStateManager(
 	localeMessages LocaleMessagesMap,
 	collisionSystem *CollisionSystem,
 	inputSystem *InputSystem,
+	shouldAddEntities *bool,
 ) GameStateManager {
 	return GameStateManager{
-		GameModel:       gameModel,
-		SystemsManager:  systemsManager,
-		UI:              ui,
-		LocaleMessages:  localeMessages,
-		CollisionSystem: collisionSystem,
-		InputSystem:     inputSystem,
+		GameModel:         gameModel,
+		SystemsManager:    systemsManager,
+		UI:                ui,
+		LocaleMessages:    localeMessages,
+		CollisionSystem:   collisionSystem,
+		InputSystem:       inputSystem,
+		ShouldAddEntities: shouldAddEntities,
 	}
 }
 
@@ -43,7 +46,7 @@ func (g *GameStateManager) Update() {
 	case StateStart:
 		GameStateStart(g.UI, g.LocaleMessages, g.GameModel)
 	case StateGame:
-		GameStateGame(g.UI, g.GameModel, RoomsMap, g.SystemsManager, g.InputSystem)
+		GameStateGame(g.UI, g.GameModel, RoomsMap, g.SystemsManager, g.InputSystem, g.ShouldAddEntities)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameModel)
 	case StateOver:
