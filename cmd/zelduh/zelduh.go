@@ -30,10 +30,10 @@ func run() {
 	shouldAddEntities := true
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
+	currentState := zelduh.StateStart
 
 	gameModel := zelduh.GameModel{
-		EntitiesMap:  map[zelduh.EntityID]zelduh.Entity{},
-		CurrentState: zelduh.StateStart,
+		EntitiesMap: map[zelduh.EntityID]zelduh.Entity{},
 		RoomTransition: &zelduh.RoomTransition{
 			Start: float64(zelduh.TileSize),
 		},
@@ -76,6 +76,7 @@ func run() {
 			SpatialSystem:     &spatialSystem,
 			HealthSystem:      healthSystem,
 			ShouldAddEntities: &shouldAddEntities,
+			CurrentState:      &currentState,
 		},
 	}
 
@@ -109,6 +110,7 @@ func run() {
 		&shouldAddEntities,
 		&currentRoomID,
 		&nextRoomID,
+		&currentState,
 	)
 
 	for !ui.Window.Closed() {

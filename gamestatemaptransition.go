@@ -14,6 +14,7 @@ func GameStateMapTransition(
 	inputSystem *InputSystem,
 	currentRoomID *RoomID,
 	nextRoomID *RoomID,
+	currentState *State,
 ) {
 	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
@@ -74,7 +75,7 @@ func GameStateMapTransition(
 		systemsManager.RemoveAllMoveableObstacles()
 		systemsManager.RemoveAllEntities()
 	} else {
-		gameModel.CurrentState = StateGame
+		*currentState = StateGame
 		if *nextRoomID != 0 {
 			*currentRoomID = *nextRoomID
 		}

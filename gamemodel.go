@@ -7,7 +7,6 @@ import (
 // GameModel contains data used throughout the game
 type GameModel struct {
 	RoomTransition *RoomTransition
-	CurrentState   State
 	EntitiesMap    map[EntityID]Entity
 	Spritesheet    map[int]*pixel.Sprite
 	Entities       Entities

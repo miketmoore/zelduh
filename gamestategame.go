@@ -13,6 +13,7 @@ func GameStateGame(
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,
 	currentRoomID *RoomID,
+	currentState *State,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -56,10 +57,10 @@ func GameStateGame(
 	systemsManager.Update()
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {
-		gameModel.CurrentState = StatePause
+		*currentState = StatePause
 	}
 
 	if ui.Window.JustPressed(pixelgl.KeyX) {
-		gameModel.CurrentState = StateOver
+		*currentState = StateOver
 	}
 }
