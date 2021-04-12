@@ -58,7 +58,7 @@ func run() {
 		},
 	}
 
-	gameModel.SpatialSystem = &zelduh.SystemSpatial{
+	spatialSystem := zelduh.SystemSpatial{
 		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
@@ -72,13 +72,14 @@ func run() {
 		CollisionHandler: zelduh.CollisionHandler{
 			GameModel:      &gameModel,
 			SystemsManager: &systemsManager,
+			SpatialSystem:  &spatialSystem,
 		},
 	}
 
 	systemsManager.AddSystems(
 		gameModel.InputSystem,
 		gameModel.HealthSystem,
-		gameModel.SpatialSystem,
+		&spatialSystem,
 		collisionSystem,
 		&zelduh.SystemRender{
 			Win:         ui.Window,

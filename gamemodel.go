@@ -17,7 +17,6 @@ type GameModel struct {
 	AllMapDrawData            map[string]MapData
 	HealthSystem              *SystemHealth
 	InputSystem               *SystemInput
-	SpatialSystem             *SystemSpatial
 }
 
 type Entities struct {
