@@ -21,27 +21,31 @@ func run() {
 		os.Exit(0)
 	}
 
-	systemsManager := zelduh.NewSystemsManager()
-
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, zelduh.RoomsMap)
 
-	ui := zelduh.NewUI(currLocaleMsgs)
+	systemsManager := zelduh.NewSystemsManager()
+
+	entityFactory := zelduh.NewEntityFactory(&systemsManager)
+
+	spatialSystem := zelduh.SpatialSystem{
+		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
+	}
+
+	healthSystem := &zelduh.HealthSystem{}
+
+	entitiesMap := zelduh.EntitiesMap{}
+
+	roomTransition := zelduh.RoomTransition{
+		Start: float64(zelduh.TileSize),
+	}
+
+	roomWarps := zelduh.RoomWarps{}
 
 	shouldAddEntities := true
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
 	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize)
-
-	roomTransition := zelduh.RoomTransition{
-		Start: float64(zelduh.TileSize),
-	}
-
-	entitiesMap := zelduh.EntitiesMap{}
-
-	roomWarps := zelduh.RoomWarps{}
-
-	entityFactory := zelduh.NewEntityFactory(&systemsManager)
 
 	player := entityFactory.NewEntity("player", 6, 6)
 	bomb := entityFactory.NewEntity("bomb", 0, 0)
@@ -53,14 +57,6 @@ func run() {
 		entityFactory.NewEntity("heart", 2.15, 14),
 		entityFactory.NewEntity("heart", 2.80, 14),
 	}
-
-	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
-
-	spatialSystem := zelduh.SpatialSystem{
-		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
-	}
-
-	healthSystem := &zelduh.HealthSystem{}
 
 	collisionSystem := &zelduh.CollisionSystem{
 		MapBounds: pixel.R(
@@ -87,6 +83,8 @@ func run() {
 		),
 	}
 
+	ui := zelduh.NewUI(currLocaleMsgs)
+
 	inputSystem := &zelduh.InputSystem{Win: ui.Window}
 
 	systemsManager.AddSystems(
@@ -106,6 +104,8 @@ func run() {
 		arrow,
 		bomb,
 	)
+
+	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
 	gameStateManager := zelduh.NewGameStateManager(
 		&systemsManager,
