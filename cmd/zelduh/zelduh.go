@@ -41,17 +41,18 @@ func run() {
 
 	roomWarps := zelduh.RoomWarps{}
 
-	player := zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID())
-	bomb := zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID())
-	explosion := zelduh.BuildEntityFromConfig(zelduh.GetPreset("explosion")(0, 0), systemsManager.NewEntityID())
-	sword := zelduh.BuildEntityFromConfig(zelduh.GetPreset("sword")(0, 0), systemsManager.NewEntityID())
-	arrow := zelduh.BuildEntityFromConfig(zelduh.GetPreset("arrow")(0, 0), systemsManager.NewEntityID())
-	hearts := zelduh.BuildEntitiesFromConfigs(
-		systemsManager.NewEntityID,
-		zelduh.GetPreset("heart")(1.5, 14),
-		zelduh.GetPreset("heart")(2.15, 14),
-		zelduh.GetPreset("heart")(2.80, 14),
-	)
+	entityFactory := zelduh.NewEntityFactory(&systemsManager)
+
+	player := entityFactory.NewEntity("player", 6, 6)
+	bomb := entityFactory.NewEntity("bomb", 0, 0)
+	explosion := entityFactory.NewEntity("explosion", 0, 0)
+	sword := entityFactory.NewEntity("sword", 0, 0)
+	arrow := entityFactory.NewEntity("arrow", 0, 0)
+	hearts := []zelduh.Entity{
+		entityFactory.NewEntity("heart", 1.5, 14),
+		entityFactory.NewEntity("heart", 2.15, 14),
+		entityFactory.NewEntity("heart", 2.80, 14),
+	}
 
 	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
