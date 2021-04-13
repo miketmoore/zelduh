@@ -23,6 +23,7 @@ type GameStateManager struct {
 	CurrentState              *State
 	Spritesheet               Spritesheet
 	MapDrawData               MapDrawData
+	RoomTransition            *RoomTransition
 }
 
 func NewGameStateManager(
@@ -38,6 +39,7 @@ func NewGameStateManager(
 	currentState *State,
 	spritesheet Spritesheet,
 	mapDrawData MapDrawData,
+	roomTransition *RoomTransition,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:         gameModel,
@@ -52,6 +54,7 @@ func NewGameStateManager(
 		CurrentState:      currentState,
 		Spritesheet:       spritesheet,
 		MapDrawData:       mapDrawData,
+		RoomTransition:    roomTransition,
 	}
 }
 
@@ -76,6 +79,19 @@ func (g *GameStateManager) Update() {
 	case StateOver:
 		GameStateOver(g.UI, g.LocaleMessages, g.GameModel, g.CurrentState)
 	case StateMapTransition:
-		GameStateMapTransition(g.UI, g.SystemsManager, RoomsMap, g.CollisionSystem, g.GameModel, g.InputSystem, g.CurrentRoomID, g.NextRoomID, g.CurrentState, g.Spritesheet, g.MapDrawData)
+		GameStateMapTransition(
+			g.UI,
+			g.SystemsManager,
+			RoomsMap,
+			g.CollisionSystem,
+			g.GameModel,
+			g.InputSystem,
+			g.CurrentRoomID,
+			g.NextRoomID,
+			g.CurrentState,
+			g.Spritesheet,
+			g.MapDrawData,
+			g.RoomTransition,
+		)
 	}
 }

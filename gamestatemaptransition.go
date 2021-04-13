@@ -17,10 +17,11 @@ func GameStateMapTransition(
 	currentState *State,
 	spritesheet Spritesheet,
 	mapDrawData MapDrawData,
+	roomTransition *RoomTransition,
 ) {
 	inputSystem.DisablePlayer()
-	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
-		gameModel.RoomTransition.Timer--
+	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
+		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
 		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
@@ -33,7 +34,7 @@ func GameStateMapTransition(
 		connectedRooms := roomsMap[*currentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
-			gameModel.RoomTransition,
+			roomTransition,
 			*connectedRooms,
 		)
 
@@ -66,8 +67,8 @@ func GameStateMapTransition(
 		)
 
 		systemsManager.Update()
-	} else if gameModel.RoomTransition.Style == TransitionWarp && gameModel.RoomTransition.Timer > 0 {
-		gameModel.RoomTransition.Timer--
+	} else if roomTransition.Style == TransitionWarp && roomTransition.Timer > 0 {
+		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
 		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
 
@@ -81,7 +82,7 @@ func GameStateMapTransition(
 		if *nextRoomID != 0 {
 			*currentRoomID = *nextRoomID
 		}
-		gameModel.RoomTransition.Active = false
+		roomTransition.Active = false
 	}
 }
 

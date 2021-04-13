@@ -33,11 +33,12 @@ func run() {
 	currentState := zelduh.StateStart
 	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize)
 
+	roomTransition := zelduh.RoomTransition{
+		Start: float64(zelduh.TileSize),
+	}
+
 	gameModel := zelduh.GameModel{
 		EntitiesMap: map[zelduh.EntityID]zelduh.Entity{},
-		RoomTransition: &zelduh.RoomTransition{
-			Start: float64(zelduh.TileSize),
-		},
 
 		RoomWarps: map[zelduh.EntityID]zelduh.EntityConfig{},
 
@@ -78,6 +79,7 @@ func run() {
 			HealthSystem:      healthSystem,
 			ShouldAddEntities: &shouldAddEntities,
 			CurrentState:      &currentState,
+			RoomTransition:    &roomTransition,
 		},
 	}
 
@@ -114,6 +116,7 @@ func run() {
 		&currentState,
 		spritesheet,
 		mapDrawData,
+		&roomTransition,
 	)
 
 	for !ui.Window.Closed() {

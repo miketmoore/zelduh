@@ -13,15 +13,16 @@ type CollisionHandler struct {
 	ShouldAddEntities *bool
 	NextRoomID        *RoomID
 	CurrentState      *State
+	RoomTransition    *RoomTransition
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
 func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
-	if !ch.GameModel.RoomTransition.Active {
-		ch.GameModel.RoomTransition.Active = true
-		ch.GameModel.RoomTransition.Side = side
-		ch.GameModel.RoomTransition.Style = TransitionSlide
-		ch.GameModel.RoomTransition.Timer = int(ch.GameModel.RoomTransition.Start)
+	if !ch.RoomTransition.Active {
+		ch.RoomTransition.Active = true
+		ch.RoomTransition.Side = side
+		ch.RoomTransition.Style = TransitionSlide
+		ch.RoomTransition.Timer = int(ch.RoomTransition.Start)
 		*ch.CurrentState = StateMapTransition
 		*ch.ShouldAddEntities = true
 	}
@@ -170,10 +171,10 @@ func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID Enti
 // OnPlayerCollisionWithWarp handles collision between player and warp
 func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
 	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
-	if ok && !ch.GameModel.RoomTransition.Active {
-		ch.GameModel.RoomTransition.Active = true
-		ch.GameModel.RoomTransition.Style = TransitionWarp
-		ch.GameModel.RoomTransition.Timer = 1
+	if ok && !ch.RoomTransition.Active {
+		ch.RoomTransition.Active = true
+		ch.RoomTransition.Style = TransitionWarp
+		ch.RoomTransition.Timer = 1
 		*ch.CurrentState = StateMapTransition
 		*ch.ShouldAddEntities = true
 		*ch.NextRoomID = entityConfig.WarpToRoomID
