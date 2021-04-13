@@ -18,6 +18,7 @@ func GameStateMapTransition(
 	spritesheet Spritesheet,
 	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
+	player *Entity,
 ) {
 	inputSystem.DisablePlayer()
 	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
@@ -59,11 +60,11 @@ func GameStateMapTransition(
 		DrawMask(ui.Window)
 
 		// Move player with map transition
-		gameModel.Entities.Player.ComponentSpatial.Rect = pixel.R(
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+TileSize,
-			gameModel.Entities.Player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+TileSize,
+		player.ComponentSpatial.Rect = pixel.R(
+			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
+			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
+			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+TileSize,
+			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+TileSize,
 		)
 
 		systemsManager.Update()

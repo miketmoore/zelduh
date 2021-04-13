@@ -17,6 +17,8 @@ func GameStateGame(
 	spritesheet Spritesheet,
 	mapDrawData MapDrawData,
 	entitiesMap EntitiesMap,
+	player *Entity,
+	hearts []Entity,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -32,7 +34,7 @@ func GameStateGame(
 
 	if *shouldAddEntities {
 		*shouldAddEntities = false
-		AddUIHearts(systemsManager, gameModel.Entities.Hearts, gameModel.Entities.Player.ComponentHealth.Total)
+		AddUIHearts(systemsManager, hearts, player.ComponentHealth.Total)
 
 		AddUICoin(systemsManager)
 
