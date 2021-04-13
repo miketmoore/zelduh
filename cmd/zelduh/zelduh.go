@@ -39,10 +39,7 @@ func run() {
 
 	entitiesMap := zelduh.EntitiesMap{}
 
-	gameModel := zelduh.GameModel{
-
-		RoomWarps: map[zelduh.EntityID]zelduh.EntityConfig{},
-	}
+	roomWarps := zelduh.RoomWarps{}
 
 	player := zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID())
 	bomb := zelduh.BuildEntityFromConfig(zelduh.GetPreset("bomb")(0, 0), systemsManager.NewEntityID())
@@ -72,7 +69,6 @@ func run() {
 			zelduh.MapY+zelduh.MapH,
 		),
 		CollisionHandler: zelduh.NewCollisionHandler(
-			&gameModel,
 			&systemsManager,
 			&spatialSystem,
 			healthSystem,
@@ -86,6 +82,7 @@ func run() {
 			&explosion,
 			&arrow,
 			hearts,
+			roomWarps,
 		),
 	}
 
@@ -110,7 +107,6 @@ func run() {
 	)
 
 	gameStateManager := zelduh.NewGameStateManager(
-		&gameModel,
 		&systemsManager,
 		ui,
 		currLocaleMsgs,
@@ -126,6 +122,7 @@ func run() {
 		entitiesMap,
 		&player,
 		hearts,
+		roomWarps,
 	)
 
 	for !ui.Window.Closed() {

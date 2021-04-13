@@ -8,7 +8,6 @@ import (
 func GameStatePause(
 	ui UI,
 	currLocaleMsgs LocaleMessagesMap,
-	gameModel *GameModel,
 	currentState *State,
 ) {
 	ui.Window.Clear(colornames.Darkgray)

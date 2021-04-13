@@ -7,7 +7,6 @@ import (
 
 func GameStateGame(
 	ui UI,
-	gameModel *GameModel,
 	roomsMap Rooms,
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,
@@ -19,6 +18,7 @@ func GameStateGame(
 	entitiesMap EntitiesMap,
 	player *Entity,
 	hearts []Entity,
+	roomWarps RoomWarps,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -42,7 +42,9 @@ func GameStateGame(
 		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, mapDrawData, currentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
-		gameModel.RoomWarps = map[EntityID]EntityConfig{}
+		for k := range roomWarps {
+			delete(roomWarps, k)
+		}
 
 		// Iterate through all entity configurations and build entities and add to systems
 		for _, c := range roomsMap[*currentRoomID].(*Room).EntityConfigs {
@@ -52,7 +54,7 @@ func GameStateGame(
 
 			switch c.Category {
 			case CategoryWarp:
-				gameModel.RoomWarps[entity.ID()] = c
+				roomWarps[entity.ID()] = c
 			}
 		}
 	}

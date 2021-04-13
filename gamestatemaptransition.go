@@ -10,7 +10,6 @@ func GameStateMapTransition(
 	systemsManager *SystemsManager,
 	roomsMap Rooms,
 	collisionSystem *CollisionSystem,
-	gameModel *GameModel,
 	inputSystem *InputSystem,
 	currentRoomID *RoomID,
 	nextRoomID *RoomID,

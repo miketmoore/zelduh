@@ -6,7 +6,6 @@ import (
 
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
-	GameModel                       *GameModel
 	SystemsManager                  *SystemsManager
 	SpatialSystem                   *SpatialSystem
 	HealthSystem                    *HealthSystem
@@ -17,10 +16,10 @@ type CollisionHandler struct {
 	EntitiesMap                     EntitiesMap
 	Player, Sword, Explosion, Arrow *Entity
 	Hearts                          []Entity
+	RoomWarps                       RoomWarps
 }
 
 func NewCollisionHandler(
-	gameModel *GameModel,
 	systemsManager *SystemsManager,
 	spatialSystem *SpatialSystem,
 	healthSystem *HealthSystem,
@@ -31,9 +30,9 @@ func NewCollisionHandler(
 	entitiesMap EntitiesMap,
 	player, sword, explosion, arrow *Entity,
 	hearts []Entity,
+	roomWarps RoomWarps,
 ) CollisionHandler {
 	return CollisionHandler{
-		GameModel:         gameModel,
 		SystemsManager:    systemsManager,
 		SpatialSystem:     spatialSystem,
 		HealthSystem:      healthSystem,
@@ -47,6 +46,7 @@ func NewCollisionHandler(
 		Explosion:         explosion,
 		Arrow:             arrow,
 		Hearts:            hearts,
+		RoomWarps:         roomWarps,
 	}
 }
 
@@ -204,7 +204,7 @@ func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID Enti
 
 // OnPlayerCollisionWithWarp handles collision between player and warp
 func (ch *CollisionHandler) OnPlayerCollisionWithWarp(warpID EntityID) {
-	entityConfig, ok := ch.GameModel.RoomWarps[warpID]
+	entityConfig, ok := ch.RoomWarps[warpID]
 	if ok && !ch.RoomTransition.Active {
 		ch.RoomTransition.Active = true
 		ch.RoomTransition.Style = TransitionWarp
