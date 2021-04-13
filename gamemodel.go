@@ -2,9 +2,8 @@ package zelduh
 
 // GameModel contains data used throughout the game
 type GameModel struct {
-	EntitiesMap map[EntityID]Entity
-	Entities    Entities
-	RoomWarps   map[EntityID]EntityConfig
+	Entities  Entities
+	RoomWarps map[EntityID]EntityConfig
 }
 
 type Entities struct {

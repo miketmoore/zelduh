@@ -14,6 +14,7 @@ type CollisionHandler struct {
 	NextRoomID        *RoomID
 	CurrentState      *State
 	RoomTransition    *RoomTransition
+	EntitiesMap       EntitiesMap
 }
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
@@ -128,7 +129,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID Ent
 
 // OnMoveableObstacleCollisionWithSwitch handles collision between moveable obstacle and switch
 func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID EntityID) {
-	for id, entity := range ch.GameModel.EntitiesMap {
+	for id, entity := range ch.EntitiesMap {
 		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
 		}
@@ -137,7 +138,7 @@ func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitc
 
 // OnMoveableObstacleNoCollisionWithSwitch handles *no* collision between moveable obstacle and switch
 func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID EntityID) {
-	for id, entity := range ch.GameModel.EntitiesMap {
+	for id, entity := range ch.EntitiesMap {
 		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
 		}
@@ -152,7 +153,7 @@ func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID Ent
 
 // OnPlayerCollisionWithSwitch handles collision between player and switch
 func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID EntityID) {
-	for id, entity := range ch.GameModel.EntitiesMap {
+	for id, entity := range ch.EntitiesMap {
 		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
 		}
@@ -161,7 +162,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID Entity
 
 // OnPlayerNoCollisionWithSwitch handles *no* collision between player and switch
 func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID EntityID) {
-	for id, entity := range ch.GameModel.EntitiesMap {
+	for id, entity := range ch.EntitiesMap {
 		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
 			entity.ComponentToggler.Toggle()
 		}

@@ -16,6 +16,7 @@ func GameStateGame(
 	currentState *State,
 	spritesheet Spritesheet,
 	mapDrawData MapDrawData,
+	entitiesMap EntitiesMap,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -44,7 +45,7 @@ func GameStateGame(
 		// Iterate through all entity configurations and build entities and add to systems
 		for _, c := range roomsMap[*currentRoomID].(*Room).EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID())
-			gameModel.EntitiesMap[entity.ID()] = entity
+			entitiesMap[entity.ID()] = entity
 			systemsManager.AddEntity(entity)
 
 			switch c.Category {

@@ -24,6 +24,7 @@ type GameStateManager struct {
 	Spritesheet               Spritesheet
 	MapDrawData               MapDrawData
 	RoomTransition            *RoomTransition
+	EntitiesMap               EntitiesMap
 }
 
 func NewGameStateManager(
@@ -40,6 +41,7 @@ func NewGameStateManager(
 	spritesheet Spritesheet,
 	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
+	entitiesMap EntitiesMap,
 ) GameStateManager {
 	return GameStateManager{
 		GameModel:         gameModel,
@@ -55,6 +57,7 @@ func NewGameStateManager(
 		Spritesheet:       spritesheet,
 		MapDrawData:       mapDrawData,
 		RoomTransition:    roomTransition,
+		EntitiesMap:       entitiesMap,
 	}
 }
 
@@ -72,7 +75,9 @@ func (g *GameStateManager) Update() {
 			g.ShouldAddEntities,
 			g.CurrentRoomID,
 			g.CurrentState,
-			g.Spritesheet, g.MapDrawData,
+			g.Spritesheet,
+			g.MapDrawData,
+			g.EntitiesMap,
 		)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.GameModel, g.CurrentState)

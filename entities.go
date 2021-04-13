@@ -36,6 +36,8 @@ type Entity struct {
 	*ComponentTemporary
 }
 
+type EntitiesMap map[EntityID]Entity
+
 // ID returns the entity ID
 func (e *Entity) ID() EntityID {
 	return e.id
