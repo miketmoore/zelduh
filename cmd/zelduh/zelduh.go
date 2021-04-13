@@ -80,6 +80,7 @@ func run() {
 			ShouldAddEntities: &shouldAddEntities,
 			CurrentState:      &currentState,
 			RoomTransition:    &roomTransition,
+			NextRoomID:        &nextRoomID,
 		},
 	}
 
