@@ -13,7 +13,7 @@ type ConnectedRooms struct {
 
 // Room defines an API for room implementations
 type Roomer interface {
-	MapName() string
+	MapName() MapName
 	ConnectedRooms() *ConnectedRooms
 	SetConnectedRoom(Direction, RoomID)
 }
@@ -23,13 +23,13 @@ type Rooms map[RoomID]Roomer
 
 // Room represents one map section
 type Room struct {
-	mapName        string
+	mapName        MapName
 	connectedRooms *ConnectedRooms
 	EntityConfigs  []EntityConfig
 }
 
 // MapName returns the room's map name
-func (r Room) MapName() string {
+func (r Room) MapName() MapName {
 	return r.mapName
 }
 
@@ -53,7 +53,7 @@ func (r Room) SetConnectedRoom(direction Direction, id RoomID) {
 }
 
 // NewRoom builds a new Room
-func NewRoom(name string, entityConfigs ...EntityConfig) *Room {
+func NewRoom(name MapName, entityConfigs ...EntityConfig) *Room {
 	return &Room{
 		mapName:        name,
 		connectedRooms: &ConnectedRooms{},

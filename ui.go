@@ -69,11 +69,11 @@ func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleM
 func DrawMapBackgroundImage(
 	win *pixelgl.Window,
 	spritesheet map[int]*pixel.Sprite,
-	allMapDrawData map[string]MapData,
-	name string,
+	mapDrawData MapDrawData,
+	name MapName,
 	modX, modY float64) {
 
-	d := allMapDrawData[name]
+	d := mapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			sprite := spritesheet[spriteData.SpriteID]
@@ -106,8 +106,8 @@ func AddUIHearts(systemsManager *SystemsManager, hearts []Entity, health int) {
 	}
 }
 
-func DrawObstaclesPerMapTiles(systemsManager *SystemsManager, roomsMap Rooms, allMapDrawData map[string]MapData, roomID *RoomID, modX, modY float64) []Entity {
-	d := allMapDrawData[roomsMap[*roomID].MapName()]
+func DrawObstaclesPerMapTiles(systemsManager *SystemsManager, roomsMap Rooms, mapDrawData MapDrawData, roomID *RoomID, modX, modY float64) []Entity {
+	d := mapDrawData[roomsMap[*roomID].MapName()]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {

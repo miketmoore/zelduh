@@ -45,13 +45,17 @@ type MapData struct {
 	Data []mapDrawData
 }
 
+type MapName string
+
+type MapDrawData map[MapName]MapData
+
 // BuildMapDrawData builds draw data and stores it in a map
-func BuildMapDrawData(dir string, files []string, tileSize float64) map[string]MapData {
+func BuildMapDrawData(dir string, files []string, tileSize float64) MapDrawData {
 
 	// load all TMX file data for each map
 	tmxMapData := Load(files, dir)
 
-	all := map[string]MapData{}
+	all := MapDrawData{}
 
 	for mapName, mapData := range tmxMapData {
 
@@ -84,7 +88,7 @@ func BuildMapDrawData(dir string, files []string, tileSize float64) map[string]M
 				}
 
 			}
-			all[mapName] = md
+			all[MapName(mapName)] = md
 		}
 	}
 

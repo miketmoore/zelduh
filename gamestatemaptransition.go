@@ -16,6 +16,7 @@ func GameStateMapTransition(
 	nextRoomID *RoomID,
 	currentState *State,
 	spritesheet Spritesheet,
+	mapDrawData MapDrawData,
 ) {
 	inputSystem.DisablePlayer()
 	if gameModel.RoomTransition.Style == TransitionSlide && gameModel.RoomTransition.Timer > 0 {
@@ -41,7 +42,7 @@ func GameStateMapTransition(
 		DrawMapBackgroundImage(
 			ui.Window,
 			spritesheet,
-			gameModel.AllMapDrawData,
+			mapDrawData,
 			roomsMap[*currentRoomID].MapName(),
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
@@ -49,7 +50,7 @@ func GameStateMapTransition(
 		DrawMapBackgroundImage(
 			ui.Window,
 			spritesheet,
-			gameModel.AllMapDrawData,
+			mapDrawData,
 			roomsMap[*nextRoomID].MapName(),
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,

@@ -39,8 +39,7 @@ func run() {
 			Start: float64(zelduh.TileSize),
 		},
 
-		RoomWarps:      map[zelduh.EntityID]zelduh.EntityConfig{},
-		AllMapDrawData: zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize),
+		RoomWarps: map[zelduh.EntityID]zelduh.EntityConfig{},
 
 		Entities: zelduh.Entities{
 			Player:    zelduh.BuildEntityFromConfig(zelduh.GetPreset("player")(6, 6), systemsManager.NewEntityID()),
@@ -56,6 +55,8 @@ func run() {
 			),
 		},
 	}
+
+	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
 
 	spatialSystem := zelduh.SpatialSystem{
 		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -112,6 +113,7 @@ func run() {
 		&nextRoomID,
 		&currentState,
 		spritesheet,
+		mapDrawData,
 	)
 
 	for !ui.Window.Closed() {

@@ -6,7 +6,6 @@ type GameModel struct {
 	EntitiesMap    map[EntityID]Entity
 	Entities       Entities
 	RoomWarps      map[EntityID]EntityConfig
-	AllMapDrawData map[string]MapData
 }
 
 type Entities struct {

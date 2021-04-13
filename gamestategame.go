@@ -15,6 +15,7 @@ func GameStateGame(
 	currentRoomID *RoomID,
 	currentState *State,
 	spritesheet Spritesheet,
+	mapDrawData MapDrawData,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -24,7 +25,7 @@ func GameStateGame(
 	DrawMapBackgroundImage(
 		ui.Window,
 		spritesheet,
-		gameModel.AllMapDrawData,
+		mapDrawData,
 		roomsMap[*currentRoomID].MapName(),
 		0, 0)
 
@@ -35,7 +36,7 @@ func GameStateGame(
 		AddUICoin(systemsManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, gameModel.AllMapDrawData, currentRoomID, 0, 0)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, mapDrawData, currentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
 		gameModel.RoomWarps = map[EntityID]EntityConfig{}
