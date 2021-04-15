@@ -21,7 +21,9 @@ func run() {
 		os.Exit(0)
 	}
 
-	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, zelduh.RoomsMap)
+	rooms := zelduh.BuildRooms()
+
+	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, rooms)
 
 	systemsManager := zelduh.NewSystemsManager()
 
@@ -124,6 +126,7 @@ func run() {
 		&player,
 		hearts,
 		roomWarps,
+		rooms,
 	)
 
 	for !ui.Window.Closed() {

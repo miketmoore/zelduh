@@ -27,6 +27,7 @@ type GameStateManager struct {
 	Player                    *Entity
 	Hearts                    []Entity
 	RoomWarps                 RoomWarps
+	Rooms                     Rooms
 }
 
 func NewGameStateManager(
@@ -46,6 +47,7 @@ func NewGameStateManager(
 	player *Entity,
 	hearts []Entity,
 	roomWarps RoomWarps,
+	rooms Rooms,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:    systemsManager,
@@ -64,6 +66,7 @@ func NewGameStateManager(
 		Player:            player,
 		Hearts:            hearts,
 		RoomWarps:         roomWarps,
+		Rooms:             rooms,
 	}
 }
 
@@ -74,7 +77,7 @@ func (g *GameStateManager) Update() {
 	case StateGame:
 		GameStateGame(
 			g.UI,
-			RoomsMap,
+			g.Rooms,
 			g.SystemsManager,
 			g.InputSystem,
 			g.ShouldAddEntities,
@@ -95,7 +98,7 @@ func (g *GameStateManager) Update() {
 		GameStateMapTransition(
 			g.UI,
 			g.SystemsManager,
-			RoomsMap,
+			g.Rooms,
 			g.CollisionSystem,
 			g.InputSystem,
 			g.CurrentRoomID,

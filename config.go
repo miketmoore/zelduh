@@ -89,74 +89,77 @@ var NonObstacleSprites = map[int]bool{
 	137: true,
 }
 
+// TODO move to zelduh cmd file since it is configuration
 // Map of RoomID to a Room configuration
-var RoomsMap = Rooms{
-	1: NewRoom("overworldFourWallsDoorBottomRight",
-		GetPreset("puzzleBox")(5, 5),
-		GetPreset("floorSwitch")(5, 6),
-		GetPreset("toggleObstacle")(10, 7),
-	),
-	2: NewRoom("overworldFourWallsDoorTopBottom",
-		GetPreset("skull")(5, 5),
-		GetPreset("skeleton")(11, 9),
-		GetPreset("spinner")(7, 9),
-		GetPreset("eyeburrower")(8, 9),
-	),
-	3: NewRoom("overworldFourWallsDoorRightTopBottom",
-		WarpStone(3, 7, 6, 5),
-	),
-	5: NewRoom("rockWithCaveEntrance",
-		EntityConfig{
-			Category:     CategoryWarp,
-			WarpToRoomID: 11,
-			W:            TileSize,
-			H:            TileSize,
-			X:            (TileSize * 7) + TileSize/2,
-			Y:            (TileSize * 9) + TileSize/2,
-			Hitbox: &HitboxConfig{
-				Radius: 30,
+func BuildRooms() Rooms {
+	return Rooms{
+		1: NewRoom("overworldFourWallsDoorBottomRight",
+			GetPreset("puzzleBox")(5, 5),
+			GetPreset("floorSwitch")(5, 6),
+			GetPreset("toggleObstacle")(10, 7),
+		),
+		2: NewRoom("overworldFourWallsDoorTopBottom",
+			GetPreset("skull")(5, 5),
+			GetPreset("skeleton")(11, 9),
+			GetPreset("spinner")(7, 9),
+			GetPreset("eyeburrower")(8, 9),
+		),
+		3: NewRoom("overworldFourWallsDoorRightTopBottom",
+			WarpStone(3, 7, 6, 5),
+		),
+		5: NewRoom("rockWithCaveEntrance",
+			EntityConfig{
+				Category:     CategoryWarp,
+				WarpToRoomID: 11,
+				W:            TileSize,
+				H:            TileSize,
+				X:            (TileSize * 7) + TileSize/2,
+				Y:            (TileSize * 9) + TileSize/2,
+				Hitbox: &HitboxConfig{
+					Radius: 30,
+				},
 			},
-		},
-		EntityConfig{
-			Category:     CategoryWarp,
-			WarpToRoomID: 11,
-			W:            TileSize,
-			H:            TileSize,
-			X:            (TileSize * 8) + TileSize/2,
-			Y:            (TileSize * 9) + TileSize/2,
-			Hitbox: &HitboxConfig{
-				Radius: 30,
+			EntityConfig{
+				Category:     CategoryWarp,
+				WarpToRoomID: 11,
+				W:            TileSize,
+				H:            TileSize,
+				X:            (TileSize * 8) + TileSize/2,
+				Y:            (TileSize * 9) + TileSize/2,
+				Hitbox: &HitboxConfig{
+					Radius: 30,
+				},
 			},
-		},
-	),
-	6:  NewRoom("rockPathLeftRightEntrance"),
-	7:  NewRoom("overworldFourWallsDoorLeftTop"),
-	8:  NewRoom("overworldFourWallsDoorBottom"),
-	9:  NewRoom("overworldFourWallsDoorTop"),
-	10: NewRoom("overworldFourWallsDoorLeft"),
-	11: NewRoom("dungeonFourDoors",
-		// South door of cave - warp to cave entrance
-		EntityConfig{
-			Category:     CategoryWarp,
-			WarpToRoomID: 5,
-			W:            TileSize,
-			H:            TileSize,
-			X:            (TileSize * 6) + TileSize + (TileSize / 2.5),
-			Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
-			Hitbox: &HitboxConfig{
-				Radius: 15,
+		),
+		6:  NewRoom("rockPathLeftRightEntrance"),
+		7:  NewRoom("overworldFourWallsDoorLeftTop"),
+		8:  NewRoom("overworldFourWallsDoorBottom"),
+		9:  NewRoom("overworldFourWallsDoorTop"),
+		10: NewRoom("overworldFourWallsDoorLeft"),
+		11: NewRoom("dungeonFourDoors",
+			// South door of cave - warp to cave entrance
+			EntityConfig{
+				Category:     CategoryWarp,
+				WarpToRoomID: 5,
+				W:            TileSize,
+				H:            TileSize,
+				X:            (TileSize * 6) + TileSize + (TileSize / 2.5),
+				Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
+				Hitbox: &HitboxConfig{
+					Radius: 15,
+				},
 			},
-		},
-		EntityConfig{
-			Category:     CategoryWarp,
-			WarpToRoomID: 5,
-			W:            TileSize,
-			H:            TileSize,
-			X:            (TileSize * 7) + TileSize + (TileSize / 2.5),
-			Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
-			Hitbox: &HitboxConfig{
-				Radius: 15,
+			EntityConfig{
+				Category:     CategoryWarp,
+				WarpToRoomID: 5,
+				W:            TileSize,
+				H:            TileSize,
+				X:            (TileSize * 7) + TileSize + (TileSize / 2.5),
+				Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
+				Hitbox: &HitboxConfig{
+					Radius: 15,
+				},
 			},
-		},
-	),
+		),
+	}
 }
