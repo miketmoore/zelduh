@@ -91,7 +91,7 @@ var NonObstacleSprites = map[int]bool{
 
 // TODO move to zelduh cmd file since it is configuration
 // Map of RoomID to a Room configuration
-func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager) Rooms {
+func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager, tileSize float64) Rooms {
 	return Rooms{
 		1: NewRoom("overworldFourWallsDoorBottomRight",
 			entityConfigPresetFnManager.GetPreset("puzzleBox")(5, 5),
@@ -111,10 +111,10 @@ func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager) Rooms 
 			EntityConfig{
 				Category:     CategoryWarp,
 				WarpToRoomID: 11,
-				W:            TileSize,
-				H:            TileSize,
-				X:            (TileSize * 7) + TileSize/2,
-				Y:            (TileSize * 9) + TileSize/2,
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 7) + tileSize/2,
+				Y:            (tileSize * 9) + tileSize/2,
 				Hitbox: &HitboxConfig{
 					Radius: 30,
 				},
@@ -122,10 +122,10 @@ func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager) Rooms 
 			EntityConfig{
 				Category:     CategoryWarp,
 				WarpToRoomID: 11,
-				W:            TileSize,
-				H:            TileSize,
-				X:            (TileSize * 8) + TileSize/2,
-				Y:            (TileSize * 9) + TileSize/2,
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 8) + tileSize/2,
+				Y:            (tileSize * 9) + tileSize/2,
 				Hitbox: &HitboxConfig{
 					Radius: 30,
 				},
@@ -141,10 +141,10 @@ func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager) Rooms 
 			EntityConfig{
 				Category:     CategoryWarp,
 				WarpToRoomID: 5,
-				W:            TileSize,
-				H:            TileSize,
-				X:            (TileSize * 6) + TileSize + (TileSize / 2.5),
-				Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 6) + tileSize + (tileSize / 2.5),
+				Y:            (tileSize * 1) + tileSize + (tileSize / 2.5),
 				Hitbox: &HitboxConfig{
 					Radius: 15,
 				},
@@ -152,10 +152,10 @@ func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager) Rooms 
 			EntityConfig{
 				Category:     CategoryWarp,
 				WarpToRoomID: 5,
-				W:            TileSize,
-				H:            TileSize,
-				X:            (TileSize * 7) + TileSize + (TileSize / 2.5),
-				Y:            (TileSize * 1) + TileSize + (TileSize / 2.5),
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 7) + tileSize + (tileSize / 2.5),
+				Y:            (tileSize * 1) + tileSize + (tileSize / 2.5),
 				Hitbox: &HitboxConfig{
 					Radius: 15,
 				},

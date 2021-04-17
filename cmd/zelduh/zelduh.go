@@ -25,7 +25,7 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager)
+	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager, zelduh.TileSize)
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, rooms)
 
