@@ -18,6 +18,7 @@ type CollisionHandler struct {
 	Hearts                          []Entity
 	RoomWarps                       RoomWarps
 	EntityConfigPresetFnManager     *EntityConfigPresetFnManager
+	TileSize                        float64
 }
 
 func NewCollisionHandler(
@@ -33,6 +34,7 @@ func NewCollisionHandler(
 	hearts []Entity,
 	roomWarps RoomWarps,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	tileSize float64,
 ) CollisionHandler {
 	return CollisionHandler{
 		SystemsManager:              systemsManager,
@@ -50,6 +52,7 @@ func NewCollisionHandler(
 		Hearts:                      hearts,
 		RoomWarps:                   roomWarps,
 		EntityConfigPresetFnManager: entityConfigPresetFnManager,
+		TileSize:                    tileSize,
 	}
 }
 
@@ -87,8 +90,13 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	}
 }
 
-func dropCoin(entityConfigPresetFnManager *EntityConfigPresetFnManager, v pixel.Vec, systemsManager *SystemsManager) {
-	coin := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("coin")(v.X/TileSize, v.Y/TileSize), systemsManager.NewEntityID())
+func dropCoin(
+	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	v pixel.Vec,
+	systemsManager *SystemsManager,
+	tileSize float64,
+) {
+	coin := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("coin")(v.X/tileSize, v.Y/tileSize), systemsManager.NewEntityID())
 	systemsManager.AddEntity(coin)
 }
 
@@ -102,12 +110,12 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 				enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
 				ch.Explosion.ComponentTemporary.Expiration = len(ch.Explosion.ComponentAnimation.Map["default"].Frames)
 				ch.Explosion.ComponentSpatial = &ComponentSpatial{
-					Width:  TileSize,
-					Height: TileSize,
+					Width:  ch.TileSize,
+					Height: ch.TileSize,
 					Rect:   enemySpatial.Rect,
 				}
 				ch.Explosion.ComponentTemporary.OnExpiration = func() {
-					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize)
 				}
 				ch.SystemsManager.AddEntity(*ch.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
@@ -128,12 +136,12 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 			enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
 			ch.Explosion.ComponentTemporary.Expiration = len(ch.Explosion.ComponentAnimation.Map["default"].Frames)
 			ch.Explosion.ComponentSpatial = &ComponentSpatial{
-				Width:  TileSize,
-				Height: TileSize,
+				Width:  ch.TileSize,
+				Height: ch.TileSize,
 				Rect:   enemySpatial.Rect,
 			}
 			ch.Explosion.ComponentTemporary.OnExpiration = func() {
-				dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+				dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize)
 			}
 			ch.SystemsManager.AddEntity(*ch.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)

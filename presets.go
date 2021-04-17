@@ -25,7 +25,7 @@ func (m *EntityConfigPresetFnManager) GetPreset(presetName string) entityConfigP
 }
 
 // TODO move this to a higher level configuration location
-func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
+func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]entityConfigPresetFn {
 	return map[string]entityConfigPresetFn{
 		"arrow": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
@@ -34,10 +34,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 					Direction: DirectionDown,
 					Speed:     0.0,
 				},
-				W: TileSize,
-				H: TileSize,
-				X: TileSize * xTiles,
-				Y: TileSize * yTiles,
+				W: tileSize,
+				H: tileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"up":    GetSpriteSet("arrowUp"),
 					"right": GetSpriteSet("arrowRight"),
@@ -57,10 +57,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 					Direction: DirectionDown,
 					Speed:     0.0,
 				},
-				W: TileSize,
-				H: TileSize,
-				X: TileSize * xTiles,
-				Y: TileSize * yTiles,
+				W: tileSize,
+				H: tileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("bomb"),
 				},
@@ -73,10 +73,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"coin": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryCoin,
-				W:        TileSize,
-				H:        TileSize,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("coin"),
 				},
@@ -94,20 +94,20 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"obstacle": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryObstacle,
-				W:        TileSize,
-				H:        TileSize,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
 			}
 		},
 		"player": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryPlayer,
 				Health:   3,
-				W:        TileSize,
-				H:        TileSize,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
 				Hitbox: &HitboxConfig{
 					Box:                  imdraw.New(nil),
 					Radius:               15,
@@ -143,10 +143,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 					Direction: DirectionDown,
 					Speed:     0.0,
 				},
-				W: TileSize,
-				H: TileSize,
-				X: TileSize * xTiles,
-				Y: TileSize * yTiles,
+				W: tileSize,
+				H: tileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"up":    GetSpriteSet("swordUp"),
 					"right": GetSpriteSet("swordRight"),
@@ -162,7 +162,7 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"eyeburrower": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryEnemy,
-				W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("eyeburrower"),
 				},
@@ -185,10 +185,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"heart": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryHeart,
-				W:        TileSize,
-				H:        TileSize,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
 				Hitbox: &HitboxConfig{
 					Box: imdraw.New(nil),
 				},
@@ -201,7 +201,7 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"skeleton": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryEnemy,
-				W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("skeleton"),
 				},
@@ -224,7 +224,7 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"skull": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryEnemy,
-				W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("skull"),
 				},
@@ -247,7 +247,7 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"spinner": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryEnemy,
-				W:        TileSize, H: TileSize, X: TileSize * xTiles, Y: TileSize * yTiles,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("spinner"),
 				},
@@ -270,10 +270,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"uiCoin": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryHeart,
-				W:        TileSize,
-				H:        TileSize,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
 				Hitbox: &HitboxConfig{
 					Box: imdraw.New(nil),
 				},
@@ -285,10 +285,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"warpStone": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryWarp,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
-				W:        TileSize,
-				H:        TileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
 				Hitbox: &HitboxConfig{
 					Box:    imdraw.New(nil),
 					Radius: 20,
@@ -301,16 +301,16 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"puzzleBox": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryMovableObstacle,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
-				W:        TileSize,
-				H:        TileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("puzzleBox"),
 				},
 				Movement: &MovementConfig{
 					Speed:    1.0,
-					MaxMoves: int(TileSize) / 2,
+					MaxMoves: int(tileSize) / 2,
 					MaxSpeed: 2.0,
 				},
 			}
@@ -318,10 +318,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"floorSwitch": func(xTiles, yTiles float64) EntityConfig {
 			return EntityConfig{
 				Category: CategoryCollisionSwitch,
-				X:        TileSize * xTiles,
-				Y:        TileSize * yTiles,
-				W:        TileSize,
-				H:        TileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("floorSwitch"),
 				},
@@ -333,10 +333,10 @@ func BuildEntityConfigPresetFnsMap() map[string]entityConfigPresetFn {
 		"toggleObstacle": func(xTiles, yTiles float64) EntityConfig {
 			// TODO get this working again
 			return EntityConfig{
-				X: TileSize * xTiles,
-				Y: TileSize * yTiles,
-				W: TileSize,
-				H: TileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
+				W: tileSize,
+				H: tileSize,
 				Animation: AnimationConfig{
 					"default": GetSpriteSet("toggleObstacle"),
 				},

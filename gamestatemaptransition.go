@@ -18,6 +18,7 @@ func GameStateMapTransition(
 	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
 	player *Entity,
+	tileSize float64,
 ) {
 	inputSystem.DisablePlayer()
 	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
@@ -36,6 +37,7 @@ func GameStateMapTransition(
 		transitionRoomResp := calculateTransitionSlide(
 			roomTransition,
 			*connectedRooms,
+			tileSize,
 		)
 
 		*nextRoomID = transitionRoomResp.nextRoomID
@@ -47,6 +49,7 @@ func GameStateMapTransition(
 			roomsMap[*currentRoomID].MapName(),
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
+			tileSize,
 		)
 		DrawMapBackgroundImage(
 			ui.Window,
@@ -55,6 +58,7 @@ func GameStateMapTransition(
 			roomsMap[*nextRoomID].MapName(),
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
+			tileSize,
 		)
 		DrawMask(ui.Window)
 
@@ -62,8 +66,8 @@ func GameStateMapTransition(
 		player.ComponentSpatial.Rect = pixel.R(
 			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
 			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
-			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+TileSize,
-			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+TileSize,
+			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+tileSize,
+			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+tileSize,
 		)
 
 		systemsManager.Update()
@@ -94,20 +98,21 @@ type transitionRoomResponse struct {
 func calculateTransitionSlide(
 	roomTransition *RoomTransition,
 	connectedRooms ConnectedRooms,
+	tileSize float64,
 ) transitionRoomResponse {
 
 	var nextRoomID RoomID
 	inc := (roomTransition.Start - float64(roomTransition.Timer))
-	incY := inc * (MapH / TileSize)
-	incX := inc * (MapW / TileSize)
+	incY := inc * (MapH / tileSize)
+	incX := inc * (MapW / tileSize)
 	modY := 0.0
 	modYNext := 0.0
 	modX := 0.0
 	modXNext := 0.0
 	playerModX := 0.0
 	playerModY := 0.0
-	playerIncY := ((MapH / TileSize) - 1) + 7
-	playerIncX := ((MapW / TileSize) - 1) + 7
+	playerIncY := ((MapH / tileSize) - 1) + 7
+	playerIncX := ((MapW / tileSize) - 1) + 7
 	if roomTransition.Side == BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
 		modYNext = incY - MapH

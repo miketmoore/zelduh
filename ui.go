@@ -71,7 +71,9 @@ func DrawMapBackgroundImage(
 	spritesheet map[int]*pixel.Sprite,
 	mapDrawData MapDrawData,
 	name MapName,
-	modX, modY float64) {
+	modX, modY float64,
+	tileSize float64,
+) {
 
 	d := mapDrawData[name]
 	for _, spriteData := range d.Data {
@@ -81,8 +83,8 @@ func DrawMapBackgroundImage(
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+MapX+modX+TileSize/2,
-				vec.Y+MapY+modY+TileSize/2,
+				vec.X+MapX+modX+tileSize/2,
+				vec.Y+MapY+modY+tileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -108,9 +110,15 @@ func AddUIHearts(systemsManager *SystemsManager, hearts []Entity, health int) {
 	}
 }
 
-func DrawObstaclesPerMapTiles(systemsManager *SystemsManager,
+func DrawObstaclesPerMapTiles(
+	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
-	roomsMap Rooms, mapDrawData MapDrawData, roomID *RoomID, modX, modY float64) []Entity {
+	roomsMap Rooms,
+	mapDrawData MapDrawData,
+	roomID *RoomID,
+	modX, modY float64,
+	tileSize float64,
+) []Entity {
 	d := mapDrawData[roomsMap[*roomID].MapName()]
 	obstacles := []Entity{}
 	mod := 0.5
@@ -118,13 +126,13 @@ func DrawObstaclesPerMapTiles(systemsManager *SystemsManager,
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+MapX+modX+TileSize/2,
-				vec.Y+MapY+modY+TileSize/2,
+				vec.X+MapX+modX+tileSize/2,
+				vec.Y+MapY+modY+tileSize/2,
 			)
 
 			if _, ok := NonObstacleSprites[spriteData.SpriteID]; !ok {
-				x := movedVec.X/TileSize - mod
-				y := movedVec.Y/TileSize - mod
+				x := movedVec.X/tileSize - mod
+				y := movedVec.Y/tileSize - mod
 				id := systemsManager.NewEntityID()
 				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(x, y), id)
 				obstacles = append(obstacles, obstacle)

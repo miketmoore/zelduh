@@ -20,6 +20,7 @@ func GameStateGame(
 	hearts []Entity,
 	roomWarps RoomWarps,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	tileSize float64,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -31,7 +32,9 @@ func GameStateGame(
 		spritesheet,
 		mapDrawData,
 		roomsMap[*currentRoomID].MapName(),
-		0, 0)
+		0, 0,
+		tileSize,
+	)
 
 	if *shouldAddEntities {
 		*shouldAddEntities = false
@@ -40,7 +43,7 @@ func GameStateGame(
 		AddUICoin(systemsManager, entityConfigPresetFnManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, entityConfigPresetFnManager, roomsMap, mapDrawData, currentRoomID, 0, 0)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, entityConfigPresetFnManager, roomsMap, mapDrawData, currentRoomID, 0, 0, tileSize)
 		systemsManager.AddEntities(obstacles...)
 
 		for k := range roomWarps {

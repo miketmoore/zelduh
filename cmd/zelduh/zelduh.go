@@ -21,11 +21,14 @@ func run() {
 		os.Exit(0)
 	}
 
-	entityConfigPresetFnsMap := zelduh.BuildEntityConfigPresetFnsMap()
+	// TileSize defines the width and height of a tile
+	var tileSize float64 = 48
+
+	entityConfigPresetFnsMap := zelduh.BuildEntityConfigPresetFnsMap(tileSize)
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager, zelduh.TileSize)
+	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager, tileSize)
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, rooms)
 
@@ -42,7 +45,7 @@ func run() {
 	entitiesMap := zelduh.EntitiesMap{}
 
 	roomTransition := zelduh.RoomTransition{
-		Start: float64(zelduh.TileSize),
+		Start: float64(tileSize),
 	}
 
 	roomWarps := zelduh.RoomWarps{}
@@ -51,7 +54,7 @@ func run() {
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
-	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, zelduh.TileSize)
+	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, tileSize)
 
 	player := entityFactory.NewEntity("player", 6, 6)
 	bomb := entityFactory.NewEntity("bomb", 0, 0)
@@ -87,6 +90,7 @@ func run() {
 			hearts,
 			roomWarps,
 			&entityConfigPresetFnManager,
+			tileSize,
 		),
 	}
 
@@ -112,7 +116,7 @@ func run() {
 		bomb,
 	)
 
-	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, zelduh.TileSize)
+	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, tileSize)
 
 	gameStateManager := zelduh.NewGameStateManager(
 		&systemsManager,
@@ -133,6 +137,7 @@ func run() {
 		roomWarps,
 		rooms,
 		&entityConfigPresetFnManager,
+		tileSize,
 	)
 
 	for !ui.Window.Closed() {
