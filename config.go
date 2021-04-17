@@ -1,8 +1,5 @@
 package zelduh
 
-// FrameRate is used to determine which sprite to use for animations
-const FrameRate int = 5
-
 const (
 	// WinX is the x coordinate of the window
 	WinX float64 = 0

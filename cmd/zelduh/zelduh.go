@@ -22,7 +22,10 @@ func run() {
 	}
 
 	// TileSize defines the width and height of a tile
-	var tileSize float64 = 48
+	const tileSize float64 = 48
+
+	// FrameRate is used to determine which sprite to use for animations
+	const frameRate int = 5
 
 	entityConfigPresetFnsMap := zelduh.BuildEntityConfigPresetFnsMap(tileSize)
 
@@ -56,15 +59,15 @@ func run() {
 	currentState := zelduh.StateStart
 	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, tileSize)
 
-	player := entityFactory.NewEntity("player", 6, 6)
-	bomb := entityFactory.NewEntity("bomb", 0, 0)
-	explosion := entityFactory.NewEntity("explosion", 0, 0)
-	sword := entityFactory.NewEntity("sword", 0, 0)
-	arrow := entityFactory.NewEntity("arrow", 0, 0)
+	player := entityFactory.NewEntity("player", 6, 6, frameRate)
+	bomb := entityFactory.NewEntity("bomb", 0, 0, frameRate)
+	explosion := entityFactory.NewEntity("explosion", 0, 0, frameRate)
+	sword := entityFactory.NewEntity("sword", 0, 0, frameRate)
+	arrow := entityFactory.NewEntity("arrow", 0, 0, frameRate)
 	hearts := []zelduh.Entity{
-		entityFactory.NewEntity("heart", 1.5, 14),
-		entityFactory.NewEntity("heart", 2.15, 14),
-		entityFactory.NewEntity("heart", 2.80, 14),
+		entityFactory.NewEntity("heart", 1.5, 14, frameRate),
+		entityFactory.NewEntity("heart", 2.15, 14, frameRate),
+		entityFactory.NewEntity("heart", 2.80, 14, frameRate),
 	}
 
 	collisionSystem := &zelduh.CollisionSystem{
@@ -91,6 +94,7 @@ func run() {
 			roomWarps,
 			&entityConfigPresetFnManager,
 			tileSize,
+			frameRate,
 		),
 	}
 
@@ -138,6 +142,7 @@ func run() {
 		rooms,
 		&entityConfigPresetFnManager,
 		tileSize,
+		frameRate,
 	)
 
 	for !ui.Window.Closed() {

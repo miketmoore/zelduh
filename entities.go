@@ -44,17 +44,17 @@ func (e *Entity) ID() EntityID {
 }
 
 // BuildEntitiesFromConfigs builds and returns a batch of entities
-func BuildEntitiesFromConfigs(newEntityID func() EntityID, configs ...EntityConfig) []Entity {
+func BuildEntitiesFromConfigs(newEntityID func() EntityID, frameRate int, configs ...EntityConfig) []Entity {
 	batch := []Entity{}
 	for _, config := range configs {
-		entity := BuildEntityFromConfig(config, newEntityID())
+		entity := BuildEntityFromConfig(config, newEntityID(), frameRate)
 		batch = append(batch, entity)
 	}
 	return batch
 }
 
 // BuildEntityFromConfig builds an entity from a configuration
-func BuildEntityFromConfig(c EntityConfig, id EntityID) Entity {
+func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
@@ -144,7 +144,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID) Entity {
 		for key, val := range c.Animation {
 			entity.ComponentAnimation.Map[key] = &ComponentAnimationData{
 				Frames:    val,
-				FrameRate: FrameRate,
+				FrameRate: frameRate,
 			}
 		}
 	} else {

@@ -19,6 +19,7 @@ type CollisionHandler struct {
 	RoomWarps                       RoomWarps
 	EntityConfigPresetFnManager     *EntityConfigPresetFnManager
 	TileSize                        float64
+	FrameRate                       int
 }
 
 func NewCollisionHandler(
@@ -35,6 +36,7 @@ func NewCollisionHandler(
 	roomWarps RoomWarps,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
+	frameRate int,
 ) CollisionHandler {
 	return CollisionHandler{
 		SystemsManager:              systemsManager,
@@ -53,6 +55,7 @@ func NewCollisionHandler(
 		RoomWarps:                   roomWarps,
 		EntityConfigPresetFnManager: entityConfigPresetFnManager,
 		TileSize:                    tileSize,
+		FrameRate:                   frameRate,
 	}
 }
 
@@ -95,8 +98,13 @@ func dropCoin(
 	v pixel.Vec,
 	systemsManager *SystemsManager,
 	tileSize float64,
+	frameRate int,
 ) {
-	coin := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("coin")(v.X/tileSize, v.Y/tileSize), systemsManager.NewEntityID())
+	coin := BuildEntityFromConfig(
+		entityConfigPresetFnManager.GetPreset("coin")(v.X/tileSize, v.Y/tileSize),
+		systemsManager.NewEntityID(),
+		frameRate,
+	)
 	systemsManager.AddEntity(coin)
 }
 
@@ -115,7 +123,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 					Rect:   enemySpatial.Rect,
 				}
 				ch.Explosion.ComponentTemporary.OnExpiration = func() {
-					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize)
+					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
 				}
 				ch.SystemsManager.AddEntity(*ch.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
@@ -141,7 +149,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 				Rect:   enemySpatial.Rect,
 			}
 			ch.Explosion.ComponentTemporary.OnExpiration = func() {
-				dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize)
+				dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
 			}
 			ch.SystemsManager.AddEntity(*ch.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)

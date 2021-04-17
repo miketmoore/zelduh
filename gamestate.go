@@ -30,6 +30,7 @@ type GameStateManager struct {
 	Rooms                       Rooms
 	EntityConfigPresetFnManager *EntityConfigPresetFnManager
 	TileSize                    float64
+	FrameRate                   int
 }
 
 func NewGameStateManager(
@@ -52,6 +53,7 @@ func NewGameStateManager(
 	rooms Rooms,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
+	frameRate int,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:              systemsManager,
@@ -73,6 +75,7 @@ func NewGameStateManager(
 		Rooms:                       rooms,
 		EntityConfigPresetFnManager: entityConfigPresetFnManager,
 		TileSize:                    tileSize,
+		FrameRate:                   frameRate,
 	}
 }
 
@@ -97,6 +100,7 @@ func (g *GameStateManager) Update() {
 			g.RoomWarps,
 			g.EntityConfigPresetFnManager,
 			g.TileSize,
+			g.FrameRate,
 		)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState)

@@ -92,10 +92,10 @@ func DrawMapBackgroundImage(
 	}
 }
 
-func AddUICoin(systemsManager *SystemsManager, entityConfigPresetFnManager *EntityConfigPresetFnManager) {
+func AddUICoin(systemsManager *SystemsManager, entityConfigPresetFnManager *EntityConfigPresetFnManager, frameRate int) {
 	presetFn := entityConfigPresetFnManager.GetPreset("uiCoin")
 	entityConfig := presetFn(4, 14)
-	coin := BuildEntityFromConfig(entityConfig, systemsManager.NewEntityID())
+	coin := BuildEntityFromConfig(entityConfig, systemsManager.NewEntityID(), frameRate)
 	systemsManager.AddEntity(coin)
 }
 
@@ -118,6 +118,7 @@ func DrawObstaclesPerMapTiles(
 	roomID *RoomID,
 	modX, modY float64,
 	tileSize float64,
+	frameRate int,
 ) []Entity {
 	d := mapDrawData[roomsMap[*roomID].MapName()]
 	obstacles := []Entity{}
@@ -134,7 +135,7 @@ func DrawObstaclesPerMapTiles(
 				x := movedVec.X/tileSize - mod
 				y := movedVec.Y/tileSize - mod
 				id := systemsManager.NewEntityID()
-				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(x, y), id)
+				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(x, y), id, frameRate)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
