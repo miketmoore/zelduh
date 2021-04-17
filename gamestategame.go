@@ -19,6 +19,7 @@ func GameStateGame(
 	player *Entity,
 	hearts []Entity,
 	roomWarps RoomWarps,
+	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 ) {
 	inputSystem.EnablePlayer()
 
@@ -36,10 +37,10 @@ func GameStateGame(
 		*shouldAddEntities = false
 		AddUIHearts(systemsManager, hearts, player.ComponentHealth.Total)
 
-		AddUICoin(systemsManager)
+		AddUICoin(systemsManager, entityConfigPresetFnManager)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, roomsMap, mapDrawData, currentRoomID, 0, 0)
+		obstacles := DrawObstaclesPerMapTiles(systemsManager, entityConfigPresetFnManager, roomsMap, mapDrawData, currentRoomID, 0, 0)
 		systemsManager.AddEntities(obstacles...)
 
 		for k := range roomWarps {

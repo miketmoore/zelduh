@@ -91,21 +91,21 @@ var NonObstacleSprites = map[int]bool{
 
 // TODO move to zelduh cmd file since it is configuration
 // Map of RoomID to a Room configuration
-func BuildRooms() Rooms {
+func BuildRooms(entityConfigPresetFnManager *EntityConfigPresetFnManager) Rooms {
 	return Rooms{
 		1: NewRoom("overworldFourWallsDoorBottomRight",
-			GetPreset("puzzleBox")(5, 5),
-			GetPreset("floorSwitch")(5, 6),
-			GetPreset("toggleObstacle")(10, 7),
+			entityConfigPresetFnManager.GetPreset("puzzleBox")(5, 5),
+			entityConfigPresetFnManager.GetPreset("floorSwitch")(5, 6),
+			entityConfigPresetFnManager.GetPreset("toggleObstacle")(10, 7),
 		),
 		2: NewRoom("overworldFourWallsDoorTopBottom",
-			GetPreset("skull")(5, 5),
-			GetPreset("skeleton")(11, 9),
-			GetPreset("spinner")(7, 9),
-			GetPreset("eyeburrower")(8, 9),
+			entityConfigPresetFnManager.GetPreset("skull")(5, 5),
+			entityConfigPresetFnManager.GetPreset("skeleton")(11, 9),
+			entityConfigPresetFnManager.GetPreset("spinner")(7, 9),
+			entityConfigPresetFnManager.GetPreset("eyeburrower")(8, 9),
 		),
 		3: NewRoom("overworldFourWallsDoorRightTopBottom",
-			WarpStone(3, 7, 6, 5),
+			WarpStone(entityConfigPresetFnManager, 3, 7, 6, 5),
 		),
 		5: NewRoom("rockWithCaveEntrance",
 			EntityConfig{

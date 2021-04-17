@@ -17,6 +17,7 @@ type CollisionHandler struct {
 	Player, Sword, Explosion, Arrow *Entity
 	Hearts                          []Entity
 	RoomWarps                       RoomWarps
+	EntityConfigPresetFnManager     *EntityConfigPresetFnManager
 }
 
 func NewCollisionHandler(
@@ -31,22 +32,24 @@ func NewCollisionHandler(
 	player, sword, explosion, arrow *Entity,
 	hearts []Entity,
 	roomWarps RoomWarps,
+	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 ) CollisionHandler {
 	return CollisionHandler{
-		SystemsManager:    systemsManager,
-		SpatialSystem:     spatialSystem,
-		HealthSystem:      healthSystem,
-		ShouldAddEntities: shouldAddEntities,
-		NextRoomID:        nextRoomID,
-		CurrentState:      currentState,
-		RoomTransition:    roomTransition,
-		EntitiesMap:       entitiesMap,
-		Player:            player,
-		Sword:             sword,
-		Explosion:         explosion,
-		Arrow:             arrow,
-		Hearts:            hearts,
-		RoomWarps:         roomWarps,
+		SystemsManager:              systemsManager,
+		SpatialSystem:               spatialSystem,
+		HealthSystem:                healthSystem,
+		ShouldAddEntities:           shouldAddEntities,
+		NextRoomID:                  nextRoomID,
+		CurrentState:                currentState,
+		RoomTransition:              roomTransition,
+		EntitiesMap:                 entitiesMap,
+		Player:                      player,
+		Sword:                       sword,
+		Explosion:                   explosion,
+		Arrow:                       arrow,
+		Hearts:                      hearts,
+		RoomWarps:                   roomWarps,
+		EntityConfigPresetFnManager: entityConfigPresetFnManager,
 	}
 }
 
@@ -84,8 +87,8 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	}
 }
 
-func dropCoin(v pixel.Vec, systemsManager *SystemsManager) {
-	coin := BuildEntityFromConfig(GetPreset("coin")(v.X/TileSize, v.Y/TileSize), systemsManager.NewEntityID())
+func dropCoin(entityConfigPresetFnManager *EntityConfigPresetFnManager, v pixel.Vec, systemsManager *SystemsManager) {
+	coin := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("coin")(v.X/TileSize, v.Y/TileSize), systemsManager.NewEntityID())
 	systemsManager.AddEntity(coin)
 }
 
@@ -104,7 +107,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 					Rect:   enemySpatial.Rect,
 				}
 				ch.Explosion.ComponentTemporary.OnExpiration = func() {
-					dropCoin(ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
 				}
 				ch.SystemsManager.AddEntity(*ch.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
@@ -130,7 +133,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 				Rect:   enemySpatial.Rect,
 			}
 			ch.Explosion.ComponentTemporary.OnExpiration = func() {
-				dropCoin(ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
+				dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager)
 			}
 			ch.SystemsManager.AddEntity(*ch.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)

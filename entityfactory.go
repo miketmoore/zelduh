@@ -1,19 +1,22 @@
 package zelduh
 
 type EntityFactory struct {
-	systemsManager *SystemsManager
+	systemsManager              *SystemsManager
+	entityConfigPresetFnManager *EntityConfigPresetFnManager
 }
 
 func NewEntityFactory(
 	systemsManager *SystemsManager,
+	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 ) EntityFactory {
 	return EntityFactory{
-		systemsManager: systemsManager,
+		systemsManager:              systemsManager,
+		entityConfigPresetFnManager: entityConfigPresetFnManager,
 	}
 }
 
 func (ef *EntityFactory) NewEntity(presetName string, xTiles, yTiles float64) Entity {
-	presetFn := GetPreset(presetName)
+	presetFn := ef.entityConfigPresetFnManager.GetPreset(presetName)
 	entityConfig := presetFn(xTiles, yTiles)
 	entityID := ef.systemsManager.NewEntityID()
 	return BuildEntityFromConfig(

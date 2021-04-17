@@ -21,13 +21,17 @@ func run() {
 		os.Exit(0)
 	}
 
-	rooms := zelduh.BuildRooms()
+	entityConfigPresetFnsMap := zelduh.BuildEntityConfigPresetFnsMap()
+
+	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
+
+	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager)
 
 	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, rooms)
 
 	systemsManager := zelduh.NewSystemsManager()
 
-	entityFactory := zelduh.NewEntityFactory(&systemsManager)
+	entityFactory := zelduh.NewEntityFactory(&systemsManager, &entityConfigPresetFnManager)
 
 	spatialSystem := zelduh.SpatialSystem{
 		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
@@ -82,6 +86,7 @@ func run() {
 			&arrow,
 			hearts,
 			roomWarps,
+			&entityConfigPresetFnManager,
 		),
 	}
 
@@ -127,6 +132,7 @@ func run() {
 		hearts,
 		roomWarps,
 		rooms,
+		&entityConfigPresetFnManager,
 	)
 
 	for !ui.Window.Closed() {
