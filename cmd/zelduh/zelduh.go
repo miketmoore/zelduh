@@ -33,7 +33,18 @@ func run() {
 
 	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager, tileSize)
 
-	zelduh.BuildMapRoomIDToRoom(zelduh.Overworld, rooms)
+	zelduh.BuildMapRoomIDToRoom(
+		// Overworld is a multi-dimensional array representing the overworld
+		// Each room ID should be unique
+		[][]zelduh.RoomID{
+			{1, 10},
+			{2, 0, 0, 8},
+			{3, 5, 6, 7},
+			{9},
+			{11},
+		},
+		rooms,
+	)
 
 	systemsManager := zelduh.NewSystemsManager()
 
@@ -57,7 +68,7 @@ func run() {
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
-	spritesheet := zelduh.LoadAndBuildSpritesheet(zelduh.SpritesheetPath, tileSize)
+	spritesheet := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
 
 	player := entityFactory.NewEntity("player", 6, 6, frameRate)
 	bomb := entityFactory.NewEntity("bomb", 0, 0, frameRate)
@@ -120,7 +131,47 @@ func run() {
 		bomb,
 	)
 
-	mapDrawData := zelduh.BuildMapDrawData(zelduh.TilemapDir, zelduh.TilemapFiles, tileSize)
+	mapDrawData := zelduh.BuildMapDrawData(
+		"assets/tilemaps/",
+		[]string{
+			"overworldOpen",
+			"overworldOpenCircleOfTrees",
+			"overworldFourWallsDoorBottom",
+			"overworldFourWallsDoorLeftTop",
+			"overworldFourWallsDoorRightTop",
+			"overworldFourWallsDoorTopBottom",
+			"overworldFourWallsDoorRightTopBottom",
+			"overworldFourWallsDoorBottomRight",
+			"overworldFourWallsDoorTop",
+			"overworldFourWallsDoorRight",
+			"overworldFourWallsDoorLeft",
+			"overworldTreeClusterTopRight",
+			"overworldFourWallsClusterTrees",
+			"overworldFourWallsDoorsAllSides",
+			"rockPatternTest",
+			"rockPathOpenLeft",
+			"rockWithCaveEntrance",
+			"rockPathLeftRightEntrance",
+			"test",
+			"dungeonFourDoors",
+		},
+		tileSize,
+	)
+
+	// NonObstacleSprites defines which sprites are not obstacles
+	var nonObstacleSprites = map[int]bool{
+		8:   true,
+		9:   true,
+		24:  true,
+		37:  true,
+		38:  true,
+		52:  true,
+		53:  true,
+		66:  true,
+		86:  true,
+		136: true,
+		137: true,
+	}
 
 	gameStateManager := zelduh.NewGameStateManager(
 		&systemsManager,
@@ -143,6 +194,7 @@ func run() {
 		&entityConfigPresetFnManager,
 		tileSize,
 		frameRate,
+		nonObstacleSprites,
 	)
 
 	for !ui.Window.Closed() {

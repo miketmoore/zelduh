@@ -31,6 +31,7 @@ type GameStateManager struct {
 	EntityConfigPresetFnManager *EntityConfigPresetFnManager
 	TileSize                    float64
 	FrameRate                   int
+	NonObstacleSprites          map[int]bool
 }
 
 func NewGameStateManager(
@@ -54,6 +55,7 @@ func NewGameStateManager(
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
 	frameRate int,
+	nonObstacleSprites map[int]bool,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:              systemsManager,
@@ -76,6 +78,7 @@ func NewGameStateManager(
 		EntityConfigPresetFnManager: entityConfigPresetFnManager,
 		TileSize:                    tileSize,
 		FrameRate:                   frameRate,
+		NonObstacleSprites:          nonObstacleSprites,
 	}
 }
 
@@ -101,6 +104,7 @@ func (g *GameStateManager) Update() {
 			g.EntityConfigPresetFnManager,
 			g.TileSize,
 			g.FrameRate,
+			g.NonObstacleSprites,
 		)
 	case StatePause:
 		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState)

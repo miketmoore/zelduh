@@ -119,6 +119,7 @@ func DrawObstaclesPerMapTiles(
 	modX, modY float64,
 	tileSize float64,
 	frameRate int,
+	nonObstacleSprites map[int]bool,
 ) []Entity {
 	d := mapDrawData[roomsMap[*roomID].MapName()]
 	obstacles := []Entity{}
@@ -131,7 +132,7 @@ func DrawObstaclesPerMapTiles(
 				vec.Y+MapY+modY+tileSize/2,
 			)
 
-			if _, ok := NonObstacleSprites[spriteData.SpriteID]; !ok {
+			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
 				x := movedVec.X/tileSize - mod
 				y := movedVec.Y/tileSize - mod
 				id := systemsManager.NewEntityID()
