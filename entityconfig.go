@@ -51,3 +51,23 @@ type EntityConfig struct {
 	Dash                                                          *DashConfig
 	Movement                                                      *MovementConfig
 }
+
+type EntityConfigPresetFn = func(xTiles, yTiles float64) EntityConfig
+
+// EntityConfigPresetFnManager contains a map of strings (preset names) to EntityConfigPresetFn
+// it is used to get an EntityConfig preset
+type EntityConfigPresetFnManager struct {
+	entityConfigPresetFns map[string]EntityConfigPresetFn
+}
+
+// NewEntityConfigPresetFnManager returns a new EntityConfigPresetFnManager
+func NewEntityConfigPresetFnManager(entityConfigPresetFns map[string]EntityConfigPresetFn) EntityConfigPresetFnManager {
+	return EntityConfigPresetFnManager{
+		entityConfigPresetFns: entityConfigPresetFns,
+	}
+}
+
+// GetPreset gets an entity config preset function by key
+func (m *EntityConfigPresetFnManager) GetPreset(presetName string) EntityConfigPresetFn {
+	return m.entityConfigPresetFns[presetName]
+}

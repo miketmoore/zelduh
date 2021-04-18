@@ -10,6 +10,7 @@ import (
 	"github.com/miketmoore/zelduh"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -27,7 +28,7 @@ func run() {
 	// FrameRate is used to determine which sprite to use for animations
 	const frameRate int = 5
 
-	entityConfigPresetFnsMap := zelduh.BuildEntityConfigPresetFnsMap(tileSize)
+	entityConfigPresetFnsMap := BuildEntityConfigPresetFnsMap(tileSize)
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
@@ -314,4 +315,327 @@ func WarpStone(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, 
 	e.WarpToRoomID = 6
 	e.Hitbox.Radius = 5
 	return e
+}
+
+// TODO move this to a higher level configuration location
+func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityConfigPresetFn {
+	return map[string]zelduh.EntityConfigPresetFn{
+		"arrow": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryArrow,
+				Movement: &zelduh.MovementConfig{
+					Direction: zelduh.DirectionDown,
+					Speed:     0.0,
+				},
+				W: tileSize,
+				H: tileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"up":    zelduh.GetSpriteSet("arrowUp"),
+					"right": zelduh.GetSpriteSet("arrowRight"),
+					"down":  zelduh.GetSpriteSet("arrowDown"),
+					"left":  zelduh.GetSpriteSet("arrowLeft"),
+				},
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 5,
+				},
+				Ignore: true,
+			}
+		},
+		"bomb": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryBomb,
+				Movement: &zelduh.MovementConfig{
+					Direction: zelduh.DirectionDown,
+					Speed:     0.0,
+				},
+				W: tileSize,
+				H: tileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("bomb"),
+				},
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 5,
+				},
+				Ignore: true,
+			}
+		},
+		"coin": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryCoin,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("coin"),
+				},
+			}
+		},
+		"explosion": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category:   zelduh.CategoryExplosion,
+				Expiration: 12,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("explosion"),
+				},
+			}
+		},
+		"obstacle": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryObstacle,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+			}
+		},
+		"player": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryPlayer,
+				Health:   3,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				Hitbox: &zelduh.HitboxConfig{
+					Box:                  imdraw.New(nil),
+					Radius:               15,
+					CollisionWithRectMod: 5,
+				},
+				Movement: &zelduh.MovementConfig{
+					Direction: zelduh.DirectionDown,
+					MaxSpeed:  7.0,
+					Speed:     0.0,
+				},
+				Coins: true,
+				Dash: &zelduh.DashConfig{
+					Charge:    0,
+					MaxCharge: 50,
+					SpeedMod:  7,
+				},
+				Animation: zelduh.AnimationConfig{
+					"up":               zelduh.GetSpriteSet("playerUp"),
+					"right":            zelduh.GetSpriteSet("playerRight"),
+					"down":             zelduh.GetSpriteSet("playerDown"),
+					"left":             zelduh.GetSpriteSet("playerLeft"),
+					"swordAttackUp":    zelduh.GetSpriteSet("playerSwordUp"),
+					"swordAttackRight": zelduh.GetSpriteSet("playerSwordRight"),
+					"swordAttackLeft":  zelduh.GetSpriteSet("playerSwordLeft"),
+					"swordAttackDown":  zelduh.GetSpriteSet("playerSwordDown"),
+				},
+			}
+		},
+		"sword": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategorySword,
+				Movement: &zelduh.MovementConfig{
+					Direction: zelduh.DirectionDown,
+					Speed:     0.0,
+				},
+				W: tileSize,
+				H: tileSize,
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"up":    zelduh.GetSpriteSet("swordUp"),
+					"right": zelduh.GetSpriteSet("swordRight"),
+					"down":  zelduh.GetSpriteSet("swordDown"),
+					"left":  zelduh.GetSpriteSet("swordLeft"),
+				},
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 20,
+				},
+				Ignore: true,
+			}
+		},
+		"eyeburrower": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryEnemy,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("eyeburrower"),
+				},
+				Health: 2,
+				Hitbox: &zelduh.HitboxConfig{
+					Box:    imdraw.New(nil),
+					Radius: 20,
+				},
+				Movement: &zelduh.MovementConfig{
+					Direction:    zelduh.DirectionDown,
+					Speed:        1.0,
+					MaxSpeed:     1.0,
+					HitSpeed:     10.0,
+					HitBackMoves: 10,
+					MaxMoves:     100,
+					PatternName:  "random",
+				},
+			}
+		},
+		"heart": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryHeart,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				Hitbox: &zelduh.HitboxConfig{
+					Box: imdraw.New(nil),
+				},
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("heart"),
+				},
+			}
+
+		},
+		"skeleton": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryEnemy,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("skeleton"),
+				},
+				Health: 2,
+				Hitbox: &zelduh.HitboxConfig{
+					Box:    imdraw.New(nil),
+					Radius: 20,
+				},
+				Movement: &zelduh.MovementConfig{
+					Direction:    zelduh.DirectionDown,
+					Speed:        1.0,
+					MaxSpeed:     1.0,
+					HitSpeed:     10.0,
+					HitBackMoves: 10,
+					MaxMoves:     100,
+					PatternName:  "random",
+				},
+			}
+		},
+		"skull": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryEnemy,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("skull"),
+				},
+				Health: 2,
+				Hitbox: &zelduh.HitboxConfig{
+					Box:    imdraw.New(nil),
+					Radius: 20,
+				},
+				Movement: &zelduh.MovementConfig{
+					Direction:    zelduh.DirectionDown,
+					Speed:        1.0,
+					MaxSpeed:     1.0,
+					HitSpeed:     10.0,
+					HitBackMoves: 10,
+					MaxMoves:     100,
+					PatternName:  "random",
+				},
+			}
+		},
+		"spinner": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryEnemy,
+				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("spinner"),
+				},
+				Invincible: true,
+				Hitbox: &zelduh.HitboxConfig{
+					Box:    imdraw.New(nil),
+					Radius: 20,
+				},
+				Movement: &zelduh.MovementConfig{
+					Direction:    zelduh.DirectionRight,
+					Speed:        1.0,
+					MaxSpeed:     1.0,
+					HitSpeed:     10.0,
+					HitBackMoves: 10,
+					MaxMoves:     100,
+					PatternName:  "left-right",
+				},
+			}
+		},
+		"uiCoin": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryHeart,
+				W:        tileSize,
+				H:        tileSize,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				Hitbox: &zelduh.HitboxConfig{
+					Box: imdraw.New(nil),
+				},
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("uiCoin"),
+				},
+			}
+		},
+		"warpStone": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryWarp,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				Hitbox: &zelduh.HitboxConfig{
+					Box:    imdraw.New(nil),
+					Radius: 20,
+				},
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("warpStone"),
+				},
+			}
+		},
+		"puzzleBox": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryMovableObstacle,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("puzzleBox"),
+				},
+				Movement: &zelduh.MovementConfig{
+					Speed:    1.0,
+					MaxMoves: int(tileSize) / 2,
+					MaxSpeed: 2.0,
+				},
+			}
+		},
+		"floorSwitch": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category: zelduh.CategoryCollisionSwitch,
+				X:        tileSize * xTiles,
+				Y:        tileSize * yTiles,
+				W:        tileSize,
+				H:        tileSize,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("floorSwitch"),
+				},
+				Toggleable: true,
+			}
+		},
+		// this is an impassable obstacle that can be toggled "remotely"
+		// it has two visual states that coincide with each toggle state
+		"toggleObstacle": func(xTiles, yTiles float64) zelduh.EntityConfig {
+			// TODO get this working again
+			return zelduh.EntityConfig{
+				X: tileSize * xTiles,
+				Y: tileSize * yTiles,
+				W: tileSize,
+				H: tileSize,
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("toggleObstacle"),
+				},
+				// Impassable: true,
+				Toggleable: true,
+			}
+		},
+	}
 }
