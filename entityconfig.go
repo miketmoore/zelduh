@@ -34,11 +34,20 @@ type DashConfig struct {
 	SpeedMod          float64
 }
 
+type Coordinates struct {
+	X, Y float64
+}
+
+type Dimensions struct {
+	Width, Height float64
+}
+
 // EntityConfig is used to simplify building entities
 type EntityConfig struct {
 	Category                                                      EntityCategory
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
-	X, Y, W, H                                                    float64
+	Coordinates                                                   Coordinates
+	Dimensions                                                    Dimensions
 	SpriteFrames                                                  []int
 	WarpToRoomID                                                  RoomID
 	PatternName                                                   string

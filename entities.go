@@ -55,13 +55,20 @@ func BuildEntitiesFromConfigs(newEntityID func() EntityID, frameRate int, config
 
 // BuildEntityFromConfig builds an entity from a configuration
 func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
+
+	width := c.Dimensions.Width
+	height := c.Dimensions.Height
+
+	x := c.Coordinates.X
+	y := c.Coordinates.Y
+
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
 		ComponentSpatial: &ComponentSpatial{
-			Width:  c.W,
-			Height: c.H,
-			Rect:   pixel.R(c.X, c.Y, c.X+c.W, c.Y+c.H),
+			Width:  width,
+			Height: height,
+			Rect:   pixel.R(x, y, x+width, y+height),
 			Shape:  imdraw.New(nil),
 			HitBox: imdraw.New(nil),
 		},

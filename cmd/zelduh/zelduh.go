@@ -236,6 +236,25 @@ func main() {
 // TODO move to zelduh cmd file since it is configuration
 // Map of RoomID to a Room configuration
 func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, tileSize float64) zelduh.Rooms {
+
+	dimensions := zelduh.Dimensions{
+		Width:  tileSize,
+		Height: tileSize,
+	}
+
+	buildWarpStone := func(
+		entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
+		coordinates zelduh.Coordinates,
+		WarpToRoomID,
+		HitBoxRadius float64,
+	) zelduh.EntityConfig {
+		presetFn := entityConfigPresetFnManager.GetPreset("warpStone")
+		e := presetFn(coordinates.X, coordinates.Y)
+		e.WarpToRoomID = 6
+		e.Hitbox.Radius = 5
+		return e
+	}
+
 	return zelduh.Rooms{
 		1: zelduh.NewRoom("overworldFourWallsDoorBottomRight",
 			entityConfigPresetFnManager.GetPreset("puzzleBox")(5, 5),
@@ -249,16 +268,17 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 			entityConfigPresetFnManager.GetPreset("eyeburrower")(8, 9),
 		),
 		3: zelduh.NewRoom("overworldFourWallsDoorRightTopBottom",
-			WarpStone(entityConfigPresetFnManager, 3, 7, 6, 5),
+			buildWarpStone(entityConfigPresetFnManager, zelduh.Coordinates{X: 3, Y: 7}, 6, 5),
 		),
 		5: zelduh.NewRoom("rockWithCaveEntrance",
 			zelduh.EntityConfig{
 				Category:     zelduh.CategoryWarp,
 				WarpToRoomID: 11,
-				W:            tileSize,
-				H:            tileSize,
-				X:            (tileSize * 7) + tileSize/2,
-				Y:            (tileSize * 9) + tileSize/2,
+				Dimensions:   dimensions,
+				Coordinates: zelduh.Coordinates{
+					X: (tileSize * 7) + tileSize/2,
+					Y: (tileSize * 9) + tileSize/2,
+				},
 				Hitbox: &zelduh.HitboxConfig{
 					Radius: 30,
 				},
@@ -266,10 +286,11 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 			zelduh.EntityConfig{
 				Category:     zelduh.CategoryWarp,
 				WarpToRoomID: 11,
-				W:            tileSize,
-				H:            tileSize,
-				X:            (tileSize * 8) + tileSize/2,
-				Y:            (tileSize * 9) + tileSize/2,
+				Dimensions:   dimensions,
+				Coordinates: zelduh.Coordinates{
+					X: (tileSize * 8) + tileSize/2,
+					Y: (tileSize * 9) + tileSize/2,
+				},
 				Hitbox: &zelduh.HitboxConfig{
 					Radius: 30,
 				},
@@ -285,10 +306,11 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 			zelduh.EntityConfig{
 				Category:     zelduh.CategoryWarp,
 				WarpToRoomID: 5,
-				W:            tileSize,
-				H:            tileSize,
-				X:            (tileSize * 6) + tileSize + (tileSize / 2.5),
-				Y:            (tileSize * 1) + tileSize + (tileSize / 2.5),
+				Dimensions:   dimensions,
+				Coordinates: zelduh.Coordinates{
+					X: (tileSize * 6) + tileSize + (tileSize / 2.5),
+					Y: (tileSize * 1) + tileSize + (tileSize / 2.5),
+				},
 				Hitbox: &zelduh.HitboxConfig{
 					Radius: 15,
 				},
@@ -296,10 +318,11 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 			zelduh.EntityConfig{
 				Category:     zelduh.CategoryWarp,
 				WarpToRoomID: 5,
-				W:            tileSize,
-				H:            tileSize,
-				X:            (tileSize * 7) + tileSize + (tileSize / 2.5),
-				Y:            (tileSize * 1) + tileSize + (tileSize / 2.5),
+				Dimensions:   dimensions,
+				Coordinates: zelduh.Coordinates{
+					X: (tileSize * 7) + tileSize + (tileSize / 2.5),
+					Y: (tileSize * 1) + tileSize + (tileSize / 2.5),
+				},
 				Hitbox: &zelduh.HitboxConfig{
 					Radius: 15,
 				},
@@ -308,17 +331,21 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 	}
 }
 
-// WarpStone returns an entity config for a warp stone
-func WarpStone(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, X, Y, WarpToRoomID, HitBoxRadius float64) zelduh.EntityConfig {
-	presetFn := entityConfigPresetFnManager.GetPreset("warpStone")
-	e := presetFn(X, Y)
-	e.WarpToRoomID = 6
-	e.Hitbox.Radius = 5
-	return e
-}
-
 // TODO move this to a higher level configuration location
 func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityConfigPresetFn {
+
+	dimensions := zelduh.Dimensions{
+		Width:  tileSize,
+		Height: tileSize,
+	}
+
+	buildCoordinates := func(xTiles, yTiles float64) zelduh.Coordinates {
+		return zelduh.Coordinates{
+			X: tileSize * xTiles,
+			Y: tileSize * yTiles,
+		}
+	}
+
 	return map[string]zelduh.EntityConfigPresetFn{
 		"arrow": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
@@ -327,10 +354,8 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 					Direction: zelduh.DirectionDown,
 					Speed:     0.0,
 				},
-				W: tileSize,
-				H: tileSize,
-				X: tileSize * xTiles,
-				Y: tileSize * yTiles,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"up":    zelduh.GetSpriteSet("arrowUp"),
 					"right": zelduh.GetSpriteSet("arrowRight"),
@@ -350,10 +375,8 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 					Direction: zelduh.DirectionDown,
 					Speed:     0.0,
 				},
-				W: tileSize,
-				H: tileSize,
-				X: tileSize * xTiles,
-				Y: tileSize * yTiles,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("bomb"),
 				},
@@ -365,11 +388,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"coin": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryCoin,
-				W:        tileSize,
-				H:        tileSize,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
+				Category:    zelduh.CategoryCoin,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("coin"),
 				},
@@ -386,21 +407,17 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"obstacle": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryObstacle,
-				W:        tileSize,
-				H:        tileSize,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
+				Category:    zelduh.CategoryObstacle,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 			}
 		},
 		"player": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryPlayer,
-				Health:   3,
-				W:        tileSize,
-				H:        tileSize,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
+				Category:    zelduh.CategoryPlayer,
+				Health:      3,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Hitbox: &zelduh.HitboxConfig{
 					Box:                  imdraw.New(nil),
 					Radius:               15,
@@ -436,10 +453,8 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 					Direction: zelduh.DirectionDown,
 					Speed:     0.0,
 				},
-				W: tileSize,
-				H: tileSize,
-				X: tileSize * xTiles,
-				Y: tileSize * yTiles,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"up":    zelduh.GetSpriteSet("swordUp"),
 					"right": zelduh.GetSpriteSet("swordRight"),
@@ -454,8 +469,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"eyeburrower": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryEnemy,
-				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Category:    zelduh.CategoryEnemy,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("eyeburrower"),
 				},
@@ -477,11 +493,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"heart": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryHeart,
-				W:        tileSize,
-				H:        tileSize,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
+				Category:    zelduh.CategoryHeart,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Hitbox: &zelduh.HitboxConfig{
 					Box: imdraw.New(nil),
 				},
@@ -493,8 +507,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"skeleton": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryEnemy,
-				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Category:    zelduh.CategoryEnemy,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("skeleton"),
 				},
@@ -516,8 +531,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"skull": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryEnemy,
-				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Category:    zelduh.CategoryEnemy,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("skull"),
 				},
@@ -539,8 +555,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"spinner": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryEnemy,
-				W:        tileSize, H: tileSize, X: tileSize * xTiles, Y: tileSize * yTiles,
+				Category:    zelduh.CategoryEnemy,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("spinner"),
 				},
@@ -562,11 +579,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"uiCoin": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryHeart,
-				W:        tileSize,
-				H:        tileSize,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
+				Category:    zelduh.CategoryHeart,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(xTiles, yTiles),
 				Hitbox: &zelduh.HitboxConfig{
 					Box: imdraw.New(nil),
 				},
@@ -577,11 +592,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"warpStone": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryWarp,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
-				W:        tileSize,
-				H:        tileSize,
+				Category:    zelduh.CategoryWarp,
+				Coordinates: buildCoordinates(xTiles, yTiles),
+				Dimensions:  dimensions,
 				Hitbox: &zelduh.HitboxConfig{
 					Box:    imdraw.New(nil),
 					Radius: 20,
@@ -593,11 +606,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"puzzleBox": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryMovableObstacle,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
-				W:        tileSize,
-				H:        tileSize,
+				Category:    zelduh.CategoryMovableObstacle,
+				Coordinates: buildCoordinates(xTiles, yTiles),
+				Dimensions:  dimensions,
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("puzzleBox"),
 				},
@@ -610,11 +621,9 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		"floorSwitch": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
-				Category: zelduh.CategoryCollisionSwitch,
-				X:        tileSize * xTiles,
-				Y:        tileSize * yTiles,
-				W:        tileSize,
-				H:        tileSize,
+				Category:    zelduh.CategoryCollisionSwitch,
+				Coordinates: buildCoordinates(xTiles, yTiles),
+				Dimensions:  dimensions,
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("floorSwitch"),
 				},
@@ -626,10 +635,8 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		"toggleObstacle": func(xTiles, yTiles float64) zelduh.EntityConfig {
 			// TODO get this working again
 			return zelduh.EntityConfig{
-				X: tileSize * xTiles,
-				Y: tileSize * yTiles,
-				W: tileSize,
-				H: tileSize,
+				Coordinates: buildCoordinates(xTiles, yTiles),
+				Dimensions:  dimensions,
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("toggleObstacle"),
 				},
