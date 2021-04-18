@@ -100,8 +100,12 @@ func dropCoin(
 	tileSize float64,
 	frameRate int,
 ) {
+	coordinates := Coordinates{
+		X: v.X / tileSize,
+		Y: v.Y / tileSize,
+	}
 	coin := BuildEntityFromConfig(
-		entityConfigPresetFnManager.GetPreset("coin")(v.X/tileSize, v.Y/tileSize),
+		entityConfigPresetFnManager.GetPreset("coin")(coordinates),
 		systemsManager.NewEntityID(),
 		frameRate,
 	)

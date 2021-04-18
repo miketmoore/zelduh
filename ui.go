@@ -95,7 +95,7 @@ func DrawMapBackgroundImage(
 
 func AddUICoin(systemsManager *SystemsManager, entityConfigPresetFnManager *EntityConfigPresetFnManager, frameRate int) {
 	presetFn := entityConfigPresetFnManager.GetPreset("uiCoin")
-	entityConfig := presetFn(4, 14)
+	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
 	coin := BuildEntityFromConfig(entityConfig, systemsManager.NewEntityID(), frameRate)
 	systemsManager.AddEntity(coin)
 }
@@ -135,10 +135,12 @@ func DrawObstaclesPerMapTiles(
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
-				x := movedVec.X/tileSize - mod
-				y := movedVec.Y/tileSize - mod
+				coordinates := Coordinates{
+					X: movedVec.X/tileSize - mod,
+					Y: movedVec.Y/tileSize - mod,
+				}
 				id := systemsManager.NewEntityID()
-				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(x, y), id, frameRate)
+				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(coordinates), id, frameRate)
 				obstacles = append(obstacles, obstacle)
 			}
 		}

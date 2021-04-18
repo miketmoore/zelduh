@@ -15,9 +15,9 @@ func NewEntityFactory(
 	}
 }
 
-func (ef *EntityFactory) NewEntity(presetName string, xTiles, yTiles float64, frameRate int) Entity {
+func (ef *EntityFactory) NewEntity(presetName string, coordinates Coordinates, frameRate int) Entity {
 	presetFn := ef.entityConfigPresetFnManager.GetPreset(presetName)
-	entityConfig := presetFn(xTiles, yTiles)
+	entityConfig := presetFn(coordinates)
 	entityID := ef.systemsManager.NewEntityID()
 	return BuildEntityFromConfig(
 		entityConfig,

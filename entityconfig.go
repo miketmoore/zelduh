@@ -61,7 +61,7 @@ type EntityConfig struct {
 	Movement                                                      *MovementConfig
 }
 
-type EntityConfigPresetFn = func(xTiles, yTiles float64) EntityConfig
+type EntityConfigPresetFn = func(coordinates Coordinates) EntityConfig
 
 // EntityConfigPresetFnManager contains a map of strings (preset names) to EntityConfigPresetFn
 // it is used to get an EntityConfig preset
