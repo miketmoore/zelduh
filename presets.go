@@ -346,12 +346,3 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]entityConfigPres
 		},
 	}
 }
-
-// WarpStone returns an entity config for a warp stone
-func WarpStone(entityConfigPresetFnManager *EntityConfigPresetFnManager, X, Y, WarpToRoomID, HitBoxRadius float64) EntityConfig {
-	presetFn := entityConfigPresetFnManager.GetPreset("warpStone")
-	e := presetFn(X, Y)
-	e.WarpToRoomID = 6
-	e.Hitbox.Radius = 5
-	return e
-}

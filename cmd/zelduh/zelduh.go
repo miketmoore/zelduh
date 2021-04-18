@@ -31,7 +31,7 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	rooms := zelduh.BuildRooms(&entityConfigPresetFnManager, tileSize)
+	rooms := BuildRooms(&entityConfigPresetFnManager, tileSize)
 
 	zelduh.BuildMapRoomIDToRoom(
 		// Overworld is a multi-dimensional array representing the overworld
@@ -230,4 +230,88 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+// TODO move to zelduh cmd file since it is configuration
+// Map of RoomID to a Room configuration
+func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, tileSize float64) zelduh.Rooms {
+	return zelduh.Rooms{
+		1: zelduh.NewRoom("overworldFourWallsDoorBottomRight",
+			entityConfigPresetFnManager.GetPreset("puzzleBox")(5, 5),
+			entityConfigPresetFnManager.GetPreset("floorSwitch")(5, 6),
+			entityConfigPresetFnManager.GetPreset("toggleObstacle")(10, 7),
+		),
+		2: zelduh.NewRoom("overworldFourWallsDoorTopBottom",
+			entityConfigPresetFnManager.GetPreset("skull")(5, 5),
+			entityConfigPresetFnManager.GetPreset("skeleton")(11, 9),
+			entityConfigPresetFnManager.GetPreset("spinner")(7, 9),
+			entityConfigPresetFnManager.GetPreset("eyeburrower")(8, 9),
+		),
+		3: zelduh.NewRoom("overworldFourWallsDoorRightTopBottom",
+			WarpStone(entityConfigPresetFnManager, 3, 7, 6, 5),
+		),
+		5: zelduh.NewRoom("rockWithCaveEntrance",
+			zelduh.EntityConfig{
+				Category:     zelduh.CategoryWarp,
+				WarpToRoomID: 11,
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 7) + tileSize/2,
+				Y:            (tileSize * 9) + tileSize/2,
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 30,
+				},
+			},
+			zelduh.EntityConfig{
+				Category:     zelduh.CategoryWarp,
+				WarpToRoomID: 11,
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 8) + tileSize/2,
+				Y:            (tileSize * 9) + tileSize/2,
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 30,
+				},
+			},
+		),
+		6:  zelduh.NewRoom("rockPathLeftRightEntrance"),
+		7:  zelduh.NewRoom("overworldFourWallsDoorLeftTop"),
+		8:  zelduh.NewRoom("overworldFourWallsDoorBottom"),
+		9:  zelduh.NewRoom("overworldFourWallsDoorTop"),
+		10: zelduh.NewRoom("overworldFourWallsDoorLeft"),
+		11: zelduh.NewRoom("dungeonFourDoors",
+			// South door of cave - warp to cave entrance
+			zelduh.EntityConfig{
+				Category:     zelduh.CategoryWarp,
+				WarpToRoomID: 5,
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 6) + tileSize + (tileSize / 2.5),
+				Y:            (tileSize * 1) + tileSize + (tileSize / 2.5),
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 15,
+				},
+			},
+			zelduh.EntityConfig{
+				Category:     zelduh.CategoryWarp,
+				WarpToRoomID: 5,
+				W:            tileSize,
+				H:            tileSize,
+				X:            (tileSize * 7) + tileSize + (tileSize / 2.5),
+				Y:            (tileSize * 1) + tileSize + (tileSize / 2.5),
+				Hitbox: &zelduh.HitboxConfig{
+					Radius: 15,
+				},
+			},
+		),
+	}
+}
+
+// WarpStone returns an entity config for a warp stone
+func WarpStone(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, X, Y, WarpToRoomID, HitBoxRadius float64) zelduh.EntityConfig {
+	presetFn := entityConfigPresetFnManager.GetPreset("warpStone")
+	e := presetFn(X, Y)
+	e.WarpToRoomID = 6
+	e.Hitbox.Radius = 5
+	return e
 }
