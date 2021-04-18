@@ -66,17 +66,17 @@ type EntityConfigPresetFn = func(coordinates Coordinates) EntityConfig
 // EntityConfigPresetFnManager contains a map of strings (preset names) to EntityConfigPresetFn
 // it is used to get an EntityConfig preset
 type EntityConfigPresetFnManager struct {
-	entityConfigPresetFns map[string]EntityConfigPresetFn
+	entityConfigPresetFns map[PresetName]EntityConfigPresetFn
 }
 
 // NewEntityConfigPresetFnManager returns a new EntityConfigPresetFnManager
-func NewEntityConfigPresetFnManager(entityConfigPresetFns map[string]EntityConfigPresetFn) EntityConfigPresetFnManager {
+func NewEntityConfigPresetFnManager(entityConfigPresetFns map[PresetName]EntityConfigPresetFn) EntityConfigPresetFnManager {
 	return EntityConfigPresetFnManager{
 		entityConfigPresetFns: entityConfigPresetFns,
 	}
 }
 
 // GetPreset gets an entity config preset function by key
-func (m *EntityConfigPresetFnManager) GetPreset(presetName string) EntityConfigPresetFn {
+func (m *EntityConfigPresetFnManager) GetPreset(presetName PresetName) EntityConfigPresetFn {
 	return m.entityConfigPresetFns[presetName]
 }

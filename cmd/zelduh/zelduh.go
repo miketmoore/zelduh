@@ -246,15 +246,15 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 
 	return zelduh.Rooms{
 		1: zelduh.NewRoom("overworldFourWallsDoorBottomRight",
-			entityConfigPresetFnManager.GetPreset("puzzleBox")(zelduh.Coordinates{X: 5, Y: 5}),
-			entityConfigPresetFnManager.GetPreset("floorSwitch")(zelduh.Coordinates{X: 5, Y: 6}),
-			entityConfigPresetFnManager.GetPreset("toggleObstacle")(zelduh.Coordinates{X: 10, Y: 7}),
+			entityConfigPresetFnManager.GetPreset(PresetNamePuzzleBox)(zelduh.Coordinates{X: 5, Y: 5}),
+			entityConfigPresetFnManager.GetPreset(PresetNameFloorSwitch)(zelduh.Coordinates{X: 5, Y: 6}),
+			entityConfigPresetFnManager.GetPreset(PresetNameToggleObstacle)(zelduh.Coordinates{X: 10, Y: 7}),
 		),
 		2: zelduh.NewRoom("overworldFourWallsDoorTopBottom",
-			entityConfigPresetFnManager.GetPreset("skull")(zelduh.Coordinates{X: 5, Y: 5}),
-			entityConfigPresetFnManager.GetPreset("skeleton")(zelduh.Coordinates{X: 11, Y: 9}),
-			entityConfigPresetFnManager.GetPreset("spinner")(zelduh.Coordinates{X: 7, Y: 9}),
-			entityConfigPresetFnManager.GetPreset("eyeburrower")(zelduh.Coordinates{X: 8, Y: 9}),
+			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkull)(zelduh.Coordinates{X: 5, Y: 5}),
+			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkeleton)(zelduh.Coordinates{X: 11, Y: 9}),
+			entityConfigPresetFnManager.GetPreset(PresetNameEnemySpinner)(zelduh.Coordinates{X: 7, Y: 9}),
+			entityConfigPresetFnManager.GetPreset(PresetNameEnemyEyeBurrower)(zelduh.Coordinates{X: 8, Y: 9}),
 		),
 		3: zelduh.NewRoom("overworldFourWallsDoorRightTopBottom",
 			buildWarpStone(6, zelduh.Coordinates{X: 3, Y: 7}, 5),
@@ -354,8 +354,28 @@ func buildWarpStoneFnFactory(
 	}
 }
 
+const (
+	PresetNameArrow            zelduh.PresetName = "arrow"
+	PresetNameBomb             zelduh.PresetName = "bomb"
+	PresetNameCoin             zelduh.PresetName = "coin"
+	PresetNameExplosion        zelduh.PresetName = "explosion"
+	PresetNameObstacle         zelduh.PresetName = "obstacle"
+	PresetNamePlayer           zelduh.PresetName = "player"
+	PresetNameFloorSwitch      zelduh.PresetName = "floorSwitch"
+	PresetNameToggleObstacle   zelduh.PresetName = "toggleObstacle"
+	PresetNamePuzzleBox        zelduh.PresetName = "puzzleBox"
+	PresetNameWarpStone        zelduh.PresetName = "warpStone"
+	PresetNameUICoin           zelduh.PresetName = "uiCoin"
+	PresetNameEnemySpinner     zelduh.PresetName = "spinner"
+	PresetNameEnemySkull       zelduh.PresetName = "skull"
+	PresetNameEnemySkeleton    zelduh.PresetName = "skeleton"
+	PresetNameHeart            zelduh.PresetName = "heart"
+	PresetNameEnemyEyeBurrower zelduh.PresetName = "eyeBurrower"
+	PresetNameSword            zelduh.PresetName = "sword"
+)
+
 // TODO move this to a higher level configuration location
-func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityConfigPresetFn {
+func BuildEntityConfigPresetFnsMap(tileSize float64) map[zelduh.PresetName]zelduh.EntityConfigPresetFn {
 
 	dimensions := zelduh.Dimensions{
 		Width:  tileSize,
@@ -369,8 +389,8 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		}
 	}
 
-	return map[string]zelduh.EntityConfigPresetFn{
-		"arrow": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+	return map[zelduh.PresetName]zelduh.EntityConfigPresetFn{
+		PresetNameArrow: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category: zelduh.CategoryArrow,
 				Movement: &zelduh.MovementConfig{
@@ -391,7 +411,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				Ignore: true,
 			}
 		},
-		"bomb": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameBomb: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category: zelduh.CategoryBomb,
 				Movement: &zelduh.MovementConfig{
@@ -409,7 +429,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				Ignore: true,
 			}
 		},
-		"coin": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameCoin: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryCoin,
 				Dimensions:  dimensions,
@@ -419,7 +439,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"explosion": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameExplosion: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:   zelduh.CategoryExplosion,
 				Expiration: 12,
@@ -428,14 +448,14 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"obstacle": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameObstacle: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryObstacle,
 				Dimensions:  dimensions,
 				Coordinates: buildCoordinates(coordinates),
 			}
 		},
-		"player": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNamePlayer: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryPlayer,
 				Health:      3,
@@ -469,7 +489,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"sword": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameSword: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category: zelduh.CategorySword,
 				Movement: &zelduh.MovementConfig{
@@ -490,7 +510,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				Ignore: true,
 			}
 		},
-		"eyeburrower": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameEnemyEyeBurrower: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryEnemy,
 				Dimensions:  dimensions,
@@ -514,7 +534,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"heart": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameHeart: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryHeart,
 				Dimensions:  dimensions,
@@ -528,7 +548,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 			}
 
 		},
-		"skeleton": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameEnemySkeleton: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryEnemy,
 				Dimensions:  dimensions,
@@ -552,7 +572,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"skull": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameEnemySkull: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryEnemy,
 				Dimensions:  dimensions,
@@ -576,7 +596,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"spinner": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameEnemySpinner: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryEnemy,
 				Dimensions:  dimensions,
@@ -600,7 +620,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"uiCoin": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameUICoin: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryHeart,
 				Dimensions:  dimensions,
@@ -613,7 +633,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"warpStone": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameWarpStone: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryWarp,
 				Coordinates: buildCoordinates(coordinates),
@@ -627,7 +647,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"puzzleBox": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNamePuzzleBox: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryMovableObstacle,
 				Coordinates: buildCoordinates(coordinates),
@@ -642,7 +662,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 				},
 			}
 		},
-		"floorSwitch": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameFloorSwitch: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryCollisionSwitch,
 				Coordinates: buildCoordinates(coordinates),
@@ -655,7 +675,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[string]zelduh.EntityCon
 		},
 		// this is an impassable obstacle that can be toggled "remotely"
 		// it has two visual states that coincide with each toggle state
-		"toggleObstacle": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		PresetNameToggleObstacle: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			// TODO get this working again
 			return zelduh.EntityConfig{
 				Coordinates: buildCoordinates(coordinates),
