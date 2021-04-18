@@ -81,12 +81,27 @@ func run() {
 		entityFactory.NewEntity("heart", 2.80, 14, frameRate),
 	}
 
+	windowConfig := zelduh.WindowConfig{
+		X:      0,
+		Y:      0,
+		Width:  800,
+		Height: 800,
+	}
+
+	mapConfig := zelduh.MapConfig{
+		Width:  tileSize * 14,
+		Height: tileSize * 12,
+	}
+
+	mapConfig.X = (windowConfig.Width - mapConfig.Width) / 2
+	mapConfig.Y = (windowConfig.Height - mapConfig.Height) / 2
+
 	collisionSystem := &zelduh.CollisionSystem{
 		MapBounds: pixel.R(
-			zelduh.MapX,
-			zelduh.MapY,
-			zelduh.MapX+zelduh.MapW,
-			zelduh.MapY+zelduh.MapH,
+			mapConfig.X,
+			mapConfig.Y,
+			mapConfig.X+mapConfig.Width,
+			mapConfig.Y+mapConfig.Height,
 		),
 		CollisionHandler: zelduh.NewCollisionHandler(
 			&systemsManager,
@@ -109,7 +124,7 @@ func run() {
 		),
 	}
 
-	ui := zelduh.NewUI(currLocaleMsgs)
+	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
 	inputSystem := &zelduh.InputSystem{Win: ui.Window}
 
@@ -195,6 +210,8 @@ func run() {
 		tileSize,
 		frameRate,
 		nonObstacleSprites,
+		windowConfig,
+		mapConfig,
 	)
 
 	for !ui.Window.Closed() {

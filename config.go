@@ -1,32 +1,12 @@
 package zelduh
 
-const (
-	// WinX is the x coordinate of the window
-	WinX float64 = 0
+type WindowConfig struct {
+	X, Y, Width, Height float64
+}
 
-	// WinY is the y coordinate of the window
-	WinY float64 = 0
-
-	// WinW is the width of the window
-	WinW float64 = 800
-
-	// WinH is the height of the window
-	WinH float64 = 800
-)
-
-const (
-	// MapW is the width of the game map
-	MapW float64 = 672 // 48 * 14
-
-	// MapH is the height of the game map
-	MapH float64 = 576 // 48 * 12
-
-	// MapX is the x coordinate of the game map
-	MapX = (WinW - MapW) / 2
-
-	// MapY is the y coordinate of the game map
-	MapY = (WinH - MapH) / 2
-)
+type MapConfig struct {
+	X, Y, Width, Height float64
+}
 
 // TODO move to zelduh cmd file since it is configuration
 // Map of RoomID to a Room configuration

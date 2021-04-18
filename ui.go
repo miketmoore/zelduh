@@ -17,7 +17,7 @@ type UI struct {
 	Text   *text.Text
 }
 
-func NewUI(currLocaleMsgs LocaleMessagesMap) UI {
+func NewUI(currLocaleMsgs LocaleMessagesMap, windowConfig WindowConfig) UI {
 
 	// Initialize text
 	orig := pixel.V(20, 50)
@@ -28,7 +28,7 @@ func NewUI(currLocaleMsgs LocaleMessagesMap) UI {
 	win, err := pixelgl.NewWindow(
 		pixelgl.WindowConfig{
 			Title:  currLocaleMsgs["gameTitle"],
-			Bounds: pixel.R(WinX, WinY, WinW, WinH),
+			Bounds: pixel.R(windowConfig.X, windowConfig.Y, windowConfig.Width, windowConfig.Height),
 			VSync:  true,
 		},
 	)
@@ -51,18 +51,18 @@ func DrawCenterText(win *pixelgl.Window, txt *text.Text, s string, c color.RGBA)
 	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 }
 
-func DrawMapBackground(win *pixelgl.Window, x, y, w, h float64, color color.Color) {
+func DrawMapBackground(win *pixelgl.Window, mapConfig MapConfig, color color.Color) {
 	s := imdraw.New(nil)
 	s.Color = color
-	s.Push(pixel.V(x, y))
-	s.Push(pixel.V(x+w, y+h))
+	s.Push(pixel.V(mapConfig.X, mapConfig.Y))
+	s.Push(pixel.V(mapConfig.X+mapConfig.Width, mapConfig.Y+mapConfig.Height))
 	s.Rectangle(0)
 	s.Draw(win)
 }
 
-func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap) {
+func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, mapConfig MapConfig) {
 	win.Clear(colornames.Darkgray)
-	DrawMapBackground(win, MapX, MapY, MapW, MapH, colornames.White)
+	DrawMapBackground(win, mapConfig, colornames.White)
 	DrawCenterText(win, txt, currLocaleMsgs["gameTitle"], colornames.Black)
 }
 
@@ -73,6 +73,7 @@ func DrawMapBackgroundImage(
 	name MapName,
 	modX, modY float64,
 	tileSize float64,
+	mapConfig MapConfig,
 ) {
 
 	d := mapDrawData[name]
@@ -83,8 +84,8 @@ func DrawMapBackgroundImage(
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+MapX+modX+tileSize/2,
-				vec.Y+MapY+modY+tileSize/2,
+				vec.X+mapConfig.X+modX+tileSize/2,
+				vec.Y+mapConfig.Y+modY+tileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -120,6 +121,7 @@ func DrawObstaclesPerMapTiles(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
+	mapConfig MapConfig,
 ) []Entity {
 	d := mapDrawData[roomsMap[*roomID].MapName()]
 	obstacles := []Entity{}
@@ -128,8 +130,8 @@ func DrawObstaclesPerMapTiles(
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+MapX+modX+tileSize/2,
-				vec.Y+MapY+modY+tileSize/2,
+				vec.X+mapConfig.X+modX+tileSize/2,
+				vec.Y+mapConfig.Y+modY+tileSize/2,
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
@@ -144,12 +146,12 @@ func DrawObstaclesPerMapTiles(
 	return obstacles
 }
 
-func DrawMask(win *pixelgl.Window) {
+func DrawMask(win *pixelgl.Window, windowConfig WindowConfig, mapConfig MapConfig) {
 	// top
 	s := imdraw.New(nil)
 	s.Color = colornames.White
-	s.Push(pixel.V(0, MapY+MapH))
-	s.Push(pixel.V(WinW, MapY+MapH+(WinH-(MapY+MapH))))
+	s.Push(pixel.V(0, mapConfig.Y+mapConfig.Height))
+	s.Push(pixel.V(windowConfig.Width, mapConfig.Y+mapConfig.Height+(windowConfig.Height-(mapConfig.Y+mapConfig.Height))))
 	s.Rectangle(0)
 	s.Draw(win)
 
@@ -157,7 +159,7 @@ func DrawMask(win *pixelgl.Window) {
 	s = imdraw.New(nil)
 	s.Color = colornames.White
 	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(WinW, (WinH - (MapY + MapH))))
+	s.Push(pixel.V(windowConfig.Width, (windowConfig.Height - (mapConfig.Y + mapConfig.Height))))
 	s.Rectangle(0)
 	s.Draw(win)
 
@@ -165,15 +167,15 @@ func DrawMask(win *pixelgl.Window) {
 	s = imdraw.New(nil)
 	s.Color = colornames.White
 	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(0+MapX, WinH))
+	s.Push(pixel.V(0+mapConfig.X, windowConfig.Height))
 	s.Rectangle(0)
 	s.Draw(win)
 
 	// right
 	s = imdraw.New(nil)
 	s.Color = colornames.White
-	s.Push(pixel.V(MapX+MapW, MapY))
-	s.Push(pixel.V(WinW, WinH))
+	s.Push(pixel.V(mapConfig.X+mapConfig.Width, mapConfig.Y))
+	s.Push(pixel.V(windowConfig.Width, windowConfig.Height))
 	s.Rectangle(0)
 	s.Draw(win)
 }

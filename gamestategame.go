@@ -23,11 +23,13 @@ func GameStateGame(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
+	windowConfig WindowConfig,
+	mapConfig MapConfig,
 ) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
-	DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
+	DrawMapBackground(ui.Window, mapConfig, colornames.White)
 
 	DrawMapBackgroundImage(
 		ui.Window,
@@ -36,6 +38,7 @@ func GameStateGame(
 		roomsMap[*currentRoomID].MapName(),
 		0, 0,
 		tileSize,
+		mapConfig,
 	)
 
 	if *shouldAddEntities {
@@ -45,7 +48,18 @@ func GameStateGame(
 		AddUICoin(systemsManager, entityConfigPresetFnManager, frameRate)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(systemsManager, entityConfigPresetFnManager, roomsMap, mapDrawData, currentRoomID, 0, 0, tileSize, frameRate, nonObstacleSprites)
+		obstacles := DrawObstaclesPerMapTiles(
+			systemsManager,
+			entityConfigPresetFnManager,
+			roomsMap,
+			mapDrawData,
+			currentRoomID,
+			0, 0,
+			tileSize,
+			frameRate,
+			nonObstacleSprites,
+			mapConfig,
+		)
 		systemsManager.AddEntities(obstacles...)
 
 		for k := range roomWarps {
@@ -65,7 +79,7 @@ func GameStateGame(
 		}
 	}
 
-	DrawMask(ui.Window)
+	DrawMask(ui.Window, windowConfig, mapConfig)
 
 	systemsManager.Update()
 

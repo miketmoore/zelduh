@@ -32,6 +32,8 @@ type GameStateManager struct {
 	TileSize                    float64
 	FrameRate                   int
 	NonObstacleSprites          map[int]bool
+	WindowConfig                WindowConfig
+	MapConfig                   MapConfig
 }
 
 func NewGameStateManager(
@@ -56,6 +58,8 @@ func NewGameStateManager(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
+	windowConfig WindowConfig,
+	mapConfig MapConfig,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:              systemsManager,
@@ -79,13 +83,15 @@ func NewGameStateManager(
 		TileSize:                    tileSize,
 		FrameRate:                   frameRate,
 		NonObstacleSprites:          nonObstacleSprites,
+		WindowConfig:                windowConfig,
+		MapConfig:                   mapConfig,
 	}
 }
 
 func (g *GameStateManager) Update() {
 	switch *g.CurrentState {
 	case StateStart:
-		GameStateStart(g.UI, g.LocaleMessages, g.CurrentState)
+		GameStateStart(g.UI, g.LocaleMessages, g.CurrentState, g.MapConfig)
 	case StateGame:
 		GameStateGame(
 			g.UI,
@@ -105,11 +111,13 @@ func (g *GameStateManager) Update() {
 			g.TileSize,
 			g.FrameRate,
 			g.NonObstacleSprites,
+			g.WindowConfig,
+			g.MapConfig,
 		)
 	case StatePause:
-		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState)
+		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState, g.MapConfig)
 	case StateOver:
-		GameStateOver(g.UI, g.LocaleMessages, g.CurrentState)
+		GameStateOver(g.UI, g.LocaleMessages, g.CurrentState, g.MapConfig)
 	case StateMapTransition:
 		GameStateMapTransition(
 			g.UI,
@@ -125,6 +133,8 @@ func (g *GameStateManager) Update() {
 			g.RoomTransition,
 			g.Player,
 			g.TileSize,
+			g.WindowConfig,
+			g.MapConfig,
 		)
 	}
 }

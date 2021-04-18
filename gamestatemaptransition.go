@@ -19,12 +19,14 @@ func GameStateMapTransition(
 	roomTransition *RoomTransition,
 	player *Entity,
 	tileSize float64,
+	windowConfig WindowConfig,
+	mapConfig MapConfig,
 ) {
 	inputSystem.DisablePlayer()
 	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
 		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
-		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
+		DrawMapBackground(ui.Window, mapConfig, colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
 		systemsManager.RemoveAllEnemies()
@@ -38,6 +40,7 @@ func GameStateMapTransition(
 			roomTransition,
 			*connectedRooms,
 			tileSize,
+			mapConfig,
 		)
 
 		*nextRoomID = transitionRoomResp.nextRoomID
@@ -50,6 +53,7 @@ func GameStateMapTransition(
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
 			tileSize,
+			mapConfig,
 		)
 		DrawMapBackgroundImage(
 			ui.Window,
@@ -59,8 +63,9 @@ func GameStateMapTransition(
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 			tileSize,
+			mapConfig,
 		)
-		DrawMask(ui.Window)
+		DrawMask(ui.Window, windowConfig, mapConfig)
 
 		// Move player with map transition
 		player.ComponentSpatial.Rect = pixel.R(
@@ -74,7 +79,7 @@ func GameStateMapTransition(
 	} else if roomTransition.Style == TransitionWarp && roomTransition.Timer > 0 {
 		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
-		DrawMapBackground(ui.Window, MapX, MapY, MapW, MapH, colornames.White)
+		DrawMapBackground(ui.Window, mapConfig, colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
 		systemsManager.RemoveAllEnemies()
@@ -99,38 +104,39 @@ func calculateTransitionSlide(
 	roomTransition *RoomTransition,
 	connectedRooms ConnectedRooms,
 	tileSize float64,
+	mapConfig MapConfig,
 ) transitionRoomResponse {
 
 	var nextRoomID RoomID
 	inc := (roomTransition.Start - float64(roomTransition.Timer))
-	incY := inc * (MapH / tileSize)
-	incX := inc * (MapW / tileSize)
+	incY := inc * (mapConfig.Height / tileSize)
+	incX := inc * (mapConfig.Width / tileSize)
 	modY := 0.0
 	modYNext := 0.0
 	modX := 0.0
 	modXNext := 0.0
 	playerModX := 0.0
 	playerModY := 0.0
-	playerIncY := ((MapH / tileSize) - 1) + 7
-	playerIncX := ((MapW / tileSize) - 1) + 7
+	playerIncY := ((mapConfig.Height / tileSize) - 1) + 7
+	playerIncX := ((mapConfig.Width / tileSize) - 1) + 7
 	if roomTransition.Side == BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
-		modYNext = incY - MapH
+		modYNext = incY - mapConfig.Height
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
 	} else if roomTransition.Side == BoundTop && connectedRooms.Top != 0 {
 		modY = -incY
-		modYNext = -incY + MapH
+		modYNext = -incY + mapConfig.Height
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
 	} else if roomTransition.Side == BoundLeft && connectedRooms.Left != 0 {
 		modX = incX
-		modXNext = incX - MapW
+		modXNext = incX - mapConfig.Width
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
 	} else if roomTransition.Side == BoundRight && connectedRooms.Right != 0 {
 		modX = -incX
-		modXNext = -incX + MapW
+		modXNext = -incX + mapConfig.Width
 		nextRoomID = connectedRooms.Right
 		playerModX -= playerIncX
 	} else {
