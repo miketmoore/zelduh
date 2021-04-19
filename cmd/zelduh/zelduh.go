@@ -32,6 +32,7 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
+	// Build a map of RoomIDs to Room structs
 	rooms := BuildRooms(&entityConfigPresetFnManager, tileSize)
 
 	zelduh.BuildMapRoomIDToRoom(
@@ -44,6 +45,7 @@ func run() {
 			{9},
 			{11},
 		},
+		// This is mutated
 		rooms,
 	)
 
