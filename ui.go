@@ -70,7 +70,7 @@ func DrawMapBackgroundImage(
 	win *pixelgl.Window,
 	spritesheet map[int]*pixel.Sprite,
 	mapDrawData MapDrawData,
-	name MapName,
+	name RoomName,
 	modX, modY float64,
 	tileSize float64,
 	mapConfig MapConfig,
@@ -123,7 +123,7 @@ func DrawObstaclesPerMapTiles(
 	nonObstacleSprites map[int]bool,
 	mapConfig MapConfig,
 ) []Entity {
-	d := mapDrawData[roomsMap[*roomID].MapName()]
+	d := mapDrawData[roomsMap[*roomID].RoomName()]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {

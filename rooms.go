@@ -3,6 +3,8 @@ package zelduh
 // RoomID is a room ID
 type RoomID int
 
+type RoomName string
+
 // ConnectedRooms is used to configure adjacent rooms
 type ConnectedRooms struct {
 	Top    RoomID
@@ -13,7 +15,7 @@ type ConnectedRooms struct {
 
 // Room defines an API for room implementations
 type Roomer interface {
-	MapName() MapName
+	RoomName() RoomName
 	ConnectedRooms() *ConnectedRooms
 	SetConnectedRoom(Direction, RoomID)
 }
@@ -23,13 +25,13 @@ type Rooms map[RoomID]Roomer
 
 // Room represents one map section
 type Room struct {
-	mapName        MapName
+	mapName        RoomName
 	connectedRooms *ConnectedRooms
 	EntityConfigs  []EntityConfig
 }
 
-// MapName returns the room's map name
-func (r Room) MapName() MapName {
+// RoomName returns the room's map name
+func (r Room) RoomName() RoomName {
 	return r.mapName
 }
 
@@ -53,7 +55,7 @@ func (r Room) SetConnectedRoom(direction Direction, id RoomID) {
 }
 
 // NewRoom builds a new Room
-func NewRoom(name MapName, entityConfigs ...EntityConfig) *Room {
+func NewRoom(name RoomName, entityConfigs ...EntityConfig) *Room {
 	return &Room{
 		mapName:        name,
 		connectedRooms: &ConnectedRooms{},

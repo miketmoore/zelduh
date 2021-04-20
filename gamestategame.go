@@ -35,7 +35,7 @@ func GameStateGame(
 		ui.Window,
 		spritesheet,
 		mapDrawData,
-		roomsMap[*currentRoomID].MapName(),
+		roomsMap[*currentRoomID].RoomName(),
 		0, 0,
 		tileSize,
 		mapConfig,
