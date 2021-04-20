@@ -27,7 +27,7 @@ type GameStateManager struct {
 	Player                      *Entity
 	Hearts                      []Entity
 	RoomWarps                   RoomWarps
-	Rooms                       Rooms
+	LevelManager                *LevelManager
 	EntityConfigPresetFnManager *EntityConfigPresetFnManager
 	TileSize                    float64
 	FrameRate                   int
@@ -53,7 +53,7 @@ func NewGameStateManager(
 	player *Entity,
 	hearts []Entity,
 	roomWarps RoomWarps,
-	rooms Rooms,
+	levelManager *LevelManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
 	frameRate int,
@@ -78,7 +78,7 @@ func NewGameStateManager(
 		Player:                      player,
 		Hearts:                      hearts,
 		RoomWarps:                   roomWarps,
-		Rooms:                       rooms,
+		LevelManager:                levelManager,
 		EntityConfigPresetFnManager: entityConfigPresetFnManager,
 		TileSize:                    tileSize,
 		FrameRate:                   frameRate,
@@ -95,7 +95,7 @@ func (g *GameStateManager) Update() {
 	case StateGame:
 		GameStateGame(
 			g.UI,
-			g.Rooms,
+			g.LevelManager.CurrentLevel.Map,
 			g.SystemsManager,
 			g.InputSystem,
 			g.ShouldAddEntities,
@@ -122,7 +122,7 @@ func (g *GameStateManager) Update() {
 		GameStateMapTransition(
 			g.UI,
 			g.SystemsManager,
-			g.Rooms,
+			g.LevelManager.CurrentLevel.Map,
 			g.CollisionSystem,
 			g.InputSystem,
 			g.CurrentRoomID,

@@ -32,22 +32,12 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	// Build a map of RoomIDs to Room structs
-	rooms := BuildRooms(&entityConfigPresetFnManager, tileSize)
-
-	zelduh.BuildMapRoomIDToRoom(
-		// Overworld is a multi-dimensional array representing the overworld
-		// Each room ID should be unique
-		[][]zelduh.RoomID{
-			{1, 10},
-			{2, 0, 0, 8},
-			{3, 5, 6, 7},
-			{9},
-			{11},
-		},
-		// This is mutated
-		rooms,
+	testLevel := buildTestLevel(
+		&entityConfigPresetFnManager,
+		tileSize,
 	)
+
+	levelManager := zelduh.NewLevelManager(&testLevel)
 
 	systemsManager := zelduh.NewSystemsManager()
 
@@ -208,7 +198,7 @@ func run() {
 		&player,
 		hearts,
 		roomWarps,
-		rooms,
+		&levelManager,
 		&entityConfigPresetFnManager,
 		tileSize,
 		frameRate,
@@ -233,6 +223,32 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func buildTestLevel(
+	entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
+	tileSize float64,
+) zelduh.Level {
+	// Build a map of RoomIDs to Room structs
+	rooms := BuildRooms(entityConfigPresetFnManager, tileSize)
+
+	zelduh.BuildMapRoomIDToRoom(
+		// Overworld is a multi-dimensional array representing the overworld
+		// Each room ID should be unique
+		[][]zelduh.RoomID{
+			{1, 10},
+			{2, 0, 0, 8},
+			{3, 5, 6, 7},
+			{9},
+			{11},
+		},
+		// This is mutated
+		rooms,
+	)
+
+	return zelduh.Level{
+		Map: rooms,
+	}
 }
 
 // TODO move to zelduh cmd file since it is configuration
