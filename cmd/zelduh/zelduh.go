@@ -81,20 +81,20 @@ func run() {
 		Height: 800,
 	}
 
-	mapConfig := zelduh.MapConfig{
+	activeSpaceRectangle := zelduh.ActiveSpaceRectangle{
 		Width:  tileSize * 14,
 		Height: tileSize * 12,
 	}
 
-	mapConfig.X = (windowConfig.Width - mapConfig.Width) / 2
-	mapConfig.Y = (windowConfig.Height - mapConfig.Height) / 2
+	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
+	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
 
 	collisionSystem := &zelduh.CollisionSystem{
 		MapBounds: pixel.R(
-			mapConfig.X,
-			mapConfig.Y,
-			mapConfig.X+mapConfig.Width,
-			mapConfig.Y+mapConfig.Height,
+			activeSpaceRectangle.X,
+			activeSpaceRectangle.Y,
+			activeSpaceRectangle.X+activeSpaceRectangle.Width,
+			activeSpaceRectangle.Y+activeSpaceRectangle.Height,
 		),
 		CollisionHandler: zelduh.NewCollisionHandler(
 			&systemsManager,
@@ -204,7 +204,7 @@ func run() {
 		frameRate,
 		nonObstacleSprites,
 		windowConfig,
-		mapConfig,
+		activeSpaceRectangle,
 	)
 
 	for !ui.Window.Closed() {

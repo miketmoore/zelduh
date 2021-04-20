@@ -51,18 +51,18 @@ func DrawCenterText(win *pixelgl.Window, txt *text.Text, s string, c color.RGBA)
 	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 }
 
-func DrawMapBackground(win *pixelgl.Window, mapConfig MapConfig, color color.Color) {
+func DrawMapBackground(win *pixelgl.Window, activeSpaceRectangle ActiveSpaceRectangle, color color.Color) {
 	s := imdraw.New(nil)
 	s.Color = color
-	s.Push(pixel.V(mapConfig.X, mapConfig.Y))
-	s.Push(pixel.V(mapConfig.X+mapConfig.Width, mapConfig.Y+mapConfig.Height))
+	s.Push(pixel.V(activeSpaceRectangle.X, activeSpaceRectangle.Y))
+	s.Push(pixel.V(activeSpaceRectangle.X+activeSpaceRectangle.Width, activeSpaceRectangle.Y+activeSpaceRectangle.Height))
 	s.Rectangle(0)
 	s.Draw(win)
 }
 
-func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, mapConfig MapConfig) {
+func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, activeSpaceRectangle ActiveSpaceRectangle) {
 	win.Clear(colornames.Darkgray)
-	DrawMapBackground(win, mapConfig, colornames.White)
+	DrawMapBackground(win, activeSpaceRectangle, colornames.White)
 	DrawCenterText(win, txt, currLocaleMsgs["gameTitle"], colornames.Black)
 }
 
@@ -73,7 +73,7 @@ func DrawMapBackgroundImage(
 	name RoomName,
 	modX, modY float64,
 	tileSize float64,
-	mapConfig MapConfig,
+	activeSpaceRectangle ActiveSpaceRectangle,
 ) {
 
 	d := mapDrawData[name]
@@ -84,8 +84,8 @@ func DrawMapBackgroundImage(
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+mapConfig.X+modX+tileSize/2,
-				vec.Y+mapConfig.Y+modY+tileSize/2,
+				vec.X+activeSpaceRectangle.X+modX+tileSize/2,
+				vec.Y+activeSpaceRectangle.Y+modY+tileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(win, matrix)
@@ -121,7 +121,7 @@ func DrawObstaclesPerMapTiles(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
-	mapConfig MapConfig,
+	activeSpaceRectangle ActiveSpaceRectangle,
 ) []Entity {
 	d := mapDrawData[roomsMap[*roomID].RoomName()]
 	obstacles := []Entity{}
@@ -130,8 +130,8 @@ func DrawObstaclesPerMapTiles(
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+mapConfig.X+modX+tileSize/2,
-				vec.Y+mapConfig.Y+modY+tileSize/2,
+				vec.X+activeSpaceRectangle.X+modX+tileSize/2,
+				vec.Y+activeSpaceRectangle.Y+modY+tileSize/2,
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
@@ -148,12 +148,12 @@ func DrawObstaclesPerMapTiles(
 	return obstacles
 }
 
-func DrawMask(win *pixelgl.Window, windowConfig WindowConfig, mapConfig MapConfig) {
+func DrawMask(win *pixelgl.Window, windowConfig WindowConfig, activeSpaceRectangle ActiveSpaceRectangle) {
 	// top
 	s := imdraw.New(nil)
 	s.Color = colornames.White
-	s.Push(pixel.V(0, mapConfig.Y+mapConfig.Height))
-	s.Push(pixel.V(windowConfig.Width, mapConfig.Y+mapConfig.Height+(windowConfig.Height-(mapConfig.Y+mapConfig.Height))))
+	s.Push(pixel.V(0, activeSpaceRectangle.Y+activeSpaceRectangle.Height))
+	s.Push(pixel.V(windowConfig.Width, activeSpaceRectangle.Y+activeSpaceRectangle.Height+(windowConfig.Height-(activeSpaceRectangle.Y+activeSpaceRectangle.Height))))
 	s.Rectangle(0)
 	s.Draw(win)
 
@@ -161,7 +161,7 @@ func DrawMask(win *pixelgl.Window, windowConfig WindowConfig, mapConfig MapConfi
 	s = imdraw.New(nil)
 	s.Color = colornames.White
 	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(windowConfig.Width, (windowConfig.Height - (mapConfig.Y + mapConfig.Height))))
+	s.Push(pixel.V(windowConfig.Width, (windowConfig.Height - (activeSpaceRectangle.Y + activeSpaceRectangle.Height))))
 	s.Rectangle(0)
 	s.Draw(win)
 
@@ -169,14 +169,14 @@ func DrawMask(win *pixelgl.Window, windowConfig WindowConfig, mapConfig MapConfi
 	s = imdraw.New(nil)
 	s.Color = colornames.White
 	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(0+mapConfig.X, windowConfig.Height))
+	s.Push(pixel.V(0+activeSpaceRectangle.X, windowConfig.Height))
 	s.Rectangle(0)
 	s.Draw(win)
 
 	// right
 	s = imdraw.New(nil)
 	s.Color = colornames.White
-	s.Push(pixel.V(mapConfig.X+mapConfig.Width, mapConfig.Y))
+	s.Push(pixel.V(activeSpaceRectangle.X+activeSpaceRectangle.Width, activeSpaceRectangle.Y))
 	s.Push(pixel.V(windowConfig.Width, windowConfig.Height))
 	s.Rectangle(0)
 	s.Draw(win)

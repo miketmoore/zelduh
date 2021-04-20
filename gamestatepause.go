@@ -9,10 +9,10 @@ func GameStatePause(
 	ui UI,
 	currLocaleMsgs LocaleMessagesMap,
 	currentState *State,
-	mapConfig MapConfig,
+	activeSpaceRectangle ActiveSpaceRectangle,
 ) {
 	ui.Window.Clear(colornames.Darkgray)
-	DrawMapBackground(ui.Window, mapConfig, colornames.White)
+	DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
 	DrawCenterText(ui.Window, ui.Text, currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {

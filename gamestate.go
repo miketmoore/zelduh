@@ -33,7 +33,7 @@ type GameStateManager struct {
 	FrameRate                   int
 	NonObstacleSprites          map[int]bool
 	WindowConfig                WindowConfig
-	MapConfig                   MapConfig
+	ActiveSpaceRectangle        ActiveSpaceRectangle
 }
 
 func NewGameStateManager(
@@ -59,7 +59,7 @@ func NewGameStateManager(
 	frameRate int,
 	nonObstacleSprites map[int]bool,
 	windowConfig WindowConfig,
-	mapConfig MapConfig,
+	activeSpaceRectangle ActiveSpaceRectangle,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:              systemsManager,
@@ -84,14 +84,14 @@ func NewGameStateManager(
 		FrameRate:                   frameRate,
 		NonObstacleSprites:          nonObstacleSprites,
 		WindowConfig:                windowConfig,
-		MapConfig:                   mapConfig,
+		ActiveSpaceRectangle:        activeSpaceRectangle,
 	}
 }
 
 func (g *GameStateManager) Update() {
 	switch *g.CurrentState {
 	case StateStart:
-		GameStateStart(g.UI, g.LocaleMessages, g.CurrentState, g.MapConfig)
+		GameStateStart(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
 	case StateGame:
 		GameStateGame(
 			g.UI,
@@ -112,12 +112,12 @@ func (g *GameStateManager) Update() {
 			g.FrameRate,
 			g.NonObstacleSprites,
 			g.WindowConfig,
-			g.MapConfig,
+			g.ActiveSpaceRectangle,
 		)
 	case StatePause:
-		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState, g.MapConfig)
+		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
 	case StateOver:
-		GameStateOver(g.UI, g.LocaleMessages, g.CurrentState, g.MapConfig)
+		GameStateOver(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
 	case StateMapTransition:
 		GameStateMapTransition(
 			g.UI,
@@ -134,7 +134,7 @@ func (g *GameStateManager) Update() {
 			g.Player,
 			g.TileSize,
 			g.WindowConfig,
-			g.MapConfig,
+			g.ActiveSpaceRectangle,
 		)
 	}
 }

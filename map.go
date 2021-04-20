@@ -1,6 +1,6 @@
 package zelduh
 
-// MapConfig
-type MapConfig struct {
+// ActiveSpaceRectangle
+type ActiveSpaceRectangle struct {
 	X, Y, Width, Height float64
 }

@@ -24,12 +24,12 @@ func GameStateGame(
 	frameRate int,
 	nonObstacleSprites map[int]bool,
 	windowConfig WindowConfig,
-	mapConfig MapConfig,
+	activeSpaceRectangle ActiveSpaceRectangle,
 ) {
 	inputSystem.EnablePlayer()
 
 	ui.Window.Clear(colornames.Darkgray)
-	DrawMapBackground(ui.Window, mapConfig, colornames.White)
+	DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
 
 	DrawMapBackgroundImage(
 		ui.Window,
@@ -38,7 +38,7 @@ func GameStateGame(
 		roomsMap[*currentRoomID].RoomName(),
 		0, 0,
 		tileSize,
-		mapConfig,
+		activeSpaceRectangle,
 	)
 
 	if *shouldAddEntities {
@@ -58,7 +58,7 @@ func GameStateGame(
 			tileSize,
 			frameRate,
 			nonObstacleSprites,
-			mapConfig,
+			activeSpaceRectangle,
 		)
 		systemsManager.AddEntities(obstacles...)
 
@@ -79,7 +79,7 @@ func GameStateGame(
 		}
 	}
 
-	DrawMask(ui.Window, windowConfig, mapConfig)
+	DrawMask(ui.Window, windowConfig, activeSpaceRectangle)
 
 	systemsManager.Update()
 
