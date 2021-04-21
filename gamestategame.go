@@ -67,7 +67,8 @@ func GameStateGame(
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		for _, c := range roomsMap[*currentRoomID].(*Room).EntityConfigs {
+		currentRoom := roomsMap[*currentRoomID]
+		for _, c := range currentRoom.EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID(), frameRate)
 			entitiesMap[entity.ID()] = entity
 			systemsManager.AddEntity(entity)
