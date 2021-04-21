@@ -146,10 +146,10 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 
 	if c.Animation != nil {
 		entity.ComponentAnimation = &ComponentAnimation{
-			Map: ComponentAnimationMap{},
+			ComponentAnimationByName: ComponentAnimationMap{},
 		}
 		for key, val := range c.Animation {
-			entity.ComponentAnimation.Map[key] = &ComponentAnimationData{
+			entity.ComponentAnimation.ComponentAnimationByName[key] = &ComponentAnimationData{
 				Frames:    val,
 				FrameRate: frameRate,
 			}

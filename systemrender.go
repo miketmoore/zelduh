@@ -141,7 +141,7 @@ func (s *RenderSystem) Update() {
 
 func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
-		if animData := anim.Map["default"]; animData != nil {
+		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
 			var frameIndex int
 			if !entity.ComponentToggler.Enabled() {
 				frameIndex = animData.Frames[0]
@@ -161,7 +161,7 @@ func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 
 func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
-		if animData := anim.Map["default"]; animData != nil {
+		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
 			rate := animData.FrameRateCount
 			if rate < animData.FrameRate {
 				rate++
@@ -197,13 +197,13 @@ func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity
 		var animData *ComponentAnimationData
 		switch dir {
 		case DirectionUp:
-			animData = anim.Map["swordAttackUp"]
+			animData = anim.ComponentAnimationByName["swordAttackUp"]
 		case DirectionRight:
-			animData = anim.Map["swordAttackRight"]
+			animData = anim.ComponentAnimationByName["swordAttackRight"]
 		case DirectionDown:
-			animData = anim.Map["swordAttackDown"]
+			animData = anim.ComponentAnimationByName["swordAttackDown"]
 		case DirectionLeft:
-			animData = anim.Map["swordAttackLeft"]
+			animData = anim.ComponentAnimationByName["swordAttackLeft"]
 		}
 
 		rate := animData.FrameRateCount
@@ -254,13 +254,13 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 		var animData *ComponentAnimationData
 		switch dir {
 		case DirectionUp:
-			animData = anim.Map["up"]
+			animData = anim.ComponentAnimationByName["up"]
 		case DirectionRight:
-			animData = anim.Map["right"]
+			animData = anim.ComponentAnimationByName["right"]
 		case DirectionDown:
-			animData = anim.Map["down"]
+			animData = anim.ComponentAnimationByName["down"]
 		case DirectionLeft:
-			animData = anim.Map["left"]
+			animData = anim.ComponentAnimationByName["left"]
 		}
 
 		rate := animData.FrameRateCount

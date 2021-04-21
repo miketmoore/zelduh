@@ -120,7 +120,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 			dead = ch.HealthSystem.Hit(enemyID, 1)
 			if dead {
 				enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
-				ch.Explosion.ComponentTemporary.Expiration = len(ch.Explosion.ComponentAnimation.Map["default"].Frames)
+				ch.Explosion.ComponentTemporary.Expiration = len(ch.Explosion.ComponentAnimation.ComponentAnimationByName["default"].Frames)
 				ch.Explosion.ComponentSpatial = &ComponentSpatial{
 					Width:  ch.TileSize,
 					Height: ch.TileSize,
@@ -146,7 +146,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 		ch.Arrow.ComponentIgnore.Value = true
 		if dead {
 			enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
-			ch.Explosion.ComponentTemporary.Expiration = len(ch.Explosion.ComponentAnimation.Map["default"].Frames)
+			ch.Explosion.ComponentTemporary.Expiration = len(ch.Explosion.ComponentAnimation.ComponentAnimationByName["default"].Frames)
 			ch.Explosion.ComponentSpatial = &ComponentSpatial{
 				Width:  ch.TileSize,
 				Height: ch.TileSize,

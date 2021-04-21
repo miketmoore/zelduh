@@ -98,7 +98,7 @@ type ComponentAnimationMap map[string]*ComponentAnimationData
 
 // ComponentAnimation contains everything necessary to animate basic characters
 type ComponentAnimation struct {
-	Map ComponentAnimationMap
+	ComponentAnimationByName ComponentAnimationMap
 }
 
 // ComponentTemporary is used to track when an entity should be removed
