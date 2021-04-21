@@ -58,80 +58,79 @@ func NewRoom(name RoomName, entityConfigs ...EntityConfig) *Room {
 
 // BuildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
 func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
+
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
-			roomID := layout[row][col]
+			roomAID := layout[row][col]
 			// Top
-			if row > 0 {
-				if len(layout[row-1]) > col {
-					n := layout[row-1][col]
-					if n > 0 {
-						connectRooms(roomsMap, roomID, n, DirectionUp)
-					}
+			if (row > 0) && (len(layout[row-1]) > col) {
+				roomBID := layout[row-1][col]
+				if roomBID > 0 {
+					connectRooms(roomsMap, roomAID, roomBID, DirectionUp)
 				}
 			}
 			// Right
 			if len(layout[row]) > col+1 {
-				n := layout[row][col+1]
-				if n > 0 {
-					connectRooms(roomsMap, roomID, n, DirectionRight)
+				roomBID := layout[row][col+1]
+				if roomBID > 0 {
+					connectRooms(roomsMap, roomAID, roomBID, DirectionRight)
 				}
 			}
 			// Bottom
-			if len(layout) > row+1 {
-				if len(layout[row+1]) > col {
-					n := layout[row+1][col]
-					if n > 0 {
-						connectRooms(roomsMap, roomID, n, DirectionDown)
-					}
+			if (len(layout) > row+1) && (len(layout[row+1]) > col) {
+				roomBID := layout[row+1][col]
+				if roomBID > 0 {
+					connectRooms(roomsMap, roomAID, roomBID, DirectionDown)
 				}
 			}
 			// Left
 			if col > 0 {
-				n := layout[row][col-1]
-				if n > 0 {
-					connectRooms(roomsMap, roomID, n, DirectionLeft)
+				roomBID := layout[row][col-1]
+				if roomBID > 0 {
+					connectRooms(roomsMap, roomAID, roomBID, DirectionLeft)
 				}
 			}
 		}
 	}
 }
 
-func connectRooms(roomsMap Rooms, a, b RoomID, dir Direction) {
-	roomA, okA := roomsMap[a]
-	roomB, okB := roomsMap[b]
+func connectRooms(roomsMap Rooms, roomAID, roomBID RoomID, dir Direction) {
 
-	doConnect := false
+	roomA, roomAOK := roomsMap[roomAID]
+	roomB, roomBOK := roomsMap[roomBID]
+
+	if !roomAOK || !roomBOK {
+		return
+	}
+
 	var directionAToB Direction
 	var directionBToA Direction
 
-	if okA && okB {
-		doConnect = true
-		switch dir {
-		case DirectionUp:
-			// b is above a
-			directionAToB = DirectionUp
-			directionBToA = DirectionDown
-		case DirectionRight:
-			// b is right of a
-			directionAToB = DirectionRight
-			directionBToA = DirectionLeft
-		case DirectionDown:
-			// b is below a
-			directionAToB = DirectionDown
-			directionBToA = DirectionUp
-		case DirectionLeft:
-			// b is left of a
-			directionAToB = DirectionLeft
-			directionBToA = DirectionRight
-		}
+	switch dir {
+	case DirectionUp:
+		// b is above a
+		directionAToB = DirectionUp
+		directionBToA = DirectionDown
+	case DirectionRight:
+		// b is right of a
+		directionAToB = DirectionRight
+		directionBToA = DirectionLeft
+	case DirectionDown:
+		// b is below a
+		directionAToB = DirectionDown
+		directionBToA = DirectionUp
+	case DirectionLeft:
+		// b is left of a
+		directionAToB = DirectionLeft
+		directionBToA = DirectionRight
 	}
 
-	if doConnect {
-		roomA.SetConnectedRoom(directionAToB, b)
-		roomsMap[a] = roomA
-		roomB.SetConnectedRoom(directionBToA, a)
-		roomsMap[b] = roomB
-	}
+	// Cache room references by their IDs
+	roomsMap[roomAID] = roomA
+	roomsMap[roomBID] = roomB
+
+	// Connect rooms
+	roomA.SetConnectedRoom(directionAToB, roomBID)
+	roomB.SetConnectedRoom(directionBToA, roomAID)
 
 }
