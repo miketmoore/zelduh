@@ -123,7 +123,7 @@ func DrawObstaclesPerMapTiles(
 	nonObstacleSprites map[int]bool,
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) []Entity {
-	d := mapDrawData[roomsMap[*roomID].RoomName()]
+	d := mapDrawData[roomsMap[*roomID].Name]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {
