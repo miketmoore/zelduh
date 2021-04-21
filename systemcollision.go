@@ -117,12 +117,20 @@ func isColliding(r1, r2 pixel.Rect) bool {
 
 // Update checks for collisions
 func (s *CollisionSystem) Update() {
+	s.handlePlayerAtMapEdge()
+	s.handleEnemyCollisions()
+	s.handleCoinCollisions()
+	s.handleObstacleCollisions()
+	s.handleMoveableObstacleCollisions()
+	s.handleSwitchCollisions()
+	s.handleWarpCollisions()
+}
+
+func (s *CollisionSystem) handlePlayerAtMapEdge() {
 
 	player := s.player
-	playerR := s.player.ComponentSpatial.Rect
 	mapBounds := s.MapBounds
 
-	// is player at map edge?
 	if player.ComponentSpatial.Rect.Min.Y <= mapBounds.Min.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
 	} else if player.ComponentSpatial.Rect.Min.X <= mapBounds.Min.X {
@@ -132,6 +140,12 @@ func (s *CollisionSystem) Update() {
 	} else if player.ComponentSpatial.Rect.Max.Y >= mapBounds.Max.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
 	}
+}
+
+func (s *CollisionSystem) handleEnemyCollisions() {
+
+	player := s.player
+	playerR := s.player.ComponentSpatial.Rect
 
 	w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height
 	for _, enemy := range s.enemies {
@@ -160,11 +174,18 @@ func (s *CollisionSystem) Update() {
 			}
 		}
 	}
+}
+
+func (s *CollisionSystem) handleCoinCollisions() {
 	for _, coin := range s.coins {
 		if isColliding(coin.ComponentSpatial.Rect, s.player.ComponentSpatial.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithCoin(coin.ID)
 		}
 	}
+}
+
+func (s *CollisionSystem) handleObstacleCollisions() {
+	player := s.player
 
 	for _, obstacle := range s.obstacles {
 		mod := player.ComponentSpatial.CollisionWithRectMod
@@ -193,6 +214,9 @@ func (s *CollisionSystem) Update() {
 			s.CollisionHandler.OnArrowCollisionWithObstacle()
 		}
 	}
+}
+
+func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.ComponentSpatial.Rect, s.player.ComponentSpatial.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
@@ -222,9 +246,12 @@ func (s *CollisionSystem) Update() {
 			s.CollisionHandler.OnArrowCollisionWithObstacle()
 		}
 	}
+}
 
+func (s *CollisionSystem) handleSwitchCollisions() {
 	for _, collisionSwitch := range s.collisionSwitches {
 		if collisionSwitch.ComponentSpatial.HitBoxRadius > 0 {
+			w, h := s.player.ComponentSpatial.Width, s.player.ComponentSpatial.Height
 			if isCircleCollision(
 				s.player.ComponentSpatial.HitBoxRadius,
 				collisionSwitch.ComponentSpatial.HitBoxRadius,
@@ -242,7 +269,9 @@ func (s *CollisionSystem) Update() {
 		}
 
 	}
+}
 
+func (s *CollisionSystem) handleWarpCollisions() {
 	for _, warp := range s.warps {
 		if isColliding(s.player.ComponentSpatial.Rect, warp.ComponentSpatial.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithWarp(warp.ID)
