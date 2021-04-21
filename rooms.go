@@ -56,49 +56,6 @@ func NewRoom(name RoomName, entityConfigs ...EntityConfig) *Room {
 	}
 }
 
-func indexRoom(roomsMap Rooms, a, b RoomID, dir Direction) {
-	roomA, okA := roomsMap[a]
-	roomB, okB := roomsMap[b]
-	if okA && okB {
-		switch dir {
-		case DirectionUp:
-			// b is above a
-			roomA.SetConnectedRoom(DirectionUp, b)
-			roomsMap[a] = roomA
-			roomB.SetConnectedRoom(DirectionDown, a)
-			roomsMap[b] = roomB
-		case DirectionRight:
-			// b is right of a
-			roomA, ok := roomsMap[a]
-			if ok {
-				roomA.SetConnectedRoom(DirectionRight, b)
-				roomsMap[a] = roomA
-				roomB.SetConnectedRoom(DirectionLeft, a)
-				roomsMap[b] = roomB
-			}
-		case DirectionDown:
-			// b is below a
-			roomA, ok := roomsMap[a]
-			if ok {
-				roomA.SetConnectedRoom(DirectionDown, b)
-				roomsMap[a] = roomA
-				roomB.SetConnectedRoom(DirectionUp, a)
-				roomsMap[b] = roomB
-			}
-		case DirectionLeft:
-			// b is left of a
-			roomA, ok := roomsMap[a]
-			if ok {
-				roomA.SetConnectedRoom(DirectionLeft, b)
-				roomsMap[a] = roomA
-				roomB.SetConnectedRoom(DirectionRight, a)
-				roomsMap[b] = roomB
-			}
-		}
-	}
-
-}
-
 // BuildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
 func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 	for row := 0; row < len(layout); row++ {
@@ -109,7 +66,7 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 				if len(layout[row-1]) > col {
 					n := layout[row-1][col]
 					if n > 0 {
-						indexRoom(roomsMap, roomID, n, DirectionUp)
+						connectRooms(roomsMap, roomID, n, DirectionUp)
 					}
 				}
 			}
@@ -117,7 +74,7 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 			if len(layout[row]) > col+1 {
 				n := layout[row][col+1]
 				if n > 0 {
-					indexRoom(roomsMap, roomID, n, DirectionRight)
+					connectRooms(roomsMap, roomID, n, DirectionRight)
 				}
 			}
 			// Bottom
@@ -125,7 +82,7 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 				if len(layout[row+1]) > col {
 					n := layout[row+1][col]
 					if n > 0 {
-						indexRoom(roomsMap, roomID, n, DirectionDown)
+						connectRooms(roomsMap, roomID, n, DirectionDown)
 					}
 				}
 			}
@@ -133,9 +90,48 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 			if col > 0 {
 				n := layout[row][col-1]
 				if n > 0 {
-					indexRoom(roomsMap, roomID, n, DirectionLeft)
+					connectRooms(roomsMap, roomID, n, DirectionLeft)
 				}
 			}
 		}
 	}
+}
+
+func connectRooms(roomsMap Rooms, a, b RoomID, dir Direction) {
+	roomA, okA := roomsMap[a]
+	roomB, okB := roomsMap[b]
+
+	doConnect := false
+	var directionAToB Direction
+	var directionBToA Direction
+
+	if okA && okB {
+		doConnect = true
+		switch dir {
+		case DirectionUp:
+			// b is above a
+			directionAToB = DirectionUp
+			directionBToA = DirectionDown
+		case DirectionRight:
+			// b is right of a
+			directionAToB = DirectionRight
+			directionBToA = DirectionLeft
+		case DirectionDown:
+			// b is below a
+			directionAToB = DirectionDown
+			directionBToA = DirectionUp
+		case DirectionLeft:
+			// b is left of a
+			directionAToB = DirectionLeft
+			directionBToA = DirectionRight
+		}
+	}
+
+	if doConnect {
+		roomA.SetConnectedRoom(directionAToB, b)
+		roomsMap[a] = roomA
+		roomB.SetConnectedRoom(directionBToA, a)
+		roomsMap[b] = roomB
+	}
+
 }
