@@ -8,7 +8,7 @@ import (
 func GameStateMapTransition(
 	ui UI,
 	systemsManager *SystemsManager,
-	roomsMap RoomByIDMap,
+	roomByIDMap RoomByIDMap,
 	collisionSystem *CollisionSystem,
 	inputSystem *InputSystem,
 	currentRoomID *RoomID,
@@ -34,7 +34,7 @@ func GameStateMapTransition(
 		systemsManager.RemoveAllMoveableObstacles()
 		systemsManager.RemoveAllEntities()
 
-		connectedRooms := roomsMap[*currentRoomID].ConnectedRooms()
+		connectedRooms := roomByIDMap[*currentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
 			roomTransition,
@@ -49,7 +49,7 @@ func GameStateMapTransition(
 			ui.Window,
 			spritesheet,
 			mapDrawData,
-			roomsMap[*currentRoomID].Name,
+			roomByIDMap[*currentRoomID].Name,
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
 			tileSize,
@@ -59,7 +59,7 @@ func GameStateMapTransition(
 			ui.Window,
 			spritesheet,
 			mapDrawData,
-			roomsMap[*nextRoomID].Name,
+			roomByIDMap[*nextRoomID].Name,
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 			tileSize,

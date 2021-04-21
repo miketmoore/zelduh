@@ -230,7 +230,7 @@ func buildTestLevel(
 	tileSize float64,
 ) zelduh.Level {
 	// Build a map of RoomIDs to Room structs
-	rooms := BuildRooms(entityConfigPresetFnManager, tileSize)
+	roomByIDMap := BuildRooms(entityConfigPresetFnManager, tileSize)
 
 	zelduh.BuildMapRoomIDToRoom(
 		// Overworld is a multi-dimensional array representing the overworld
@@ -243,11 +243,11 @@ func buildTestLevel(
 			{11},
 		},
 		// This is mutated
-		rooms,
+		roomByIDMap,
 	)
 
 	return zelduh.Level{
-		Map: rooms,
+		RoomByIDMap: roomByIDMap,
 	}
 }
 

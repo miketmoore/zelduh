@@ -7,7 +7,7 @@ import (
 
 func GameStateGame(
 	ui UI,
-	roomsMap RoomByIDMap,
+	roomByIDMap RoomByIDMap,
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,
@@ -35,7 +35,7 @@ func GameStateGame(
 		ui.Window,
 		spritesheet,
 		mapDrawData,
-		roomsMap[*currentRoomID].Name,
+		roomByIDMap[*currentRoomID].Name,
 		0, 0,
 		tileSize,
 		activeSpaceRectangle,
@@ -51,7 +51,7 @@ func GameStateGame(
 		obstacles := DrawObstaclesPerMapTiles(
 			systemsManager,
 			entityConfigPresetFnManager,
-			roomsMap,
+			roomByIDMap,
 			mapDrawData,
 			currentRoomID,
 			0, 0,
@@ -67,7 +67,7 @@ func GameStateGame(
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		currentRoom := roomsMap[*currentRoomID]
+		currentRoom := roomByIDMap[*currentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID(), frameRate)
 			entitiesMap[entity.ID()] = entity

@@ -52,7 +52,7 @@ func NewRoom(name RoomName, entityConfigs ...EntityConfig) *Room {
 }
 
 // BuildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
-func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap RoomByIDMap) {
+func BuildMapRoomIDToRoom(layout [][]RoomID, roomByIDMap RoomByIDMap) {
 
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
@@ -61,38 +61,38 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap RoomByIDMap) {
 			if (row > 0) && (len(layout[row-1]) > col) {
 				roomBID := layout[row-1][col]
 				if roomBID > 0 {
-					connectRooms(roomsMap, roomAID, roomBID, DirectionUp)
+					connectRooms(roomByIDMap, roomAID, roomBID, DirectionUp)
 				}
 			}
 			// Right
 			if len(layout[row]) > col+1 {
 				roomBID := layout[row][col+1]
 				if roomBID > 0 {
-					connectRooms(roomsMap, roomAID, roomBID, DirectionRight)
+					connectRooms(roomByIDMap, roomAID, roomBID, DirectionRight)
 				}
 			}
 			// Bottom
 			if (len(layout) > row+1) && (len(layout[row+1]) > col) {
 				roomBID := layout[row+1][col]
 				if roomBID > 0 {
-					connectRooms(roomsMap, roomAID, roomBID, DirectionDown)
+					connectRooms(roomByIDMap, roomAID, roomBID, DirectionDown)
 				}
 			}
 			// Left
 			if col > 0 {
 				roomBID := layout[row][col-1]
 				if roomBID > 0 {
-					connectRooms(roomsMap, roomAID, roomBID, DirectionLeft)
+					connectRooms(roomByIDMap, roomAID, roomBID, DirectionLeft)
 				}
 			}
 		}
 	}
 }
 
-func connectRooms(roomsMap RoomByIDMap, roomAID, roomBID RoomID, dir Direction) {
+func connectRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir Direction) {
 
-	roomA, roomAOK := roomsMap[roomAID]
-	roomB, roomBOK := roomsMap[roomBID]
+	roomA, roomAOK := roomByIDMap[roomAID]
+	roomB, roomBOK := roomByIDMap[roomBID]
 
 	if !roomAOK || !roomBOK {
 		return
@@ -121,8 +121,8 @@ func connectRooms(roomsMap RoomByIDMap, roomAID, roomBID RoomID, dir Direction) 
 	}
 
 	// Cache room references by their IDs
-	roomsMap[roomAID] = roomA
-	roomsMap[roomBID] = roomB
+	roomByIDMap[roomAID] = roomA
+	roomByIDMap[roomBID] = roomB
 
 	// Connect rooms
 	roomA.SetConnectedRoom(directionAToB, roomBID)

@@ -95,7 +95,7 @@ func (g *GameStateManager) Update() {
 	case StateGame:
 		GameStateGame(
 			g.UI,
-			g.LevelManager.CurrentLevel.Map,
+			g.LevelManager.CurrentLevel.RoomByIDMap,
 			g.SystemsManager,
 			g.InputSystem,
 			g.ShouldAddEntities,
@@ -122,7 +122,7 @@ func (g *GameStateManager) Update() {
 		GameStateMapTransition(
 			g.UI,
 			g.SystemsManager,
-			g.LevelManager.CurrentLevel.Map,
+			g.LevelManager.CurrentLevel.RoomByIDMap,
 			g.CollisionSystem,
 			g.InputSystem,
 			g.CurrentRoomID,
