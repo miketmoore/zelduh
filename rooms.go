@@ -14,14 +14,14 @@ type ConnectedRooms struct {
 }
 
 // Room defines an API for room implementations
-type Roomer interface {
+type ConnectedRoom interface {
 	RoomName() RoomName
 	ConnectedRooms() *ConnectedRooms
 	SetConnectedRoom(Direction, RoomID)
 }
 
 // Rooms is a type of map that indexes rooms by their ID
-type Rooms map[RoomID]Roomer
+type Rooms map[RoomID]ConnectedRoom
 
 // Room represents one map section
 type Room struct {
