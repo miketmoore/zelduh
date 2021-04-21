@@ -89,33 +89,35 @@ func run() {
 	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
 	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
 
-	collisionSystem := &zelduh.CollisionSystem{
-		MapBounds: pixel.R(
+	collisionHandler := zelduh.NewCollisionHandler(
+		&systemsManager,
+		&spatialSystem,
+		healthSystem,
+		&shouldAddEntities,
+		&nextRoomID,
+		&currentState,
+		&roomTransition,
+		entitiesMap,
+		&player,
+		&sword,
+		&explosion,
+		&arrow,
+		hearts,
+		roomWarps,
+		&entityConfigPresetFnManager,
+		tileSize,
+		frameRate,
+	)
+
+	collisionSystem := zelduh.NewCollisionSystem(
+		pixel.R(
 			activeSpaceRectangle.X,
 			activeSpaceRectangle.Y,
 			activeSpaceRectangle.X+activeSpaceRectangle.Width,
 			activeSpaceRectangle.Y+activeSpaceRectangle.Height,
 		),
-		CollisionHandler: zelduh.NewCollisionHandler(
-			&systemsManager,
-			&spatialSystem,
-			healthSystem,
-			&shouldAddEntities,
-			&nextRoomID,
-			&currentState,
-			&roomTransition,
-			entitiesMap,
-			&player,
-			&sword,
-			&explosion,
-			&arrow,
-			hearts,
-			roomWarps,
-			&entityConfigPresetFnManager,
-			tileSize,
-			frameRate,
-		),
-	}
+		&collisionHandler,
+	)
 
 	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
@@ -125,7 +127,7 @@ func run() {
 		inputSystem,
 		healthSystem,
 		&spatialSystem,
-		collisionSystem,
+		&collisionSystem,
 		&zelduh.RenderSystem{
 			Win:         ui.Window,
 			Spritesheet: spritesheet,
@@ -185,7 +187,7 @@ func run() {
 		&systemsManager,
 		ui,
 		currLocaleMsgs,
-		collisionSystem,
+		&collisionSystem,
 		inputSystem,
 		&shouldAddEntities,
 		&currentRoomID,

@@ -24,7 +24,17 @@ type CollisionSystem struct {
 	moveableObstacles []collisionEntity
 	collisionSwitches []collisionEntity
 	warps             []collisionEntity
-	CollisionHandler  CollisionHandler
+	CollisionHandler  *CollisionHandler
+}
+
+func NewCollisionSystem(
+	mapBounds pixel.Rect,
+	collisionHandler *CollisionHandler,
+) CollisionSystem {
+	return CollisionSystem{
+		MapBounds:        mapBounds,
+		CollisionHandler: collisionHandler,
+	}
 }
 
 // AddEntity adds an entity to the system
@@ -196,17 +206,17 @@ func (s *CollisionSystem) Update() {
 			}
 		}
 
-		for _, enemy := range s.enemies {
-			if isColliding(moveableObstacle.ComponentSpatial.Rect, enemy.ComponentSpatial.Rect) {
-				// s.EnemyCollisionWithMoveableObstacle(enemy.ID)
-			}
-		}
+		// for _, enemy := range s.enemies {
+		// 	if isColliding(moveableObstacle.ComponentSpatial.Rect, enemy.ComponentSpatial.Rect) {
+		// 		// s.EnemyCollisionWithMoveableObstacle(enemy.ID)
+		// 	}
+		// }
 
-		for _, obstacle := range s.obstacles {
-			if isColliding(moveableObstacle.ComponentSpatial.Rect, obstacle.ComponentSpatial.Rect) {
-				// s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
-			}
-		}
+		// for _, obstacle := range s.obstacles {
+		// 	if isColliding(moveableObstacle.ComponentSpatial.Rect, obstacle.ComponentSpatial.Rect) {
+		// 		// s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
+		// 	}
+		// }
 
 		if isColliding(moveableObstacle.ComponentSpatial.Rect, s.arrow.ComponentSpatial.Rect) {
 			s.CollisionHandler.OnArrowCollisionWithObstacle()
