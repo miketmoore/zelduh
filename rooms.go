@@ -13,8 +13,8 @@ type ConnectedRooms struct {
 	Left   RoomID
 }
 
-// Rooms is a type of map that indexes rooms by their ID
-type Rooms map[RoomID]*Room
+// RoomByIDMap is a type of map that indexes rooms by their ID
+type RoomByIDMap map[RoomID]*Room
 
 // Room represents one map section
 type Room struct {
@@ -52,7 +52,7 @@ func NewRoom(name RoomName, entityConfigs ...EntityConfig) *Room {
 }
 
 // BuildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
-func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
+func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap RoomByIDMap) {
 
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
@@ -89,7 +89,7 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomsMap Rooms) {
 	}
 }
 
-func connectRooms(roomsMap Rooms, roomAID, roomBID RoomID, dir Direction) {
+func connectRooms(roomsMap RoomByIDMap, roomAID, roomBID RoomID, dir Direction) {
 
 	roomA, roomAOK := roomsMap[roomAID]
 	roomB, roomBOK := roomsMap[roomBID]

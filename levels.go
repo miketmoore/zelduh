@@ -1,7 +1,7 @@
 package zelduh
 
 type Level struct {
-	Map Rooms
+	Map RoomByIDMap
 }
 
 type LevelManager struct {

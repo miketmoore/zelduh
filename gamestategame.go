@@ -7,7 +7,7 @@ import (
 
 func GameStateGame(
 	ui UI,
-	roomsMap Rooms,
+	roomsMap RoomByIDMap,
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,

@@ -253,7 +253,7 @@ func buildTestLevel(
 
 // TODO move to zelduh cmd file since it is configuration
 // Map of RoomID to a Room configuration
-func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, tileSize float64) zelduh.Rooms {
+func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager, tileSize float64) zelduh.RoomByIDMap {
 
 	buildWarpStone := buildWarpStoneFnFactory(entityConfigPresetFnManager)
 
@@ -262,7 +262,7 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 		Height: tileSize,
 	})
 
-	return zelduh.Rooms{
+	return zelduh.RoomByIDMap{
 		1: zelduh.NewRoom("overworldFourWallsDoorBottomRight",
 			entityConfigPresetFnManager.GetPreset(PresetNamePuzzleBox)(zelduh.Coordinates{X: 5, Y: 5}),
 			entityConfigPresetFnManager.GetPreset(PresetNameFloorSwitch)(zelduh.Coordinates{X: 5, Y: 6}),
