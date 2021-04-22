@@ -22,7 +22,8 @@ func GameStateMapTransition(
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) {
-	inputSystem.DisablePlayer()
+	inputSystem.Disable()
+
 	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
 		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)

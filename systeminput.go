@@ -12,25 +12,25 @@ type inputEntity struct {
 
 // InputSystem is a custom system for detecting collisions and what to do when they occur
 type InputSystem struct {
-	Win           *pixelgl.Window
-	playerEntity  inputEntity
-	playerEnabled bool
-	sword         inputEntity
-	arrow         inputEntity
+	Win          *pixelgl.Window
+	playerEntity inputEntity
+	inputEnabled bool
+	sword        inputEntity
+	arrow        inputEntity
 }
 
 func NewInputSystem(window *pixelgl.Window) InputSystem {
 	return InputSystem{Win: window}
 }
 
-// DisablePlayer disables player input
-func (s *InputSystem) DisablePlayer() {
-	s.playerEnabled = false
+// Disable disables input
+func (s *InputSystem) Disable() {
+	s.inputEnabled = false
 }
 
-// EnablePlayer enables player input
-func (s *InputSystem) EnablePlayer() {
-	s.playerEnabled = true
+// Enable enables  input
+func (s *InputSystem) Enable() {
+	s.inputEnabled = true
 }
 
 // AddEntity adds an entity to the system
@@ -52,7 +52,7 @@ func (s *InputSystem) AddEntity(entity Entity) {
 
 // Update checks for player input
 func (s InputSystem) Update() {
-	if !s.playerEnabled {
+	if !s.inputEnabled {
 		return
 	}
 
