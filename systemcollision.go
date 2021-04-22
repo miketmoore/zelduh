@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"math"
-
 	"github.com/faiface/pixel"
 )
 
@@ -108,13 +106,6 @@ func (s *CollisionSystem) RemoveAll(category EntityCategory) {
 	}
 }
 
-func isColliding(r1, r2 pixel.Rect) bool {
-	return r1.Min.X < r2.Max.X &&
-		r1.Max.X > r2.Min.X &&
-		r1.Min.Y < r2.Max.Y &&
-		r1.Max.Y > r2.Min.Y
-}
-
 // Update checks for collisions
 func (s *CollisionSystem) Update() {
 	s.handlePlayerAtMapEdge()
@@ -217,8 +208,11 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 }
 
 func (s *CollisionSystem) handleMoveableObstacleCollisions() {
+
+	player := s.player
+
 	for _, moveableObstacle := range s.moveableObstacles {
-		if isColliding(moveableObstacle.ComponentSpatial.Rect, s.player.ComponentSpatial.Rect) {
+		if isColliding(moveableObstacle.ComponentSpatial.Rect, player.ComponentSpatial.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 		}
 
@@ -249,19 +243,22 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 }
 
 func (s *CollisionSystem) handleSwitchCollisions() {
+
+	player := s.player
+
 	for _, collisionSwitch := range s.collisionSwitches {
 		if collisionSwitch.ComponentSpatial.HitBoxRadius > 0 {
-			w, h := s.player.ComponentSpatial.Width, s.player.ComponentSpatial.Height
+			w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height
 			if isCircleCollision(
 				s.player.ComponentSpatial.HitBoxRadius,
 				collisionSwitch.ComponentSpatial.HitBoxRadius,
-				w, h, s.player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
+				w, h, player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
 				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.CollisionHandler.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
 			}
 		} else {
-			if isColliding(s.player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
+			if isColliding(player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
 				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.CollisionHandler.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
@@ -272,24 +269,12 @@ func (s *CollisionSystem) handleSwitchCollisions() {
 }
 
 func (s *CollisionSystem) handleWarpCollisions() {
+
+	player := s.player
+
 	for _, warp := range s.warps {
-		if isColliding(s.player.ComponentSpatial.Rect, warp.ComponentSpatial.Rect) {
+		if isColliding(player.ComponentSpatial.Rect, warp.ComponentSpatial.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithWarp(warp.ID)
 		}
 	}
-}
-
-func isCircleCollision(radius1, radius2, w, h float64, rect1, rect2 pixel.Rect) bool {
-	x1 := rect1.Min.X + (w / 2)
-	y1 := rect1.Min.Y + (h / 2)
-
-	x2 := rect2.Min.X + (w / 2)
-	y2 := rect2.Min.Y + (h / 2)
-
-	dx := x1 - x2
-	dy := y1 - y2
-
-	distance := math.Sqrt(dx*dx + dy*dy)
-
-	return distance < (radius1 + radius2)
 }
