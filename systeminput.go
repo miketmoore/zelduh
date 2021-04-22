@@ -1,9 +1,5 @@
 package zelduh
 
-import (
-	"github.com/faiface/pixel/pixelgl"
-)
-
 type inputEntity struct {
 	*ComponentMovement
 	*ComponentIgnore
@@ -12,15 +8,15 @@ type inputEntity struct {
 
 // InputSystem is a custom system for detecting collisions and what to do when they occur
 type InputSystem struct {
-	Win          *pixelgl.Window
+	Input        Input
 	playerEntity inputEntity
 	inputEnabled bool
 	sword        inputEntity
 	arrow        inputEntity
 }
 
-func NewInputSystem(window *pixelgl.Window) InputSystem {
-	return InputSystem{Win: window}
+func NewInputSystem(input Input) InputSystem {
+	return InputSystem{Input: input}
 }
 
 // Disable disables input
@@ -50,37 +46,45 @@ func (s *InputSystem) AddEntity(entity Entity) {
 	}
 }
 
-// Update checks for player input
-func (s InputSystem) Update() {
-	if !s.inputEnabled {
-		return
-	}
+type Input interface {
+	Up() bool
+	Right() bool
+	Down() bool
+	Left() bool
+	PrimaryAttack() bool
+	SecondaryAttack() bool
+	Combo() bool
+}
 
-	win := s.Win
+func (s InputSystem) handleInputMovement() {
+	input := s.Input
 	player := s.playerEntity
-
 	movingSpeed := player.ComponentMovement.MaxSpeed
 
-	player.ComponentMovement.LastDirection = player.ComponentMovement.Direction
-	if win.Pressed(pixelgl.KeyUp) {
+	if input.Up() {
 		player.ComponentMovement.Speed = movingSpeed
 		player.ComponentMovement.Direction = DirectionUp
-	} else if win.Pressed(pixelgl.KeyRight) {
+	} else if input.Right() {
 		player.ComponentMovement.Speed = movingSpeed
 		player.ComponentMovement.Direction = DirectionRight
-	} else if win.Pressed(pixelgl.KeyDown) {
+	} else if input.Down() {
 		player.ComponentMovement.Speed = movingSpeed
 		player.ComponentMovement.Direction = DirectionDown
-	} else if win.Pressed(pixelgl.KeyLeft) {
+	} else if input.Left() {
 		player.ComponentMovement.Speed = movingSpeed
 		player.ComponentMovement.Direction = DirectionLeft
 	} else {
 		player.ComponentMovement.Speed = 0
 	}
+}
+
+func (s InputSystem) handleInputSword() {
+	input := s.Input
+	player := s.playerEntity
 
 	// attack with sword
 	s.sword.ComponentMovement.Direction = player.ComponentMovement.Direction
-	if win.Pressed(pixelgl.KeyF) {
+	if input.PrimaryAttack() {
 		s.sword.ComponentMovement.Speed = 1.0
 		s.sword.ComponentIgnore.Value = false
 	} else {
@@ -88,10 +92,16 @@ func (s InputSystem) Update() {
 		s.sword.ComponentIgnore.Value = true
 	}
 
+}
+
+func (s InputSystem) handleInputArrow() {
+	input := s.Input
+	player := s.playerEntity
+
 	// fire arrow
 	if s.arrow.ComponentMovement.RemainingMoves == 0 {
 		s.arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
-		if win.Pressed(pixelgl.KeyG) {
+		if input.SecondaryAttack() {
 			s.arrow.ComponentMovement.Speed = 7.0
 			s.arrow.ComponentMovement.RemainingMoves = 100
 			s.arrow.ComponentIgnore.Value = false
@@ -103,9 +113,13 @@ func (s InputSystem) Update() {
 	} else {
 		s.arrow.ComponentMovement.RemainingMoves--
 	}
+}
+
+func (s InputSystem) handleInputDash() {
+	input := s.Input
 
 	// dashing
-	if !win.Pressed(pixelgl.KeyF) && win.Pressed(pixelgl.KeySpace) {
+	if !input.PrimaryAttack() && input.Combo() {
 		if s.playerEntity.ComponentDash.Charge < s.playerEntity.ComponentDash.MaxCharge {
 			s.playerEntity.ComponentDash.Charge++
 			s.sword.ComponentMovement.Speed = 0
@@ -117,4 +131,19 @@ func (s InputSystem) Update() {
 	} else {
 		s.playerEntity.ComponentDash.Charge = 0
 	}
+}
+
+// Update checks for player input
+func (s InputSystem) Update() {
+	if !s.inputEnabled {
+		return
+	}
+
+	s.playerEntity.ComponentMovement.LastDirection = s.playerEntity.ComponentMovement.Direction
+
+	s.handleInputMovement()
+	s.handleInputSword()
+	s.handleInputArrow()
+	s.handleInputDash()
+
 }
