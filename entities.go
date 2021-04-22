@@ -38,6 +38,10 @@ type Entity struct {
 
 type EntitiesMap map[EntityID]Entity
 
+func NewEntitiesMap() EntitiesMap {
+	return EntitiesMap{}
+}
+
 // ID returns the entity ID
 func (e *Entity) ID() EntityID {
 	return e.id

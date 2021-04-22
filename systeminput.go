@@ -19,6 +19,10 @@ type InputSystem struct {
 	arrow         inputEntity
 }
 
+func NewInputSystem(window *pixelgl.Window) InputSystem {
+	return InputSystem{Win: window}
+}
+
 // DisablePlayer disables player input
 func (s *InputSystem) DisablePlayer() {
 	s.playerEnabled = false

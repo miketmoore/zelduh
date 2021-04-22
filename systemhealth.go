@@ -10,6 +10,10 @@ type HealthSystem struct {
 	entities []healthEntity
 }
 
+func NewHealthSystem() HealthSystem {
+	return HealthSystem{}
+}
+
 // AddEntity adds the entity to the system
 func (s *HealthSystem) AddEntity(entity Entity) {
 	s.entities = append(s.entities, healthEntity{

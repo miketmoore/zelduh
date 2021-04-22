@@ -46,15 +46,13 @@ func run() {
 		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 
-	healthSystem := &zelduh.HealthSystem{}
+	healthSystem := zelduh.NewHealthSystem()
 
-	entitiesMap := zelduh.EntitiesMap{}
+	entitiesMap := zelduh.NewEntitiesMap()
 
-	roomTransition := zelduh.RoomTransition{
-		Start: float64(tileSize),
-	}
+	roomTransition := zelduh.NewRoomTransition(float64(tileSize))
 
-	roomWarps := zelduh.RoomWarps{}
+	roomWarps := zelduh.NewRoomWarps()
 
 	shouldAddEntities := true
 	var currentRoomID zelduh.RoomID = 1
@@ -73,17 +71,9 @@ func run() {
 		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.80, Y: 14}, frameRate),
 	}
 
-	windowConfig := zelduh.WindowConfig{
-		X:      0,
-		Y:      0,
-		Width:  800,
-		Height: 800,
-	}
+	windowConfig := zelduh.NewWindowConfig(0, 0, 800, 800)
 
-	activeSpaceRectangle := zelduh.ActiveSpaceRectangle{
-		Width:  tileSize * 14,
-		Height: tileSize * 12,
-	}
+	activeSpaceRectangle := zelduh.NewActiveSpaceRectangle(0, 0, tileSize*14, tileSize*12)
 
 	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
 	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
@@ -91,7 +81,7 @@ func run() {
 	collisionHandler := zelduh.NewCollisionHandler(
 		&systemsManager,
 		&spatialSystem,
-		healthSystem,
+		&healthSystem,
 		&shouldAddEntities,
 		&nextRoomID,
 		&currentState,
@@ -120,11 +110,11 @@ func run() {
 
 	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
-	inputSystem := &zelduh.InputSystem{Win: ui.Window}
+	inputSystem := zelduh.NewInputSystem(ui.Window)
 
 	systemsManager.AddSystems(
-		inputSystem,
-		healthSystem,
+		&inputSystem,
+		&healthSystem,
 		&spatialSystem,
 		&collisionSystem,
 		&zelduh.RenderSystem{
@@ -187,7 +177,7 @@ func run() {
 		ui,
 		currLocaleMsgs,
 		&collisionSystem,
-		inputSystem,
+		&inputSystem,
 		&shouldAddEntities,
 		&currentRoomID,
 		&nextRoomID,

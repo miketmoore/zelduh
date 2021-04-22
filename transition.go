@@ -18,3 +18,7 @@ type RoomTransition struct {
 	Timer  int
 	Style  TransitionStyle
 }
+
+func NewRoomTransition(start float64) RoomTransition {
+	return RoomTransition{Start: start}
+}

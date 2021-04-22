@@ -4,3 +4,7 @@ package zelduh
 type ActiveSpaceRectangle struct {
 	X, Y, Width, Height float64
 }
+
+func NewActiveSpaceRectangle(x, y, width, height float64) ActiveSpaceRectangle {
+	return ActiveSpaceRectangle{x, y, width, height}
+}
