@@ -15,7 +15,7 @@ go get -u github.com/miketmoore/zelduh/...
 ## Play
 
 ```
-go run cmd/zelduh/zelduh.go
+go run cmd/zelduh/*.go
 ```
 
 ## Controls
