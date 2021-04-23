@@ -9,12 +9,13 @@ type inputEntity struct {
 // InputSystem is a custom system for detecting collisions and what to do when they occur
 type InputSystem struct {
 	Input        Input
-	playerEntity inputEntity
+	player       inputEntity
 	inputEnabled bool
 	sword        inputEntity
 	arrow        inputEntity
 }
 
+// NewInputSystem creates a new InputSystem
 func NewInputSystem(input Input) InputSystem {
 	return InputSystem{Input: input}
 }
@@ -38,7 +39,7 @@ func (s *InputSystem) AddEntity(entity Entity) {
 	}
 	switch entity.Category {
 	case CategoryPlayer:
-		s.playerEntity = r
+		s.player = r
 	case CategorySword:
 		s.sword = r
 	case CategoryArrow:
@@ -56,9 +57,27 @@ type Input interface {
 	Combo() bool
 }
 
+// Update checks for player input
+func (s InputSystem) Update() {
+	if !s.inputEnabled {
+		return
+	}
+
+	s.updatePlayerLastDirection()
+	s.handleInputMovement()
+	s.handleInputSword()
+	s.handleInputArrow()
+	s.handleInputDash()
+
+}
+
+func (s InputSystem) updatePlayerLastDirection() {
+	s.player.ComponentMovement.LastDirection = s.player.ComponentMovement.Direction
+}
+
 func (s InputSystem) handleInputMovement() {
 	input := s.Input
-	player := s.playerEntity
+	player := s.player
 	movingSpeed := player.ComponentMovement.MaxSpeed
 
 	if input.Up() {
@@ -80,9 +99,8 @@ func (s InputSystem) handleInputMovement() {
 
 func (s InputSystem) handleInputSword() {
 	input := s.Input
-	player := s.playerEntity
+	player := s.player
 
-	// attack with sword
 	s.sword.ComponentMovement.Direction = player.ComponentMovement.Direction
 	if input.PrimaryAttack() {
 		s.sword.ComponentMovement.Speed = 1.0
@@ -96,9 +114,8 @@ func (s InputSystem) handleInputSword() {
 
 func (s InputSystem) handleInputArrow() {
 	input := s.Input
-	player := s.playerEntity
+	player := s.player
 
-	// fire arrow
 	if s.arrow.ComponentMovement.RemainingMoves == 0 {
 		s.arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
 		if input.SecondaryAttack() {
@@ -118,10 +135,9 @@ func (s InputSystem) handleInputArrow() {
 func (s InputSystem) handleInputDash() {
 	input := s.Input
 
-	// dashing
 	if !input.PrimaryAttack() && input.Combo() {
-		if s.playerEntity.ComponentDash.Charge < s.playerEntity.ComponentDash.MaxCharge {
-			s.playerEntity.ComponentDash.Charge++
+		if s.player.ComponentDash.Charge < s.player.ComponentDash.MaxCharge {
+			s.player.ComponentDash.Charge++
 			s.sword.ComponentMovement.Speed = 0
 			s.sword.ComponentIgnore.Value = true
 		} else {
@@ -129,21 +145,6 @@ func (s InputSystem) handleInputDash() {
 			s.sword.ComponentIgnore.Value = false
 		}
 	} else {
-		s.playerEntity.ComponentDash.Charge = 0
+		s.player.ComponentDash.Charge = 0
 	}
-}
-
-// Update checks for player input
-func (s InputSystem) Update() {
-	if !s.inputEnabled {
-		return
-	}
-
-	s.playerEntity.ComponentMovement.LastDirection = s.playerEntity.ComponentMovement.Direction
-
-	s.handleInputMovement()
-	s.handleInputSword()
-	s.handleInputArrow()
-	s.handleInputDash()
-
 }
