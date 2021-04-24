@@ -200,6 +200,8 @@ func run() {
 		activeSpaceRectangle,
 	)
 
+	draw := true
+
 	for !ui.Window.Closed() {
 
 		// Quit application when user input matches
@@ -208,6 +210,16 @@ func run() {
 		}
 
 		gameStateManager.Update()
+
+		if draw {
+			draw = false
+			dialogCorner := entityFactory.NewEntity(
+				PresetNameDialogCorner,
+				zelduh.Coordinates{X: 0, Y: 0},
+				frameRate,
+			)
+			systemsManager.AddEntities(dialogCorner)
+		}
 
 		ui.Window.Update()
 

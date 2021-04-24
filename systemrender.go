@@ -62,6 +62,8 @@ func (s *RenderSystem) AddEntity(entity Entity) {
 		fallthrough
 	case CategoryCoin:
 		fallthrough
+	case CategoryIgnore:
+		fallthrough
 	default:
 		if entity.ComponentToggler != nil {
 			r.ComponentToggler = entity.ComponentToggler

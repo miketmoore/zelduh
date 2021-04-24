@@ -23,6 +23,7 @@ const (
 	PresetNameHeart            zelduh.PresetName = "heart"
 	PresetNameEnemyEyeBurrower zelduh.PresetName = "eyeBurrower"
 	PresetNameSword            zelduh.PresetName = "sword"
+	PresetNameDialogCorner     zelduh.PresetName = "dialogCorner"
 )
 
 type BuildWarpFn func(
@@ -331,6 +332,16 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[zelduh.PresetName]zeldu
 				},
 				Animation: zelduh.AnimationConfig{
 					"default": zelduh.GetSpriteSet("uiCoin"),
+				},
+			}
+		},
+		PresetNameDialogCorner: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+			return zelduh.EntityConfig{
+				Category:    zelduh.CategoryHeart,
+				Dimensions:  dimensions,
+				Coordinates: buildCoordinates(coordinates),
+				Animation: zelduh.AnimationConfig{
+					"default": zelduh.GetSpriteSet("dialogCorner"),
 				},
 			}
 		},

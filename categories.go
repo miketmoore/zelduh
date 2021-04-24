@@ -13,4 +13,5 @@ const (
 	CategoryMovableObstacle
 	CategoryCollisionSwitch
 	CategoryWarp
+	CategoryIgnore
 )
