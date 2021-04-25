@@ -42,6 +42,10 @@ type Dimensions struct {
 	Width, Height float64
 }
 
+type Transform struct {
+	Rotation float64
+}
+
 // EntityConfig is used to simplify building entities
 type EntityConfig struct {
 	Category                                                      EntityCategory
@@ -59,6 +63,7 @@ type EntityConfig struct {
 	Hitbox                                                        *HitboxConfig
 	Dash                                                          *DashConfig
 	Movement                                                      *MovementConfig
+	Transform                                                     *Transform
 }
 
 type EntityConfigPresetFn = func(coordinates Coordinates) EntityConfig

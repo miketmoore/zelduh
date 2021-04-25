@@ -185,11 +185,20 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 			frameIndex := animData.Frames[frameNum]
 			frame := s.Spritesheet[frameIndex]
 
-			v := pixel.V(
+			vector := pixel.V(
 				entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
 				entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
 			)
-			frame.Draw(s.Win, pixel.IM.Moved(v))
+
+			matrix := pixel.IM.Moved(vector)
+
+			if entity.ComponentSpatial.Transform != nil {
+				// Transform
+				angle := entity.ComponentSpatial.Transform.Rotation
+				matrix = matrix.Rotated(vector, angle)
+			}
+
+			frame.Draw(s.Win, matrix)
 		}
 	}
 }

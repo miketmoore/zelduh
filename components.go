@@ -73,6 +73,10 @@ type ComponentMovement struct {
 	PatternName    string
 }
 
+type ComponentSpatialTransform struct {
+	Rotation float64
+}
+
 // ComponentSpatial contains spatial data
 type ComponentSpatial struct {
 	Width                float64
@@ -83,6 +87,7 @@ type ComponentSpatial struct {
 	HitBox               *imdraw.IMDraw
 	HitBoxRadius         float64
 	CollisionWithRectMod float64
+	Transform            *ComponentSpatialTransform
 }
 
 // ComponentAnimationData contains data about animating one sequence of sprites

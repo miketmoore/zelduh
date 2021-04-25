@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	_ "image/png"
+	"math"
 	"math/rand"
 	"os"
 	"time"
@@ -213,29 +214,35 @@ func run() {
 
 		if draw {
 			draw = false
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogCorner,
-				zelduh.Coordinates{X: 3, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogSide,
-				zelduh.Coordinates{X: 4, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogSide,
-				zelduh.Coordinates{X: 5, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogSide,
-				zelduh.Coordinates{X: 6, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogCorner,
-				zelduh.Coordinates{X: 7, Y: 11},
+			// systemsManager.AddEntities(entityFactory.NewEntity(
+			// 	PresetNameDialogCorner,
+			// 	zelduh.Coordinates{X: 3, Y: 11},
+			// 	frameRate,
+			// ))
+			// systemsManager.AddEntities(entityFactory.NewEntity(
+			// 	PresetNameDialogSide,
+			// 	zelduh.Coordinates{X: 4, Y: 11},
+			// 	frameRate,
+			// ))
+			// systemsManager.AddEntities(entityFactory.NewEntity(
+			// 	PresetNameDialogSide,
+			// 	zelduh.Coordinates{X: 5, Y: 11},
+			// 	frameRate,
+			// ))
+			// systemsManager.AddEntities(entityFactory.NewEntity(
+			// 	PresetNameDialogSide,
+			// 	zelduh.Coordinates{X: 6, Y: 11},
+			// 	frameRate,
+			// ))
+
+			entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)
+			entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
+			entityConfig.Transform = &zelduh.Transform{
+				Rotation: math.Pi / 4,
+			}
+
+			systemsManager.AddEntities(entityFactory.NewEntity2(
+				entityConfig,
 				frameRate,
 			))
 		}

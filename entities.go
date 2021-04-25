@@ -103,6 +103,25 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		entity.ComponentSpatial.HitBoxRadius = c.Hitbox.Radius
 	}
 
+	if c.Transform != nil {
+		// How to rotate pixel.Rect?
+		// entity.ComponentSpatial.
+
+		// https://github.com/faiface/pixel/wiki/Moving,-scaling-and-rotating-with-Matrix#rotation
+		// mat := pixel.IM
+		// mat = mat.Moved(win.Bounds().Center())
+		// mat = mat.Rotated(win.Bounds().Center(), math.Pi/4)
+		// sprite.Draw(win, mat)
+
+		// matrix := pixel.IM
+		// vector := entity.ComponentSpatial.Rect.Center()
+		// matrix = matrix.Rotated(vector, 90)
+
+		entity.ComponentSpatial.Transform = &ComponentSpatialTransform{
+			Rotation: c.Transform.Rotation,
+		}
+	}
+
 	if c.Toggleable {
 		entity.ComponentToggler = &ComponentToggler{}
 		if c.Toggled {

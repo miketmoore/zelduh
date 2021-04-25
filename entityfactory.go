@@ -27,3 +27,11 @@ func (ef *EntityFactory) NewEntity(presetName PresetName, coordinates Coordinate
 		frameRate,
 	)
 }
+
+func (ef *EntityFactory) NewEntity2(entityConfig EntityConfig, frameRate int) Entity {
+	return BuildEntityFromConfig(
+		entityConfig,
+		ef.systemsManager.NewEntityID(),
+		frameRate,
+	)
+}
