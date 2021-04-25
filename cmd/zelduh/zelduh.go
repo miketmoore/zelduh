@@ -213,57 +213,13 @@ func run() {
 
 		if draw {
 			draw = false
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogCorner,
-				zelduh.Coordinates{X: 3, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogSide,
-				zelduh.Coordinates{X: 4, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogSide,
-				zelduh.Coordinates{X: 5, Y: 11},
-				frameRate,
-			))
-			systemsManager.AddEntities(entityFactory.NewEntity(
-				PresetNameDialogSide,
-				zelduh.Coordinates{X: 6, Y: 11},
-				frameRate,
-			))
 
-			// Top right corner
-			entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)
-			entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
-			entityConfig.Transform = &zelduh.Transform{
-				Rotation: -90,
-			}
-			systemsManager.AddEntities(entityFactory.NewEntity2(
-				entityConfig,
+			drawDialog(
+				systemsManager,
+				entityConfigPresetFnManager,
+				entityFactory,
 				frameRate,
-			))
-
-			// Left Side
-			entityConfig2 := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 3, Y: 10})
-			entityConfig2.Transform = &zelduh.Transform{
-				Rotation: 90,
-			}
-			systemsManager.AddEntities(entityFactory.NewEntity2(
-				entityConfig2,
-				frameRate,
-			))
-
-			// Right Side
-			entityConfig3 := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 7, Y: 10})
-			entityConfig3.Transform = &zelduh.Transform{
-				Rotation: -90,
-			}
-			systemsManager.AddEntities(entityFactory.NewEntity2(
-				entityConfig3,
-				frameRate,
-			))
+			)
 
 			// systemsManager.AddEntities(entityFactory.NewEntity(
 			// 	PresetNameDialogSide,
@@ -300,4 +256,109 @@ func run() {
 
 func main() {
 	pixelgl.Run(run)
+}
+
+func buildRotatedEntityConfig(
+	presetName zelduh.PresetName,
+	entityConfigPresetFnManager zelduh.EntityConfigPresetFnManager,
+	x, y, degrees float64,
+) zelduh.EntityConfig {
+	entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(presetName)
+	entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: x, Y: y})
+	entityConfig.Transform = &zelduh.Transform{
+		Rotation: degrees,
+	}
+	return entityConfig
+}
+
+func drawDialog(
+	systemsManager zelduh.SystemsManager,
+	entityConfigPresetFnManager zelduh.EntityConfigPresetFnManager,
+	entityFactory zelduh.EntityFactory,
+	frameRate int,
+) {
+
+	// Top left corner
+	systemsManager.AddEntities(entityFactory.NewEntity(
+		PresetNameDialogCorner,
+		zelduh.Coordinates{X: 3, Y: 11},
+		frameRate,
+	))
+
+	// Top side
+	systemsManager.AddEntities(entityFactory.NewEntity(
+		PresetNameDialogSide,
+		zelduh.Coordinates{X: 4, Y: 11},
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity(
+		PresetNameDialogSide,
+		zelduh.Coordinates{X: 5, Y: 11},
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity(
+		PresetNameDialogSide,
+		zelduh.Coordinates{X: 6, Y: 11},
+		frameRate,
+	))
+
+	// Top right corner
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 11, -90),
+		frameRate,
+	))
+
+	// Left Side
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 10, 90),
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 9, 90),
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 8, 90),
+		frameRate,
+	))
+
+	// Right Side
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 10, -90),
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 9, -90),
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 8, -90),
+		frameRate,
+	))
+
+	// Bottom left corner
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 3, 7, 90),
+		frameRate,
+	))
+
+	// Bottom right corner
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 7, 180),
+		frameRate,
+	))
+
+	// Bottom side
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 4, 7, 180),
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 5, 7, 180),
+		frameRate,
+	))
+	systemsManager.AddEntities(entityFactory.NewEntity2(
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 6, 7, 180),
+		frameRate,
+	))
 }
