@@ -5,7 +5,6 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
 )
 
 type renderEntity struct {
@@ -170,40 +169,33 @@ func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 }
 
 func (s *RenderSystem) drawRectangle(entity renderEntity) {
-	// rect.Color = colornames.White
-
-	// // initialization
-	// circle := imdraw.New(nil)
 
 	spatialData := entity.ComponentSpatial
 
-	// // circle.Color = spatialData.Color
-	// circle.Color = colornames.Blue
-
-	// circle.Push(point)
-
-	// circle.Circle(64, 0)
-	// circle.Draw(s.Win)
-
-	// rect := imdraw.New(nil)
 	rect := spatialData.Shape
-	rect.Color = colornames.Blue
+	// rect.Color = colornames.White
+	// rect.Color = colornames.Blue
+	rect.Color = spatialData.Color
 
 	x := entity.ComponentSpatial.Rect.Min.X
 	y := entity.ComponentSpatial.Rect.Min.Y
 
+	// point := pixel.V(
+	// 	x, y,
+	// )
 	point := pixel.V(
-		x, y,
+		(x*48)+entity.ComponentSpatial.Width/2,
+		(y*48)+entity.ComponentSpatial.Height/2,
 	)
 	rect.Push(point)
 
 	point2 := pixel.V(
-		entity.ComponentSpatial.Rect.Max.X,
-		entity.ComponentSpatial.Rect.Max.Y,
+		point.X+(spatialData.Width*48),
+		point.Y+(spatialData.Height*48),
 	)
 	rect.Push(point2)
 
-	rect.Rectangle(5)
+	rect.Rectangle(0)
 
 	rect.Draw(s.Win)
 }

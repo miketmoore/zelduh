@@ -311,14 +311,14 @@ func drawDialog(
 		{
 			Category: zelduh.CategoryRectangle,
 			Coordinates: zelduh.Coordinates{
-				X: 3,
-				Y: 10,
+				X: 4,
+				Y: 8,
 			},
 			Dimensions: zelduh.Dimensions{
-				Width:  tileSize * 3,
-				Height: tileSize * 3,
+				Width:  3,
+				Height: 3,
 			},
-			Color: colornames.Blue,
+			Color: colornames.White,
 		},
 	}
 

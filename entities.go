@@ -74,6 +74,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		Rect:   spatialRectangle,
 		Shape:  imdraw.New(nil),
 		HitBox: imdraw.New(nil),
+		Color:  c.Color,
 	}
 
 	entity := Entity{
