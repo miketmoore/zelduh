@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	_ "image/png"
-	"math"
 	"math/rand"
 	"os"
 	"time"
@@ -235,10 +234,16 @@ func run() {
 			// 	frameRate,
 			// ))
 
+			// 45 math.PI / 4
+			// 90 math.PI / 2
+			// 180 math.PI
+
+			// rad= deg/360 * 2pi = deg * pi/180
+
 			entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)
 			entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
 			entityConfig.Transform = &zelduh.Transform{
-				Rotation: math.Pi / 4,
+				Rotation: 180,
 			}
 
 			systemsManager.AddEntities(entityFactory.NewEntity2(

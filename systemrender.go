@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"math"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -194,8 +196,9 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 
 			if entity.ComponentSpatial.Transform != nil {
 				// Transform
-				angle := entity.ComponentSpatial.Transform.Rotation
-				matrix = matrix.Rotated(vector, angle)
+				degrees := entity.ComponentSpatial.Transform.Rotation
+				radians := degrees * math.Pi / 180
+				matrix = matrix.Rotated(vector, radians)
 			}
 
 			frame.Draw(s.Win, matrix)
