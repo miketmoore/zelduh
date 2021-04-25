@@ -173,16 +173,11 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	spatialData := entity.ComponentSpatial
 
 	rect := spatialData.Shape
-	// rect.Color = colornames.White
-	// rect.Color = colornames.Blue
 	rect.Color = spatialData.Color
 
 	x := entity.ComponentSpatial.Rect.Min.X
 	y := entity.ComponentSpatial.Rect.Min.Y
 
-	// point := pixel.V(
-	// 	x, y,
-	// )
 	point := pixel.V(
 		(x*48)+entity.ComponentSpatial.Width/2,
 		(y*48)+entity.ComponentSpatial.Height/2,
