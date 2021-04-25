@@ -213,11 +213,58 @@ func run() {
 
 		if draw {
 			draw = false
-			// systemsManager.AddEntities(entityFactory.NewEntity(
-			// 	PresetNameDialogCorner,
-			// 	zelduh.Coordinates{X: 3, Y: 11},
-			// 	frameRate,
-			// ))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogCorner,
+				zelduh.Coordinates{X: 3, Y: 11},
+				frameRate,
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogSide,
+				zelduh.Coordinates{X: 4, Y: 11},
+				frameRate,
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogSide,
+				zelduh.Coordinates{X: 5, Y: 11},
+				frameRate,
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogSide,
+				zelduh.Coordinates{X: 6, Y: 11},
+				frameRate,
+			))
+
+			// Top right corner
+			entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)
+			entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
+			entityConfig.Transform = &zelduh.Transform{
+				Rotation: -90,
+			}
+			systemsManager.AddEntities(entityFactory.NewEntity2(
+				entityConfig,
+				frameRate,
+			))
+
+			// Left Side
+			entityConfig2 := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 3, Y: 10})
+			entityConfig2.Transform = &zelduh.Transform{
+				Rotation: 90,
+			}
+			systemsManager.AddEntities(entityFactory.NewEntity2(
+				entityConfig2,
+				frameRate,
+			))
+
+			// Right Side
+			entityConfig3 := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 7, Y: 10})
+			entityConfig3.Transform = &zelduh.Transform{
+				Rotation: -90,
+			}
+			systemsManager.AddEntities(entityFactory.NewEntity2(
+				entityConfig3,
+				frameRate,
+			))
+
 			// systemsManager.AddEntities(entityFactory.NewEntity(
 			// 	PresetNameDialogSide,
 			// 	zelduh.Coordinates{X: 4, Y: 11},
@@ -234,22 +281,16 @@ func run() {
 			// 	frameRate,
 			// ))
 
-			// 45 math.PI / 4
-			// 90 math.PI / 2
-			// 180 math.PI
+			// entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)
+			// entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
+			// entityConfig.Transform = &zelduh.Transform{
+			// 	Rotation: 180,
+			// }
 
-			// rad= deg/360 * 2pi = deg * pi/180
-
-			entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)
-			entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
-			entityConfig.Transform = &zelduh.Transform{
-				Rotation: 180,
-			}
-
-			systemsManager.AddEntities(entityFactory.NewEntity2(
-				entityConfig,
-				frameRate,
-			))
+			// systemsManager.AddEntities(entityFactory.NewEntity2(
+			// 	entityConfig,
+			// 	frameRate,
+			// ))
 		}
 
 		ui.Window.Update()
