@@ -101,5 +101,5 @@ var spriteSets = map[string][]int{
 	"coin":             {5, 5, 6, 6, 21, 21},
 	"heart":            {106},
 	"dialogCorner":     {11},
-	"dialogEdge":       {12},
+	"dialogSide":       {12},
 }

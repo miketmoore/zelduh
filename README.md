@@ -27,3 +27,8 @@ go run cmd/zelduh/*.go
 | Sword | F | 
 | Arrow | G |
 | Dash | F + Space | 
+
+
+## Notes
+
+Screen is a 15 wide grid (X coordinates 0-14)

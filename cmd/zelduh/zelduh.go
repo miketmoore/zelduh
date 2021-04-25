@@ -213,12 +213,31 @@ func run() {
 
 		if draw {
 			draw = false
-			dialogCorner := entityFactory.NewEntity(
+			systemsManager.AddEntities(entityFactory.NewEntity(
 				PresetNameDialogCorner,
-				zelduh.Coordinates{X: 0, Y: 0},
+				zelduh.Coordinates{X: 3, Y: 11},
 				frameRate,
-			)
-			systemsManager.AddEntities(dialogCorner)
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogSide,
+				zelduh.Coordinates{X: 4, Y: 11},
+				frameRate,
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogSide,
+				zelduh.Coordinates{X: 5, Y: 11},
+				frameRate,
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogSide,
+				zelduh.Coordinates{X: 6, Y: 11},
+				frameRate,
+			))
+			systemsManager.AddEntities(entityFactory.NewEntity(
+				PresetNameDialogCorner,
+				zelduh.Coordinates{X: 7, Y: 11},
+				frameRate,
+			))
 		}
 
 		ui.Window.Update()
