@@ -66,16 +66,20 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	x := c.Coordinates.X
 	y := c.Coordinates.Y
 
+	spatialRectangle := pixel.R(x, y, x+width, y+height)
+
+	spatialComponent := &ComponentSpatial{
+		Width:  width,
+		Height: height,
+		Rect:   spatialRectangle,
+		Shape:  imdraw.New(nil),
+		HitBox: imdraw.New(nil),
+	}
+
 	entity := Entity{
-		id:       id,
-		Category: c.Category,
-		ComponentSpatial: &ComponentSpatial{
-			Width:  width,
-			Height: height,
-			Rect:   pixel.R(x, y, x+width, y+height),
-			Shape:  imdraw.New(nil),
-			HitBox: imdraw.New(nil),
-		},
+		id:               id,
+		Category:         c.Category,
+		ComponentSpatial: spatialComponent,
 		ComponentIgnore: &ComponentIgnore{
 			Value: c.Ignore,
 		},

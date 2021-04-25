@@ -14,4 +14,5 @@ const (
 	CategoryCollisionSwitch
 	CategoryWarp
 	CategoryIgnore
+	CategoryRectangle
 )

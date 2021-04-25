@@ -358,14 +358,14 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[zelduh.PresetName]zeldu
 				},
 			}
 		},
-		"square": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
-			return zelduh.EntityConfig{
-				Category:    zelduh.CategoryIgnore,
-				Dimensions:  dimensions,
-				Coordinates: buildCoordinates(coordinates),
-				// TODO draw a square!
-			}
-		},
+		// "square": func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
+		// 	return zelduh.EntityConfig{
+		// 		Category:    zelduh.CategoryIgnore,
+		// 		Dimensions:  dimensions,
+		// 		Coordinates: buildCoordinates(coordinates),
+		// 		// TODO draw a square!
+		// 	}
+		// },
 		PresetNameWarpStone: func(coordinates zelduh.Coordinates) zelduh.EntityConfig {
 			return zelduh.EntityConfig{
 				Category:    zelduh.CategoryWarp,

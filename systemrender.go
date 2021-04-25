@@ -5,6 +5,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
 )
 
 type renderEntity struct {
@@ -106,6 +107,11 @@ func (s *RenderSystem) RemoveAllEntities() {
 func (s *RenderSystem) Update() {
 
 	for _, entity := range s.entities {
+
+		if entity.Category == CategoryRectangle {
+			s.drawRectangle(entity)
+		}
+
 		if entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value {
 			if entity.ComponentTemporary != nil {
 				if entity.ComponentTemporary.Expiration == 0 {
@@ -161,6 +167,45 @@ func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 			frame.Draw(s.Win, pixel.IM.Moved(v))
 		}
 	}
+}
+
+func (s *RenderSystem) drawRectangle(entity renderEntity) {
+	// rect.Color = colornames.White
+
+	// // initialization
+	// circle := imdraw.New(nil)
+
+	spatialData := entity.ComponentSpatial
+
+	// // circle.Color = spatialData.Color
+	// circle.Color = colornames.Blue
+
+	// circle.Push(point)
+
+	// circle.Circle(64, 0)
+	// circle.Draw(s.Win)
+
+	// rect := imdraw.New(nil)
+	rect := spatialData.Shape
+	rect.Color = colornames.Blue
+
+	x := entity.ComponentSpatial.Rect.Min.X
+	y := entity.ComponentSpatial.Rect.Min.Y
+
+	point := pixel.V(
+		x, y,
+	)
+	rect.Push(point)
+
+	point2 := pixel.V(
+		entity.ComponentSpatial.Rect.Max.X,
+		entity.ComponentSpatial.Rect.Max.Y,
+	)
+	rect.Push(point2)
+
+	rect.Rectangle(5)
+
+	rect.Draw(s.Win)
 }
 
 func (s *RenderSystem) animateDefault(entity renderEntity) {

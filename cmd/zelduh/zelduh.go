@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/miketmoore/zelduh"
+	"golang.org/x/image/colornames"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
@@ -219,6 +220,7 @@ func run() {
 				entityConfigPresetFnManager,
 				entityFactory,
 				frameRate,
+				tileSize,
 			)
 
 			// systemsManager.AddEntities(entityFactory.NewEntity(
@@ -276,6 +278,7 @@ func drawDialog(
 	entityConfigPresetFnManager zelduh.EntityConfigPresetFnManager,
 	entityFactory zelduh.EntityFactory,
 	frameRate int,
+	tileSize float64,
 ) {
 
 	entityConfigs := []zelduh.EntityConfig{
@@ -303,7 +306,30 @@ func drawDialog(
 		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 4, 7, 180),
 		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 5, 7, 180),
 		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 6, 7, 180),
+
+		// Center fill
+		{
+			Category: zelduh.CategoryRectangle,
+			Coordinates: zelduh.Coordinates{
+				X: 3,
+				Y: 10,
+			},
+			Dimensions: zelduh.Dimensions{
+				Width:  tileSize * 3,
+				Height: tileSize * 3,
+			},
+			Color: colornames.Blue,
+		},
 	}
+
+	// center fill
+	// circle := imdraw.New(nil)
+	// circle.Color = colornames.Red
+	// circle.Push(0)
+	// circle.Circle(64, 0)
+
+	// rect := imdraw.New(nil)
+	// rect.Color = colornames.White
 
 	for _, entityConfig := range entityConfigs {
 		systemsManager.AddEntity(entityFactory.NewEntity2(entityConfig, frameRate))

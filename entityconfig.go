@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"image/color"
+
 	"github.com/faiface/pixel/imdraw"
 )
 
@@ -64,6 +66,7 @@ type EntityConfig struct {
 	Dash                                                          *DashConfig
 	Movement                                                      *MovementConfig
 	Transform                                                     *Transform
+	Color                                                         color.RGBA
 }
 
 type EntityConfigPresetFn = func(coordinates Coordinates) EntityConfig

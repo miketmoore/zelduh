@@ -88,6 +88,7 @@ type ComponentSpatial struct {
 	HitBoxRadius         float64
 	CollisionWithRectMod float64
 	Transform            *ComponentSpatialTransform
+	Color                color.RGBA
 }
 
 // ComponentAnimationData contains data about animating one sequence of sprites
