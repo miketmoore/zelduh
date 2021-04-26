@@ -11,6 +11,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -201,8 +202,6 @@ func run() {
 		activeSpaceRectangle,
 	)
 
-	draw := true
-
 	for !ui.Window.Closed() {
 
 		// Quit application when user input matches
@@ -212,44 +211,19 @@ func run() {
 
 		gameStateManager.Update()
 
-		if draw {
-			draw = false
+		drawDebugGrid(
+			ui.Window,
+			activeSpaceRectangle,
+			tileSize,
+		)
 
-			drawDialog(
-				systemsManager,
-				entityConfigPresetFnManager,
-				entityFactory,
-				frameRate,
-				tileSize,
-			)
-
-			// systemsManager.AddEntities(entityFactory.NewEntity(
-			// 	PresetNameDialogSide,
-			// 	zelduh.Coordinates{X: 4, Y: 11},
-			// 	frameRate,
-			// ))
-			// systemsManager.AddEntities(entityFactory.NewEntity(
-			// 	PresetNameDialogSide,
-			// 	zelduh.Coordinates{X: 5, Y: 11},
-			// 	frameRate,
-			// ))
-			// systemsManager.AddEntities(entityFactory.NewEntity(
-			// 	PresetNameDialogSide,
-			// 	zelduh.Coordinates{X: 6, Y: 11},
-			// 	frameRate,
-			// ))
-
-			// entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)
-			// entityConfig := entityConfigPresetFn(zelduh.Coordinates{X: 7, Y: 11})
-			// entityConfig.Transform = &zelduh.Transform{
-			// 	Rotation: 180,
-			// }
-
-			// systemsManager.AddEntities(entityFactory.NewEntity2(
-			// 	entityConfig,
-			// 	frameRate,
-			// ))
-		}
+		// drawDialog(
+		// 	systemsManager,
+		// 	entityConfigPresetFnManager,
+		// 	entityFactory,
+		// 	frameRate,
+		// 	tileSize,
+		// )
 
 		ui.Window.Update()
 
@@ -271,6 +245,51 @@ func buildRotatedEntityConfig(
 		Rotation: degrees,
 	}
 	return entityConfig
+}
+
+func drawDebugGridCell(win *pixelgl.Window, x, y, tileSize float64) {
+
+	rect := imdraw.New(nil)
+	rect.Color = colornames.Blue
+
+	point0 := pixel.V(x, y)
+	rect.Push(point0)
+
+	point1 := pixel.V(x+tileSize, y+tileSize)
+	rect.Push(point1)
+
+	rect.Rectangle(1)
+	rect.Draw(win)
+}
+
+func drawDebugGrid(win *pixelgl.Window, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
+
+	var actualOriginX float64 = activeSpaceRectangle.X
+	var actualOriginY float64 = activeSpaceRectangle.Y
+
+	var totalColumns float64 = activeSpaceRectangle.Width / tileSize
+	var totalRows float64 = activeSpaceRectangle.Height / tileSize
+
+	var x float64 = 0
+	var y float64 = 0
+
+	for ; x < totalColumns; x++ {
+		// for ; y < totalRows; y++ {
+		// 	drawDebugGridCell(win, x*tileSize, y*tileSize, tileSize)
+		// }
+		cellX := actualOriginX + (x * tileSize)
+		cellY := actualOriginY + (y * tileSize)
+
+		drawDebugGridCell(win, cellX, cellY, tileSize)
+
+		if x == (totalColumns - 1) {
+			if y < (totalRows - 1) {
+				x = -1
+				y++
+			}
+		}
+	}
+
 }
 
 func drawDialog(
