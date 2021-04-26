@@ -13,6 +13,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 )
 
 func run() {
@@ -33,12 +34,12 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	testLevel := buildTestLevel(
-		&entityConfigPresetFnManager,
-		tileSize,
-	)
+	// testLevel := buildTestLevel(
+	// 	&entityConfigPresetFnManager,
+	// 	tileSize,
+	// )
 
-	levelManager := zelduh.NewLevelManager(&testLevel)
+	// levelManager := zelduh.NewLevelManager(&testLevel)
 
 	systemsManager := zelduh.NewSystemsManager()
 
@@ -57,7 +58,7 @@ func run() {
 	roomWarps := zelduh.NewRoomWarps()
 
 	shouldAddEntities := true
-	var currentRoomID zelduh.RoomID = 1
+	// var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
 	spritesheet := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
@@ -134,73 +135,75 @@ func run() {
 		bomb,
 	)
 
-	mapDrawData := zelduh.BuildMapDrawData(
-		"assets/tilemaps/",
-		[]string{
-			"overworldOpen",
-			"overworldOpenCircleOfTrees",
-			"overworldFourWallsDoorBottom",
-			"overworldFourWallsDoorLeftTop",
-			"overworldFourWallsDoorRightTop",
-			"overworldFourWallsDoorTopBottom",
-			"overworldFourWallsDoorRightTopBottom",
-			"overworldFourWallsDoorBottomRight",
-			"overworldFourWallsDoorTop",
-			"overworldFourWallsDoorRight",
-			"overworldFourWallsDoorLeft",
-			"overworldTreeClusterTopRight",
-			"overworldFourWallsClusterTrees",
-			"overworldFourWallsDoorsAllSides",
-			"rockPatternTest",
-			"rockPathOpenLeft",
-			"rockWithCaveEntrance",
-			"rockPathLeftRightEntrance",
-			"test",
-			"dungeonFourDoors",
-		},
-		tileSize,
-	)
+	// mapDrawData := zelduh.BuildMapDrawData(
+	// 	"assets/tilemaps/",
+	// 	[]string{
+	// 		"overworldOpen",
+	// 		"overworldOpenCircleOfTrees",
+	// 		"overworldFourWallsDoorBottom",
+	// 		"overworldFourWallsDoorLeftTop",
+	// 		"overworldFourWallsDoorRightTop",
+	// 		"overworldFourWallsDoorTopBottom",
+	// 		"overworldFourWallsDoorRightTopBottom",
+	// 		"overworldFourWallsDoorBottomRight",
+	// 		"overworldFourWallsDoorTop",
+	// 		"overworldFourWallsDoorRight",
+	// 		"overworldFourWallsDoorLeft",
+	// 		"overworldTreeClusterTopRight",
+	// 		"overworldFourWallsClusterTrees",
+	// 		"overworldFourWallsDoorsAllSides",
+	// 		"rockPatternTest",
+	// 		"rockPathOpenLeft",
+	// 		"rockWithCaveEntrance",
+	// 		"rockPathLeftRightEntrance",
+	// 		"test",
+	// 		"dungeonFourDoors",
+	// 	},
+	// 	tileSize,
+	// )
 
-	// NonObstacleSprites defines which sprites are not obstacles
-	var nonObstacleSprites = map[int]bool{
-		8:   true,
-		9:   true,
-		24:  true,
-		37:  true,
-		38:  true,
-		52:  true,
-		53:  true,
-		66:  true,
-		86:  true,
-		136: true,
-		137: true,
-	}
+	// // NonObstacleSprites defines which sprites are not obstacles
+	// var nonObstacleSprites = map[int]bool{
+	// 	8:   true,
+	// 	9:   true,
+	// 	24:  true,
+	// 	37:  true,
+	// 	38:  true,
+	// 	52:  true,
+	// 	53:  true,
+	// 	66:  true,
+	// 	86:  true,
+	// 	136: true,
+	// 	137: true,
+	// }
 
-	gameStateManager := zelduh.NewGameStateManager(
-		&systemsManager,
-		ui,
-		currLocaleMsgs,
-		&collisionSystem,
-		&inputSystem,
-		&shouldAddEntities,
-		&currentRoomID,
-		&nextRoomID,
-		&currentState,
-		spritesheet,
-		mapDrawData,
-		&roomTransition,
-		entitiesMap,
-		&player,
-		hearts,
-		roomWarps,
-		&levelManager,
-		&entityConfigPresetFnManager,
-		tileSize,
-		frameRate,
-		nonObstacleSprites,
-		windowConfig,
-		activeSpaceRectangle,
-	)
+	// gameStateManager := zelduh.NewGameStateManager(
+	// 	&systemsManager,
+	// 	ui,
+	// 	currLocaleMsgs,
+	// 	&collisionSystem,
+	// 	&inputSystem,
+	// 	&shouldAddEntities,
+	// 	&currentRoomID,
+	// 	&nextRoomID,
+	// 	&currentState,
+	// 	spritesheet,
+	// 	mapDrawData,
+	// 	&roomTransition,
+	// 	entitiesMap,
+	// 	&player,
+	// 	hearts,
+	// 	roomWarps,
+	// 	&levelManager,
+	// 	&entityConfigPresetFnManager,
+	// 	tileSize,
+	// 	frameRate,
+	// 	nonObstacleSprites,
+	// 	windowConfig,
+	// 	activeSpaceRectangle,
+	// )
+
+	draw := true
 
 	for !ui.Window.Closed() {
 
@@ -209,13 +212,17 @@ func run() {
 			os.Exit(1)
 		}
 
-		gameStateManager.Update()
+		// gameStateManager.Update()
 
-		drawDebugGrid(
-			ui.Window,
-			activeSpaceRectangle,
-			tileSize,
-		)
+		if draw {
+			draw = false
+			drawDebugGrid(
+				ui.Window,
+				ui.Text,
+				activeSpaceRectangle,
+				tileSize,
+			)
+		}
 
 		// drawDialog(
 		// 	systemsManager,
@@ -247,23 +254,24 @@ func buildRotatedEntityConfig(
 	return entityConfig
 }
 
-func drawDebugGridCell(win *pixelgl.Window, x, y, tileSize float64) {
+func drawDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) {
 
-	rect := imdraw.New(nil)
-	rect.Color = colornames.Blue
+	imdraw := imdraw.New(nil)
+	imdraw.Color = colornames.Blue
 
-	point0 := pixel.V(x, y)
-	rect.Push(point0)
+	imdraw.Push(rect.Min)
+	imdraw.Push(rect.Max)
 
-	point1 := pixel.V(x+tileSize, y+tileSize)
-	rect.Push(point1)
+	imdraw.Rectangle(1)
+	imdraw.Draw(win)
 
-	rect.Rectangle(1)
-	rect.Draw(win)
 }
 
 // Draw and overlay representing the virtual grid
-func drawDebugGrid(win *pixelgl.Window, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
+func drawDebugGrid(win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
+	fmt.Println("Drawing debug grid")
+
+	win.Clear(colornames.White)
 
 	actualOriginX := activeSpaceRectangle.X
 	actualOriginY := activeSpaceRectangle.Y
@@ -274,11 +282,35 @@ func drawDebugGrid(win *pixelgl.Window, activeSpaceRectangle zelduh.ActiveSpaceR
 	var x float64 = 0
 	var y float64 = 0
 
+	drawText := true
+
 	for ; x < totalColumns; x++ {
 		cellX := actualOriginX + (x * tileSize)
 		cellY := actualOriginY + (y * tileSize)
 
-		drawDebugGridCell(win, cellX, cellY, tileSize)
+		rect := pixel.R(cellX, cellY, cellX+tileSize, cellY+tileSize)
+
+		// fmt.Println(x, y, rect)
+
+		drawDebugGridCell(win, rect, tileSize)
+
+		if drawText {
+
+			// message := fmt.Sprintf("%f,%f", x, y)
+			message := fmt.Sprintf("%d,%d", int(x), int(y))
+			fmt.Fprintln(txt, message)
+			// txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+
+			// vector := pixel.V(cellX, cellY)
+			matrix := pixel.IM.Moved(
+				pixel.V(
+					(actualOriginX-18)+(x*tileSize),
+					(actualOriginY-48)+(y*tileSize),
+				),
+			)
+			txt.Draw(win, matrix)
+			txt.Clear()
+		}
 
 		if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
 			x = -1
