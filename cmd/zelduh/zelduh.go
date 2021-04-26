@@ -203,6 +203,12 @@ func run() {
 		activeSpaceRectangle,
 	)
 
+	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
+	fmt.Println(totalCells)
+	debugGridCellCachePopulated := false
+	// debugGridCellCache := []*imdraw.IMDraw{}
+	var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
+
 	for !ui.Window.Closed() {
 
 		// Quit application when user input matches
@@ -212,7 +218,10 @@ func run() {
 
 		gameStateManager.Update()
 
+		// draw grid after everything else is drawn?
 		drawDebugGrid(
+			&debugGridCellCachePopulated,
+			debugGridCellCache,
 			ui.Window,
 			ui.Text,
 			activeSpaceRectangle,
@@ -249,7 +258,7 @@ func buildRotatedEntityConfig(
 	return entityConfig
 }
 
-func drawDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) {
+func buildDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) *imdraw.IMDraw {
 
 	imdraw := imdraw.New(nil)
 	imdraw.Color = colornames.Blue
@@ -258,13 +267,14 @@ func drawDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) {
 	imdraw.Push(rect.Max)
 
 	imdraw.Rectangle(1)
-	imdraw.Draw(win)
+	// imdraw.Draw(win)
 
+	return imdraw
 }
 
 // Draw and overlay representing the virtual grid
-func drawDebugGrid(win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
-
+func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
+	// fmt.Println("draw debug grid")
 	// win.Clear(colornames.White)
 
 	actualOriginX := activeSpaceRectangle.X
@@ -273,39 +283,50 @@ func drawDebugGrid(win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zel
 	totalColumns := activeSpaceRectangle.Width / tileSize
 	totalRows := activeSpaceRectangle.Height / tileSize
 
+	cacheIndex := 0
+
 	var x float64 = 0
 	var y float64 = 0
 
-	drawText := true
+	if !(*debugGridCellCachePopulated) {
+		fmt.Println("building cache")
+		for ; x < totalColumns; x++ {
+			cellX := actualOriginX + (x * tileSize)
+			cellY := actualOriginY + (y * tileSize)
 
-	for ; x < totalColumns; x++ {
-		cellX := actualOriginX + (x * tileSize)
-		cellY := actualOriginY + (y * tileSize)
+			rect := pixel.R(cellX, cellY, cellX+tileSize, cellY+tileSize)
 
-		rect := pixel.R(cellX, cellY, cellX+tileSize, cellY+tileSize)
+			imdraw := buildDebugGridCell(win, rect, tileSize)
+			cache[cacheIndex] = imdraw
+			cacheIndex++
 
-		// fmt.Println(x, y, rect)
-
-		drawDebugGridCell(win, rect, tileSize)
-
-		if drawText {
-
-			// message := fmt.Sprintf("%f,%f", x, y)
-			message := fmt.Sprintf("%d,%d", int(x), int(y))
-			fmt.Fprintln(txt, message)
-			// txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
-
-			// vector := pixel.V(cellX, cellY)
-			matrix := pixel.IM.Moved(
-				pixel.V(
-					(actualOriginX-18)+(x*tileSize),
-					(actualOriginY-48)+(y*tileSize),
-				),
-			)
-			txt.Color = colornames.White
-			txt.Draw(win, matrix)
-			txt.Clear()
+			if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
+				x = -1
+				y++
+			}
 		}
+		*debugGridCellCachePopulated = true
+		fmt.Println("cache built")
+	} else {
+		for _, imdraw := range cache {
+			imdraw.Draw(win)
+		}
+	}
+
+	// fmt.Println("drawing debug grid text, ", totalColumns, totalRows)
+	for ; x < totalColumns; x++ {
+		// fmt.Println("drawing text...", x)
+		message := fmt.Sprintf("%d,%d", int(x), int(y))
+		fmt.Fprintln(txt, message)
+		matrix := pixel.IM.Moved(
+			pixel.V(
+				(actualOriginX-18)+(x*tileSize),
+				(actualOriginY-48)+(y*tileSize),
+			),
+		)
+		txt.Color = colornames.White
+		txt.Draw(win, matrix)
+		// txt.Clear()
 
 		if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
 			x = -1
