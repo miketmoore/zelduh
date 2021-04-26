@@ -262,31 +262,27 @@ func drawDebugGridCell(win *pixelgl.Window, x, y, tileSize float64) {
 	rect.Draw(win)
 }
 
+// Draw and overlay representing the virtual grid
 func drawDebugGrid(win *pixelgl.Window, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
 
-	var actualOriginX float64 = activeSpaceRectangle.X
-	var actualOriginY float64 = activeSpaceRectangle.Y
+	actualOriginX := activeSpaceRectangle.X
+	actualOriginY := activeSpaceRectangle.Y
 
-	var totalColumns float64 = activeSpaceRectangle.Width / tileSize
-	var totalRows float64 = activeSpaceRectangle.Height / tileSize
+	totalColumns := activeSpaceRectangle.Width / tileSize
+	totalRows := activeSpaceRectangle.Height / tileSize
 
 	var x float64 = 0
 	var y float64 = 0
 
 	for ; x < totalColumns; x++ {
-		// for ; y < totalRows; y++ {
-		// 	drawDebugGridCell(win, x*tileSize, y*tileSize, tileSize)
-		// }
 		cellX := actualOriginX + (x * tileSize)
 		cellY := actualOriginY + (y * tileSize)
 
 		drawDebugGridCell(win, cellX, cellY, tileSize)
 
-		if x == (totalColumns - 1) {
-			if y < (totalRows - 1) {
-				x = -1
-				y++
-			}
+		if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
+			x = -1
+			y++
 		}
 	}
 
