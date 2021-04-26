@@ -34,12 +34,12 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	// testLevel := buildTestLevel(
-	// 	&entityConfigPresetFnManager,
-	// 	tileSize,
-	// )
+	testLevel := buildTestLevel(
+		&entityConfigPresetFnManager,
+		tileSize,
+	)
 
-	// levelManager := zelduh.NewLevelManager(&testLevel)
+	levelManager := zelduh.NewLevelManager(&testLevel)
 
 	systemsManager := zelduh.NewSystemsManager()
 
@@ -58,7 +58,7 @@ func run() {
 	roomWarps := zelduh.NewRoomWarps()
 
 	shouldAddEntities := true
-	// var currentRoomID zelduh.RoomID = 1
+	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
 	spritesheet := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
@@ -135,75 +135,73 @@ func run() {
 		bomb,
 	)
 
-	// mapDrawData := zelduh.BuildMapDrawData(
-	// 	"assets/tilemaps/",
-	// 	[]string{
-	// 		"overworldOpen",
-	// 		"overworldOpenCircleOfTrees",
-	// 		"overworldFourWallsDoorBottom",
-	// 		"overworldFourWallsDoorLeftTop",
-	// 		"overworldFourWallsDoorRightTop",
-	// 		"overworldFourWallsDoorTopBottom",
-	// 		"overworldFourWallsDoorRightTopBottom",
-	// 		"overworldFourWallsDoorBottomRight",
-	// 		"overworldFourWallsDoorTop",
-	// 		"overworldFourWallsDoorRight",
-	// 		"overworldFourWallsDoorLeft",
-	// 		"overworldTreeClusterTopRight",
-	// 		"overworldFourWallsClusterTrees",
-	// 		"overworldFourWallsDoorsAllSides",
-	// 		"rockPatternTest",
-	// 		"rockPathOpenLeft",
-	// 		"rockWithCaveEntrance",
-	// 		"rockPathLeftRightEntrance",
-	// 		"test",
-	// 		"dungeonFourDoors",
-	// 	},
-	// 	tileSize,
-	// )
+	mapDrawData := zelduh.BuildMapDrawData(
+		"assets/tilemaps/",
+		[]string{
+			"overworldOpen",
+			"overworldOpenCircleOfTrees",
+			"overworldFourWallsDoorBottom",
+			"overworldFourWallsDoorLeftTop",
+			"overworldFourWallsDoorRightTop",
+			"overworldFourWallsDoorTopBottom",
+			"overworldFourWallsDoorRightTopBottom",
+			"overworldFourWallsDoorBottomRight",
+			"overworldFourWallsDoorTop",
+			"overworldFourWallsDoorRight",
+			"overworldFourWallsDoorLeft",
+			"overworldTreeClusterTopRight",
+			"overworldFourWallsClusterTrees",
+			"overworldFourWallsDoorsAllSides",
+			"rockPatternTest",
+			"rockPathOpenLeft",
+			"rockWithCaveEntrance",
+			"rockPathLeftRightEntrance",
+			"test",
+			"dungeonFourDoors",
+		},
+		tileSize,
+	)
 
-	// // NonObstacleSprites defines which sprites are not obstacles
-	// var nonObstacleSprites = map[int]bool{
-	// 	8:   true,
-	// 	9:   true,
-	// 	24:  true,
-	// 	37:  true,
-	// 	38:  true,
-	// 	52:  true,
-	// 	53:  true,
-	// 	66:  true,
-	// 	86:  true,
-	// 	136: true,
-	// 	137: true,
-	// }
+	// NonObstacleSprites defines which sprites are not obstacles
+	var nonObstacleSprites = map[int]bool{
+		8:   true,
+		9:   true,
+		24:  true,
+		37:  true,
+		38:  true,
+		52:  true,
+		53:  true,
+		66:  true,
+		86:  true,
+		136: true,
+		137: true,
+	}
 
-	// gameStateManager := zelduh.NewGameStateManager(
-	// 	&systemsManager,
-	// 	ui,
-	// 	currLocaleMsgs,
-	// 	&collisionSystem,
-	// 	&inputSystem,
-	// 	&shouldAddEntities,
-	// 	&currentRoomID,
-	// 	&nextRoomID,
-	// 	&currentState,
-	// 	spritesheet,
-	// 	mapDrawData,
-	// 	&roomTransition,
-	// 	entitiesMap,
-	// 	&player,
-	// 	hearts,
-	// 	roomWarps,
-	// 	&levelManager,
-	// 	&entityConfigPresetFnManager,
-	// 	tileSize,
-	// 	frameRate,
-	// 	nonObstacleSprites,
-	// 	windowConfig,
-	// 	activeSpaceRectangle,
-	// )
-
-	draw := true
+	gameStateManager := zelduh.NewGameStateManager(
+		&systemsManager,
+		ui,
+		currLocaleMsgs,
+		&collisionSystem,
+		&inputSystem,
+		&shouldAddEntities,
+		&currentRoomID,
+		&nextRoomID,
+		&currentState,
+		spritesheet,
+		mapDrawData,
+		&roomTransition,
+		entitiesMap,
+		&player,
+		hearts,
+		roomWarps,
+		&levelManager,
+		&entityConfigPresetFnManager,
+		tileSize,
+		frameRate,
+		nonObstacleSprites,
+		windowConfig,
+		activeSpaceRectangle,
+	)
 
 	for !ui.Window.Closed() {
 
@@ -212,17 +210,14 @@ func run() {
 			os.Exit(1)
 		}
 
-		// gameStateManager.Update()
+		gameStateManager.Update()
 
-		if draw {
-			draw = false
-			drawDebugGrid(
-				ui.Window,
-				ui.Text,
-				activeSpaceRectangle,
-				tileSize,
-			)
-		}
+		drawDebugGrid(
+			ui.Window,
+			ui.Text,
+			activeSpaceRectangle,
+			tileSize,
+		)
 
 		// drawDialog(
 		// 	systemsManager,
@@ -269,9 +264,8 @@ func drawDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) {
 
 // Draw and overlay representing the virtual grid
 func drawDebugGrid(win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
-	fmt.Println("Drawing debug grid")
 
-	win.Clear(colornames.White)
+	// win.Clear(colornames.White)
 
 	actualOriginX := activeSpaceRectangle.X
 	actualOriginY := activeSpaceRectangle.Y
@@ -308,6 +302,7 @@ func drawDebugGrid(win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zel
 					(actualOriginY-48)+(y*tileSize),
 				),
 			)
+			txt.Color = colornames.White
 			txt.Draw(win, matrix)
 			txt.Clear()
 		}
