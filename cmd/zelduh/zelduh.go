@@ -209,6 +209,9 @@ func run() {
 	// debugGridCellCache := []*imdraw.IMDraw{}
 	var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
 
+	debugTxtOrigin := pixel.V(20, 50)
+	debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
+
 	for !ui.Window.Closed() {
 
 		// Quit application when user input matches
@@ -223,7 +226,7 @@ func run() {
 			&debugGridCellCachePopulated,
 			debugGridCellCache,
 			ui.Window,
-			ui.Text,
+			debugTxt,
 			activeSpaceRectangle,
 			tileSize,
 		)
