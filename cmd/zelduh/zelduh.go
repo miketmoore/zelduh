@@ -63,11 +63,11 @@ func run() {
 	currentState := zelduh.StateStart
 	spritesheet := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
 
-	player := entityFactory.NewEntity("player", zelduh.Coordinates{X: 6, Y: 6}, frameRate)
-	bomb := entityFactory.NewEntity("bomb", zelduh.Coordinates{X: 0, Y: 0}, frameRate)
-	explosion := entityFactory.NewEntity("explosion", zelduh.Coordinates{X: 0, Y: 0}, frameRate)
-	sword := entityFactory.NewEntity("sword", zelduh.Coordinates{X: 0, Y: 0}, frameRate)
-	arrow := entityFactory.NewEntity("arrow", zelduh.Coordinates{X: 0, Y: 0}, frameRate)
+	player := entityFactory.NewEntity("player", zelduh.NewCoordinates(6, 6), frameRate)
+	bomb := entityFactory.NewEntity("bomb", zelduh.NewCoordinates(0, 0), frameRate)
+	explosion := entityFactory.NewEntity("explosion", zelduh.NewCoordinates(0, 0), frameRate)
+	sword := entityFactory.NewEntity("sword", zelduh.NewCoordinates(0, 0), frameRate)
+	arrow := entityFactory.NewEntity("arrow", zelduh.NewCoordinates(0, 0), frameRate)
 	hearts := []zelduh.Entity{
 		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 1.5, Y: 14}, frameRate),
 		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.15, Y: 14}, frameRate),
@@ -128,6 +128,7 @@ func run() {
 			Win:                  ui.Window,
 			Spritesheet:          spritesheet,
 			ActiveSpaceRectangle: activeSpaceRectangle,
+			TileSize:             tileSize,
 		},
 	)
 
@@ -206,14 +207,14 @@ func run() {
 		activeSpaceRectangle,
 	)
 
-	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
-	fmt.Println(totalCells)
-	debugGridCellCachePopulated := false
-	// debugGridCellCache := []*imdraw.IMDraw{}
-	var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
+	// totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
+	// fmt.Println(totalCells)
+	// debugGridCellCachePopulated := false
+	// // debugGridCellCache := []*imdraw.IMDraw{}
+	// var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
 
-	debugTxtOrigin := pixel.V(20, 50)
-	debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
+	// debugTxtOrigin := pixel.V(20, 50)
+	// debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
 
 	for !ui.Window.Closed() {
 
@@ -225,22 +226,22 @@ func run() {
 		gameStateManager.Update()
 
 		// draw grid after everything else is drawn?
-		drawDebugGrid(
-			&debugGridCellCachePopulated,
-			debugGridCellCache,
-			ui.Window,
-			debugTxt,
-			activeSpaceRectangle,
-			tileSize,
-		)
+		// drawDebugGrid(
+		// 	&debugGridCellCachePopulated,
+		// 	debugGridCellCache,
+		// 	ui.Window,
+		// 	debugTxt,
+		// 	activeSpaceRectangle,
+		// 	tileSize,
+		// )
 
-		drawDialog(
-			systemsManager,
-			entityConfigPresetFnManager,
-			entityFactory,
-			frameRate,
-			tileSize,
-		)
+		// drawDialog(
+		// 	systemsManager,
+		// 	entityConfigPresetFnManager,
+		// 	entityFactory,
+		// 	frameRate,
+		// 	tileSize,
+		// )
 
 		ui.Window.Update()
 
@@ -355,9 +356,9 @@ func drawDialog(
 		// Top left corner
 		entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)(zelduh.NewCoordinates(3, 9)),
 		// Top side
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 4, Y: 9}),
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 5, Y: 9}),
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 6, Y: 9}),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.NewCoordinates(4, 9)),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.NewCoordinates(5, 9)),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.NewCoordinates(6, 9)),
 		// Top right corner
 		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 9, -90),
 		// Left Side

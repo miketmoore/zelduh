@@ -23,6 +23,7 @@ type renderEntity struct {
 type RenderSystem struct {
 	Win         *pixelgl.Window
 	Spritesheet map[int]*pixel.Sprite
+	TileSize    float64
 
 	player renderEntity
 	arrow  renderEntity
@@ -176,13 +177,10 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect := spatialData.Shape
 	rect.Color = spatialData.Color
 
-	x := entity.ComponentSpatial.Rect.Min.X
-	y := entity.ComponentSpatial.Rect.Min.Y
+	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.ComponentSpatial.Rect.Min.X)
+	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.ComponentSpatial.Rect.Min.Y)
+	point := pixel.V(vectorX, vectorY)
 
-	point := pixel.V(
-		(x*48)+entity.ComponentSpatial.Width/2,
-		(y*48)+entity.ComponentSpatial.Height/2,
-	)
 	rect.Push(point)
 
 	point2 := pixel.V(
@@ -219,11 +217,6 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 
 			frameIndex := animData.Frames[frameNum]
 			frame := s.Spritesheet[frameIndex]
-
-			// vector := pixel.V(
-			// 	entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
-			// 	entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
-			// )
 
 			vectorX := entity.ComponentSpatial.Rect.Center().X + s.ActiveSpaceRectangle.X
 			vectorY := entity.ComponentSpatial.Rect.Center().Y + s.ActiveSpaceRectangle.Y
