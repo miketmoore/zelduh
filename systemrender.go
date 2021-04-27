@@ -197,43 +197,64 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-			rate := animData.FrameRateCount
-			if rate < animData.FrameRate {
-				rate++
-			} else {
-				rate = 0
-			}
+
+			rate := s.determineFrameRate(animData)
+
 			animData.FrameRateCount = rate
 
-			frameNum := animData.Frame
-			if rate == animData.FrameRate {
-				if frameNum < len(animData.Frames)-1 {
-					frameNum++
-				} else {
-					frameNum = 0
-				}
-				animData.Frame = frameNum
-			}
+			frameNum := s.determineFrameNumber(animData)
 
 			frameIndex := animData.Frames[frameNum]
+
 			frame := s.Spritesheet[frameIndex]
 
-			vectorX := entity.ComponentSpatial.Rect.Center().X + s.ActiveSpaceRectangle.X
-			vectorY := entity.ComponentSpatial.Rect.Center().Y + s.ActiveSpaceRectangle.Y
-			vector := pixel.V(vectorX, vectorY)
-
-			matrix := pixel.IM.Moved(vector)
-
-			if entity.ComponentSpatial.Transform != nil {
-				// Transform
-				degrees := entity.ComponentSpatial.Transform.Rotation
-				radians := degrees * math.Pi / 180
-				matrix = matrix.Rotated(vector, radians)
-			}
+			matrix := s.buildSpriteMatrix(entity.ComponentSpatial)
 
 			frame.Draw(s.Win, matrix)
 		}
 	}
+}
+
+func (s *RenderSystem) determineFrameRate(animData *ComponentAnimationData) int {
+	rate := animData.FrameRateCount
+	if rate < animData.FrameRate {
+		rate++
+	} else {
+		rate = 0
+	}
+	return rate
+}
+
+func (s *RenderSystem) determineFrameNumber(animData *ComponentAnimationData) int {
+	rate := animData.FrameRateCount
+	frameNum := animData.Frame
+	if rate == animData.FrameRate {
+		if frameNum < len(animData.Frames)-1 {
+			frameNum++
+		} else {
+			frameNum = 0
+		}
+		animData.Frame = frameNum
+	}
+	return frameNum
+}
+
+func (s *RenderSystem) buildSpriteMatrix(spatialComponent *ComponentSpatial) pixel.Matrix {
+
+	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
+	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
+	vector := pixel.V(vectorX, vectorY)
+
+	matrix := pixel.IM.Moved(vector)
+
+	if spatialComponent.Transform != nil {
+		// Transform
+		degrees := spatialComponent.Transform.Rotation
+		radians := degrees * math.Pi / 180
+		matrix = matrix.Rotated(vector, radians)
+	}
+
+	return matrix
 }
 
 func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity) {
