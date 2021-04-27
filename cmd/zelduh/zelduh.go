@@ -326,7 +326,7 @@ func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, wi
 		)
 		txt.Color = colornames.White
 		txt.Draw(win, matrix)
-		// txt.Clear()
+		txt.Clear()
 
 		if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
 			x = -1
