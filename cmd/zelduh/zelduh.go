@@ -81,6 +81,8 @@ func run() {
 	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
 	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
 
+	fmt.Println("active space ", activeSpaceRectangle)
+
 	collisionHandler := zelduh.NewCollisionHandler(
 		&systemsManager,
 		&spatialSystem,
@@ -123,8 +125,9 @@ func run() {
 		&spatialSystem,
 		&collisionSystem,
 		&zelduh.RenderSystem{
-			Win:         ui.Window,
-			Spritesheet: spritesheet,
+			Win:                  ui.Window,
+			Spritesheet:          spritesheet,
+			ActiveSpaceRectangle: activeSpaceRectangle,
 		},
 	)
 
@@ -231,13 +234,13 @@ func run() {
 			tileSize,
 		)
 
-		// drawDialog(
-		// 	systemsManager,
-		// 	entityConfigPresetFnManager,
-		// 	entityFactory,
-		// 	frameRate,
-		// 	tileSize,
-		// )
+		drawDialog(
+			systemsManager,
+			entityConfigPresetFnManager,
+			entityFactory,
+			frameRate,
+			tileSize,
+		)
 
 		ui.Window.Update()
 
@@ -350,36 +353,36 @@ func drawDialog(
 
 	entityConfigs := []zelduh.EntityConfig{
 		// Top left corner
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)(zelduh.Coordinates{X: 3, Y: 11}),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)(zelduh.NewCoordinates(3, 9)),
 		// Top side
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 4, Y: 11}),
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 5, Y: 11}),
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 6, Y: 11}),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 4, Y: 9}),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 5, Y: 9}),
+		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 6, Y: 9}),
 		// Top right corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 11, -90),
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 9, -90),
 		// Left Side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 10, 90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 9, 90),
 		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 8, 90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 7, 90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 6, 90),
 		// Right Side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 10, -90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 9, -90),
 		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 8, -90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 7, -90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 6, -90),
 		// Bottom left corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 3, 7, 90),
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 3, 5, 90),
 		// Bottom right corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 7, 180),
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 5, 180),
 		// Bottom side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 4, 7, 180),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 5, 7, 180),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 6, 7, 180),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 4, 5, 180),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 5, 5, 180),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 6, 5, 180),
 
 		// Center fill
 		{
 			Category: zelduh.CategoryRectangle,
 			Coordinates: zelduh.Coordinates{
 				X: 4,
-				Y: 8,
+				Y: 6,
 			},
 			Dimensions: zelduh.Dimensions{
 				Width:  3,

@@ -28,8 +28,9 @@ type RenderSystem struct {
 	arrow  renderEntity
 	sword  renderEntity
 
-	entities  []renderEntity
-	obstacles []renderEntity
+	entities             []renderEntity
+	obstacles            []renderEntity
+	ActiveSpaceRectangle ActiveSpaceRectangle
 }
 
 // AddEntity adds an entity to the system
@@ -219,10 +220,14 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 			frameIndex := animData.Frames[frameNum]
 			frame := s.Spritesheet[frameIndex]
 
-			vector := pixel.V(
-				entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
-				entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
-			)
+			// vector := pixel.V(
+			// 	entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
+			// 	entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
+			// )
+
+			vectorX := entity.ComponentSpatial.Rect.Center().X + s.ActiveSpaceRectangle.X
+			vectorY := entity.ComponentSpatial.Rect.Center().Y + s.ActiveSpaceRectangle.Y
+			vector := pixel.V(vectorX, vectorY)
 
 			matrix := pixel.IM.Moved(vector)
 

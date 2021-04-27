@@ -40,6 +40,10 @@ type Coordinates struct {
 	X, Y float64
 }
 
+func NewCoordinates(x, y float64) Coordinates {
+	return Coordinates{x, y}
+}
+
 type Dimensions struct {
 	Width, Height float64
 }
