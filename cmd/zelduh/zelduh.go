@@ -314,6 +314,7 @@ func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, wi
 	}
 
 	// fmt.Println("drawing debug grid text, ", totalColumns, totalRows)
+	txt.Clear()
 	for ; x < totalColumns; x++ {
 		// fmt.Println("drawing text...", x)
 		message := fmt.Sprintf("%d,%d", int(x), int(y))
