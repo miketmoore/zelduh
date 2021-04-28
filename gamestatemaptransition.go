@@ -14,7 +14,7 @@ func GameStateMapTransition(
 	currentRoomID *RoomID,
 	nextRoomID *RoomID,
 	currentState *State,
-	spritesheet Spritesheet,
+	spriteMap SpriteMap,
 	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
 	player *Entity,
@@ -48,7 +48,7 @@ func GameStateMapTransition(
 
 		DrawMapBackgroundImage(
 			ui.Window,
-			spritesheet,
+			spriteMap,
 			mapDrawData,
 			roomByIDMap[*currentRoomID].Name,
 			transitionRoomResp.modX,
@@ -58,7 +58,7 @@ func GameStateMapTransition(
 		)
 		DrawMapBackgroundImage(
 			ui.Window,
-			spritesheet,
+			spriteMap,
 			mapDrawData,
 			roomByIDMap[*nextRoomID].Name,
 			transitionRoomResp.modXNext,

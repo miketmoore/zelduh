@@ -13,7 +13,7 @@ func GameStateGame(
 	shouldAddEntities *bool,
 	currentRoomID *RoomID,
 	currentState *State,
-	spritesheet Spritesheet,
+	spriteMap SpriteMap,
 	mapDrawData MapDrawData,
 	entitiesMap EntitiesMap,
 	player *Entity,
@@ -33,7 +33,7 @@ func GameStateGame(
 
 	DrawMapBackgroundImage(
 		ui.Window,
-		spritesheet,
+		spriteMap,
 		mapDrawData,
 		roomByIDMap[*currentRoomID].Name,
 		0, 0,

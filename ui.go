@@ -68,7 +68,7 @@ func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleM
 
 func DrawMapBackgroundImage(
 	win *pixelgl.Window,
-	spritesheet map[int]*pixel.Sprite,
+	spriteMap SpriteMap,
 	mapDrawData MapDrawData,
 	name RoomName,
 	modX, modY float64,
@@ -79,7 +79,7 @@ func DrawMapBackgroundImage(
 	d := mapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
-			sprite := spritesheet[spriteData.SpriteID]
+			sprite := spriteMap[spriteData.SpriteID]
 
 			vec := spriteData.Rect.Min
 

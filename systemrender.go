@@ -23,9 +23,9 @@ type renderEntity struct {
 
 // RenderSystem is a custom system
 type RenderSystem struct {
-	Win         *pixelgl.Window
-	Spritesheet map[int]*pixel.Sprite
-	TileSize    float64
+	Win       *pixelgl.Window
+	SpriteMap SpriteMap
+	TileSize  float64
 
 	player renderEntity
 	arrow  renderEntity
@@ -161,7 +161,7 @@ func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 			} else {
 				frameIndex = animData.Frames[1]
 			}
-			frame := s.Spritesheet[frameIndex]
+			frame := s.SpriteMap[frameIndex]
 
 			v := pixel.V(
 				entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
@@ -200,18 +200,18 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
 
-			rate := s.determineFrameRate(animData)
+			rate := determineFrameRate(animData)
 
 			animData.FrameRateCount = rate
 
-			frameNum := s.determineFrameNumber(animData)
+			frameNum := determineFrameNumber(animData)
 
 			frameIndex := animData.Frames[frameNum]
 
-			frame := s.Spritesheet[frameIndex]
+			frame := s.SpriteMap[frameIndex]
 
-			vector := s.buildSpriteVector(entity.ComponentSpatial)
-			matrix := s.buildSpriteMatrix(entity.ComponentSpatial, vector)
+			vector := buildSpriteVector(entity.ComponentSpatial, s.ActiveSpaceRectangle)
+			matrix := buildSpriteMatrix(entity.ComponentSpatial, vector)
 
 			frame.Draw(s.Win, matrix)
 
@@ -237,7 +237,7 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 // 	circle.Draw(s.Win)
 // }
 
-func (s *RenderSystem) determineFrameRate(animData *ComponentAnimationData) int {
+func determineFrameRate(animData *ComponentAnimationData) int {
 	rate := animData.FrameRateCount
 	if rate < animData.FrameRate {
 		return rate + 1
@@ -245,7 +245,7 @@ func (s *RenderSystem) determineFrameRate(animData *ComponentAnimationData) int 
 	return 0
 }
 
-func (s *RenderSystem) determineFrameNumber(animData *ComponentAnimationData) int {
+func determineFrameNumber(animData *ComponentAnimationData) int {
 	rate := animData.FrameRateCount
 	frameNum := animData.Frame
 	if rate == animData.FrameRate {
@@ -259,13 +259,13 @@ func (s *RenderSystem) determineFrameNumber(animData *ComponentAnimationData) in
 	return frameNum
 }
 
-func (s *RenderSystem) buildSpriteVector(spatialComponent *ComponentSpatial) pixel.Vec {
-	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
-	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
+func buildSpriteVector(spatialComponent *ComponentSpatial, activeSpaceRectangle ActiveSpaceRectangle) pixel.Vec {
+	vectorX := spatialComponent.Rect.Center().X + activeSpaceRectangle.X
+	vectorY := spatialComponent.Rect.Center().Y + activeSpaceRectangle.Y
 	return pixel.V(vectorX, vectorY)
 }
 
-func (s *RenderSystem) buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pixel.Matrix {
+func buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pixel.Matrix {
 
 	matrix := pixel.IM.Moved(vector)
 
@@ -293,13 +293,13 @@ func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity
 			animData = anim.ComponentAnimationByName["swordAttackLeft"]
 		}
 
-		rate := s.determineFrameRate(animData)
+		rate := determineFrameRate(animData)
 		animData.FrameRateCount = rate
 
-		frameNum := s.determineFrameNumber(animData)
+		frameNum := determineFrameNumber(animData)
 
 		frameIndex := animData.Frames[frameNum]
-		frame := s.Spritesheet[frameIndex]
+		frame := s.SpriteMap[frameIndex]
 
 		rect := entity.ComponentSpatial.Rect
 		v := pixel.V(
@@ -337,37 +337,63 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 			animData = anim.ComponentAnimationByName["left"]
 		}
 
-		rate := animData.FrameRateCount
-		if rate < animData.FrameRate {
-			rate++
-		} else {
-			rate = 0
-		}
-		animData.FrameRateCount = rate
+		// rate := animData.FrameRateCount
+		// if rate < animData.FrameRate {
+		// 	rate++
+		// } else {
+		// 	rate = 0
+		// }
+		// animData.FrameRateCount = rate
 
-		frameNum := animData.Frame
-		if rate == animData.FrameRate {
-			if frameNum < len(animData.Frames)-1 {
-				frameNum++
-			} else {
-				frameNum = 0
-			}
-			animData.Frame = frameNum
-		}
+		// frameNum := animData.Frame
+		// if rate == animData.FrameRate {
+		// 	if frameNum < len(animData.Frames)-1 {
+		// 		frameNum++
+		// 	} else {
+		// 		frameNum = 0
+		// 	}
+		// 	animData.Frame = frameNum
+		// }
 
-		frameIndex := animData.Frames[frameNum]
-		frame := s.Spritesheet[frameIndex]
+		// frameIndex := animData.Frames[frameNum]
+		// frame := s.SpriteMap[frameIndex]
 
-		rect := entity.ComponentSpatial.Rect
-		v := pixel.V(
-			rect.Min.X+entity.ComponentSpatial.Width/2,
-			rect.Min.Y+entity.ComponentSpatial.Height/2,
-		)
+		// rect := entity.ComponentSpatial.Rect
+		// v := pixel.V(
+		// 	rect.Min.X+entity.ComponentSpatial.Width/2,
+		// 	rect.Min.Y+entity.ComponentSpatial.Height/2,
+		// )
 
-		frame.Draw(s.Win, pixel.IM.Moved(v))
+		// frame.Draw(s.Win, pixel.IM.Moved(v))
+
+		frame, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
+
+		frame.Draw(s.Win, matrix)
 
 		// s.drawHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
 	}
+}
+
+func GetSpriteDrawData(
+	animData *ComponentAnimationData,
+	spatialComponent *ComponentSpatial,
+	activeSpaceRectangle ActiveSpaceRectangle,
+	spriteMap SpriteMap,
+) (*pixel.Sprite, pixel.Matrix) {
+	rate := determineFrameRate(animData)
+
+	animData.FrameRateCount = rate
+
+	frameNum := determineFrameNumber(animData)
+
+	frameIndex := animData.Frames[frameNum]
+
+	frame := spriteMap[frameIndex]
+
+	vector := buildSpriteVector(spatialComponent, activeSpaceRectangle)
+	matrix := buildSpriteMatrix(spatialComponent, vector)
+
+	return frame, matrix
 }
 
 func (s *RenderSystem) drawHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {

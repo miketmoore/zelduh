@@ -20,7 +20,7 @@ type GameStateManager struct {
 	ShouldAddEntities           *bool
 	CurrentRoomID, NextRoomID   *RoomID
 	CurrentState                *State
-	Spritesheet                 Spritesheet
+	SpriteMap                   SpriteMap
 	MapDrawData                 MapDrawData
 	RoomTransition              *RoomTransition
 	EntitiesMap                 EntitiesMap
@@ -46,7 +46,7 @@ func NewGameStateManager(
 	currentRoomID *RoomID,
 	nextRoomID *RoomID,
 	currentState *State,
-	spritesheet Spritesheet,
+	spriteMap SpriteMap,
 	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
 	entitiesMap EntitiesMap,
@@ -71,7 +71,7 @@ func NewGameStateManager(
 		CurrentRoomID:               currentRoomID,
 		NextRoomID:                  nextRoomID,
 		CurrentState:                currentState,
-		Spritesheet:                 spritesheet,
+		SpriteMap:                   spriteMap,
 		MapDrawData:                 mapDrawData,
 		RoomTransition:              roomTransition,
 		EntitiesMap:                 entitiesMap,
@@ -101,7 +101,7 @@ func (g *GameStateManager) Update() {
 			g.ShouldAddEntities,
 			g.CurrentRoomID,
 			g.CurrentState,
-			g.Spritesheet,
+			g.SpriteMap,
 			g.MapDrawData,
 			g.EntitiesMap,
 			g.Player,
@@ -128,7 +128,7 @@ func (g *GameStateManager) Update() {
 			g.CurrentRoomID,
 			g.NextRoomID,
 			g.CurrentState,
-			g.Spritesheet,
+			g.SpriteMap,
 			g.MapDrawData,
 			g.RoomTransition,
 			g.Player,

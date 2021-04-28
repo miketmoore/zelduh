@@ -9,8 +9,6 @@ import (
 	"github.com/faiface/pixel"
 )
 
-type Spritesheet map[int]*pixel.Sprite
-
 func loadPicture(path string) pixel.Picture {
 	file, err := os.Open(path)
 	if err != nil {
@@ -28,8 +26,10 @@ func loadPicture(path string) pixel.Picture {
 	return pixel.PictureDataFromImage(img)
 }
 
+type SpriteMap map[int]*pixel.Sprite
+
 // LoadAndBuildSpritesheet this is a map of pixel engine sprites
-func LoadAndBuildSpritesheet(path string, tileSize float64) map[int]*pixel.Sprite {
+func LoadAndBuildSpritesheet(path string, tileSize float64) SpriteMap {
 	pic := loadPicture(path)
 
 	cols := pic.Bounds().W() / tileSize
@@ -39,12 +39,12 @@ func LoadAndBuildSpritesheet(path string, tileSize float64) map[int]*pixel.Sprit
 
 	index := maxIndex
 	id := maxIndex + 1
-	spritesheet := map[int]*pixel.Sprite{}
+	spriteMap := SpriteMap{}
 	for row := (rows - 1); row >= 0; row-- {
 		for col := (cols - 1); col >= 0; col-- {
 			x := col
 			y := math.Abs(rows-row) - 1
-			spritesheet[int(id)] = pixel.NewSprite(pic, pixel.R(
+			spriteMap[int(id)] = pixel.NewSprite(pic, pixel.R(
 				x*tileSize,
 				y*tileSize,
 				x*tileSize+tileSize,
@@ -54,7 +54,7 @@ func LoadAndBuildSpritesheet(path string, tileSize float64) map[int]*pixel.Sprit
 			id--
 		}
 	}
-	return spritesheet
+	return spriteMap
 }
 
 // GetSpriteSet returns a sprite set by key
@@ -62,7 +62,7 @@ func GetSpriteSet(key string) []int {
 	return spriteSets[key]
 }
 
-// spritesheet is 15 tiles wid
+// spriteMap is 15 tiles wid
 // each tile is 48 pixels square
 
 var spriteSets = map[string][]int{

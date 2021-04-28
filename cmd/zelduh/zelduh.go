@@ -61,7 +61,7 @@ func run() {
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
 	currentState := zelduh.StateStart
-	spritesheet := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
+	spriteMap := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
 
 	player := entityFactory.NewEntity("player", zelduh.NewCoordinates(6, 6), frameRate)
 	bomb := entityFactory.NewEntity("bomb", zelduh.NewCoordinates(0, 0), frameRate)
@@ -128,7 +128,7 @@ func run() {
 		&collisionSystem,
 		&zelduh.RenderSystem{
 			Win:                  ui.Window,
-			Spritesheet:          spritesheet,
+			SpriteMap:            spriteMap,
 			ActiveSpaceRectangle: activeSpaceRectangle,
 			TileSize:             tileSize,
 		},
@@ -193,7 +193,7 @@ func run() {
 		&currentRoomID,
 		&nextRoomID,
 		&currentState,
-		spritesheet,
+		spriteMap,
 		mapDrawData,
 		&roomTransition,
 		entitiesMap,
