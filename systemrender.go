@@ -214,17 +214,16 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 
 			frame.Draw(s.Win, matrix)
 
-			s.drawHitbox(entity)
+			// s.drawHitbox(frame.Frame(), entity.ComponentSpatial.HitBoxRadius)
+			s.drawHitbox(entity.ComponentSpatial.Rect, entity.ComponentSpatial.HitBoxRadius)
 		}
 	}
 }
 
-func (s *RenderSystem) drawHitbox(entity renderEntity) {
+func (s *RenderSystem) drawHitbox(rect pixel.Rect, radius float64) {
 
-	spatialComponent := entity.ComponentSpatial
-
-	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
-	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
+	vectorX := rect.Center().X + s.ActiveSpaceRectangle.X
+	vectorY := rect.Center().Y + s.ActiveSpaceRectangle.Y
 	vector := pixel.V(vectorX, vectorY)
 
 	// matrix := pixel.IM.Moved(vector)
@@ -233,7 +232,7 @@ func (s *RenderSystem) drawHitbox(entity renderEntity) {
 	circle.Color = colornames.Blue
 	circle.Push(vector)
 
-	circle.Circle(entity.ComponentSpatial.HitBoxRadius, 1)
+	circle.Circle(radius, 5)
 	circle.Draw(s.Win)
 }
 
@@ -363,5 +362,7 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 		)
 
 		frame.Draw(s.Win, pixel.IM.Moved(v))
+
+		s.drawHitbox(entity.ComponentSpatial.Rect, entity.ComponentSpatial.HitBoxRadius)
 	}
 }
