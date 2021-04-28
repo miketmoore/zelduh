@@ -47,7 +47,7 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 		// entityConfigPresetFnManager.GetPreset(PresetNameToggleObstacle)(zelduh.Coordinates{X: 10, Y: 7}),
 
 		2: zelduh.NewRoom("overworldFourWallsDoorTopBottom",
-			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkull)(zelduh.NewCoordinates(1, 1)),
+			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkull)(zelduh.NewCoordinates(6, 6)),
 			// entityConfigPresetFnManager.GetPreset(PresetNameEnemySkeleton)(zelduh.Coordinates{X: 11, Y: 9}),
 			// entityConfigPresetFnManager.GetPreset(PresetNameEnemySpinner)(zelduh.Coordinates{X: 7, Y: 9}),
 			// entityConfigPresetFnManager.GetPreset(PresetNameEnemyEyeBurrower)(zelduh.Coordinates{X: 8, Y: 9}),

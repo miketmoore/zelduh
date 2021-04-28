@@ -363,6 +363,20 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 
 		frame.Draw(s.Win, pixel.IM.Moved(v))
 
-		s.drawHitbox(entity.ComponentSpatial.Rect, entity.ComponentSpatial.HitBoxRadius)
+		s.drawPlayerHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
 	}
+}
+
+func (s *RenderSystem) drawPlayerHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {
+
+	// vectorX := rect.Center().X + s.ActiveSpaceRectangle.X
+	// vectorY := rect.Center().Y + s.ActiveSpaceRectangle.Y
+	// vector := pixel.V(vectorX, vectorY)
+
+	circle := imdraw.New(nil)
+	circle.Color = colornames.Blue
+	circle.Push(vector)
+
+	circle.Circle(radius, 5)
+	circle.Draw(s.Win)
 }
