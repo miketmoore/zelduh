@@ -210,31 +210,32 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 
 			frame := s.Spritesheet[frameIndex]
 
-			matrix := s.buildSpriteMatrix(entity.ComponentSpatial)
+			vector := s.buildSpriteVector(entity.ComponentSpatial)
+			matrix := s.buildSpriteMatrix(entity.ComponentSpatial, vector)
 
 			frame.Draw(s.Win, matrix)
 
 			// s.drawHitbox(frame.Frame(), entity.ComponentSpatial.HitBoxRadius)
-			s.drawHitbox(entity.ComponentSpatial.Rect, entity.ComponentSpatial.HitBoxRadius)
+			s.drawHitbox(entity.ComponentSpatial.Rect, vector, entity.ComponentSpatial.HitBoxRadius)
 		}
 	}
 }
 
-func (s *RenderSystem) drawHitbox(rect pixel.Rect, radius float64) {
+// func (s *RenderSystem) drawHitbox(rect pixel.Rect, radius float64) {
 
-	vectorX := rect.Center().X + s.ActiveSpaceRectangle.X
-	vectorY := rect.Center().Y + s.ActiveSpaceRectangle.Y
-	vector := pixel.V(vectorX, vectorY)
+// 	vectorX := rect.Center().X + s.ActiveSpaceRectangle.X
+// 	vectorY := rect.Center().Y + s.ActiveSpaceRectangle.Y
+// 	vector := pixel.V(vectorX, vectorY)
 
-	// matrix := pixel.IM.Moved(vector)
+// 	// matrix := pixel.IM.Moved(vector)
 
-	circle := imdraw.New(nil)
-	circle.Color = colornames.Blue
-	circle.Push(vector)
+// 	circle := imdraw.New(nil)
+// 	circle.Color = colornames.Blue
+// 	circle.Push(vector)
 
-	circle.Circle(radius, 5)
-	circle.Draw(s.Win)
-}
+// 	circle.Circle(radius, 5)
+// 	circle.Draw(s.Win)
+// }
 
 func (s *RenderSystem) determineFrameRate(animData *ComponentAnimationData) int {
 	rate := animData.FrameRateCount
@@ -258,11 +259,13 @@ func (s *RenderSystem) determineFrameNumber(animData *ComponentAnimationData) in
 	return frameNum
 }
 
-func (s *RenderSystem) buildSpriteMatrix(spatialComponent *ComponentSpatial) pixel.Matrix {
-
+func (s *RenderSystem) buildSpriteVector(spatialComponent *ComponentSpatial) pixel.Vec {
 	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
 	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
-	vector := pixel.V(vectorX, vectorY)
+	return pixel.V(vectorX, vectorY)
+}
+
+func (s *RenderSystem) buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pixel.Matrix {
 
 	matrix := pixel.IM.Moved(vector)
 
@@ -363,15 +366,11 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 
 		frame.Draw(s.Win, pixel.IM.Moved(v))
 
-		s.drawPlayerHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
+		s.drawHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
 	}
 }
 
-func (s *RenderSystem) drawPlayerHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {
-
-	// vectorX := rect.Center().X + s.ActiveSpaceRectangle.X
-	// vectorY := rect.Center().Y + s.ActiveSpaceRectangle.Y
-	// vector := pixel.V(vectorX, vectorY)
+func (s *RenderSystem) drawHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {
 
 	circle := imdraw.New(nil)
 	circle.Color = colornames.Blue
