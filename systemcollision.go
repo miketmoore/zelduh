@@ -142,6 +142,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 	for _, enemy := range s.enemies {
 		enemyR := enemy.ComponentSpatial.Rect
 
+		// Check if player and enemy are colliding
 		if isCircleCollision(
 			player.ComponentSpatial.HitBoxRadius,
 			enemy.ComponentSpatial.HitBoxRadius,
@@ -150,6 +151,8 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 		}
 
 		if !enemy.ComponentInvincible.Enabled {
+
+			// Check if the player sword is colliding with the enemy
 			if isCircleCollision(
 				s.sword.ComponentSpatial.HitBoxRadius,
 				enemy.ComponentSpatial.HitBoxRadius,
@@ -157,6 +160,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.CollisionHandler.OnSwordCollisionWithEnemy(enemy.ID)
 			}
 
+			// Check if the player arrow is colliding with the enemy
 			if isCircleCollision(
 				s.arrow.ComponentSpatial.HitBoxRadius,
 				enemy.ComponentSpatial.HitBoxRadius,

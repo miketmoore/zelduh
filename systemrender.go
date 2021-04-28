@@ -4,7 +4,9 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
 )
 
 type renderEntity struct {
@@ -211,6 +213,12 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 			matrix := s.buildSpriteMatrix(entity.ComponentSpatial)
 
 			frame.Draw(s.Win, matrix)
+
+			circle := imdraw.New(nil)
+			circle.Color = colornames.Blue
+			circle.Push(entity.ComponentSpatial.Rect.Center())
+			circle.Circle(entity.ComponentSpatial.HitBoxRadius, 1)
+			circle.Draw(s.Win)
 		}
 	}
 }
@@ -218,11 +226,9 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 func (s *RenderSystem) determineFrameRate(animData *ComponentAnimationData) int {
 	rate := animData.FrameRateCount
 	if rate < animData.FrameRate {
-		rate++
-	} else {
-		rate = 0
+		return rate + 1
 	}
-	return rate
+	return 0
 }
 
 func (s *RenderSystem) determineFrameNumber(animData *ComponentAnimationData) int {
@@ -271,23 +277,10 @@ func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity
 			animData = anim.ComponentAnimationByName["swordAttackLeft"]
 		}
 
-		rate := animData.FrameRateCount
-		if rate < animData.FrameRate {
-			rate++
-		} else {
-			rate = 0
-		}
+		rate := s.determineFrameRate(animData)
 		animData.FrameRateCount = rate
 
-		frameNum := animData.Frame
-		if rate == animData.FrameRate {
-			if frameNum < len(animData.Frames)-1 {
-				frameNum++
-			} else {
-				frameNum = 0
-			}
-			animData.Frame = frameNum
-		}
+		frameNum := s.determineFrameNumber(animData)
 
 		frameIndex := animData.Frames[frameNum]
 		frame := s.Spritesheet[frameIndex]
