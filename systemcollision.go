@@ -177,21 +177,33 @@ func (s *CollisionSystem) drawHitbox(rect pixel.Rect, vector pixel.Vec, radius f
 func (s *CollisionSystem) handleEnemyCollisions() {
 
 	player := s.player
-	playerR := s.player.ComponentSpatial.Rect
+	// playerR := s.player.ComponentSpatial.Rect
 
 	w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height
 	for _, enemy := range s.enemies {
 		enemyR := enemy.ComponentSpatial.Rect
 
-		v := s.buildSpriteVector(player.ComponentSpatial)
+		// v := s.buildSpriteVector(player.ComponentSpatial)
+		playerRect := player.ComponentSpatial.Rect
+		playerVector := pixel.V(
+			playerRect.Min.X+player.ComponentSpatial.Width/2,
+			playerRect.Min.Y+player.ComponentSpatial.Height/2,
+		)
 		// m := s.buildSpriteMatrix(player.ComponentSpatial, v)
-		s.drawHitbox(player.ComponentSpatial.Rect, v, player.HitBoxRadius)
+		s.drawHitbox(playerRect, playerVector, player.HitBoxRadius)
+
+		enemyRect := enemy.ComponentSpatial.Rect
+		enemyVector := pixel.V(
+			enemyRect.Min.X+player.ComponentSpatial.Width/2,
+			enemyRect.Min.Y+player.ComponentSpatial.Height/2,
+		)
+		s.drawHitbox(enemyRect, enemyVector, enemy.HitBoxRadius)
 
 		// Check if player and enemy are colliding
 		if isCircleCollision(
 			player.ComponentSpatial.HitBoxRadius,
 			enemy.ComponentSpatial.HitBoxRadius,
-			w, h, playerR, enemyR) {
+			w, h, playerRect, enemyRect) {
 			s.CollisionHandler.OnPlayerCollisionWithEnemy(enemy.ID)
 		}
 

@@ -216,7 +216,7 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 			frame.Draw(s.Win, matrix)
 
 			// s.drawHitbox(frame.Frame(), entity.ComponentSpatial.HitBoxRadius)
-			s.drawHitbox(entity.ComponentSpatial.Rect, vector, entity.ComponentSpatial.HitBoxRadius)
+			// s.drawHitbox(entity.ComponentSpatial.Rect, vector, entity.ComponentSpatial.HitBoxRadius)
 		}
 	}
 }
@@ -366,7 +366,7 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 
 		frame.Draw(s.Win, pixel.IM.Moved(v))
 
-		s.drawHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
+		// s.drawHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
 	}
 }
 
