@@ -103,6 +103,8 @@ func run() {
 		frameRate,
 	)
 
+	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
+
 	collisionSystem := zelduh.NewCollisionSystem(
 		pixel.R(
 			activeSpaceRectangle.X,
@@ -111,9 +113,9 @@ func run() {
 			activeSpaceRectangle.Y+activeSpaceRectangle.Height,
 		),
 		&collisionHandler,
+		activeSpaceRectangle,
+		ui.Window,
 	)
-
-	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
 	input := Input{window: ui.Window}
 

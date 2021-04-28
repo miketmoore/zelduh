@@ -1,7 +1,12 @@
 package zelduh
 
 import (
+	"math"
+
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
+	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
 )
 
 type collisionEntity struct {
@@ -12,26 +17,32 @@ type collisionEntity struct {
 
 // CollisionSystem is a custom system for detecting collisions and what to do when they occur
 type CollisionSystem struct {
-	MapBounds         pixel.Rect
-	player            collisionEntity
-	sword             collisionEntity
-	arrow             collisionEntity
-	enemies           []collisionEntity
-	coins             []collisionEntity
-	obstacles         []collisionEntity
-	moveableObstacles []collisionEntity
-	collisionSwitches []collisionEntity
-	warps             []collisionEntity
-	CollisionHandler  *CollisionHandler
+	MapBounds            pixel.Rect
+	player               collisionEntity
+	sword                collisionEntity
+	arrow                collisionEntity
+	enemies              []collisionEntity
+	coins                []collisionEntity
+	obstacles            []collisionEntity
+	moveableObstacles    []collisionEntity
+	collisionSwitches    []collisionEntity
+	warps                []collisionEntity
+	CollisionHandler     *CollisionHandler
+	ActiveSpaceRectangle ActiveSpaceRectangle
+	Win                  *pixelgl.Window
 }
 
 func NewCollisionSystem(
 	mapBounds pixel.Rect,
 	collisionHandler *CollisionHandler,
+	activeSpaceRectangle ActiveSpaceRectangle,
+	win *pixelgl.Window,
 ) CollisionSystem {
 	return CollisionSystem{
-		MapBounds:        mapBounds,
-		CollisionHandler: collisionHandler,
+		MapBounds:            mapBounds,
+		CollisionHandler:     collisionHandler,
+		ActiveSpaceRectangle: activeSpaceRectangle,
+		Win:                  win,
 	}
 }
 
@@ -133,6 +144,36 @@ func (s *CollisionSystem) handlePlayerAtMapEdge() {
 	}
 }
 
+func (s *CollisionSystem) buildSpriteVector(spatialComponent *ComponentSpatial) pixel.Vec {
+	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
+	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
+	return pixel.V(vectorX, vectorY)
+}
+
+func (s *CollisionSystem) buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pixel.Matrix {
+
+	matrix := pixel.IM.Moved(vector)
+
+	if spatialComponent.Transform != nil {
+		// Transform
+		degrees := spatialComponent.Transform.Rotation
+		radians := degrees * math.Pi / 180
+		matrix = matrix.Rotated(vector, radians)
+	}
+
+	return matrix
+}
+
+func (s *CollisionSystem) drawHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {
+
+	circle := imdraw.New(nil)
+	circle.Color = colornames.Blue
+	circle.Push(vector)
+
+	circle.Circle(radius, 5)
+	circle.Draw(s.Win)
+}
+
 func (s *CollisionSystem) handleEnemyCollisions() {
 
 	player := s.player
@@ -141,6 +182,10 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 	w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height
 	for _, enemy := range s.enemies {
 		enemyR := enemy.ComponentSpatial.Rect
+
+		v := s.buildSpriteVector(player.ComponentSpatial)
+		// m := s.buildSpriteMatrix(player.ComponentSpatial, v)
+		s.drawHitbox(player.ComponentSpatial.Rect, v, player.HitBoxRadius)
 
 		// Check if player and enemy are colliding
 		if isCircleCollision(
