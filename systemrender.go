@@ -214,13 +214,27 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 
 			frame.Draw(s.Win, matrix)
 
-			circle := imdraw.New(nil)
-			circle.Color = colornames.Blue
-			circle.Push(entity.ComponentSpatial.Rect.Center())
-			circle.Circle(entity.ComponentSpatial.HitBoxRadius, 1)
-			circle.Draw(s.Win)
+			s.drawHitbox(entity)
 		}
 	}
+}
+
+func (s *RenderSystem) drawHitbox(entity renderEntity) {
+
+	spatialComponent := entity.ComponentSpatial
+
+	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
+	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
+	vector := pixel.V(vectorX, vectorY)
+
+	// matrix := pixel.IM.Moved(vector)
+
+	circle := imdraw.New(nil)
+	circle.Color = colornames.Blue
+	circle.Push(vector)
+
+	circle.Circle(entity.ComponentSpatial.HitBoxRadius, 1)
+	circle.Draw(s.Win)
 }
 
 func (s *RenderSystem) determineFrameRate(animData *ComponentAnimationData) int {

@@ -40,17 +40,17 @@ func BuildRooms(entityConfigPresetFnManager *zelduh.EntityConfigPresetFnManager,
 	})
 
 	return zelduh.RoomByIDMap{
-		1: zelduh.NewRoom("overworldFourWallsDoorBottomRight"),// entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)(zelduh.Coordinates{X: 3, Y: 11}),
+		1: zelduh.NewRoom("overworldFourWallsDoorBottomRight"), // entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)(zelduh.Coordinates{X: 3, Y: 11}),
 		// entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(zelduh.Coordinates{X: 10, Y: 10}),
 		// entityConfigPresetFnManager.GetPreset(PresetNamePuzzleBox)(zelduh.Coordinates{X: 5, Y: 5}),
 		// entityConfigPresetFnManager.GetPreset(PresetNameFloorSwitch)(zelduh.Coordinates{X: 5, Y: 6}),
 		// entityConfigPresetFnManager.GetPreset(PresetNameToggleObstacle)(zelduh.Coordinates{X: 10, Y: 7}),
 
 		2: zelduh.NewRoom("overworldFourWallsDoorTopBottom",
-			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkull)(zelduh.Coordinates{X: 5, Y: 5}),
-			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkeleton)(zelduh.Coordinates{X: 11, Y: 9}),
-			entityConfigPresetFnManager.GetPreset(PresetNameEnemySpinner)(zelduh.Coordinates{X: 7, Y: 9}),
-			entityConfigPresetFnManager.GetPreset(PresetNameEnemyEyeBurrower)(zelduh.Coordinates{X: 8, Y: 9}),
+			entityConfigPresetFnManager.GetPreset(PresetNameEnemySkull)(zelduh.NewCoordinates(1, 1)),
+			// entityConfigPresetFnManager.GetPreset(PresetNameEnemySkeleton)(zelduh.Coordinates{X: 11, Y: 9}),
+			// entityConfigPresetFnManager.GetPreset(PresetNameEnemySpinner)(zelduh.Coordinates{X: 7, Y: 9}),
+			// entityConfigPresetFnManager.GetPreset(PresetNameEnemyEyeBurrower)(zelduh.Coordinates{X: 8, Y: 9}),
 		),
 		3: zelduh.NewRoom("overworldFourWallsDoorRightTopBottom",
 			buildWarpStone(6, zelduh.Coordinates{X: 3, Y: 7}, 5),
