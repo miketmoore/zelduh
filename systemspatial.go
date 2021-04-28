@@ -150,15 +150,15 @@ func (s *SpatialSystem) Update() {
 		s.moveMoveableObstacle(entity)
 	}
 
-	for i := 0; i < len(s.enemies); i++ {
-		enemy := s.enemies[i]
-		switch enemy.ComponentMovement.PatternName {
-		case "random":
-			s.moveEnemyRandom(enemy)
-		case "left-right":
-			s.moveEnemyLeftRight(enemy)
-		}
-	}
+	// for i := 0; i < len(s.enemies); i++ {
+	// 	enemy := s.enemies[i]
+	// 	switch enemy.ComponentMovement.PatternName {
+	// 	case "random":
+	// 		s.moveEnemyRandom(enemy)
+	// 	case "left-right":
+	// 		s.moveEnemyLeftRight(enemy)
+	// 	}
+	// }
 }
 
 func (s *SpatialSystem) moveableObstacle(id EntityID) (spatialEntity, bool) {

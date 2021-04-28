@@ -209,14 +209,14 @@ func run() {
 		activeSpaceRectangle,
 	)
 
-	// totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
-	// fmt.Println(totalCells)
-	// debugGridCellCachePopulated := false
-	// // debugGridCellCache := []*imdraw.IMDraw{}
-	// var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
+	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
+	fmt.Println(totalCells)
+	debugGridCellCachePopulated := false
+	// debugGridCellCache := []*imdraw.IMDraw{}
+	var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
 
-	// debugTxtOrigin := pixel.V(20, 50)
-	// debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
+	debugTxtOrigin := pixel.V(20, 50)
+	debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
 
 	for !ui.Window.Closed() {
 
@@ -228,14 +228,14 @@ func run() {
 		gameStateManager.Update()
 
 		// draw grid after everything else is drawn?
-		// drawDebugGrid(
-		// 	&debugGridCellCachePopulated,
-		// 	debugGridCellCache,
-		// 	ui.Window,
-		// 	debugTxt,
-		// 	activeSpaceRectangle,
-		// 	tileSize,
-		// )
+		drawDebugGrid(
+			&debugGridCellCachePopulated,
+			debugGridCellCache,
+			ui.Window,
+			debugTxt,
+			activeSpaceRectangle,
+			tileSize,
+		)
 
 		// drawDialog(
 		// 	systemsManager,
