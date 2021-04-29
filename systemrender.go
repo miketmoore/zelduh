@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"errors"
+	"fmt"
 	"math"
 
 	"github.com/faiface/pixel"
@@ -149,6 +151,20 @@ func (s *RenderSystem) Update() error {
 	}
 
 	return nil
+}
+
+func getComponentAnimationByName(entity renderEntity, name string) (*ComponentAnimationData, error) {
+	componentAnimation := entity.ComponentAnimation
+	if componentAnimation == nil {
+		return nil, errors.New("componentAnimation is not defined")
+	}
+
+	animationData, ok := componentAnimation.ComponentAnimationByName[name]
+	if !ok {
+		return nil, fmt.Errorf("ComponentAnimationData not found by name=%s", name)
+	}
+
+	return animationData, nil
 }
 
 func (s *RenderSystem) drawSprite(
