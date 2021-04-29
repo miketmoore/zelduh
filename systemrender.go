@@ -155,19 +155,20 @@ func (s *RenderSystem) Update() {
 func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-			var frameIndex int
-			if !entity.ComponentToggler.Enabled() {
-				frameIndex = animData.Frames[0]
-			} else {
-				frameIndex = animData.Frames[1]
-			}
-			frame := s.SpriteMap[frameIndex]
+			// var frameIndex int
+			// if !entity.ComponentToggler.Enabled() {
+			// 	frameIndex = animData.Frames[0]
+			// } else {
+			// 	frameIndex = animData.Frames[1]
+			// }
+			// frame := s.SpriteMap[frameIndex]
 
-			v := pixel.V(
-				entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
-				entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
-			)
-			frame.Draw(s.Win, pixel.IM.Moved(v))
+			// v := pixel.V(
+			// 	entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
+			// 	entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
+			// )
+			frame, vector, _ := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
+			frame.Draw(s.Win, pixel.IM.Moved(vector))
 		}
 	}
 }
@@ -366,7 +367,7 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 
 		// frame.Draw(s.Win, pixel.IM.Moved(v))
 
-		frame, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
+		frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
 
 		frame.Draw(s.Win, matrix)
 
@@ -379,7 +380,7 @@ func GetSpriteDrawData(
 	spatialComponent *ComponentSpatial,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	spriteMap SpriteMap,
-) (*pixel.Sprite, pixel.Matrix) {
+) (*pixel.Sprite, pixel.Vec, pixel.Matrix) {
 	rate := determineFrameRate(animData)
 
 	animData.FrameRateCount = rate
@@ -393,7 +394,7 @@ func GetSpriteDrawData(
 	vector := buildSpriteVector(spatialComponent, activeSpaceRectangle)
 	matrix := buildSpriteMatrix(spatialComponent, vector)
 
-	return frame, matrix
+	return frame, vector, matrix
 }
 
 func (s *RenderSystem) drawHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {
