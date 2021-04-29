@@ -58,9 +58,9 @@ type Input interface {
 }
 
 // Update checks for player input
-func (s InputSystem) Update() {
+func (s InputSystem) Update() error {
 	if !s.inputEnabled {
-		return
+		return nil
 	}
 
 	s.updatePlayerLastDirection()
@@ -69,6 +69,7 @@ func (s InputSystem) Update() {
 	s.handleInputArrow()
 	s.handleInputDash()
 
+	return nil
 }
 
 func (s InputSystem) updatePlayerLastDirection() {

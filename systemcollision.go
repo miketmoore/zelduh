@@ -118,7 +118,7 @@ func (s *CollisionSystem) RemoveAll(category EntityCategory) {
 }
 
 // Update checks for collisions
-func (s *CollisionSystem) Update() {
+func (s *CollisionSystem) Update() error {
 	s.handlePlayerAtMapEdge()
 	s.handleEnemyCollisions()
 	s.handleCoinCollisions()
@@ -126,6 +126,7 @@ func (s *CollisionSystem) Update() {
 	s.handleMoveableObstacleCollisions()
 	s.handleSwitchCollisions()
 	s.handleWarpCollisions()
+	return nil
 }
 
 func (s *CollisionSystem) handlePlayerAtMapEdge() {

@@ -35,4 +35,6 @@ func (s *HealthSystem) Hit(entityID EntityID, d int) bool {
 }
 
 // Update is a no-op
-func (s *HealthSystem) Update() {}
+func (s *HealthSystem) Update() error {
+	return nil
+}

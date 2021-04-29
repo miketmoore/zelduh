@@ -2,7 +2,7 @@ package zelduh
 
 // System is an interface
 type System interface {
-	Update()
+	Update() error
 	AddEntity(Entity)
 }
 
@@ -34,10 +34,14 @@ func (w *SystemsManager) AddSystems(all ...System) {
 }
 
 // Update executes Update on all systems in this SystemsManager
-func (w *SystemsManager) Update() {
+func (w *SystemsManager) Update() error {
 	for _, sys := range w.systems {
-		sys.Update()
+		err := sys.Update()
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // Systems returns the systems in this SystemsManager

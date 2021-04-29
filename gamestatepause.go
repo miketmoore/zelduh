@@ -10,7 +10,7 @@ func GameStatePause(
 	currLocaleMsgs LocaleMessagesMap,
 	currentState *State,
 	activeSpaceRectangle ActiveSpaceRectangle,
-) {
+) error {
 	ui.Window.Clear(colornames.Darkgray)
 	DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
 	DrawCenterText(ui.Window, ui.Text, currLocaleMsgs["pauseScreenMessage"], colornames.Black)
@@ -21,4 +21,5 @@ func GameStatePause(
 	if ui.Window.JustPressed(pixelgl.KeyEscape) {
 		*currentState = StateStart
 	}
+	return nil
 }

@@ -88,12 +88,13 @@ func NewGameStateManager(
 	}
 }
 
-func (g *GameStateManager) Update() {
+func (g *GameStateManager) Update() error {
+	var err error
 	switch *g.CurrentState {
 	case StateStart:
-		GameStateStart(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
+		err = GameStateStart(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
 	case StateGame:
-		GameStateGame(
+		err = GameStateGame(
 			g.UI,
 			g.LevelManager.CurrentLevel.RoomByIDMap,
 			g.SystemsManager,
@@ -115,11 +116,11 @@ func (g *GameStateManager) Update() {
 			g.ActiveSpaceRectangle,
 		)
 	case StatePause:
-		GameStatePause(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
+		err = GameStatePause(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
 	case StateOver:
-		GameStateOver(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
+		err = GameStateOver(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
 	case StateMapTransition:
-		GameStateMapTransition(
+		err = GameStateMapTransition(
 			g.UI,
 			g.SystemsManager,
 			g.LevelManager.CurrentLevel.RoomByIDMap,
@@ -137,4 +138,6 @@ func (g *GameStateManager) Update() {
 			g.ActiveSpaceRectangle,
 		)
 	}
+
+	return err
 }

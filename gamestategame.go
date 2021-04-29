@@ -25,7 +25,7 @@ func GameStateGame(
 	nonObstacleSprites map[int]bool,
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
-) {
+) error {
 	inputSystem.Enable()
 
 	ui.Window.Clear(colornames.Darkgray)
@@ -82,7 +82,10 @@ func GameStateGame(
 
 	DrawMask(ui.Window, windowConfig, activeSpaceRectangle)
 
-	systemsManager.Update()
+	err := systemsManager.Update()
+	if err != nil {
+		return err
+	}
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {
 		*currentState = StatePause
@@ -91,4 +94,6 @@ func GameStateGame(
 	if ui.Window.JustPressed(pixelgl.KeyX) {
 		*currentState = StateOver
 	}
+
+	return nil
 }

@@ -225,7 +225,11 @@ func run() {
 			os.Exit(1)
 		}
 
-		gameStateManager.Update()
+		err := gameStateManager.Update()
+		if err != nil {
+			fmt.Println("Error: ", err)
+			os.Exit(0)
+		}
 
 		// draw grid after everything else is drawn?
 		drawDebugGrid(

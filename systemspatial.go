@@ -140,7 +140,7 @@ func (s *SpatialSystem) EnemyMovingFromHit(enemyID EntityID) bool {
 }
 
 // Update changes spatial data based on movement data
-func (s *SpatialSystem) Update() {
+func (s *SpatialSystem) Update() error {
 	s.movePlayer()
 	s.moveSword()
 	s.moveArrow()
@@ -159,6 +159,7 @@ func (s *SpatialSystem) Update() {
 	// 		s.moveEnemyLeftRight(enemy)
 	// 	}
 	// }
+	return nil
 }
 
 func (s *SpatialSystem) moveableObstacle(id EntityID) (spatialEntity, bool) {

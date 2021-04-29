@@ -105,7 +105,7 @@ func (s *RenderSystem) RemoveAllEntities() {
 }
 
 // Update changes spatial data based on movement data
-func (s *RenderSystem) Update() {
+func (s *RenderSystem) Update() error {
 
 	for _, entity := range s.entities {
 
@@ -148,6 +148,7 @@ func (s *RenderSystem) Update() {
 		s.animateAttackDirection(player.ComponentMovement.Direction, player)
 	}
 
+	return nil
 }
 
 func (s *RenderSystem) drawSprite(

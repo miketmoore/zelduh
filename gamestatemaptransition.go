@@ -21,7 +21,7 @@ func GameStateMapTransition(
 	tileSize float64,
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
-) {
+) error {
 	inputSystem.Disable()
 
 	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
@@ -76,7 +76,10 @@ func GameStateMapTransition(
 			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+tileSize,
 		)
 
-		systemsManager.Update()
+		err := systemsManager.Update()
+		if err != nil {
+			return err
+		}
 	} else if roomTransition.Style == TransitionWarp && roomTransition.Timer > 0 {
 		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
@@ -94,6 +97,8 @@ func GameStateMapTransition(
 		}
 		roomTransition.Active = false
 	}
+
+	return nil
 }
 
 type transitionRoomResponse struct {
