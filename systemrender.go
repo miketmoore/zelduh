@@ -4,9 +4,7 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
 )
 
 type renderEntity struct {
@@ -155,24 +153,13 @@ func (s *RenderSystem) Update() {
 func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-			// var frameIndex int
-			// if !entity.ComponentToggler.Enabled() {
-			// 	frameIndex = animData.Frames[0]
-			// } else {
-			// 	frameIndex = animData.Frames[1]
-			// }
-			// frame := s.SpriteMap[frameIndex]
-
-			// v := pixel.V(
-			// 	entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
-			// 	entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
-			// )
 			frame, vector, _ := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
 			frame.Draw(s.Win, pixel.IM.Moved(vector))
 		}
 	}
 }
 
+// drawRectangle draws a rectangle of any dimensions
 func (s *RenderSystem) drawRectangle(entity renderEntity) {
 
 	spatialData := entity.ComponentSpatial
@@ -201,42 +188,12 @@ func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
 
-			rate := determineFrameRate(animData)
-
-			animData.FrameRateCount = rate
-
-			frameNum := determineFrameNumber(animData)
-
-			frameIndex := animData.Frames[frameNum]
-
-			frame := s.SpriteMap[frameIndex]
-
-			vector := buildSpriteVector(entity.ComponentSpatial, s.ActiveSpaceRectangle)
-			matrix := buildSpriteMatrix(entity.ComponentSpatial, vector)
+			frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
 
 			frame.Draw(s.Win, matrix)
-
-			// s.drawHitbox(frame.Frame(), entity.ComponentSpatial.HitBoxRadius)
-			// s.drawHitbox(entity.ComponentSpatial.Rect, vector, entity.ComponentSpatial.HitBoxRadius)
 		}
 	}
 }
-
-// func (s *RenderSystem) drawHitbox(rect pixel.Rect, radius float64) {
-
-// 	vectorX := rect.Center().X + s.ActiveSpaceRectangle.X
-// 	vectorY := rect.Center().Y + s.ActiveSpaceRectangle.Y
-// 	vector := pixel.V(vectorX, vectorY)
-
-// 	// matrix := pixel.IM.Moved(vector)
-
-// 	circle := imdraw.New(nil)
-// 	circle.Color = colornames.Blue
-// 	circle.Push(vector)
-
-// 	circle.Circle(radius, 5)
-// 	circle.Draw(s.Win)
-// }
 
 func determineFrameRate(animData *ComponentAnimationData) int {
 	rate := animData.FrameRateCount
@@ -294,37 +251,13 @@ func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity
 			animData = anim.ComponentAnimationByName["swordAttackLeft"]
 		}
 
-		rate := determineFrameRate(animData)
-		animData.FrameRateCount = rate
+		frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
 
-		frameNum := determineFrameNumber(animData)
-
-		frameIndex := animData.Frames[frameNum]
-		frame := s.SpriteMap[frameIndex]
-
-		rect := entity.ComponentSpatial.Rect
-		v := pixel.V(
-			rect.Min.X+entity.ComponentSpatial.Width/2,
-			rect.Min.Y+entity.ComponentSpatial.Height/2,
-		)
-
-		frame.Draw(s.Win, pixel.IM.Moved(v))
+		frame.Draw(s.Win, matrix)
 	}
 }
 
 func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
-	// if entity.ComponentSpatial.HitBoxRadius > 0 {
-	// 	shape := entity.ComponentSpatial.Shape
-	// 	shape.Clear()
-	// 	shape.Color = colornames.Yellow
-	// 	shape.Push(pixel.V(
-	// 		entity.ComponentSpatial.Rect.Min.X+entity.ComponentSpatial.Width/2,
-	// 		entity.ComponentSpatial.Rect.Min.Y+entity.ComponentSpatial.Height/2,
-	// 	))
-	// 	// s.Push(entity.ComponentSpatial.Rect.Max)
-	// 	shape.Circle(entity.ComponentSpatial.HitBoxRadius, 0)
-	// 	shape.Draw(s.Win)
-	// }
 	if anim := entity.ComponentAnimation; anim != nil {
 		var animData *ComponentAnimationData
 		switch dir {
@@ -338,40 +271,9 @@ func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
 			animData = anim.ComponentAnimationByName["left"]
 		}
 
-		// rate := animData.FrameRateCount
-		// if rate < animData.FrameRate {
-		// 	rate++
-		// } else {
-		// 	rate = 0
-		// }
-		// animData.FrameRateCount = rate
-
-		// frameNum := animData.Frame
-		// if rate == animData.FrameRate {
-		// 	if frameNum < len(animData.Frames)-1 {
-		// 		frameNum++
-		// 	} else {
-		// 		frameNum = 0
-		// 	}
-		// 	animData.Frame = frameNum
-		// }
-
-		// frameIndex := animData.Frames[frameNum]
-		// frame := s.SpriteMap[frameIndex]
-
-		// rect := entity.ComponentSpatial.Rect
-		// v := pixel.V(
-		// 	rect.Min.X+entity.ComponentSpatial.Width/2,
-		// 	rect.Min.Y+entity.ComponentSpatial.Height/2,
-		// )
-
-		// frame.Draw(s.Win, pixel.IM.Moved(v))
-
 		frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
 
 		frame.Draw(s.Win, matrix)
-
-		// s.drawHitbox(rect, v, entity.ComponentSpatial.HitBoxRadius)
 	}
 }
 
@@ -395,14 +297,4 @@ func GetSpriteDrawData(
 	matrix := buildSpriteMatrix(spatialComponent, vector)
 
 	return frame, vector, matrix
-}
-
-func (s *RenderSystem) drawHitbox(rect pixel.Rect, vector pixel.Vec, radius float64) {
-
-	circle := imdraw.New(nil)
-	circle.Color = colornames.Blue
-	circle.Push(vector)
-
-	circle.Circle(radius, 5)
-	circle.Draw(s.Win)
 }
