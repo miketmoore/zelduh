@@ -150,49 +150,64 @@ func (s *RenderSystem) Update() {
 
 }
 
+func (s *RenderSystem) drawSprite(
+	animData *ComponentAnimationData,
+	entity renderEntity,
+) {
+	frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
+	frame.Draw(s.Win, matrix)
+}
+
 func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-			frame, vector, _ := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
-			frame.Draw(s.Win, pixel.IM.Moved(vector))
+			s.drawSprite(animData, entity)
 		}
 	}
-}
-
-// drawRectangle draws a rectangle of any dimensions
-func (s *RenderSystem) drawRectangle(entity renderEntity) {
-
-	spatialData := entity.ComponentSpatial
-
-	rect := spatialData.Shape
-	rect.Color = spatialData.Color
-
-	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.ComponentSpatial.Rect.Min.X)
-	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.ComponentSpatial.Rect.Min.Y)
-	point := pixel.V(vectorX, vectorY)
-
-	rect.Push(point)
-
-	point2 := pixel.V(
-		point.X+(spatialData.Width*48),
-		point.Y+(spatialData.Height*48),
-	)
-	rect.Push(point2)
-
-	rect.Rectangle(0)
-
-	rect.Draw(s.Win)
 }
 
 func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-
-			frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
-
-			frame.Draw(s.Win, matrix)
+			s.drawSprite(animData, entity)
 		}
 	}
+}
+
+func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity) {
+	if anim := entity.ComponentAnimation; anim != nil {
+		animData := getAttackAnimationDataByDirection(anim, dir)
+		s.drawSprite(animData, entity)
+	}
+}
+
+func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
+	if anim := entity.ComponentAnimation; anim != nil {
+		animData := getDirectionAnimationDataByDirection(anim, dir)
+		s.drawSprite(animData, entity)
+	}
+}
+
+func GetSpriteDrawData(
+	animData *ComponentAnimationData,
+	spatialComponent *ComponentSpatial,
+	activeSpaceRectangle ActiveSpaceRectangle,
+	spriteMap SpriteMap,
+) (*pixel.Sprite, pixel.Vec, pixel.Matrix) {
+	rate := determineFrameRate(animData)
+
+	animData.FrameRateCount = rate
+
+	frameNum := determineFrameNumber(animData)
+
+	frameIndex := animData.Frames[frameNum]
+
+	frame := spriteMap[frameIndex]
+
+	vector := buildSpriteVector(spatialComponent, activeSpaceRectangle)
+	matrix := buildSpriteMatrix(spatialComponent, vector)
+
+	return frame, vector, matrix
 }
 
 func determineFrameRate(animData *ComponentAnimationData) int {
@@ -237,64 +252,57 @@ func buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pix
 	return matrix
 }
 
-func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity) {
-	if anim := entity.ComponentAnimation; anim != nil {
-		var animData *ComponentAnimationData
-		switch dir {
-		case DirectionUp:
-			animData = anim.ComponentAnimationByName["swordAttackUp"]
-		case DirectionRight:
-			animData = anim.ComponentAnimationByName["swordAttackRight"]
-		case DirectionDown:
-			animData = anim.ComponentAnimationByName["swordAttackDown"]
-		case DirectionLeft:
-			animData = anim.ComponentAnimationByName["swordAttackLeft"]
-		}
-
-		frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
-
-		frame.Draw(s.Win, matrix)
+func getAttackAnimationDataByDirection(anim *ComponentAnimation, dir Direction) *ComponentAnimationData {
+	var animData *ComponentAnimationData
+	switch dir {
+	case DirectionUp:
+		animData = anim.ComponentAnimationByName["swordAttackUp"]
+	case DirectionRight:
+		animData = anim.ComponentAnimationByName["swordAttackRight"]
+	case DirectionDown:
+		animData = anim.ComponentAnimationByName["swordAttackDown"]
+	case DirectionLeft:
+		animData = anim.ComponentAnimationByName["swordAttackLeft"]
 	}
+	return animData
 }
 
-func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
-	if anim := entity.ComponentAnimation; anim != nil {
-		var animData *ComponentAnimationData
-		switch dir {
-		case DirectionUp:
-			animData = anim.ComponentAnimationByName["up"]
-		case DirectionRight:
-			animData = anim.ComponentAnimationByName["right"]
-		case DirectionDown:
-			animData = anim.ComponentAnimationByName["down"]
-		case DirectionLeft:
-			animData = anim.ComponentAnimationByName["left"]
-		}
-
-		frame, _, matrix := GetSpriteDrawData(animData, entity.ComponentSpatial, s.ActiveSpaceRectangle, s.SpriteMap)
-
-		frame.Draw(s.Win, matrix)
+func getDirectionAnimationDataByDirection(anim *ComponentAnimation, dir Direction) *ComponentAnimationData {
+	var animData *ComponentAnimationData
+	switch dir {
+	case DirectionUp:
+		animData = anim.ComponentAnimationByName["up"]
+	case DirectionRight:
+		animData = anim.ComponentAnimationByName["right"]
+	case DirectionDown:
+		animData = anim.ComponentAnimationByName["down"]
+	case DirectionLeft:
+		animData = anim.ComponentAnimationByName["left"]
 	}
+	return animData
 }
 
-func GetSpriteDrawData(
-	animData *ComponentAnimationData,
-	spatialComponent *ComponentSpatial,
-	activeSpaceRectangle ActiveSpaceRectangle,
-	spriteMap SpriteMap,
-) (*pixel.Sprite, pixel.Vec, pixel.Matrix) {
-	rate := determineFrameRate(animData)
+// drawRectangle draws a rectangle of any dimensions
+func (s *RenderSystem) drawRectangle(entity renderEntity) {
 
-	animData.FrameRateCount = rate
+	spatialData := entity.ComponentSpatial
 
-	frameNum := determineFrameNumber(animData)
+	rect := spatialData.Shape
+	rect.Color = spatialData.Color
 
-	frameIndex := animData.Frames[frameNum]
+	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.ComponentSpatial.Rect.Min.X)
+	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.ComponentSpatial.Rect.Min.Y)
+	point := pixel.V(vectorX, vectorY)
 
-	frame := spriteMap[frameIndex]
+	rect.Push(point)
 
-	vector := buildSpriteVector(spatialComponent, activeSpaceRectangle)
-	matrix := buildSpriteMatrix(spatialComponent, vector)
+	point2 := pixel.V(
+		point.X+(spatialData.Width*48),
+		point.Y+(spatialData.Height*48),
+	)
+	rect.Push(point2)
 
-	return frame, vector, matrix
+	rect.Rectangle(0)
+
+	rect.Draw(s.Win)
 }
