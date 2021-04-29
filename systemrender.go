@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"errors"
-	"fmt"
 	"math"
 
 	"github.com/faiface/pixel"
@@ -127,7 +125,11 @@ func (s *RenderSystem) Update() error {
 			if entity.ComponentToggler != nil {
 				s.animateToggleFrame(entity)
 			} else {
-				s.animateDefault(entity)
+				componentAnimationData, ok := getComponentAnimationByName(entity, "default")
+				if ok {
+					s.drawSprite(componentAnimationData, entity)
+				}
+
 			}
 		}
 	}
@@ -153,18 +155,15 @@ func (s *RenderSystem) Update() error {
 	return nil
 }
 
-func getComponentAnimationByName(entity renderEntity, name string) (*ComponentAnimationData, error) {
+func getComponentAnimationByName(entity renderEntity, name string) (*ComponentAnimationData, bool) {
 	componentAnimation := entity.ComponentAnimation
 	if componentAnimation == nil {
-		return nil, errors.New("componentAnimation is not defined")
+		return nil, false
 	}
 
 	animationData, ok := componentAnimation.ComponentAnimationByName[name]
-	if !ok {
-		return nil, fmt.Errorf("ComponentAnimationData not found by name=%s", name)
-	}
 
-	return animationData, nil
+	return animationData, ok
 }
 
 func (s *RenderSystem) drawSprite(
@@ -176,14 +175,6 @@ func (s *RenderSystem) drawSprite(
 }
 
 func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
-	if anim := entity.ComponentAnimation; anim != nil {
-		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-			s.drawSprite(animData, entity)
-		}
-	}
-}
-
-func (s *RenderSystem) animateDefault(entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
 			s.drawSprite(animData, entity)
