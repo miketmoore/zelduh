@@ -1,23 +1,27 @@
 package zelduh
 
-type inputEntity struct {
-	*ComponentMovement
-	*ComponentIgnore
-	*ComponentDash
+type InputHandlers struct {
+	OnUp, OnRight, OnDown, OnLeft, OnNoDirection,
+	OnPrimaryAttack, OnNoPrimaryAttack,
+	OnSecondaryAttack, OnNoSecondaryAttack func()
 }
 
 // InputSystem is a custom system for detecting collisions and what to do when they occur
 type InputSystem struct {
 	Input        Input
-	player       inputEntity
 	inputEnabled bool
-	sword        inputEntity
-	arrow        inputEntity
+	handlers     InputHandlers
 }
 
 // NewInputSystem creates a new InputSystem
-func NewInputSystem(input Input) InputSystem {
-	return InputSystem{Input: input}
+func NewInputSystem(
+	input Input,
+	handlers InputHandlers,
+) InputSystem {
+	return InputSystem{
+		Input:    input,
+		handlers: handlers,
+	}
 }
 
 // Disable disables input
@@ -31,21 +35,7 @@ func (s *InputSystem) Enable() {
 }
 
 // AddEntity adds an entity to the system
-func (s *InputSystem) AddEntity(entity Entity) {
-	r := inputEntity{
-		ComponentMovement: entity.ComponentMovement,
-		ComponentDash:     entity.ComponentDash,
-		ComponentIgnore:   entity.ComponentIgnore,
-	}
-	switch entity.Category {
-	case CategoryPlayer:
-		s.player = r
-	case CategorySword:
-		s.sword = r
-	case CategoryArrow:
-		s.arrow = r
-	}
-}
+func (s *InputSystem) AddEntity(entity Entity) {}
 
 type Input interface {
 	Up() bool
@@ -63,90 +53,50 @@ func (s InputSystem) Update() error {
 		return nil
 	}
 
-	s.updatePlayerLastDirection()
-	s.handleInputMovement()
-	s.handleInputSword()
-	s.handleInputArrow()
-	s.handleInputDash()
+	input := s.Input
+
+	if input.Up() {
+		s.handlers.OnUp()
+	} else if input.Right() {
+		s.handlers.OnRight()
+	} else if input.Down() {
+		s.handlers.OnDown()
+	} else if input.Left() {
+		s.handlers.OnLeft()
+	} else {
+		s.handlers.OnNoDirection()
+	}
+
+	if s.Input.PrimaryAttack() {
+		s.handlers.OnPrimaryAttack()
+	} else {
+		s.handlers.OnNoPrimaryAttack()
+	}
+
+	if s.Input.SecondaryAttack() {
+		s.handlers.OnSecondaryAttack()
+	} else {
+		s.handlers.OnNoSecondaryAttack()
+	}
+
+	// s.handleInputDash()
 
 	return nil
 }
 
-func (s InputSystem) updatePlayerLastDirection() {
-	s.player.ComponentMovement.LastDirection = s.player.ComponentMovement.Direction
-}
+// func (s InputSystem) handleInputDash() {
+// 	input := s.Input
 
-// TODO probably should not define speed in this system, makes more since in the spatial system
-func (s InputSystem) handleInputMovement() {
-	input := s.Input
-	player := s.player
-	movingSpeed := player.ComponentMovement.MaxSpeed
-
-	if input.Up() {
-		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = DirectionUp
-	} else if input.Right() {
-		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = DirectionRight
-	} else if input.Down() {
-		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = DirectionDown
-	} else if input.Left() {
-		player.ComponentMovement.Speed = movingSpeed
-		player.ComponentMovement.Direction = DirectionLeft
-	} else {
-		player.ComponentMovement.Speed = 0
-	}
-}
-
-func (s InputSystem) handleInputSword() {
-	input := s.Input
-	player := s.player
-
-	s.sword.ComponentMovement.Direction = player.ComponentMovement.Direction
-	if input.PrimaryAttack() {
-		s.sword.ComponentMovement.Speed = 1.0
-		s.sword.ComponentIgnore.Value = false
-	} else {
-		s.sword.ComponentMovement.Speed = 0
-		s.sword.ComponentIgnore.Value = true
-	}
-
-}
-
-func (s InputSystem) handleInputArrow() {
-	input := s.Input
-	player := s.player
-
-	if s.arrow.ComponentMovement.RemainingMoves == 0 {
-		s.arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
-		if input.SecondaryAttack() {
-			s.arrow.ComponentMovement.Speed = 7.0
-			s.arrow.ComponentMovement.RemainingMoves = 100
-			s.arrow.ComponentIgnore.Value = false
-		} else {
-			s.arrow.ComponentMovement.Speed = 0
-			s.arrow.ComponentMovement.RemainingMoves = 0
-			s.arrow.ComponentIgnore.Value = true
-		}
-	} else {
-		s.arrow.ComponentMovement.RemainingMoves--
-	}
-}
-
-func (s InputSystem) handleInputDash() {
-	input := s.Input
-
-	if !input.PrimaryAttack() && input.Combo() {
-		if s.player.ComponentDash.Charge < s.player.ComponentDash.MaxCharge {
-			s.player.ComponentDash.Charge++
-			s.sword.ComponentMovement.Speed = 0
-			s.sword.ComponentIgnore.Value = true
-		} else {
-			s.sword.ComponentMovement.Speed = 1.0
-			s.sword.ComponentIgnore.Value = false
-		}
-	} else {
-		s.player.ComponentDash.Charge = 0
-	}
-}
+// 	if input.PrimaryAttack() && input.Combo() {
+// 		if s.player.ComponentDash.Charge < s.player.ComponentDash.MaxCharge {
+// 			s.player.ComponentDash.Charge++
+// 			s.sword.ComponentMovement.Speed = 0
+// 			s.sword.ComponentIgnore.Value = true
+// 		} else {
+// 			s.sword.ComponentMovement.Speed = 1.0
+// 			s.sword.ComponentIgnore.Value = false
+// 		}
+// 	} else {
+// 		s.player.ComponentDash.Charge = 0
+// 	}
+// }

@@ -121,7 +121,66 @@ func run() {
 
 	input := Input{window: ui.Window}
 
-	inputSystem := zelduh.NewInputSystem(input)
+	inputHandlers := zelduh.InputHandlers{
+		OnUp: func() {
+			movingSpeed := player.ComponentMovement.MaxSpeed
+			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Direction = zelduh.DirectionUp
+		},
+		OnRight: func() {
+			movingSpeed := player.ComponentMovement.MaxSpeed
+			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Direction = zelduh.DirectionRight
+		},
+		OnDown: func() {
+			movingSpeed := player.ComponentMovement.MaxSpeed
+			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Direction = zelduh.DirectionDown
+		},
+		OnLeft: func() {
+			movingSpeed := player.ComponentMovement.MaxSpeed
+			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Direction = zelduh.DirectionLeft
+		},
+		OnNoDirection: func() {
+			player.ComponentMovement.Speed = 0
+		},
+		OnPrimaryAttack: func() {
+			sword.ComponentMovement.Direction = player.ComponentMovement.Direction
+			sword.ComponentMovement.Speed = 1.0
+			sword.ComponentIgnore.Value = false
+		},
+		OnNoPrimaryAttack: func() {
+			sword.ComponentMovement.Direction = player.ComponentMovement.Direction
+			sword.ComponentMovement.Speed = 0
+			sword.ComponentIgnore.Value = true
+		},
+		OnSecondaryAttack: func() {
+			if arrow.ComponentMovement.RemainingMoves == 0 {
+				arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
+				arrow.ComponentMovement.Speed = 7.0
+				arrow.ComponentMovement.RemainingMoves = 100
+				arrow.ComponentIgnore.Value = false
+			} else {
+				arrow.ComponentMovement.RemainingMoves--
+			}
+		},
+		OnNoSecondaryAttack: func() {
+			if arrow.ComponentMovement.RemainingMoves == 0 {
+				arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
+				arrow.ComponentMovement.Speed = 0
+				arrow.ComponentMovement.RemainingMoves = 0
+				arrow.ComponentIgnore.Value = true
+			} else {
+				arrow.ComponentMovement.RemainingMoves--
+			}
+		},
+	}
+
+	inputSystem := zelduh.NewInputSystem(
+		input,
+		inputHandlers,
+	)
 
 	systemsManager.AddSystems(
 		&inputSystem,
@@ -232,6 +291,8 @@ func run() {
 			fmt.Println("Error: ", err)
 			os.Exit(0)
 		}
+
+		player.ComponentMovement.LastDirection = player.ComponentMovement.Direction
 
 		// draw grid after everything else is drawn?
 		drawDebugGrid(
