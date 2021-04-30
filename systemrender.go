@@ -125,7 +125,7 @@ func (s *RenderSystem) RemoveAllEntities() {
 // Update changes spatial data based on movement data
 func (s *RenderSystem) Update() error {
 
-	s.drawActiveSpace()
+	// DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
 
 	for _, entity := range s.entities {
 
@@ -309,23 +309,23 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect.Draw(s.Win)
 }
 
-func (s *RenderSystem) drawActiveSpace() {
+func DrawActiveSpace(window *pixelgl.Window, activeSpaceRectangle ActiveSpaceRectangle) {
 	rect := imdraw.New(nil)
 	rect.Color = colornames.Blue
 
-	vectorX := s.ActiveSpaceRectangle.X + (s.ActiveSpaceRectangle.X)
-	vectorY := s.ActiveSpaceRectangle.Y + (s.ActiveSpaceRectangle.Y)
+	vectorX := activeSpaceRectangle.X
+	vectorY := activeSpaceRectangle.Y
 	point := pixel.V(vectorX, vectorY)
 
 	rect.Push(point)
 
 	point2 := pixel.V(
-		point.X+(s.ActiveSpaceRectangle.Width),
-		point.Y+(s.ActiveSpaceRectangle.Height),
+		point.X+(activeSpaceRectangle.Width),
+		point.Y+(activeSpaceRectangle.Height),
 	)
 	rect.Push(point2)
 
 	rect.Rectangle(5)
 
-	rect.Draw(s.Win)
+	rect.Draw(window)
 }

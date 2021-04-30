@@ -125,9 +125,17 @@ func (s *CollisionSystem) Update() error {
 }
 
 func (s *CollisionSystem) handlePlayerAtMapEdge() {
+	// DrawActiveSpace(s.Win, ActiveSpaceRectangle{
+	// 	X:      s.MapBounds.Min.X,
+	// 	Y:      s.MapBounds.Min.Y,
+	// 	Width:  s.MapBounds.W(),
+	// 	Height: s.MapBounds.H(),
+	// })
 
 	player := s.player
 	mapBounds := s.MapBounds
+
+	// fmt.Println(player.ComponentSpatial.Rect.Min.Y, mapBounds.Min.Y)
 
 	if player.ComponentSpatial.Rect.Min.Y <= mapBounds.Min.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)

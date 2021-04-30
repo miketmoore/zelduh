@@ -76,6 +76,7 @@ func (s InputSystem) updatePlayerLastDirection() {
 	s.player.ComponentMovement.LastDirection = s.player.ComponentMovement.Direction
 }
 
+// TODO probably should not define speed in this system, makes more since in the spatial system
 func (s InputSystem) handleInputMovement() {
 	input := s.Input
 	player := s.player
