@@ -26,12 +26,6 @@ type ComponentAnimation struct {
 	ComponentAnimationByName ComponentAnimationMap
 }
 
-// ComponentTemporary is used to track when an entity should be removed
-type ComponentTemporary struct {
-	Expiration   int
-	OnExpiration func()
-}
-
 // ComponentAppearance contains data about visual appearance
 type ComponentAppearance struct {
 	Color color.RGBA
@@ -46,23 +40,10 @@ type renderEntity struct {
 	*ComponentMovement
 	*ComponentIgnore
 	*ComponentToggler
-	*ComponentTemporary
 }
 
 func (entity *renderEntity) shouldNotIgnore() bool {
 	return entity.ComponentIgnore == nil || (entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value)
-}
-
-func (entity *renderEntity) isTemporary() bool {
-	return entity.ComponentTemporary != nil
-}
-
-func (entity *renderEntity) isExpired() bool {
-	return entity.isTemporary() && entity.ComponentTemporary.Expiration == 0
-}
-
-func (entity *renderEntity) decrementExpiration() {
-	entity.ComponentTemporary.Expiration--
 }
 
 // RenderSystem is a custom system
@@ -78,6 +59,24 @@ type RenderSystem struct {
 	entities             []renderEntity
 	obstacles            []renderEntity
 	ActiveSpaceRectangle ActiveSpaceRectangle
+
+	TemporarySystem *TemporarySystem
+}
+
+func NewRenderSystem(
+	window *pixelgl.Window,
+	spriteMap SpriteMap,
+	activeSpaceRectangle ActiveSpaceRectangle,
+	tileSize float64,
+	temporarySystem *TemporarySystem,
+) RenderSystem {
+	return RenderSystem{
+		Win:                  window,
+		SpriteMap:            spriteMap,
+		ActiveSpaceRectangle: activeSpaceRectangle,
+		TileSize:             tileSize,
+		TemporarySystem:      temporarySystem,
+	}
 }
 
 // AddEntity adds an entity to the system
@@ -88,7 +87,6 @@ func (s *RenderSystem) AddEntity(entity Entity) {
 		ComponentSpatial:   entity.ComponentSpatial,
 		ComponentAnimation: entity.ComponentAnimation,
 		ComponentMovement:  entity.ComponentMovement,
-		ComponentTemporary: entity.ComponentTemporary,
 		ComponentIgnore:    entity.ComponentIgnore,
 	}
 	switch entity.Category {
@@ -163,12 +161,12 @@ func (s *RenderSystem) Update() error {
 				s.drawRectangle(entity)
 			}
 
-			if entity.isTemporary() {
-				if entity.isExpired() {
-					entity.ComponentTemporary.OnExpiration()
+			if s.TemporarySystem.IsTemporary(entity.ID) {
+				if s.TemporarySystem.IsExpired(entity.ID) {
+					s.TemporarySystem.CallOnExpirationHandler(entity.ID)
 					s.RemoveEntity(entity.ID)
 				} else {
-					entity.decrementExpiration()
+					s.TemporarySystem.DecrementExpiration(entity.ID)
 				}
 			}
 

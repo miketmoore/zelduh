@@ -90,10 +90,23 @@ func run() {
 
 	fmt.Println("active space ", activeSpaceRectangle)
 
+	temporarySystem := zelduh.NewTemporarySystem()
+
+	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
+
+	renderSystem := zelduh.NewRenderSystem(
+		ui.Window,
+		spriteMap,
+		activeSpaceRectangle,
+		tileSize,
+		&temporarySystem,
+	)
+
 	collisionHandler := zelduh.NewCollisionHandler(
 		&systemsManager,
 		&spatialSystem,
 		&healthSystem,
+		&temporarySystem,
 		&shouldAddEntities,
 		&nextRoomID,
 		&currentState,
@@ -109,8 +122,6 @@ func run() {
 		tileSize,
 		frameRate,
 	)
-
-	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
 	mapBounds := pixel.R(
 		activeSpaceRectangle.X,
@@ -194,14 +205,10 @@ func run() {
 		&healthSystem,
 		&spatialSystem,
 		&collisionSystem,
-		&zelduh.RenderSystem{
-			Win:                  ui.Window,
-			SpriteMap:            spriteMap,
-			ActiveSpaceRectangle: activeSpaceRectangle,
-			TileSize:             tileSize,
-		},
+		&renderSystem,
 		&movementSystem,
 		&ignoreSystem,
+		&temporarySystem,
 	)
 
 	systemsManager.AddEntities(

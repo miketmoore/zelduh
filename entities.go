@@ -87,9 +87,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Expiration > 0 {
-		entity.ComponentTemporary = &ComponentTemporary{
-			Expiration: c.Expiration,
-		}
+		entity.ComponentTemporary = NewComponentTemporary(c.Expiration)
 	}
 
 	if c.Category == CategoryWarp {
