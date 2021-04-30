@@ -139,7 +139,10 @@ func (s *RenderSystem) Update() error {
 	sword := s.sword
 
 	if !sword.ComponentIgnore.Value {
-		s.animateDirections(player.ComponentMovement.Direction, sword)
+		// s.animateDirections(player.ComponentMovement.Direction, sword)
+		animDataKey := playerComponentAnimationByDirection[player.ComponentMovement.Direction]
+		animData := sword.ComponentAnimation.ComponentAnimationByName[animDataKey]
+		s.drawSprite(animData, sword)
 	}
 
 	if !arrow.ComponentIgnore.Value {
@@ -153,6 +156,35 @@ func (s *RenderSystem) Update() error {
 	}
 
 	return nil
+}
+
+func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
+	if anim := entity.ComponentAnimation; anim != nil {
+		animData := getDirectionAnimationDataByDirection(anim, dir)
+		s.drawSprite(animData, entity)
+	}
+}
+
+var playerComponentAnimationByDirection = map[Direction]string{
+	DirectionUp:    "up",
+	DirectionRight: "right",
+	DirectionDown:  "down",
+	DirectionLeft:  "left",
+}
+
+func getDirectionAnimationDataByDirection(anim *ComponentAnimation, dir Direction) *ComponentAnimationData {
+	var animData *ComponentAnimationData
+	switch dir {
+	case DirectionUp:
+		animData = anim.ComponentAnimationByName["up"]
+	case DirectionRight:
+		animData = anim.ComponentAnimationByName["right"]
+	case DirectionDown:
+		animData = anim.ComponentAnimationByName["down"]
+	case DirectionLeft:
+		animData = anim.ComponentAnimationByName["left"]
+	}
+	return animData
 }
 
 func getComponentAnimationByName(entity renderEntity, name string) (*ComponentAnimationData, bool) {
@@ -185,13 +217,6 @@ func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
 func (s *RenderSystem) animateAttackDirection(dir Direction, entity renderEntity) {
 	if anim := entity.ComponentAnimation; anim != nil {
 		animData := getAttackAnimationDataByDirection(anim, dir)
-		s.drawSprite(animData, entity)
-	}
-}
-
-func (s *RenderSystem) animateDirections(dir Direction, entity renderEntity) {
-	if anim := entity.ComponentAnimation; anim != nil {
-		animData := getDirectionAnimationDataByDirection(anim, dir)
 		s.drawSprite(animData, entity)
 	}
 }
@@ -271,21 +296,6 @@ func getAttackAnimationDataByDirection(anim *ComponentAnimation, dir Direction) 
 		animData = anim.ComponentAnimationByName["swordAttackDown"]
 	case DirectionLeft:
 		animData = anim.ComponentAnimationByName["swordAttackLeft"]
-	}
-	return animData
-}
-
-func getDirectionAnimationDataByDirection(anim *ComponentAnimation, dir Direction) *ComponentAnimationData {
-	var animData *ComponentAnimationData
-	switch dir {
-	case DirectionUp:
-		animData = anim.ComponentAnimationByName["up"]
-	case DirectionRight:
-		animData = anim.ComponentAnimationByName["right"]
-	case DirectionDown:
-		animData = anim.ComponentAnimationByName["down"]
-	case DirectionLeft:
-		animData = anim.ComponentAnimationByName["left"]
 	}
 	return animData
 }
