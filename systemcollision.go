@@ -79,18 +79,17 @@ func (s *CollisionSystem) AddEntity(entity Entity) {
 func (s *CollisionSystem) Remove(category EntityCategory, id EntityID) {
 	switch category {
 	case CategoryCoin:
-		for i := len(s.coins) - 1; i >= 0; i-- {
-			coin := s.coins[i]
-			if coin.ID == id {
-				s.coins = append(s.coins[:i], s.coins[i+1:]...)
-			}
-		}
+		removeEntityFromCollection(s.coins, id)
 	case CategoryEnemy:
-		for i := len(s.enemies) - 1; i >= 0; i-- {
-			enemy := s.enemies[i]
-			if enemy.ID == id {
-				s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
-			}
+		removeEntityFromCollection(s.enemies, id)
+	}
+}
+
+func removeEntityFromCollection(entities []collisionEntity, entityIDToRemove EntityID) {
+	for i := len(entities) - 1; i >= 0; i-- {
+		entity := entities[i]
+		if entity.ID == entityIDToRemove {
+			entities = append(entities[:i], entities[i+1:]...)
 		}
 	}
 }
@@ -99,21 +98,19 @@ func (s *CollisionSystem) Remove(category EntityCategory, id EntityID) {
 func (s *CollisionSystem) RemoveAll(category EntityCategory) {
 	switch category {
 	case CategoryEnemy:
-		for i := len(s.enemies) - 1; i >= 0; i-- {
-			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
-		}
+		removeAllEntities(s.enemies)
 	case CategoryCollisionSwitch:
-		for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
-			s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
-		}
+		removeAllEntities(s.collisionSwitches)
 	case CategoryMovableObstacle:
-		for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
-			s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
-		}
+		removeAllEntities(s.moveableObstacles)
 	case CategoryObstacle:
-		for i := len(s.obstacles) - 1; i >= 0; i-- {
-			s.obstacles = append(s.obstacles[:i], s.obstacles[i+1:]...)
-		}
+		removeAllEntities(s.obstacles)
+	}
+}
+
+func removeAllEntities(entities []collisionEntity) {
+	for i := len(entities) - 1; i >= 0; i-- {
+		entities = append(entities[:i], entities[i+1:]...)
 	}
 }
 
