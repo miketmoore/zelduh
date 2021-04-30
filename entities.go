@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"golang.org/x/image/colornames"
 )
 
@@ -60,30 +58,15 @@ func BuildEntitiesFromConfigs(newEntityID func() EntityID, frameRate int, config
 // BuildEntityFromConfig builds an entity from a configuration
 func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 
-	width := c.Dimensions.Width
-	height := c.Dimensions.Height
-
-	x := c.Coordinates.X
-	y := c.Coordinates.Y
-
-	spatialRectangle := pixel.R(x, y, x+width, y+height)
-
-	spatialComponent := &ComponentSpatial{
-		Width:  width,
-		Height: height,
-		Rect:   spatialRectangle,
-		Shape:  imdraw.New(nil),
-		HitBox: imdraw.New(nil),
-		Color:  c.Color,
-	}
-
 	entity := Entity{
-		id:               id,
-		Category:         c.Category,
-		ComponentSpatial: spatialComponent,
-		ComponentIgnore: &ComponentIgnore{
-			Value: c.Ignore,
-		},
+		id:       id,
+		Category: c.Category,
+		ComponentSpatial: NewComponentSpatial(
+			c.Coordinates,
+			c.Dimensions,
+			c.Color,
+		),
+		ComponentIgnore: NewComponentIgnore(c.Ignore),
 	}
 
 	if c.Expiration > 0 {
@@ -91,15 +74,11 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Category == CategoryWarp {
-		entity.ComponentEnabled = &ComponentEnabled{
-			Value: true,
-		}
+		entity.ComponentEnabled = NewComponentEnabled(true)
 	}
 
 	if c.Health > 0 {
-		entity.ComponentHealth = &ComponentHealth{
-			Total: c.Health,
-		}
+		entity.ComponentHealth = NewComponentHealth(c.Health)
 	}
 
 	if c.Hitbox != nil {
@@ -126,64 +105,44 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Toggleable {
-		entity.ComponentToggler = &ComponentToggler{}
-		if c.Toggled {
-			entity.ComponentToggler.Toggle()
-		}
+		entity.ComponentToggler = NewComponentToggler(c.Toggled)
 	}
 
-	if c.Invincible {
-		entity.ComponentInvincible = &ComponentInvincible{
-			Enabled: true,
-		}
-	} else {
-		entity.ComponentInvincible = &ComponentInvincible{
-			Enabled: false,
-		}
-	}
+	entity.ComponentInvincible = NewComponentInvincible(c.Invincible)
 
 	if c.Movement != nil {
-		entity.ComponentMovement = &ComponentMovement{
-			Direction:      c.Movement.Direction,
-			MaxSpeed:       c.Movement.MaxSpeed,
-			Speed:          c.Movement.Speed,
-			MaxMoves:       c.Movement.MaxMoves,
-			RemainingMoves: c.Movement.RemainingMoves,
-			HitSpeed:       c.Movement.HitSpeed,
-			MovingFromHit:  c.Movement.MovingFromHit,
-			HitBackMoves:   c.Movement.HitBackMoves,
-			PatternName:    c.Movement.PatternName,
-		}
+		entity.ComponentMovement = NewComponentMovement(
+			c.Movement.Direction,
+			c.Movement.Speed,
+			c.Movement.MaxSpeed,
+			c.Movement.MaxMoves,
+			c.Movement.RemainingMoves,
+			c.Movement.HitSpeed,
+			c.Movement.MovingFromHit,
+			c.Movement.HitBackMoves,
+			c.PatternName,
+		)
 	}
 
 	if c.Coins {
-		entity.ComponentCoins = &ComponentCoins{
-			Coins: 0,
-		}
+		entity.ComponentCoins = NewComponentCoins(0)
 	}
 
 	if c.Dash != nil {
-		entity.ComponentDash = &ComponentDash{
-			Charge:    c.Dash.Charge,
-			MaxCharge: c.Dash.MaxCharge,
-			SpeedMod:  c.Dash.SpeedMod,
-		}
+		entity.ComponentDash = NewComponentDash(
+			c.Dash.Charge,
+			c.Dash.MaxCharge,
+			c.Dash.SpeedMod,
+		)
 	}
 
 	if c.Animation != nil {
-		entity.ComponentAnimation = &ComponentAnimation{
-			ComponentAnimationByName: ComponentAnimationMap{},
-		}
+		entity.ComponentAnimation = NewComponentAnimation()
 		for key, val := range c.Animation {
-			entity.ComponentAnimation.ComponentAnimationByName[key] = &ComponentAnimationData{
-				Frames:    val,
-				FrameRate: frameRate,
-			}
+			entity.ComponentAnimation.ComponentAnimationByName[key] = NewComponentAnimationData(val, frameRate)
 		}
 	} else {
-		entity.ComponentAppearance = &ComponentAppearance{
-			Color: colornames.Sandybrown,
-		}
+		entity.ComponentAppearance = NewComponentAppearance(colornames.Sandybrown)
 	}
 
 	return entity

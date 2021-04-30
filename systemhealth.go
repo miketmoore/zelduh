@@ -5,6 +5,12 @@ type ComponentHealth struct {
 	Total int
 }
 
+func NewComponentHealth(total int) *ComponentHealth {
+	return &ComponentHealth{
+		Total: total,
+	}
+}
+
 type healthEntity struct {
 	ID EntityID
 	*ComponentHealth

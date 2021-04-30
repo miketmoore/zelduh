@@ -22,11 +22,36 @@ type ComponentSpatial struct {
 	Color                color.RGBA
 }
 
+func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color color.RGBA) *ComponentSpatial {
+	width := dimensions.Width
+	height := dimensions.Height
+	x := coordinates.X
+	y := coordinates.Y
+	return &ComponentSpatial{
+		Width:  width,
+		Height: height,
+		Rect:   pixel.R(x, y, x+width, y+height),
+		Shape:  imdraw.New(nil),
+		HitBox: imdraw.New(nil),
+		Color:  color,
+	}
+}
+
 // ComponentDash indicates that an entity can dash
 type ComponentDash struct {
 	Charge    int
 	MaxCharge int
 	SpeedMod  float64
+}
+
+func NewComponentDash(
+	charge, maxCharge int, speedMod float64,
+) *ComponentDash {
+	return &ComponentDash{
+		Charge:    charge,
+		MaxCharge: maxCharge,
+		SpeedMod:  speedMod,
+	}
 }
 
 type ComponentSpatialTransform struct {

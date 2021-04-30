@@ -14,6 +14,29 @@ type ComponentMovement struct {
 	PatternName    string
 }
 
+func NewComponentMovement(
+	direction Direction,
+	speed, maxSpeed float64,
+	maxMoves, remainingMoves int,
+	hitSpeed float64,
+	movingFromHit bool,
+	hitBackMoves int,
+	patternName string,
+
+) *ComponentMovement {
+	return &ComponentMovement{
+		Direction:      direction,
+		MaxSpeed:       maxSpeed,
+		Speed:          speed,
+		MaxMoves:       maxMoves,
+		RemainingMoves: remainingMoves,
+		HitSpeed:       hitSpeed,
+		MovingFromHit:  movingFromHit,
+		HitBackMoves:   hitBackMoves,
+		PatternName:    patternName,
+	}
+}
+
 type movementEntity struct {
 	ID EntityID
 	*ComponentMovement

@@ -12,6 +12,12 @@ type ComponentInvincible struct {
 	Enabled bool
 }
 
+func NewComponentInvincible(enabled bool) *ComponentInvincible {
+	return &ComponentInvincible{
+		Enabled: enabled,
+	}
+}
+
 type collisionEntity struct {
 	ID EntityID
 	*ComponentSpatial

@@ -5,6 +5,12 @@ type ComponentIgnore struct {
 	Value bool
 }
 
+func NewComponentIgnore(ignore bool) *ComponentIgnore {
+	return &ComponentIgnore{
+		Value: ignore,
+	}
+}
+
 type ignoreEntity struct {
 	ID EntityID
 	*ComponentIgnore

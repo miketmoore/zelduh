@@ -10,12 +10,25 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+func NewComponentAnimation() *ComponentAnimation {
+	return &ComponentAnimation{
+		ComponentAnimationByName: ComponentAnimationMap{},
+	}
+}
+
 // ComponentAnimationData contains data about animating one sequence of sprites
 type ComponentAnimationData struct {
 	Frames         []int
 	Frame          int
 	FrameRate      int
 	FrameRateCount int
+}
+
+func NewComponentAnimationData(frames []int, frameRate int) *ComponentAnimationData {
+	return &ComponentAnimationData{
+		Frames:    frames,
+		FrameRate: frameRate,
+	}
 }
 
 // ComponentAnimationMap indexes ComponentAnimationData by use/context
@@ -29,6 +42,12 @@ type ComponentAnimation struct {
 // ComponentAppearance contains data about visual appearance
 type ComponentAppearance struct {
 	Color color.RGBA
+}
+
+func NewComponentAppearance(color color.RGBA) *ComponentAppearance {
+	return &ComponentAppearance{
+		Color: color,
+	}
 }
 
 type renderEntity struct {
