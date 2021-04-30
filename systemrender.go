@@ -19,6 +19,22 @@ type renderEntity struct {
 	*ComponentTemporary
 }
 
+func (entity *renderEntity) shouldNotIgnore() bool {
+	return entity.ComponentIgnore == nil || (entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value)
+}
+
+func (entity *renderEntity) isTemporary() bool {
+	return entity.ComponentTemporary != nil
+}
+
+func (entity *renderEntity) isExpired() bool {
+	return entity.isTemporary() && entity.ComponentTemporary.Expiration == 0
+}
+
+func (entity *renderEntity) decrementExpiration() {
+	entity.ComponentTemporary.Expiration--
+}
+
 // RenderSystem is a custom system
 type RenderSystem struct {
 	Win       *pixelgl.Window
@@ -109,28 +125,23 @@ func (s *RenderSystem) Update() error {
 
 	for _, entity := range s.entities {
 
-		if entity.Category == CategoryRectangle {
-			s.drawRectangle(entity)
-		}
+		if entity.shouldNotIgnore() {
 
-		if entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value {
-			if entity.ComponentTemporary != nil {
-				if entity.ComponentTemporary.Expiration == 0 {
+			if entity.Category == CategoryRectangle {
+				s.drawRectangle(entity)
+			}
+
+			if entity.isTemporary() {
+				if entity.isExpired() {
 					entity.ComponentTemporary.OnExpiration()
 					s.RemoveEntity(entity.ID)
 				} else {
-					entity.ComponentTemporary.Expiration--
+					entity.decrementExpiration()
 				}
 			}
-			if entity.ComponentToggler != nil {
-				s.animateToggleFrame(entity)
-			} else {
-				componentAnimationData, ok := getComponentAnimationByName(entity, "default")
-				if ok {
-					s.drawSprite(componentAnimationData, entity)
-				}
 
-			}
+			s.drawDefaultFrame(entity)
+
 		}
 	}
 
@@ -157,6 +168,13 @@ func (s *RenderSystem) Update() error {
 	}
 
 	return nil
+}
+
+func (s *RenderSystem) drawDefaultFrame(entity renderEntity) {
+	componentAnimationData, ok := getComponentAnimationByName(entity, "default")
+	if ok {
+		s.drawSprite(componentAnimationData, entity)
+	}
 }
 
 func (s *RenderSystem) drawByPlayerDirection(entity renderEntity) {
@@ -198,14 +216,6 @@ func (s *RenderSystem) drawSprite(
 ) {
 	frame, _, matrix := s.getSpriteDrawData(animData, entity.ComponentSpatial)
 	frame.Draw(s.Win, matrix)
-}
-
-func (s *RenderSystem) animateToggleFrame(entity renderEntity) {
-	if anim := entity.ComponentAnimation; anim != nil {
-		if animData := anim.ComponentAnimationByName["default"]; animData != nil {
-			s.drawSprite(animData, entity)
-		}
-	}
 }
 
 func (s *RenderSystem) getSpriteDrawData(
