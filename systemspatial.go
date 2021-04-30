@@ -8,6 +8,18 @@ import (
 	"github.com/faiface/pixel/imdraw"
 )
 
+type ComponentHitbox struct {
+	HitBox       *imdraw.IMDraw
+	HitBoxRadius float64
+}
+
+func NewComponentHitbox(radius float64) *ComponentHitbox {
+	return &ComponentHitbox{
+		HitBox:       imdraw.New(nil),
+		HitBoxRadius: radius,
+	}
+}
+
 // ComponentSpatial contains spatial data
 type ComponentSpatial struct {
 	Width                float64
@@ -15,8 +27,6 @@ type ComponentSpatial struct {
 	PrevRect             pixel.Rect
 	Rect                 pixel.Rect
 	Shape                *imdraw.IMDraw
-	HitBox               *imdraw.IMDraw
-	HitBoxRadius         float64
 	CollisionWithRectMod float64
 	Transform            *ComponentSpatialTransform
 	Color                color.RGBA
@@ -32,7 +42,6 @@ func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color c
 		Height: height,
 		Rect:   pixel.R(x, y, x+width, y+height),
 		Shape:  imdraw.New(nil),
-		HitBox: imdraw.New(nil),
 		Color:  color,
 	}
 }

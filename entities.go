@@ -21,6 +21,7 @@ type Entity struct {
 	id       EntityID
 	Category EntityCategory
 	*ComponentInvincible
+	*ComponentHitbox
 	*ComponentAnimation
 	*ComponentAppearance
 	*ComponentCoins
@@ -82,7 +83,8 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Hitbox != nil {
-		entity.ComponentSpatial.HitBoxRadius = c.Hitbox.Radius
+		entity.ComponentHitbox = NewComponentHitbox(c.Hitbox.Radius)
+		// entity.ComponentSpatial.HitBoxRadius = c.Hitbox.Radius
 	}
 
 	if c.Transform != nil {

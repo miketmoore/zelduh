@@ -22,6 +22,7 @@ type collisionEntity struct {
 	ID EntityID
 	*ComponentSpatial
 	*ComponentInvincible
+	*ComponentHitbox
 }
 
 // CollisionSystem is a custom system for detecting collisions and what to do when they occur
@@ -58,8 +59,10 @@ func NewCollisionSystem(
 // AddEntity adds an entity to the system
 func (s *CollisionSystem) AddEntity(entity Entity) {
 	r := collisionEntity{
-		ID:               entity.ID(),
-		ComponentSpatial: entity.ComponentSpatial,
+		ID:                  entity.ID(),
+		ComponentSpatial:    entity.ComponentSpatial,
+		ComponentHitbox:     entity.ComponentHitbox,
+		ComponentInvincible: entity.ComponentInvincible,
 	}
 	switch entity.Category {
 	case CategoryPlayer:
@@ -185,7 +188,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 		// 	playerRect.Min.Y+player.ComponentSpatial.Height/2,
 		// )
 		// m := s.buildSpriteMatrix(player.ComponentSpatial, v)
-		s.drawHitbox(playerRect, player.HitBoxRadius)
+		s.drawHitbox(playerRect, player.ComponentHitbox.HitBoxRadius)
 
 		enemyRect := enemy.ComponentSpatial.Rect
 		// enemyVector := pixel.V(
@@ -220,8 +223,8 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 
 		// Check if player and enemy are colliding
 		if isCircleCollision(
-			player.ComponentSpatial.HitBoxRadius,
-			enemy.ComponentSpatial.HitBoxRadius,
+			player.ComponentHitbox.HitBoxRadius,
+			enemy.ComponentHitbox.HitBoxRadius,
 			w, h, playerRect, enemyRect) {
 			s.CollisionHandler.OnPlayerCollisionWithEnemy(enemy.ID)
 		}
@@ -230,16 +233,16 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 
 			// Check if the player sword is colliding with the enemy
 			if isCircleCollision(
-				s.sword.ComponentSpatial.HitBoxRadius,
-				enemy.ComponentSpatial.HitBoxRadius,
+				s.sword.ComponentHitbox.HitBoxRadius,
+				enemy.ComponentHitbox.HitBoxRadius,
 				w, h, s.sword.ComponentSpatial.Rect, enemyRect) {
 				s.CollisionHandler.OnSwordCollisionWithEnemy(enemy.ID)
 			}
 
 			// Check if the player arrow is colliding with the enemy
 			if isCircleCollision(
-				s.arrow.ComponentSpatial.HitBoxRadius,
-				enemy.ComponentSpatial.HitBoxRadius,
+				s.arrow.ComponentHitbox.HitBoxRadius,
+				enemy.ComponentHitbox.HitBoxRadius,
 				w, h, s.arrow.ComponentSpatial.Rect, enemyRect) {
 				s.CollisionHandler.OnArrowCollisionWithEnemy(enemy.ID)
 			}
@@ -327,11 +330,11 @@ func (s *CollisionSystem) handleSwitchCollisions() {
 	player := s.player
 
 	for _, collisionSwitch := range s.collisionSwitches {
-		if collisionSwitch.ComponentSpatial.HitBoxRadius > 0 {
+		if collisionSwitch.ComponentHitbox.HitBoxRadius > 0 {
 			w, h := player.ComponentSpatial.Width, player.ComponentSpatial.Height
 			if isCircleCollision(
-				s.player.ComponentSpatial.HitBoxRadius,
-				collisionSwitch.ComponentSpatial.HitBoxRadius,
+				s.player.ComponentHitbox.HitBoxRadius,
+				collisionSwitch.ComponentHitbox.HitBoxRadius,
 				w, h, player.ComponentSpatial.Rect, collisionSwitch.ComponentSpatial.Rect) {
 				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
