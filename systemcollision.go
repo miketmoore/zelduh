@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"math"
-
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -140,26 +138,6 @@ func (s *CollisionSystem) handlePlayerAtMapEdge() {
 	} else if player.ComponentSpatial.Rect.Max.Y >= mapBounds.Max.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
 	}
-}
-
-func (s *CollisionSystem) buildSpriteVector(spatialComponent *ComponentSpatial) pixel.Vec {
-	vectorX := spatialComponent.Rect.Center().X + s.ActiveSpaceRectangle.X
-	vectorY := spatialComponent.Rect.Center().Y + s.ActiveSpaceRectangle.Y
-	return pixel.V(vectorX, vectorY)
-}
-
-func (s *CollisionSystem) buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pixel.Matrix {
-
-	matrix := pixel.IM.Moved(vector)
-
-	if spatialComponent.Transform != nil {
-		// Transform
-		degrees := spatialComponent.Transform.Rotation
-		radians := degrees * math.Pi / 180
-		matrix = matrix.Rotated(vector, radians)
-	}
-
-	return matrix
 }
 
 func (s *CollisionSystem) drawHitbox(rect pixel.Rect, radius float64) {

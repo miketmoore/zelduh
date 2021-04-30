@@ -105,13 +105,15 @@ func run() {
 
 	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
 
+	mapBounds := pixel.R(
+		activeSpaceRectangle.X,
+		activeSpaceRectangle.Y,
+		activeSpaceRectangle.X+activeSpaceRectangle.Width,
+		activeSpaceRectangle.Y+activeSpaceRectangle.Height,
+	)
+
 	collisionSystem := zelduh.NewCollisionSystem(
-		pixel.R(
-			activeSpaceRectangle.X,
-			activeSpaceRectangle.Y,
-			activeSpaceRectangle.X+activeSpaceRectangle.Width,
-			activeSpaceRectangle.Y+activeSpaceRectangle.Height,
-		),
+		mapBounds,
 		&collisionHandler,
 		activeSpaceRectangle,
 		ui.Window,

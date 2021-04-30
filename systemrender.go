@@ -4,7 +4,9 @@ import (
 	"math"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
 )
 
 type renderEntity struct {
@@ -122,6 +124,8 @@ func (s *RenderSystem) RemoveAllEntities() {
 
 // Update changes spatial data based on movement data
 func (s *RenderSystem) Update() error {
+
+	s.drawActiveSpace()
 
 	for _, entity := range s.entities {
 
@@ -301,6 +305,27 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect.Push(point2)
 
 	rect.Rectangle(0)
+
+	rect.Draw(s.Win)
+}
+
+func (s *RenderSystem) drawActiveSpace() {
+	rect := imdraw.New(nil)
+	rect.Color = colornames.Blue
+
+	vectorX := s.ActiveSpaceRectangle.X + (s.ActiveSpaceRectangle.X)
+	vectorY := s.ActiveSpaceRectangle.Y + (s.ActiveSpaceRectangle.Y)
+	point := pixel.V(vectorX, vectorY)
+
+	rect.Push(point)
+
+	point2 := pixel.V(
+		point.X+(s.ActiveSpaceRectangle.Width),
+		point.Y+(s.ActiveSpaceRectangle.Height),
+	)
+	rect.Push(point2)
+
+	rect.Rectangle(5)
 
 	rect.Draw(s.Win)
 }
