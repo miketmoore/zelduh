@@ -83,8 +83,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Hitbox != nil {
-		entity.ComponentHitbox = NewComponentHitbox(c.Hitbox.Radius)
-		// entity.ComponentSpatial.HitBoxRadius = c.Hitbox.Radius
+		entity.ComponentHitbox = NewComponentHitbox(c.Hitbox.Radius, float64(c.Hitbox.CollisionWithRectMod))
 	}
 
 	if c.Transform != nil {

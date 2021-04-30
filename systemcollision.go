@@ -7,6 +7,20 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type ComponentHitbox struct {
+	HitBox               *imdraw.IMDraw
+	HitBoxRadius         float64
+	CollisionWithRectMod float64
+}
+
+func NewComponentHitbox(radius, collisionWithRectMod float64) *ComponentHitbox {
+	return &ComponentHitbox{
+		HitBox:               imdraw.New(nil),
+		HitBoxRadius:         radius,
+		CollisionWithRectMod: collisionWithRectMod,
+	}
+}
+
 // ComponentInvincible is used to track if an enemy is immune to damage of all kinds
 type ComponentInvincible struct {
 	Enabled bool
@@ -262,7 +276,7 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 	player := s.player
 
 	for _, obstacle := range s.obstacles {
-		mod := player.ComponentSpatial.CollisionWithRectMod
+		mod := player.ComponentHitbox.CollisionWithRectMod
 		if isColliding(obstacle.ComponentSpatial.Rect, pixel.R(
 			s.player.ComponentSpatial.Rect.Min.X+mod,
 			s.player.ComponentSpatial.Rect.Min.Y+mod,
@@ -273,7 +287,7 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 		}
 
 		for _, enemy := range s.enemies {
-			mod = enemy.ComponentSpatial.CollisionWithRectMod
+			mod = enemy.ComponentHitbox.CollisionWithRectMod
 			if isColliding(obstacle.ComponentSpatial.Rect, pixel.R(
 				enemy.ComponentSpatial.Rect.Min.X+mod,
 				enemy.ComponentSpatial.Rect.Min.Y+mod,

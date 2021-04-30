@@ -8,28 +8,15 @@ import (
 	"github.com/faiface/pixel/imdraw"
 )
 
-type ComponentHitbox struct {
-	HitBox       *imdraw.IMDraw
-	HitBoxRadius float64
-}
-
-func NewComponentHitbox(radius float64) *ComponentHitbox {
-	return &ComponentHitbox{
-		HitBox:       imdraw.New(nil),
-		HitBoxRadius: radius,
-	}
-}
-
 // ComponentSpatial contains spatial data
 type ComponentSpatial struct {
-	Width                float64
-	Height               float64
-	PrevRect             pixel.Rect
-	Rect                 pixel.Rect
-	Shape                *imdraw.IMDraw
-	CollisionWithRectMod float64
-	Transform            *ComponentSpatialTransform
-	Color                color.RGBA
+	Width     float64
+	Height    float64
+	PrevRect  pixel.Rect
+	Rect      pixel.Rect
+	Shape     *imdraw.IMDraw
+	Transform *ComponentSpatialTransform
+	Color     color.RGBA
 }
 
 func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color color.RGBA) *ComponentSpatial {
