@@ -64,10 +64,17 @@ func run() {
 	spriteMap := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
 
 	player := entityFactory.NewEntity("player", zelduh.NewCoordinates(6, 6), frameRate)
+	playerID := player.ID()
+
 	bomb := entityFactory.NewEntity("bomb", zelduh.NewCoordinates(0, 0), frameRate)
 	explosion := entityFactory.NewEntity("explosion", zelduh.NewCoordinates(0, 0), frameRate)
+
 	sword := entityFactory.NewEntity("sword", zelduh.NewCoordinates(0, 0), frameRate)
+	swordID := sword.ID()
+
 	arrow := entityFactory.NewEntity("arrow", zelduh.NewCoordinates(0, 0), frameRate)
+	arrowID := arrow.ID()
+
 	hearts := []zelduh.Entity{
 		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 1.5, Y: 14}, frameRate),
 		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.15, Y: 14}, frameRate),
@@ -121,54 +128,58 @@ func run() {
 
 	input := Input{window: ui.Window}
 
+	movementSystem := zelduh.NewMovementSystem(playerID)
+
+	ignoreSystem := zelduh.NewIgnoreSystem()
+
 	inputHandlers := zelduh.InputHandlers{
 		OnUp: func() {
-			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Direction = zelduh.DirectionUp
+			movementSystem.SetMaxSpeed(playerID)
+			movementSystem.ChangeDirection(playerID, zelduh.DirectionUp)
 		},
 		OnRight: func() {
-			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Direction = zelduh.DirectionRight
+			movementSystem.SetMaxSpeed(playerID)
+			movementSystem.ChangeDirection(playerID, zelduh.DirectionRight)
 		},
 		OnDown: func() {
-			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Direction = zelduh.DirectionDown
+			movementSystem.SetMaxSpeed(playerID)
+			movementSystem.ChangeDirection(playerID, zelduh.DirectionDown)
 		},
 		OnLeft: func() {
-			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Direction = zelduh.DirectionLeft
+			movementSystem.SetMaxSpeed(playerID)
+			movementSystem.ChangeDirection(playerID, zelduh.DirectionLeft)
 		},
 		OnNoDirection: func() {
-			player.ComponentMovement.Speed = 0
+			movementSystem.SetZeroSpeed(playerID)
 		},
 		OnPrimaryAttack: func() {
-			sword.ComponentMovement.Direction = player.ComponentMovement.Direction
-			sword.ComponentMovement.Speed = 1.0
-			sword.ComponentIgnore.Value = false
+			movementSystem.MatchDirectionToPlayer(swordID)
+			movementSystem.ChangeSpeed(swordID, 1.0)
+			ignoreSystem.DoNotIgnore(swordID)
 		},
 		OnNoPrimaryAttack: func() {
-			sword.ComponentMovement.Direction = player.ComponentMovement.Direction
-			sword.ComponentMovement.Speed = 0
-			sword.ComponentIgnore.Value = true
+			movementSystem.MatchDirectionToPlayer(swordID)
+			movementSystem.SetZeroSpeed(swordID)
+			ignoreSystem.Ignore(swordID)
 		},
 		OnSecondaryAttack: func() {
 			if arrow.ComponentMovement.RemainingMoves == 0 {
-				arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
-				arrow.ComponentMovement.Speed = 7.0
-				arrow.ComponentMovement.RemainingMoves = 100
-				arrow.ComponentIgnore.Value = false
+				movementSystem.MatchDirectionToPlayer(arrowID)
+				movementSystem.ChangeSpeed(arrowID, 7.0)
+				movementSystem.SetRemainingMoves(arrowID, 100)
+				ignoreSystem.DoNotIgnore(arrowID)
 			} else {
-				arrow.ComponentMovement.RemainingMoves--
+				movementSystem.DecrementRemainingMoves(arrowID)
 			}
 		},
 		OnNoSecondaryAttack: func() {
 			if arrow.ComponentMovement.RemainingMoves == 0 {
-				arrow.ComponentMovement.Direction = player.ComponentMovement.Direction
-				arrow.ComponentMovement.Speed = 0
-				arrow.ComponentMovement.RemainingMoves = 0
-				arrow.ComponentIgnore.Value = true
+				movementSystem.MatchDirectionToPlayer(arrowID)
+				movementSystem.SetZeroSpeed(arrowID)
+				movementSystem.SetRemainingMoves(arrowID, 0)
+				ignoreSystem.Ignore(arrowID)
 			} else {
-				arrow.ComponentMovement.RemainingMoves--
+				movementSystem.DecrementRemainingMoves(arrowID)
 			}
 		},
 	}
@@ -189,6 +200,8 @@ func run() {
 			ActiveSpaceRectangle: activeSpaceRectangle,
 			TileSize:             tileSize,
 		},
+		&movementSystem,
+		&ignoreSystem,
 	)
 
 	systemsManager.AddEntities(
