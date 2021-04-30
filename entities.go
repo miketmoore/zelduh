@@ -33,6 +33,7 @@ type Entity struct {
 	*ComponentMovement
 	*ComponentSpatial
 	*ComponentTemporary
+	*ComponentRotation
 }
 
 type EntitiesMap map[EntityID]Entity
@@ -100,9 +101,10 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		// vector := entity.ComponentSpatial.Rect.Center()
 		// matrix = matrix.Rotated(vector, 90)
 
-		entity.ComponentSpatial.Transform = &ComponentSpatialTransform{
-			Rotation: c.Transform.Rotation,
-		}
+		entity.ComponentRotation = NewComponentRotation(c.Transform.Rotation)
+		// entity.ComponentSpatial.Transform = &ComponentSpatialTransform{
+		// 	Rotation: c.Transform.Rotation,
+		// }
 	}
 
 	if c.Toggleable {

@@ -10,6 +10,14 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type ComponentRotation struct {
+	Degrees float64
+}
+
+func NewComponentRotation(degrees float64) *ComponentRotation {
+	return &ComponentRotation{Degrees: degrees}
+}
+
 func NewComponentAnimation() *ComponentAnimation {
 	return &ComponentAnimation{
 		ComponentAnimationByName: ComponentAnimationMap{},
@@ -54,6 +62,7 @@ type renderEntity struct {
 	ID       EntityID
 	Category EntityCategory
 	*ComponentSpatial
+	*ComponentRotation
 	*ComponentAppearance
 	*ComponentAnimation
 	*ComponentMovement
@@ -263,13 +272,14 @@ func (s *RenderSystem) drawSprite(
 	animData *ComponentAnimationData,
 	entity renderEntity,
 ) {
-	frame, _, matrix := s.getSpriteDrawData(animData, entity.ComponentSpatial)
+	frame, _, matrix := s.getSpriteDrawData(animData, entity.ComponentSpatial, entity.ComponentRotation)
 	frame.Draw(s.Win, matrix)
 }
 
 func (s *RenderSystem) getSpriteDrawData(
 	animData *ComponentAnimationData,
 	spatialComponent *ComponentSpatial,
+	rotationComponent *ComponentRotation,
 ) (*pixel.Sprite, pixel.Vec, pixel.Matrix) {
 	rate := determineFrameRate(animData)
 
@@ -282,7 +292,7 @@ func (s *RenderSystem) getSpriteDrawData(
 	frame := s.SpriteMap[frameIndex]
 
 	vector := buildSpriteVector(spatialComponent, s.ActiveSpaceRectangle)
-	matrix := buildSpriteMatrix(spatialComponent, vector)
+	matrix := buildSpriteMatrix(rotationComponent, vector)
 
 	return frame, vector, matrix
 }
@@ -315,14 +325,12 @@ func buildSpriteVector(spatialComponent *ComponentSpatial, activeSpaceRectangle 
 	return pixel.V(vectorX, vectorY)
 }
 
-func buildSpriteMatrix(spatialComponent *ComponentSpatial, vector pixel.Vec) pixel.Matrix {
+func buildSpriteMatrix(rotationComponent *ComponentRotation, vector pixel.Vec) pixel.Matrix {
 
 	matrix := pixel.IM.Moved(vector)
 
-	if spatialComponent.Transform != nil {
-		// Transform
-		degrees := spatialComponent.Transform.Rotation
-		radians := degrees * math.Pi / 180
+	if rotationComponent != nil {
+		radians := rotationComponent.Degrees * math.Pi / 180
 		matrix = matrix.Rotated(vector, radians)
 	}
 

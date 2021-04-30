@@ -10,13 +10,13 @@ import (
 
 // ComponentSpatial contains spatial data
 type ComponentSpatial struct {
-	Width     float64
-	Height    float64
-	PrevRect  pixel.Rect
-	Rect      pixel.Rect
-	Shape     *imdraw.IMDraw
-	Transform *ComponentSpatialTransform
-	Color     color.RGBA
+	Width    float64
+	Height   float64
+	PrevRect pixel.Rect
+	Rect     pixel.Rect
+	Shape    *imdraw.IMDraw
+	// Transform *ComponentSpatialTransform
+	Color color.RGBA
 }
 
 func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color color.RGBA) *ComponentSpatial {
