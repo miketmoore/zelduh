@@ -1,5 +1,10 @@
 package zelduh
 
+// ComponentIgnore determines if an entity is ignored by the game, or not
+type ComponentIgnore struct {
+	Value bool
+}
+
 type ignoreEntity struct {
 	ID EntityID
 	*ComponentIgnore

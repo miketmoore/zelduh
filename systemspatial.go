@@ -1,10 +1,37 @@
 package zelduh
 
 import (
+	"image/color"
 	"math/rand"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 )
+
+// ComponentSpatial contains spatial data
+type ComponentSpatial struct {
+	Width                float64
+	Height               float64
+	PrevRect             pixel.Rect
+	Rect                 pixel.Rect
+	Shape                *imdraw.IMDraw
+	HitBox               *imdraw.IMDraw
+	HitBoxRadius         float64
+	CollisionWithRectMod float64
+	Transform            *ComponentSpatialTransform
+	Color                color.RGBA
+}
+
+// ComponentDash indicates that an entity can dash
+type ComponentDash struct {
+	Charge    int
+	MaxCharge int
+	SpeedMod  float64
+}
+
+type ComponentSpatialTransform struct {
+	Rotation float64
+}
 
 type spatialEntity struct {
 	ID EntityID

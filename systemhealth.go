@@ -1,5 +1,10 @@
 package zelduh
 
+// ComponentHealth contains health data
+type ComponentHealth struct {
+	Total int
+}
+
 type healthEntity struct {
 	ID EntityID
 	*ComponentHealth

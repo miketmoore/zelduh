@@ -1,6 +1,7 @@
 package zelduh
 
 import (
+	"image/color"
 	"math"
 
 	"github.com/faiface/pixel"
@@ -8,6 +9,33 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
 )
+
+// ComponentAnimationData contains data about animating one sequence of sprites
+type ComponentAnimationData struct {
+	Frames         []int
+	Frame          int
+	FrameRate      int
+	FrameRateCount int
+}
+
+// ComponentAnimationMap indexes ComponentAnimationData by use/context
+type ComponentAnimationMap map[string]*ComponentAnimationData
+
+// ComponentAnimation contains everything necessary to animate basic characters
+type ComponentAnimation struct {
+	ComponentAnimationByName ComponentAnimationMap
+}
+
+// ComponentTemporary is used to track when an entity should be removed
+type ComponentTemporary struct {
+	Expiration   int
+	OnExpiration func()
+}
+
+// ComponentAppearance contains data about visual appearance
+type ComponentAppearance struct {
+	Color color.RGBA
+}
 
 type renderEntity struct {
 	ID       EntityID

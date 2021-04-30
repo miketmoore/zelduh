@@ -1,5 +1,19 @@
 package zelduh
 
+// ComponentMovement contains data about movement
+type ComponentMovement struct {
+	LastDirection  Direction
+	Direction      Direction
+	MaxSpeed       float64
+	Speed          float64
+	MaxMoves       int
+	RemainingMoves int
+	HitSpeed       float64
+	MovingFromHit  bool
+	HitBackMoves   int
+	PatternName    string
+}
+
 type movementEntity struct {
 	ID EntityID
 	*ComponentMovement

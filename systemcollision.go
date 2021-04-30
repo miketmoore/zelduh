@@ -7,6 +7,11 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+// ComponentInvincible is used to track if an enemy is immune to damage of all kinds
+type ComponentInvincible struct {
+	Enabled bool
+}
+
 type collisionEntity struct {
 	ID EntityID
 	*ComponentSpatial
