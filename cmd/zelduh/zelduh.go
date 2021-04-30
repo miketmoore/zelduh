@@ -123,23 +123,19 @@ func run() {
 
 	inputHandlers := zelduh.InputHandlers{
 		OnUp: func() {
-			movingSpeed := player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
 			player.ComponentMovement.Direction = zelduh.DirectionUp
 		},
 		OnRight: func() {
-			movingSpeed := player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
 			player.ComponentMovement.Direction = zelduh.DirectionRight
 		},
 		OnDown: func() {
-			movingSpeed := player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
 			player.ComponentMovement.Direction = zelduh.DirectionDown
 		},
 		OnLeft: func() {
-			movingSpeed := player.ComponentMovement.MaxSpeed
-			player.ComponentMovement.Speed = movingSpeed
+			player.ComponentMovement.Speed = player.ComponentMovement.MaxSpeed
 			player.ComponentMovement.Direction = zelduh.DirectionLeft
 		},
 		OnNoDirection: func() {
