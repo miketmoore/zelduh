@@ -37,6 +37,7 @@ type Entity struct {
 	*componentDimensions
 	*componentCoordinates
 	*componentRectangle
+	*componentShape
 }
 
 type EntitiesMap map[EntityID]Entity

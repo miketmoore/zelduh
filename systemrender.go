@@ -10,6 +10,16 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type componentShape struct {
+	Shape *imdraw.IMDraw
+}
+
+func NewComponentShape() *componentShape {
+	return &componentShape{
+		Shape: imdraw.New(nil),
+	}
+}
+
 type componentRotation struct {
 	Degrees float64
 }
@@ -73,6 +83,7 @@ type renderEntity struct {
 	*componentToggler
 	*componentDimensions
 	*componentRectangle
+	*componentShape
 }
 
 func newRenderEntity(entity Entity) renderEntity {
@@ -87,6 +98,7 @@ func newRenderEntity(entity Entity) renderEntity {
 		componentColor:      entity.componentColor,
 		componentDimensions: entity.componentDimensions,
 		componentRectangle:  entity.componentRectangle,
+		componentShape:      entity.componentShape,
 	}
 }
 
@@ -353,9 +365,7 @@ func buildSpriteMatrix(rotationComponent *componentRotation, vector pixel.Vec) p
 // drawRectangle draws a rectangle of any dimensions
 func (s *RenderSystem) drawRectangle(entity renderEntity) {
 
-	spatialData := entity.componentSpatial
-
-	rect := spatialData.Shape
+	rect := entity.componentShape.Shape
 	rect.Color = entity.componentColor.Color
 
 	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.componentRectangle.Rect.Min.X)

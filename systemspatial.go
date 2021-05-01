@@ -5,7 +5,6 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 )
 
 // componentSpatial contains spatial data
@@ -14,7 +13,7 @@ type componentSpatial struct {
 	// Height   float64
 	// PrevRect pixel.Rect
 	// Rect     pixel.Rect
-	Shape *imdraw.IMDraw
+	// Shape *imdraw.IMDraw
 	Color color.RGBA
 }
 
@@ -27,7 +26,7 @@ func NewComponentSpatial(color color.RGBA) *componentSpatial {
 		// Width:  width,
 		// Height: height,
 		// Rect:  pixel.R(x, y, x+width, y+height),
-		Shape: imdraw.New(nil),
+		// Shape: imdraw.New(nil),
 		Color: color,
 	}
 }
