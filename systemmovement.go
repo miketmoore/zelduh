@@ -2,16 +2,16 @@ package zelduh
 
 // componentMovement contains data about movement
 type componentMovement struct {
-	LastDirection  Direction
-	Direction      Direction
-	MaxSpeed       float64
-	Speed          float64
-	MaxMoves       int
-	RemainingMoves int
-	HitSpeed       float64
-	MovingFromHit  bool
-	HitBackMoves   int
-	PatternName    string
+	LastDirection       Direction
+	Direction           Direction
+	MaxSpeed            float64
+	Speed               float64
+	MaxMoves            int
+	RemainingMoves      int
+	HitSpeed            float64
+	MovingFromHit       bool
+	HitBackMoves        int
+	MovementPatternName string
 }
 
 func NewComponentMovement(
@@ -25,15 +25,15 @@ func NewComponentMovement(
 
 ) *componentMovement {
 	return &componentMovement{
-		Direction:      direction,
-		MaxSpeed:       maxSpeed,
-		Speed:          speed,
-		MaxMoves:       maxMoves,
-		RemainingMoves: remainingMoves,
-		HitSpeed:       hitSpeed,
-		MovingFromHit:  movingFromHit,
-		HitBackMoves:   hitBackMoves,
-		PatternName:    patternName,
+		Direction:           direction,
+		MaxSpeed:            maxSpeed,
+		Speed:               speed,
+		MaxMoves:            maxMoves,
+		RemainingMoves:      remainingMoves,
+		HitSpeed:            hitSpeed,
+		MovingFromHit:       movingFromHit,
+		HitBackMoves:        hitBackMoves,
+		MovementPatternName: patternName,
 	}
 }
 
@@ -89,7 +89,7 @@ func (s *MovementSystem) Update() error {
 
 	// for i := 0; i < len(s.enemies); i++ {
 	// 	enemy := s.enemies[i]
-	// 	switch enemy.componentMovement.PatternName {
+	// 	switch enemy.componentMovement.MovementPatternName {
 	// 	case "random":
 	// 		s.moveEnemyRandom(enemy)
 	// 	case "left-right":

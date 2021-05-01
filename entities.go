@@ -112,7 +112,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 			c.Movement.HitSpeed,
 			c.Movement.MovingFromHit,
 			c.Movement.HitBackMoves,
-			c.PatternName,
+			c.MovementPatternName,
 		)
 	}
 

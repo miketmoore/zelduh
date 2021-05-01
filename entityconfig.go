@@ -11,16 +11,16 @@ type AnimationConfig map[string][]int
 
 // MovementConfig is used to configure an entity's Movement component
 type MovementConfig struct {
-	LastDirection  Direction
-	Direction      Direction
-	MaxSpeed       float64
-	Speed          float64
-	MaxMoves       int
-	RemainingMoves int
-	HitSpeed       float64
-	MovingFromHit  bool
-	HitBackMoves   int
-	PatternName    string
+	LastDirection       Direction
+	Direction           Direction
+	MaxSpeed            float64
+	Speed               float64
+	MaxMoves            int
+	RemainingMoves      int
+	HitSpeed            float64
+	MovingFromHit       bool
+	HitBackMoves        int
+	MovementPatternName string
 }
 
 // HitboxConfig is used to configure an entity's hitbox
@@ -60,7 +60,7 @@ type EntityConfig struct {
 	Dimensions                                                    Dimensions
 	SpriteFrames                                                  []int
 	WarpToRoomID                                                  RoomID
-	PatternName                                                   string
+	MovementPatternName                                           string
 	Toggled                                                       bool
 	Health                                                        int
 	Expiration                                                    int

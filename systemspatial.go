@@ -171,7 +171,7 @@ func (s *SpatialSystem) Update() error {
 
 	// for i := 0; i < len(s.enemies); i++ {
 	// 	enemy := s.enemies[i]
-	// 	switch enemy.componentMovement.PatternName {
+	// 	switch enemy.componentMovement.MovementPatternName {
 	// 	case "random":
 	// 		s.moveEnemyRandom(enemy)
 	// 	case "left-right":
