@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel"
 	"golang.org/x/image/colornames"
 )
@@ -46,21 +48,36 @@ func GameStateMapTransition(
 
 		*nextRoomID = transitionRoomResp.nextRoomID
 
+		if currentRoomID == nil {
+			return fmt.Errorf("current room ID is nil")
+		}
+		currentRoom, currentRoomOk := roomByIDMap[*currentRoomID]
+		if !currentRoomOk {
+			return fmt.Errorf("current room not found by ID=%d", *currentRoomID)
+		}
 		DrawMapBackgroundImage(
 			ui.Window,
 			spriteMap,
 			mapDrawData,
-			roomByIDMap[*currentRoomID].Name,
+			currentRoom.Name,
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
 			tileSize,
 			activeSpaceRectangle,
 		)
+
+		if nextRoomID == nil {
+			return fmt.Errorf("next room ID is nil")
+		}
+		nextRoom, nextRoomOk := roomByIDMap[*nextRoomID]
+		if !nextRoomOk {
+			return fmt.Errorf("next room not found by ID=%d", *nextRoomID)
+		}
 		DrawMapBackgroundImage(
 			ui.Window,
 			spriteMap,
 			mapDrawData,
-			roomByIDMap[*nextRoomID].Name,
+			nextRoom.Name,
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 			tileSize,

@@ -202,7 +202,7 @@ func (s *RenderSystem) RemoveAllEntities() {
 // Update changes spatial data based on movement data
 func (s *RenderSystem) Update() error {
 
-	// DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
+	DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
 
 	for _, entity := range s.entities {
 
