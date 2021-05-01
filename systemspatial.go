@@ -1,35 +1,10 @@
 package zelduh
 
 import (
-	"image/color"
 	"math/rand"
 
 	"github.com/faiface/pixel"
 )
-
-// componentSpatial contains spatial data
-type componentSpatial struct {
-	// Width    float64
-	// Height   float64
-	// PrevRect pixel.Rect
-	// Rect     pixel.Rect
-	// Shape *imdraw.IMDraw
-	Color color.RGBA
-}
-
-func NewComponentSpatial(color color.RGBA) *componentSpatial {
-	// width := dimensions.Width
-	// height := dimensions.Height
-	// x := coordinates.X
-	// y := coordinates.Y
-	return &componentSpatial{
-		// Width:  width,
-		// Height: height,
-		// Rect:  pixel.R(x, y, x+width, y+height),
-		// Shape: imdraw.New(nil),
-		Color: color,
-	}
-}
 
 // componentDash indicates that an entity can dash
 type componentDash struct {
@@ -51,7 +26,6 @@ func NewComponentDash(
 type spatialEntity struct {
 	ID EntityID
 	*componentMovement
-	*componentSpatial
 	*componentDash
 	*componentDimensions
 	*componentRectangle
@@ -73,7 +47,6 @@ type SpatialSystem struct {
 func (s *SpatialSystem) AddEntity(entity Entity) {
 	r := spatialEntity{
 		ID:                  entity.ID(),
-		componentSpatial:    entity.componentSpatial,
 		componentMovement:   entity.componentMovement,
 		componentDimensions: entity.componentDimensions,
 		componentRectangle:  entity.componentRectangle,

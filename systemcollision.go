@@ -34,7 +34,6 @@ func NewComponentInvincible(enabled bool) *componentInvincible {
 
 type collisionEntity struct {
 	ID EntityID
-	*componentSpatial
 	*componentInvincible
 	*componentHitbox
 	*componentDimensions
@@ -76,7 +75,6 @@ func NewCollisionSystem(
 func (s *CollisionSystem) AddEntity(entity Entity) {
 	r := collisionEntity{
 		ID:                  entity.ID(),
-		componentSpatial:    entity.componentSpatial,
 		componentHitbox:     entity.componentHitbox,
 		componentInvincible: entity.componentInvincible,
 		componentDimensions: entity.componentDimensions,
@@ -167,8 +165,6 @@ func (s *CollisionSystem) handlePlayerAtMapEdge() {
 	player := s.player
 	mapBounds := s.MapBounds
 
-	// fmt.Println(player.componentSpatial.Rect.Min.Y, mapBounds.Min.Y)
-
 	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
 	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {
@@ -193,51 +189,18 @@ func (s *CollisionSystem) drawHitbox(rect pixel.Rect, radius float64) {
 func (s *CollisionSystem) handleEnemyCollisions() {
 
 	player := s.player
-	// playerR := s.player.componentSpatial.Rect
+	// playerR := s.player.componentRectangle.Rect
 
 	w, h := player.componentDimensions.Width, player.componentDimensions.Height
 	for _, enemy := range s.enemies {
-		// enemyR := enemy.componentSpatial.Rect
 
-		// v := s.buildSpriteVector(player.componentSpatial)
 		playerRect := player.componentRectangle.Rect
-		// playerVector := pixel.V(
-		// 	playerRect.Min.X+player.componentSpatial.Width/2,
-		// 	playerRect.Min.Y+player.componentSpatial.Height/2,
-		// )
-		// m := s.buildSpriteMatrix(player.componentSpatial, v)
+
 		s.drawHitbox(playerRect, player.componentHitbox.HitBoxRadius)
 
 		enemyRect := enemy.componentRectangle.Rect
-		// enemyVector := pixel.V(
-		// 	enemyRect.Min.X+player.componentSpatial.Width/2+200,
-		// 	enemyRect.Min.Y+player.componentSpatial.Height/2+200,
-		// )
-		// enemyRect.Moved(enemyVector)
+
 		s.drawHitbox(enemyRect, enemy.HitBoxRadius)
-
-		// shape := imdraw.New(nil)
-		// shape.Color = colornames.Blue
-		// shape.Push(pixel.V(
-		// 	enemyRect.Min.X+s.CollisionHandler.TileSize,
-		// 	enemyRect.Min.Y+s.CollisionHandler.TileSize,
-		// ))
-		// shape.Push(pixel.V(
-		// 	enemyRect.Max.X+s.CollisionHandler.TileSize,
-		// 	enemyRect.Max.Y+s.CollisionHandler.TileSize,
-		// ))
-		// shape.Rectangle(3)
-		// shape.Draw(s.Win)
-
-		// circle := imdraw.New(nil)
-		// circle.Color = colornames.Blue
-		// circle.Push(pixel.V(
-		// 	enemyRect.Min.X+s.CollisionHandler.TileSize,
-		// 	enemyRect.Min.Y+s.CollisionHandler.TileSize,
-		// ))
-
-		// circle.Circle(enemy.HitBoxRadius, 5)
-		// circle.Draw(s.Win)
 
 		// Check if player and enemy are colliding
 		if isCircleCollision(
@@ -326,13 +289,13 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 		}
 
 		// for _, enemy := range s.enemies {
-		// 	if isColliding(moveableObstacle.componentSpatial.Rect, enemy.componentSpatial.Rect) {
+		// 	if isColliding(moveableObstacle.componentRectangle.Rect, enemy.componentRectangle.Rect) {
 		// 		// s.EnemyCollisionWithMoveableObstacle(enemy.ID)
 		// 	}
 		// }
 
 		// for _, obstacle := range s.obstacles {
-		// 	if isColliding(moveableObstacle.componentSpatial.Rect, obstacle.componentSpatial.Rect) {
+		// 	if isColliding(moveableObstacle.componentRectangle.Rect, obstacle.componentRectangle.Rect) {
 		// 		// s.MoveableObstacleCollisionWithObstacle(moveableObstacle.ID)
 		// 	}
 		// }

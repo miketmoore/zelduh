@@ -31,7 +31,6 @@ type Entity struct {
 	*componentHealth
 	*componentIgnore
 	*componentMovement
-	*componentSpatial
 	*componentTemporary
 	*componentRotation
 	*componentDimensions
@@ -64,11 +63,8 @@ func BuildEntitiesFromConfigs(newEntityID func() EntityID, frameRate int, config
 // BuildEntityFromConfig builds an entity from a configuration
 func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	entity := Entity{
-		id:       id,
-		Category: c.Category,
-		componentSpatial: NewComponentSpatial(
-			c.Color,
-		),
+		id:                   id,
+		Category:             c.Category,
 		componentIgnore:      NewComponentIgnore(c.Ignore),
 		componentCoordinates: NewComponentCoordinates(c.Coordinates.X, c.Coordinates.Y),
 		componentDimensions:  NewComponentDimensions(c.Dimensions.Width, c.Dimensions.Height),
@@ -97,21 +93,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Transform != nil {
-		// How to rotate pixel.Rect?
-		// entity.componentSpatial.
-
-		// https://github.com/faiface/pixel/wiki/Moving,-scaling-and-rotating-with-Matrix#rotation
-		// mat := pixel.IM
-		// mat = mat.Moved(win.Bounds().Center())
-		// mat = mat.Rotated(win.Bounds().Center(), math.Pi/4)
-		// sprite.Draw(win, mat)
-
-		// matrix := pixel.IM
-		// vector := entity.componentSpatial.Rect.Center()
-		// matrix = matrix.Rotated(vector, 90)
-
 		entity.componentRotation = NewComponentRotation(c.Transform.Rotation)
-
 	}
 
 	if c.Toggleable {

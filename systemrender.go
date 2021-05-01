@@ -74,7 +74,6 @@ func NewComponentColor(color color.RGBA) *componentColor {
 type renderEntity struct {
 	ID       EntityID
 	Category EntityCategory
-	*componentSpatial
 	*componentRotation
 	*componentColor
 	*componentAnimation
@@ -90,7 +89,6 @@ func newRenderEntity(entity Entity) renderEntity {
 	return renderEntity{
 		ID:                  entity.ID(),
 		Category:            entity.Category,
-		componentSpatial:    entity.componentSpatial,
 		componentRotation:   entity.componentRotation,
 		componentAnimation:  entity.componentAnimation,
 		componentMovement:   entity.componentMovement,
