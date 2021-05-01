@@ -1,15 +1,12 @@
 package zelduh
 
-import (
-	"github.com/faiface/pixel"
-)
-
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
 	SystemsManager                  *SystemsManager
 	SpatialSystem                   *SpatialSystem
 	HealthSystem                    *HealthSystem
 	TemporarySystem                 *TemporarySystem
+	EntityCreator                   *EntityCreator
 	ShouldAddEntities               *bool
 	NextRoomID                      *RoomID
 	CurrentState                    *State
@@ -28,6 +25,7 @@ func NewCollisionHandler(
 	spatialSystem *SpatialSystem,
 	healthSystem *HealthSystem,
 	temporarySystem *TemporarySystem,
+	entityCreator *EntityCreator,
 	shouldAddEntities *bool,
 	nextRoomID *RoomID,
 	currentState *State,
@@ -45,6 +43,7 @@ func NewCollisionHandler(
 		SpatialSystem:               spatialSystem,
 		HealthSystem:                healthSystem,
 		TemporarySystem:             temporarySystem,
+		EntityCreator:               entityCreator,
 		ShouldAddEntities:           shouldAddEntities,
 		NextRoomID:                  nextRoomID,
 		CurrentState:                currentState,
@@ -96,43 +95,6 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	}
 }
 
-func dropCoin(
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
-	v pixel.Vec,
-	systemsManager *SystemsManager,
-	tileSize float64,
-	frameRate int,
-) {
-	coordinates := Coordinates{
-		X: v.X / tileSize,
-		Y: v.Y / tileSize,
-	}
-	coin := BuildEntityFromConfig(
-		entityConfigPresetFnManager.GetPreset("coin")(coordinates),
-		systemsManager.NewEntityID(),
-		frameRate,
-	)
-	systemsManager.AddEntity(coin)
-}
-
-func (ch *CollisionHandler) CreateExplosion(entityID EntityID) {
-	ch.TemporarySystem.SetExpiration(
-		ch.Explosion.ID(),
-		len(ch.Explosion.componentAnimation.ComponentAnimationByName["default"].Frames),
-		func() {
-			dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentRectangle.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
-		},
-	)
-
-	ch.Explosion.componentDimensions = NewComponentDimensions(ch.TileSize, ch.TileSize)
-	enemyComponentRectangle, _ := ch.SpatialSystem.ComponentRectangle(entityID)
-	ch.Explosion.componentRectangle = &componentRectangle{
-		Rect: enemyComponentRectangle.Rect,
-	}
-
-	ch.SystemsManager.AddEntity(*ch.Explosion)
-}
-
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 	if !ch.Sword.componentIgnore.Value {
@@ -140,7 +102,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 		if !ch.SpatialSystem.EnemyMovingFromHit(enemyID) {
 			dead = ch.HealthSystem.Hit(enemyID, 1)
 			if dead {
-				ch.CreateExplosion(enemyID)
+				ch.EntityCreator.CreateExplosion(enemyID)
 				ch.SystemsManager.RemoveEnemy(enemyID)
 			} else {
 				ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
@@ -156,7 +118,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 		dead := ch.HealthSystem.Hit(enemyID, 1)
 		ch.Arrow.componentIgnore.Value = true
 		if dead {
-			ch.CreateExplosion(enemyID)
+			ch.EntityCreator.CreateExplosion(enemyID)
 			ch.SystemsManager.RemoveEnemy(enemyID)
 		} else {
 			ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)

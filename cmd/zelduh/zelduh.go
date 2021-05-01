@@ -102,11 +102,22 @@ func run() {
 		&temporarySystem,
 	)
 
+	entityCreator := zelduh.NewEntityCreator(
+		&systemsManager,
+		&temporarySystem,
+		&spatialSystem,
+		&entityFactory,
+		&entityConfigPresetFnManager,
+		tileSize,
+		frameRate,
+	)
+
 	collisionHandler := zelduh.NewCollisionHandler(
 		&systemsManager,
 		&spatialSystem,
 		&healthSystem,
 		&temporarySystem,
+		&entityCreator,
 		&shouldAddEntities,
 		&nextRoomID,
 		&currentState,
