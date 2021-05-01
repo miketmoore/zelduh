@@ -5,7 +5,7 @@ import "github.com/faiface/pixel"
 type EntityCreator struct {
 	systemsManager              *SystemsManager
 	temporarySystem             *TemporarySystem
-	spatialSystem               *SpatialSystem
+	movementSystem              *MovementSystem
 	entityFactory               *EntityFactory
 	entityConfigPresetFnManager *EntityConfigPresetFnManager
 	tileSize                    float64
@@ -15,7 +15,7 @@ type EntityCreator struct {
 func NewEntityCreator(
 	systemsManager *SystemsManager,
 	temporarySystem *TemporarySystem,
-	spatialSystem *SpatialSystem,
+	movementSystem *MovementSystem,
 	entityFactory *EntityFactory,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
@@ -24,7 +24,7 @@ func NewEntityCreator(
 	return EntityCreator{
 		systemsManager:              systemsManager,
 		temporarySystem:             temporarySystem,
-		spatialSystem:               spatialSystem,
+		movementSystem:              movementSystem,
 		entityFactory:               entityFactory,
 		entityConfigPresetFnManager: entityConfigPresetFnManager,
 		tileSize:                    tileSize,
@@ -61,7 +61,7 @@ func (ec *EntityCreator) CreateExplosion(
 	)
 
 	explosion.componentDimensions = NewComponentDimensions(ec.tileSize, ec.tileSize)
-	enemyComponentRectangle, _ := ec.spatialSystem.ComponentRectangle(entityID)
+	enemyComponentRectangle, _ := ec.movementSystem.ComponentRectangle(entityID)
 	explosion.componentRectangle = &componentRectangle{
 		Rect: enemyComponentRectangle.Rect,
 	}

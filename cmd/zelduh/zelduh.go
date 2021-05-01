@@ -45,9 +45,9 @@ func run() {
 
 	entityFactory := zelduh.NewEntityFactory(&systemsManager, &entityConfigPresetFnManager)
 
-	spatialSystem := zelduh.SpatialSystem{
-		Rand: rand.New(rand.NewSource(time.Now().UnixNano())),
-	}
+	movementSystem := zelduh.NewMovementSystem(
+		rand.New(rand.NewSource(time.Now().UnixNano())),
+	)
 
 	healthSystem := zelduh.NewHealthSystem()
 
@@ -105,7 +105,7 @@ func run() {
 	entityCreator := zelduh.NewEntityCreator(
 		&systemsManager,
 		&temporarySystem,
-		&spatialSystem,
+		&movementSystem,
 		&entityFactory,
 		&entityConfigPresetFnManager,
 		tileSize,
@@ -114,7 +114,7 @@ func run() {
 
 	collisionHandler := zelduh.NewCollisionHandler(
 		&systemsManager,
-		&spatialSystem,
+		&movementSystem,
 		&healthSystem,
 		&temporarySystem,
 		&entityCreator,
@@ -149,8 +149,6 @@ func run() {
 	)
 
 	input := Input{window: ui.Window}
-
-	movementSystem := zelduh.NewMovementSystem(playerID)
 
 	ignoreSystem := zelduh.NewIgnoreSystem()
 
@@ -214,7 +212,7 @@ func run() {
 	systemsManager.AddSystems(
 		&inputSystem,
 		&healthSystem,
-		&spatialSystem,
+		&movementSystem,
 		&collisionSystem,
 		&renderSystem,
 		&movementSystem,

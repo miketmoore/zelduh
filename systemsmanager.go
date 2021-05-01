@@ -95,7 +95,7 @@ func (w *SystemsManager) Remove(category EntityCategory, id EntityID) {
 func (w *SystemsManager) RemoveEnemy(id EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
-		case *SpatialSystem:
+		case *MovementSystem:
 			sys.Remove(CategoryEnemy, id)
 		case *CollisionSystem:
 			sys.Remove(CategoryEnemy, id)
@@ -109,7 +109,7 @@ func (w *SystemsManager) RemoveEnemy(id EntityID) {
 func (w *SystemsManager) RemoveAllEnemies() {
 	for _, system := range w.Systems() {
 		switch sys := system.(type) {
-		case *SpatialSystem:
+		case *MovementSystem:
 			sys.RemoveAll(CategoryEnemy)
 		case *CollisionSystem:
 			sys.RemoveAll(CategoryEnemy)

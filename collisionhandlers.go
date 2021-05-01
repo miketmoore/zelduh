@@ -3,7 +3,7 @@ package zelduh
 // CollisionHandler contains collision handlers
 type CollisionHandler struct {
 	SystemsManager                  *SystemsManager
-	SpatialSystem                   *SpatialSystem
+	MovementSystem                  *MovementSystem
 	HealthSystem                    *HealthSystem
 	TemporarySystem                 *TemporarySystem
 	EntityCreator                   *EntityCreator
@@ -22,7 +22,7 @@ type CollisionHandler struct {
 
 func NewCollisionHandler(
 	systemsManager *SystemsManager,
-	spatialSystem *SpatialSystem,
+	movementSystem *MovementSystem,
 	healthSystem *HealthSystem,
 	temporarySystem *TemporarySystem,
 	entityCreator *EntityCreator,
@@ -40,7 +40,7 @@ func NewCollisionHandler(
 ) CollisionHandler {
 	return CollisionHandler{
 		SystemsManager:              systemsManager,
-		SpatialSystem:               spatialSystem,
+		MovementSystem:              movementSystem,
 		HealthSystem:                healthSystem,
 		TemporarySystem:             temporarySystem,
 		EntityCreator:               entityCreator,
@@ -82,7 +82,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
 func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	// TODO repeat what I did with the enemies
-	ch.SpatialSystem.MovePlayerBack()
+	ch.MovementSystem.MovePlayerBack()
 	ch.Player.componentHealth.Total--
 
 	// remove heart entity
@@ -99,13 +99,13 @@ func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 	if !ch.Sword.componentIgnore.Value {
 		dead := false
-		if !ch.SpatialSystem.EnemyMovingFromHit(enemyID) {
+		if !ch.MovementSystem.EnemyMovingFromHit(enemyID) {
 			dead = ch.HealthSystem.Hit(enemyID, 1)
 			if dead {
 				ch.EntityCreator.CreateExplosion(enemyID)
 				ch.SystemsManager.RemoveEnemy(enemyID)
 			} else {
-				ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
+				ch.MovementSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
 			}
 		}
 
@@ -121,7 +121,7 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 			ch.EntityCreator.CreateExplosion(enemyID)
 			ch.SystemsManager.RemoveEnemy(enemyID)
 		} else {
-			ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
+			ch.MovementSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
 		}
 	}
 }
@@ -140,7 +140,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID EntityID) {
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID EntityID) {
-	moved := ch.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.Player.componentMovement.Direction)
+	moved := ch.MovementSystem.MoveMoveableObstacle(obstacleID, ch.Player.componentMovement.Direction)
 	if !moved {
 		ch.Player.componentRectangle.Rect = ch.Player.componentRectangle.PrevRect
 	}
@@ -167,7 +167,7 @@ func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwi
 // OnEnemyCollisionWithObstacle handles collision between enemy and obstacle
 func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID EntityID) {
 	// Block enemy within the spatial system by reseting current rect to previous rect
-	ch.SpatialSystem.UndoEnemyRect(enemyID)
+	ch.MovementSystem.UndoEnemyRect(enemyID)
 }
 
 // OnPlayerCollisionWithSwitch handles collision between player and switch
