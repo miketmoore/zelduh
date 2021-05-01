@@ -88,15 +88,15 @@ func (s InputSystem) Update() error {
 // 	input := s.Input
 
 // 	if input.PrimaryAttack() && input.Combo() {
-// 		if s.player.ComponentDash.Charge < s.player.ComponentDash.MaxCharge {
-// 			s.player.ComponentDash.Charge++
-// 			s.sword.ComponentMovement.Speed = 0
-// 			s.sword.ComponentIgnore.Value = true
+// 		if s.player.componentDash.Charge < s.player.componentDash.MaxCharge {
+// 			s.player.componentDash.Charge++
+// 			s.sword.componentMovement.Speed = 0
+// 			s.sword.componentIgnore.Value = true
 // 		} else {
-// 			s.sword.ComponentMovement.Speed = 1.0
-// 			s.sword.ComponentIgnore.Value = false
+// 			s.sword.componentMovement.Speed = 1.0
+// 			s.sword.componentIgnore.Value = false
 // 		}
 // 	} else {
-// 		s.player.ComponentDash.Charge = 0
+// 		s.player.componentDash.Charge = 0
 // 	}
 // }

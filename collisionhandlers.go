@@ -76,7 +76,7 @@ func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
 
 // OnPlayerCollisionWithCoin handles collision between player and coin
 func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
-	ch.Player.ComponentCoins.Coins++
+	ch.Player.componentCoins.Coins++
 	ch.SystemsManager.Remove(CategoryCoin, coinID)
 }
 
@@ -84,14 +84,14 @@ func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
 func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
 	// TODO repeat what I did with the enemies
 	ch.SpatialSystem.MovePlayerBack()
-	ch.Player.ComponentHealth.Total--
+	ch.Player.componentHealth.Total--
 
 	// remove heart entity
 	heartIndex := len(ch.Hearts) - 1
 	ch.SystemsManager.Remove(CategoryHeart, ch.Hearts[heartIndex].ID())
 	ch.Hearts = append(ch.Hearts[:heartIndex], ch.Hearts[heartIndex+1:]...)
 
-	if ch.Player.ComponentHealth.Total == 0 {
+	if ch.Player.componentHealth.Total == 0 {
 		*ch.CurrentState = StateOver
 	}
 }
@@ -117,7 +117,7 @@ func dropCoin(
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
-	if !ch.Sword.ComponentIgnore.Value {
+	if !ch.Sword.componentIgnore.Value {
 		dead := false
 		if !ch.SpatialSystem.EnemyMovingFromHit(enemyID) {
 			dead = ch.HealthSystem.Hit(enemyID, 1)
@@ -126,13 +126,13 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 
 				ch.TemporarySystem.SetExpiration(
 					ch.Explosion.ID(),
-					len(ch.Explosion.ComponentAnimation.ComponentAnimationByName["default"].Frames),
+					len(ch.Explosion.componentAnimation.ComponentAnimationByName["default"].Frames),
 					func() {
-						dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
+						dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
 					},
 				)
 
-				ch.Explosion.ComponentSpatial = &ComponentSpatial{
+				ch.Explosion.componentSpatial = &componentSpatial{
 					Width:  ch.TileSize,
 					Height: ch.TileSize,
 					Rect:   enemySpatial.Rect,
@@ -141,7 +141,7 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 				ch.SystemsManager.AddEntity(*ch.Explosion)
 				ch.SystemsManager.RemoveEnemy(enemyID)
 			} else {
-				ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.ComponentMovement.Direction)
+				ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
 			}
 		}
 
@@ -150,21 +150,21 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 
 // OnArrowCollisionWithEnemy handles collision between arrow and enemy
 func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
-	if !ch.Arrow.ComponentIgnore.Value {
+	if !ch.Arrow.componentIgnore.Value {
 		dead := ch.HealthSystem.Hit(enemyID, 1)
-		ch.Arrow.ComponentIgnore.Value = true
+		ch.Arrow.componentIgnore.Value = true
 		if dead {
 			enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
 
 			ch.TemporarySystem.SetExpiration(
 				ch.Explosion.ID(),
-				len(ch.Explosion.ComponentAnimation.ComponentAnimationByName["default"].Frames),
+				len(ch.Explosion.componentAnimation.ComponentAnimationByName["default"].Frames),
 				func() {
-					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.ComponentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
+					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
 				},
 			)
 
-			ch.Explosion.ComponentSpatial = &ComponentSpatial{
+			ch.Explosion.componentSpatial = &componentSpatial{
 				Width:  ch.TileSize,
 				Height: ch.TileSize,
 				Rect:   enemySpatial.Rect,
@@ -173,36 +173,36 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 			ch.SystemsManager.AddEntity(*ch.Explosion)
 			ch.SystemsManager.RemoveEnemy(enemyID)
 		} else {
-			ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.ComponentMovement.Direction)
+			ch.SpatialSystem.MoveEnemyBack(enemyID, ch.Player.componentMovement.Direction)
 		}
 	}
 }
 
 // OnArrowCollisionWithObstacle handles collision between arrow and obstacle
 func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
-	ch.Arrow.ComponentMovement.RemainingMoves = 0
+	ch.Arrow.componentMovement.RemainingMoves = 0
 }
 
 // OnPlayerCollisionWithObstacle handles collision between player and obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID EntityID) {
 	// "Block" by undoing rect
-	ch.Player.ComponentSpatial.Rect = ch.Player.ComponentSpatial.PrevRect
-	ch.Sword.ComponentSpatial.Rect = ch.Sword.ComponentSpatial.PrevRect
+	ch.Player.componentSpatial.Rect = ch.Player.componentSpatial.PrevRect
+	ch.Sword.componentSpatial.Rect = ch.Sword.componentSpatial.PrevRect
 }
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID EntityID) {
-	moved := ch.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.Player.ComponentMovement.Direction)
+	moved := ch.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.Player.componentMovement.Direction)
 	if !moved {
-		ch.Player.ComponentSpatial.Rect = ch.Player.ComponentSpatial.PrevRect
+		ch.Player.componentSpatial.Rect = ch.Player.componentSpatial.PrevRect
 	}
 }
 
 // OnMoveableObstacleCollisionWithSwitch handles collision between moveable obstacle and switch
 func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitchID EntityID) {
 	for id, entity := range ch.EntitiesMap {
-		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
-			entity.ComponentToggler.Toggle()
+		if id == collisionSwitchID && !entity.componentToggler.Enabled() {
+			entity.componentToggler.Toggle()
 		}
 	}
 }
@@ -210,8 +210,8 @@ func (ch *CollisionHandler) OnMoveableObstacleCollisionWithSwitch(collisionSwitc
 // OnMoveableObstacleNoCollisionWithSwitch handles *no* collision between moveable obstacle and switch
 func (ch *CollisionHandler) OnMoveableObstacleNoCollisionWithSwitch(collisionSwitchID EntityID) {
 	for id, entity := range ch.EntitiesMap {
-		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
-			entity.ComponentToggler.Toggle()
+		if id == collisionSwitchID && entity.componentToggler.Enabled() {
+			entity.componentToggler.Toggle()
 		}
 	}
 }
@@ -225,8 +225,8 @@ func (ch *CollisionHandler) OnEnemyCollisionWithObstacle(enemyID, obstacleID Ent
 // OnPlayerCollisionWithSwitch handles collision between player and switch
 func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID EntityID) {
 	for id, entity := range ch.EntitiesMap {
-		if id == collisionSwitchID && !entity.ComponentToggler.Enabled() {
-			entity.ComponentToggler.Toggle()
+		if id == collisionSwitchID && !entity.componentToggler.Enabled() {
+			entity.componentToggler.Toggle()
 		}
 	}
 }
@@ -234,8 +234,8 @@ func (ch *CollisionHandler) OnPlayerCollisionWithSwitch(collisionSwitchID Entity
 // OnPlayerNoCollisionWithSwitch handles *no* collision between player and switch
 func (ch *CollisionHandler) OnPlayerNoCollisionWithSwitch(collisionSwitchID EntityID) {
 	for id, entity := range ch.EntitiesMap {
-		if id == collisionSwitchID && entity.ComponentToggler.Enabled() {
-			entity.ComponentToggler.Toggle()
+		if id == collisionSwitchID && entity.componentToggler.Enabled() {
+			entity.componentToggler.Toggle()
 		}
 	}
 }

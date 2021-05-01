@@ -1,19 +1,19 @@
 package zelduh
 
-// ComponentHealth contains health data
-type ComponentHealth struct {
+// componentHealth contains health data
+type componentHealth struct {
 	Total int
 }
 
-func NewComponentHealth(total int) *ComponentHealth {
-	return &ComponentHealth{
+func NewComponentHealth(total int) *componentHealth {
+	return &componentHealth{
 		Total: total,
 	}
 }
 
 type healthEntity struct {
 	ID EntityID
-	*ComponentHealth
+	*componentHealth
 }
 
 // HealthSystem is a custom system for altering character health
@@ -29,7 +29,7 @@ func NewHealthSystem() HealthSystem {
 func (s *HealthSystem) AddEntity(entity Entity) {
 	s.entities = append(s.entities, healthEntity{
 		ID:              entity.ID(),
-		ComponentHealth: entity.ComponentHealth,
+		componentHealth: entity.componentHealth,
 	})
 }
 
@@ -38,8 +38,8 @@ func (s *HealthSystem) Hit(entityID EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {
-			entity.ComponentHealth.Total -= d
-			return entity.ComponentHealth.Total == 0
+			entity.componentHealth.Total -= d
+			return entity.componentHealth.Total == 0
 		}
 	}
 	return false

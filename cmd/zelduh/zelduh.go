@@ -174,7 +174,7 @@ func run() {
 			ignoreSystem.Ignore(swordID)
 		},
 		OnSecondaryAttack: func() {
-			if arrow.ComponentMovement.RemainingMoves == 0 {
+			if movementSystem.RemainingMoves(arrow.ID()) == 0 {
 				movementSystem.MatchDirectionToPlayer(arrowID)
 				movementSystem.ChangeSpeed(arrowID, 7.0)
 				movementSystem.SetRemainingMoves(arrowID, 100)
@@ -184,7 +184,7 @@ func run() {
 			}
 		},
 		OnNoSecondaryAttack: func() {
-			if arrow.ComponentMovement.RemainingMoves == 0 {
+			if movementSystem.RemainingMoves(arrow.ID()) == 0 {
 				movementSystem.MatchDirectionToPlayer(arrowID)
 				movementSystem.SetZeroSpeed(arrowID)
 				movementSystem.SetRemainingMoves(arrowID, 0)
@@ -308,7 +308,7 @@ func run() {
 			os.Exit(0)
 		}
 
-		player.ComponentMovement.LastDirection = player.ComponentMovement.Direction
+		movementSystem.UpdateLastDirection(playerID)
 
 		// draw grid after everything else is drawn?
 		drawDebugGrid(

@@ -1,24 +1,24 @@
 package zelduh
 
-// ComponentIgnore determines if an entity is ignored by the game, or not
-type ComponentIgnore struct {
+// componentIgnore determines if an entity is ignored by the game, or not
+type componentIgnore struct {
 	Value bool
 }
 
-func NewComponentIgnore(ignore bool) *ComponentIgnore {
-	return &ComponentIgnore{
+func NewComponentIgnore(ignore bool) *componentIgnore {
+	return &componentIgnore{
 		Value: ignore,
 	}
 }
 
 type ignoreEntity struct {
 	ID EntityID
-	*ComponentIgnore
+	*componentIgnore
 }
 
 type IgnoreSystem struct {
 	entityByID map[EntityID]ignoreEntity
-	*ComponentIgnore
+	*componentIgnore
 }
 
 func NewIgnoreSystem() IgnoreSystem {
@@ -31,7 +31,7 @@ func NewIgnoreSystem() IgnoreSystem {
 func (s *IgnoreSystem) AddEntity(entity Entity) {
 	s.entityByID[entity.ID()] = ignoreEntity{
 		ID:              entity.ID(),
-		ComponentIgnore: entity.ComponentIgnore,
+		componentIgnore: entity.componentIgnore,
 	}
 }
 
@@ -44,13 +44,13 @@ func (s *IgnoreSystem) Update() error {
 func (s *IgnoreSystem) Ignore(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentIgnore.Value = true
+		entity.componentIgnore.Value = true
 	}
 }
 
 func (s *IgnoreSystem) DoNotIgnore(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentIgnore.Value = false
+		entity.componentIgnore.Value = false
 	}
 }

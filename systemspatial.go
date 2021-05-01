@@ -8,23 +8,22 @@ import (
 	"github.com/faiface/pixel/imdraw"
 )
 
-// ComponentSpatial contains spatial data
-type ComponentSpatial struct {
+// componentSpatial contains spatial data
+type componentSpatial struct {
 	Width    float64
 	Height   float64
 	PrevRect pixel.Rect
 	Rect     pixel.Rect
 	Shape    *imdraw.IMDraw
-	// Transform *ComponentSpatialTransform
-	Color color.RGBA
+	Color    color.RGBA
 }
 
-func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color color.RGBA) *ComponentSpatial {
+func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color color.RGBA) *componentSpatial {
 	width := dimensions.Width
 	height := dimensions.Height
 	x := coordinates.X
 	y := coordinates.Y
-	return &ComponentSpatial{
+	return &componentSpatial{
 		Width:  width,
 		Height: height,
 		Rect:   pixel.R(x, y, x+width, y+height),
@@ -33,8 +32,8 @@ func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color c
 	}
 }
 
-// ComponentDash indicates that an entity can dash
-type ComponentDash struct {
+// componentDash indicates that an entity can dash
+type componentDash struct {
 	Charge    int
 	MaxCharge int
 	SpeedMod  float64
@@ -42,23 +41,19 @@ type ComponentDash struct {
 
 func NewComponentDash(
 	charge, maxCharge int, speedMod float64,
-) *ComponentDash {
-	return &ComponentDash{
+) *componentDash {
+	return &componentDash{
 		Charge:    charge,
 		MaxCharge: maxCharge,
 		SpeedMod:  speedMod,
 	}
 }
 
-type ComponentSpatialTransform struct {
-	Rotation float64
-}
-
 type spatialEntity struct {
 	ID EntityID
-	*ComponentMovement
-	*ComponentSpatial
-	*ComponentDash
+	*componentMovement
+	*componentSpatial
+	*componentDash
 	TotalMoves  int
 	MoveCounter int
 }
@@ -77,12 +72,12 @@ type SpatialSystem struct {
 func (s *SpatialSystem) AddEntity(entity Entity) {
 	r := spatialEntity{
 		ID:                entity.ID(),
-		ComponentSpatial:  entity.ComponentSpatial,
-		ComponentMovement: entity.ComponentMovement,
+		componentSpatial:  entity.componentSpatial,
+		componentMovement: entity.componentMovement,
 	}
 	switch entity.Category {
 	case CategoryPlayer:
-		r.ComponentDash = entity.ComponentDash
+		r.componentDash = entity.componentDash
 		s.player = r
 	case CategorySword:
 		s.sword = r
@@ -122,7 +117,7 @@ func (s *SpatialSystem) RemoveAll(category EntityCategory) {
 func (s *SpatialSystem) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
-	switch player.ComponentMovement.Direction {
+	switch player.componentMovement.Direction {
 	case DirectionUp:
 		v = pixel.V(0, -48)
 	case DirectionRight:
@@ -132,17 +127,17 @@ func (s *SpatialSystem) MovePlayerBack() {
 	case DirectionLeft:
 		v = pixel.V(48, 0)
 	}
-	player.ComponentSpatial.Rect = player.ComponentSpatial.PrevRect.Moved(v)
-	player.ComponentSpatial.PrevRect = player.ComponentSpatial.Rect
+	player.componentSpatial.Rect = player.componentSpatial.PrevRect.Moved(v)
+	player.componentSpatial.PrevRect = player.componentSpatial.Rect
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
 func (s *SpatialSystem) MoveMoveableObstacle(obstacleID EntityID, dir Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
-	if ok && !entity.ComponentMovement.MovingFromHit {
-		entity.ComponentMovement.MovingFromHit = true
-		entity.ComponentMovement.RemainingMoves = entity.ComponentMovement.MaxMoves
-		entity.ComponentMovement.Direction = dir
+	if ok && !entity.componentMovement.MovingFromHit {
+		entity.componentMovement.MovingFromHit = true
+		entity.componentMovement.RemainingMoves = entity.componentMovement.MaxMoves
+		entity.componentMovement.Direction = dir
 		return true
 	}
 	return false
@@ -152,28 +147,28 @@ func (s *SpatialSystem) MoveMoveableObstacle(obstacleID EntityID, dir Direction)
 func (s *SpatialSystem) UndoEnemyRect(enemyID EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
-		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.PrevRect
+		enemy.componentSpatial.Rect = enemy.componentSpatial.PrevRect
 	}
 }
 
 // MoveEnemyBack moves the enemy back
 func (s *SpatialSystem) MoveEnemyBack(enemyID EntityID, directionHit Direction) {
 	enemy, ok := s.enemy(enemyID)
-	if ok && !enemy.ComponentMovement.MovingFromHit {
-		enemy.ComponentMovement.MovingFromHit = true
-		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.HitBackMoves
-		enemy.ComponentMovement.Direction = directionHit
+	if ok && !enemy.componentMovement.MovingFromHit {
+		enemy.componentMovement.MovingFromHit = true
+		enemy.componentMovement.RemainingMoves = enemy.componentMovement.HitBackMoves
+		enemy.componentMovement.Direction = directionHit
 	}
 }
 
 // GetEnemySpatial returns the spatial component
-func (s *SpatialSystem) GetEnemySpatial(enemyID EntityID) (*ComponentSpatial, bool) {
+func (s *SpatialSystem) GetEnemySpatial(enemyID EntityID) (*componentSpatial, bool) {
 	for _, enemy := range s.enemies {
 		if enemy.ID == enemyID {
-			return enemy.ComponentSpatial, true
+			return enemy.componentSpatial, true
 		}
 	}
-	return &ComponentSpatial{}, false
+	return &componentSpatial{}, false
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
@@ -181,7 +176,7 @@ func (s *SpatialSystem) EnemyMovingFromHit(enemyID EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
-			return enemy.ComponentMovement.MovingFromHit == true
+			return enemy.componentMovement.MovingFromHit == true
 		}
 	}
 	return false
@@ -200,7 +195,7 @@ func (s *SpatialSystem) Update() error {
 
 	// for i := 0; i < len(s.enemies); i++ {
 	// 	enemy := s.enemies[i]
-	// 	switch enemy.ComponentMovement.PatternName {
+	// 	switch enemy.componentMovement.PatternName {
 	// 	case "random":
 	// 		s.moveEnemyRandom(enemy)
 	// 	case "left-right":
@@ -245,101 +240,101 @@ func delta(dir Direction, modX, modY float64) pixel.Vec {
 
 func (s *SpatialSystem) moveSword() {
 	sword := s.sword
-	speed := sword.ComponentMovement.Speed
-	w := sword.ComponentSpatial.Width
-	h := sword.ComponentSpatial.Height
+	speed := sword.componentMovement.Speed
+	w := sword.componentSpatial.Width
+	h := sword.componentSpatial.Height
 	if speed > 0 {
-		sword.ComponentSpatial.PrevRect = sword.ComponentSpatial.Rect
-		v := delta(sword.ComponentMovement.Direction, speed+w, speed+h)
-		sword.ComponentSpatial.Rect = s.player.ComponentSpatial.Rect.Moved(v)
+		sword.componentSpatial.PrevRect = sword.componentSpatial.Rect
+		v := delta(sword.componentMovement.Direction, speed+w, speed+h)
+		sword.componentSpatial.Rect = s.player.componentSpatial.Rect.Moved(v)
 	} else {
-		sword.ComponentSpatial.Rect = s.player.ComponentSpatial.Rect
+		sword.componentSpatial.Rect = s.player.componentSpatial.Rect
 	}
 }
 
 func (s *SpatialSystem) moveArrow() {
 	arrow := s.arrow
-	speed := arrow.ComponentMovement.Speed
-	if arrow.ComponentMovement.RemainingMoves > 0 {
-		arrow.ComponentSpatial.PrevRect = arrow.ComponentSpatial.Rect
-		v := delta(arrow.ComponentMovement.Direction, speed, speed)
-		arrow.ComponentSpatial.Rect = arrow.ComponentSpatial.Rect.Moved(v)
+	speed := arrow.componentMovement.Speed
+	if arrow.componentMovement.RemainingMoves > 0 {
+		arrow.componentSpatial.PrevRect = arrow.componentSpatial.Rect
+		v := delta(arrow.componentMovement.Direction, speed, speed)
+		arrow.componentSpatial.Rect = arrow.componentSpatial.Rect.Moved(v)
 	} else {
-		arrow.ComponentSpatial.Rect = s.player.ComponentSpatial.Rect
+		arrow.componentSpatial.Rect = s.player.componentSpatial.Rect
 	}
 }
 
 func (s *SpatialSystem) movePlayer() {
 	player := s.player
-	speed := player.ComponentMovement.Speed
-	if player.ComponentDash.Charge == player.ComponentDash.MaxCharge {
-		speed += player.ComponentDash.SpeedMod
+	speed := player.componentMovement.Speed
+	if player.componentDash.Charge == player.componentDash.MaxCharge {
+		speed += player.componentDash.SpeedMod
 	}
 	if speed > 0 {
-		v := delta(player.ComponentMovement.Direction, speed, speed)
-		player.ComponentSpatial.PrevRect = player.ComponentSpatial.Rect
-		player.ComponentSpatial.Rect = player.ComponentSpatial.Rect.Moved(v)
+		v := delta(player.componentMovement.Direction, speed, speed)
+		player.componentSpatial.PrevRect = player.componentSpatial.Rect
+		player.componentSpatial.Rect = player.componentSpatial.Rect.Moved(v)
 	}
 }
 
 func (s *SpatialSystem) moveMoveableObstacle(entity *spatialEntity) {
-	if entity.ComponentMovement.RemainingMoves > 0 {
-		speed := entity.ComponentMovement.MaxSpeed
-		entity.ComponentSpatial.PrevRect = entity.ComponentSpatial.Rect
-		moveVec := delta(entity.ComponentMovement.Direction, speed, speed)
-		entity.ComponentSpatial.Rect = entity.ComponentSpatial.Rect.Moved(moveVec)
-		entity.ComponentMovement.RemainingMoves--
+	if entity.componentMovement.RemainingMoves > 0 {
+		speed := entity.componentMovement.MaxSpeed
+		entity.componentSpatial.PrevRect = entity.componentSpatial.Rect
+		moveVec := delta(entity.componentMovement.Direction, speed, speed)
+		entity.componentSpatial.Rect = entity.componentSpatial.Rect.Moved(moveVec)
+		entity.componentMovement.RemainingMoves--
 	} else {
-		entity.ComponentMovement.MovingFromHit = false
-		entity.ComponentMovement.RemainingMoves = 0
+		entity.componentMovement.MovingFromHit = false
+		entity.componentMovement.RemainingMoves = 0
 	}
 }
 
 func (s *SpatialSystem) moveEnemyRandom(enemy *spatialEntity) {
-	if enemy.ComponentMovement.RemainingMoves == 0 {
-		enemy.ComponentMovement.MovingFromHit = false
-		enemy.ComponentMovement.RemainingMoves = s.Rand.Intn(enemy.ComponentMovement.MaxMoves)
-		enemy.ComponentMovement.Direction = RandomDirection(s.Rand)
-	} else if enemy.ComponentMovement.RemainingMoves > 0 {
+	if enemy.componentMovement.RemainingMoves == 0 {
+		enemy.componentMovement.MovingFromHit = false
+		enemy.componentMovement.RemainingMoves = s.Rand.Intn(enemy.componentMovement.MaxMoves)
+		enemy.componentMovement.Direction = RandomDirection(s.Rand)
+	} else if enemy.componentMovement.RemainingMoves > 0 {
 		var speed float64
-		if enemy.ComponentMovement.MovingFromHit {
-			speed = enemy.ComponentMovement.HitSpeed
+		if enemy.componentMovement.MovingFromHit {
+			speed = enemy.componentMovement.HitSpeed
 		} else {
-			speed = enemy.ComponentMovement.MaxSpeed
+			speed = enemy.componentMovement.MaxSpeed
 		}
-		enemy.ComponentSpatial.PrevRect = enemy.ComponentSpatial.Rect
-		moveVec := delta(enemy.ComponentMovement.Direction, speed, speed)
-		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.Rect.Moved(moveVec)
-		enemy.ComponentMovement.RemainingMoves--
+		enemy.componentSpatial.PrevRect = enemy.componentSpatial.Rect
+		moveVec := delta(enemy.componentMovement.Direction, speed, speed)
+		enemy.componentSpatial.Rect = enemy.componentSpatial.Rect.Moved(moveVec)
+		enemy.componentMovement.RemainingMoves--
 	} else {
-		enemy.ComponentMovement.MovingFromHit = false
-		enemy.ComponentMovement.RemainingMoves = int(enemy.ComponentSpatial.Rect.W())
+		enemy.componentMovement.MovingFromHit = false
+		enemy.componentMovement.RemainingMoves = int(enemy.componentSpatial.Rect.W())
 	}
 }
 
 func (s *SpatialSystem) moveEnemyLeftRight(enemy *spatialEntity) {
-	if enemy.ComponentMovement.RemainingMoves == 0 {
-		enemy.ComponentMovement.MovingFromHit = false
-		enemy.ComponentMovement.RemainingMoves = enemy.ComponentMovement.MaxMoves
-		switch enemy.ComponentMovement.Direction {
+	if enemy.componentMovement.RemainingMoves == 0 {
+		enemy.componentMovement.MovingFromHit = false
+		enemy.componentMovement.RemainingMoves = enemy.componentMovement.MaxMoves
+		switch enemy.componentMovement.Direction {
 		case DirectionLeft:
-			enemy.ComponentMovement.Direction = DirectionRight
+			enemy.componentMovement.Direction = DirectionRight
 		case DirectionRight:
-			enemy.ComponentMovement.Direction = DirectionLeft
+			enemy.componentMovement.Direction = DirectionLeft
 		}
-	} else if enemy.ComponentMovement.RemainingMoves > 0 {
+	} else if enemy.componentMovement.RemainingMoves > 0 {
 		var speed float64
-		if enemy.ComponentMovement.MovingFromHit {
-			speed = enemy.ComponentMovement.HitSpeed
+		if enemy.componentMovement.MovingFromHit {
+			speed = enemy.componentMovement.HitSpeed
 		} else {
-			speed = enemy.ComponentMovement.MaxSpeed
+			speed = enemy.componentMovement.MaxSpeed
 		}
-		enemy.ComponentSpatial.PrevRect = enemy.ComponentSpatial.Rect
-		moveVec := delta(enemy.ComponentMovement.Direction, speed, speed)
-		enemy.ComponentSpatial.Rect = enemy.ComponentSpatial.Rect.Moved(moveVec)
-		enemy.ComponentMovement.RemainingMoves--
+		enemy.componentSpatial.PrevRect = enemy.componentSpatial.Rect
+		moveVec := delta(enemy.componentMovement.Direction, speed, speed)
+		enemy.componentSpatial.Rect = enemy.componentSpatial.Rect.Moved(moveVec)
+		enemy.componentMovement.RemainingMoves--
 	} else {
-		enemy.ComponentMovement.MovingFromHit = false
-		enemy.ComponentMovement.RemainingMoves = int(enemy.ComponentSpatial.Rect.W())
+		enemy.componentMovement.MovingFromHit = false
+		enemy.componentMovement.RemainingMoves = int(enemy.componentSpatial.Rect.W())
 	}
 }

@@ -43,7 +43,7 @@ func GameStateGame(
 
 	if *shouldAddEntities {
 		*shouldAddEntities = false
-		AddUIHearts(systemsManager, hearts, player.ComponentHealth.Total)
+		AddUIHearts(systemsManager, hearts, player.componentHealth.Total)
 
 		AddUICoin(systemsManager, entityConfigPresetFnManager, frameRate)
 

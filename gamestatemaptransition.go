@@ -69,11 +69,11 @@ func GameStateMapTransition(
 		DrawMask(ui.Window, windowConfig, activeSpaceRectangle)
 
 		// Move player with map transition
-		player.ComponentSpatial.Rect = pixel.R(
-			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
-			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
-			player.ComponentSpatial.Rect.Min.X+transitionRoomResp.playerModX+tileSize,
-			player.ComponentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+tileSize,
+		player.componentSpatial.Rect = pixel.R(
+			player.componentSpatial.Rect.Min.X+transitionRoomResp.playerModX,
+			player.componentSpatial.Rect.Min.Y+transitionRoomResp.playerModY,
+			player.componentSpatial.Rect.Min.X+transitionRoomResp.playerModX+tileSize,
+			player.componentSpatial.Rect.Min.Y+transitionRoomResp.playerModY+tileSize,
 		)
 
 		err := systemsManager.Update()

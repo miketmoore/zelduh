@@ -1,25 +1,25 @@
 package zelduh
 
-// ComponentTemporary is used to track when an entity should be removed
-type ComponentTemporary struct {
+// componentTemporary is used to track when an entity should be removed
+type componentTemporary struct {
 	Expiration   int
 	OnExpiration func()
 }
 
-func NewComponentTemporary(expiration int) *ComponentTemporary {
-	return &ComponentTemporary{
+func NewComponentTemporary(expiration int) *componentTemporary {
+	return &componentTemporary{
 		Expiration: expiration,
 	}
 }
 
 type temporaryEntity struct {
 	ID EntityID
-	*ComponentTemporary
+	*componentTemporary
 }
 
 type TemporarySystem struct {
 	entityByID map[EntityID]temporaryEntity
-	*ComponentIgnore
+	*componentIgnore
 }
 
 func NewTemporarySystem() TemporarySystem {
@@ -32,7 +32,7 @@ func NewTemporarySystem() TemporarySystem {
 func (s *TemporarySystem) AddEntity(entity Entity) {
 	s.entityByID[entity.ID()] = temporaryEntity{
 		ID:                 entity.ID(),
-		ComponentTemporary: entity.ComponentTemporary,
+		componentTemporary: entity.componentTemporary,
 	}
 }
 
@@ -45,15 +45,15 @@ func (s *TemporarySystem) Update() error {
 func (s *TemporarySystem) SetExpiration(entityID EntityID, value int, onExpirationHandler func()) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentTemporary.Expiration = value
-		entity.ComponentTemporary.OnExpiration = onExpirationHandler
+		entity.componentTemporary.Expiration = value
+		entity.componentTemporary.OnExpiration = onExpirationHandler
 	}
 }
 
 func (s *TemporarySystem) IsTemporary(entityID EntityID) bool {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		return entity.ComponentTemporary != nil
+		return entity.componentTemporary != nil
 	}
 	return false
 }
@@ -61,7 +61,7 @@ func (s *TemporarySystem) IsTemporary(entityID EntityID) bool {
 func (s *TemporarySystem) IsExpired(entityID EntityID) bool {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		return s.IsTemporary(entityID) && entity.ComponentTemporary.Expiration == 0
+		return s.IsTemporary(entityID) && entity.componentTemporary.Expiration == 0
 	}
 	return false
 }
@@ -69,14 +69,14 @@ func (s *TemporarySystem) IsExpired(entityID EntityID) bool {
 func (s *TemporarySystem) DecrementExpiration(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentTemporary.Expiration--
+		entity.componentTemporary.Expiration--
 	}
 }
 
 func (s *TemporarySystem) CallOnExpirationHandler(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentTemporary.OnExpiration()
+		entity.componentTemporary.OnExpiration()
 	}
 
 }

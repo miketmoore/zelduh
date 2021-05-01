@@ -10,17 +10,17 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-type ComponentRotation struct {
+type componentRotation struct {
 	Degrees float64
 }
 
-func NewComponentRotation(degrees float64) *ComponentRotation {
-	return &ComponentRotation{Degrees: degrees}
+func NewComponentRotation(degrees float64) *componentRotation {
+	return &componentRotation{Degrees: degrees}
 }
 
-func NewComponentAnimation(animationConfig AnimationConfig, frameRate int) *ComponentAnimation {
-	component := ComponentAnimation{
-		ComponentAnimationByName: ComponentAnimationMap{},
+func NewComponentAnimation(animationConfig AnimationConfig, frameRate int) *componentAnimation {
+	component := componentAnimation{
+		ComponentAnimationByName: componentAnimationMap{},
 	}
 
 	for key, val := range animationConfig {
@@ -30,64 +30,64 @@ func NewComponentAnimation(animationConfig AnimationConfig, frameRate int) *Comp
 	return &component
 }
 
-// ComponentAnimationData contains data about animating one sequence of sprites
-type ComponentAnimationData struct {
+// componentAnimationData contains data about animating one sequence of sprites
+type componentAnimationData struct {
 	Frames         []int
 	Frame          int
 	FrameRate      int
 	FrameRateCount int
 }
 
-func NewComponentAnimationData(frames []int, frameRate int) *ComponentAnimationData {
-	return &ComponentAnimationData{
+func NewComponentAnimationData(frames []int, frameRate int) *componentAnimationData {
+	return &componentAnimationData{
 		Frames:    frames,
 		FrameRate: frameRate,
 	}
 }
 
-// ComponentAnimationMap indexes ComponentAnimationData by use/context
-type ComponentAnimationMap map[string]*ComponentAnimationData
+// componentAnimationMap indexes componentAnimationData by use/context
+type componentAnimationMap map[string]*componentAnimationData
 
-// ComponentAnimation contains everything necessary to animate basic characters
-type ComponentAnimation struct {
-	ComponentAnimationByName ComponentAnimationMap
+// componentAnimation contains everything necessary to animate basic characters
+type componentAnimation struct {
+	ComponentAnimationByName componentAnimationMap
 }
 
-type ComponentColor struct {
+type componentColor struct {
 	Color color.RGBA
 }
 
-func NewComponentColor(color color.RGBA) *ComponentColor {
-	return &ComponentColor{Color: color}
+func NewComponentColor(color color.RGBA) *componentColor {
+	return &componentColor{Color: color}
 }
 
 type renderEntity struct {
 	ID       EntityID
 	Category EntityCategory
-	*ComponentSpatial
-	*ComponentRotation
-	*ComponentColor
-	*ComponentAnimation
-	*ComponentMovement
-	*ComponentIgnore
-	*ComponentToggler
+	*componentSpatial
+	*componentRotation
+	*componentColor
+	*componentAnimation
+	*componentMovement
+	*componentIgnore
+	*componentToggler
 }
 
 func newRenderEntity(entity Entity) renderEntity {
 	return renderEntity{
 		ID:                 entity.ID(),
 		Category:           entity.Category,
-		ComponentSpatial:   entity.ComponentSpatial,
-		ComponentRotation:  entity.ComponentRotation,
-		ComponentAnimation: entity.ComponentAnimation,
-		ComponentMovement:  entity.ComponentMovement,
-		ComponentIgnore:    entity.ComponentIgnore,
-		ComponentColor:     entity.ComponentColor,
+		componentSpatial:   entity.componentSpatial,
+		componentRotation:  entity.componentRotation,
+		componentAnimation: entity.componentAnimation,
+		componentMovement:  entity.componentMovement,
+		componentIgnore:    entity.componentIgnore,
+		componentColor:     entity.componentColor,
 	}
 }
 
 func (entity *renderEntity) shouldNotIgnore() bool {
-	return entity.ComponentIgnore == nil || (entity.ComponentIgnore != nil && !entity.ComponentIgnore.Value)
+	return entity.componentIgnore == nil || (entity.componentIgnore != nil && !entity.componentIgnore.Value)
 }
 
 // RenderSystem is a custom system
@@ -150,8 +150,8 @@ func (s *RenderSystem) AddEntity(entity Entity) {
 	case CategoryIgnore:
 		fallthrough
 	default:
-		if entity.ComponentToggler != nil {
-			r.ComponentToggler = entity.ComponentToggler
+		if entity.componentToggler != nil {
+			r.componentToggler = entity.componentToggler
 		}
 		s.entities = append(s.entities, r)
 	}
@@ -216,18 +216,18 @@ func (s *RenderSystem) Update() error {
 	arrow := s.arrow
 	sword := s.sword
 
-	if !sword.ComponentIgnore.Value {
+	if !sword.componentIgnore.Value {
 		s.drawByPlayerDirection(sword)
 	}
 
-	if !arrow.ComponentIgnore.Value {
+	if !arrow.componentIgnore.Value {
 		s.drawByPlayerDirection(arrow)
 	}
 
-	if sword.ComponentIgnore != nil && sword.ComponentIgnore.Value && arrow.ComponentIgnore.Value {
+	if sword.componentIgnore != nil && sword.componentIgnore.Value && arrow.componentIgnore.Value {
 		s.drawByPlayerDirection(player)
 	} else {
-		animDataKey := swordComponentAnimationByDirection[player.ComponentMovement.Direction]
+		animDataKey := swordComponentAnimationByDirection[player.componentMovement.Direction]
 		componentAnimationData, ok := getComponentAnimationByName(player, animDataKey)
 		if ok {
 			s.drawSprite(componentAnimationData, player)
@@ -245,7 +245,7 @@ func (s *RenderSystem) drawDefaultFrame(entity renderEntity) {
 }
 
 func (s *RenderSystem) drawByPlayerDirection(entity renderEntity) {
-	animDataKey := playerComponentAnimationByDirection[s.player.ComponentMovement.Direction]
+	animDataKey := playerComponentAnimationByDirection[s.player.componentMovement.Direction]
 	componentAnimationData, ok := getComponentAnimationByName(entity, animDataKey)
 	if ok {
 		s.drawSprite(componentAnimationData, entity)
@@ -266,8 +266,8 @@ var swordComponentAnimationByDirection = map[Direction]string{
 	DirectionLeft:  "swordAttackLeft",
 }
 
-func getComponentAnimationByName(entity renderEntity, name string) (*ComponentAnimationData, bool) {
-	componentAnimation := entity.ComponentAnimation
+func getComponentAnimationByName(entity renderEntity, name string) (*componentAnimationData, bool) {
+	componentAnimation := entity.componentAnimation
 	if componentAnimation == nil {
 		return nil, false
 	}
@@ -278,17 +278,17 @@ func getComponentAnimationByName(entity renderEntity, name string) (*ComponentAn
 }
 
 func (s *RenderSystem) drawSprite(
-	animData *ComponentAnimationData,
+	animData *componentAnimationData,
 	entity renderEntity,
 ) {
-	frame, _, matrix := s.getSpriteDrawData(animData, entity.ComponentSpatial, entity.ComponentRotation)
+	frame, _, matrix := s.getSpriteDrawData(animData, entity.componentSpatial, entity.componentRotation)
 	frame.Draw(s.Win, matrix)
 }
 
 func (s *RenderSystem) getSpriteDrawData(
-	animData *ComponentAnimationData,
-	spatialComponent *ComponentSpatial,
-	rotationComponent *ComponentRotation,
+	animData *componentAnimationData,
+	spatialComponent *componentSpatial,
+	rotationComponent *componentRotation,
 ) (*pixel.Sprite, pixel.Vec, pixel.Matrix) {
 	rate := determineFrameRate(animData)
 
@@ -306,7 +306,7 @@ func (s *RenderSystem) getSpriteDrawData(
 	return frame, vector, matrix
 }
 
-func determineFrameRate(animData *ComponentAnimationData) int {
+func determineFrameRate(animData *componentAnimationData) int {
 	rate := animData.FrameRateCount
 	if rate < animData.FrameRate {
 		return rate + 1
@@ -314,7 +314,7 @@ func determineFrameRate(animData *ComponentAnimationData) int {
 	return 0
 }
 
-func determineFrameNumber(animData *ComponentAnimationData) int {
+func determineFrameNumber(animData *componentAnimationData) int {
 	rate := animData.FrameRateCount
 	frameNum := animData.Frame
 	if rate == animData.FrameRate {
@@ -328,13 +328,13 @@ func determineFrameNumber(animData *ComponentAnimationData) int {
 	return frameNum
 }
 
-func buildSpriteVector(spatialComponent *ComponentSpatial, activeSpaceRectangle ActiveSpaceRectangle) pixel.Vec {
+func buildSpriteVector(spatialComponent *componentSpatial, activeSpaceRectangle ActiveSpaceRectangle) pixel.Vec {
 	vectorX := spatialComponent.Rect.Center().X + activeSpaceRectangle.X
 	vectorY := spatialComponent.Rect.Center().Y + activeSpaceRectangle.Y
 	return pixel.V(vectorX, vectorY)
 }
 
-func buildSpriteMatrix(rotationComponent *ComponentRotation, vector pixel.Vec) pixel.Matrix {
+func buildSpriteMatrix(rotationComponent *componentRotation, vector pixel.Vec) pixel.Matrix {
 
 	matrix := pixel.IM.Moved(vector)
 
@@ -349,13 +349,13 @@ func buildSpriteMatrix(rotationComponent *ComponentRotation, vector pixel.Vec) p
 // drawRectangle draws a rectangle of any dimensions
 func (s *RenderSystem) drawRectangle(entity renderEntity) {
 
-	spatialData := entity.ComponentSpatial
+	spatialData := entity.componentSpatial
 
 	rect := spatialData.Shape
-	rect.Color = entity.ComponentColor.Color
+	rect.Color = entity.componentColor.Color
 
-	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.ComponentSpatial.Rect.Min.X)
-	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.ComponentSpatial.Rect.Min.Y)
+	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.componentSpatial.Rect.Min.X)
+	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.componentSpatial.Rect.Min.Y)
 	point := pixel.V(vectorX, vectorY)
 
 	rect.Push(point)

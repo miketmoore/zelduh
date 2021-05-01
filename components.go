@@ -1,34 +1,34 @@
 package zelduh
 
-// ComponentCoins contains info about an entity's coins
-type ComponentCoins struct {
+// componentCoins contains info about an entity's coins
+type componentCoins struct {
 	Coins int
 }
 
-func NewComponentCoins(coins int) *ComponentCoins {
-	return &ComponentCoins{
+func NewComponentCoins(coins int) *componentCoins {
+	return &componentCoins{
 		Coins: coins,
 	}
 }
 
-// ComponentEnabled is a component for tracking enabled/disabled state of an entity
-type ComponentEnabled struct {
+// componentEnabled is a component for tracking enabled/disabled state of an entity
+type componentEnabled struct {
 	Value bool
 }
 
-func NewComponentEnabled(enabled bool) *ComponentEnabled {
-	return &ComponentEnabled{
+func NewComponentEnabled(enabled bool) *componentEnabled {
+	return &componentEnabled{
 		Value: enabled,
 	}
 }
 
-// ComponentToggler contains information to use when something is toggled
-type ComponentToggler struct {
+// componentToggler contains information to use when something is toggled
+type componentToggler struct {
 	enabled bool
 }
 
-func NewComponentToggler(toggled bool) *ComponentToggler {
-	component := &ComponentToggler{}
+func NewComponentToggler(toggled bool) *componentToggler {
+	component := &componentToggler{}
 	if toggled {
 		component.Toggle()
 	}
@@ -36,11 +36,11 @@ func NewComponentToggler(toggled bool) *ComponentToggler {
 }
 
 // Enabled determine if the Toggler is enabled or not
-func (s *ComponentToggler) Enabled() bool {
+func (s *componentToggler) Enabled() bool {
 	return s.enabled
 }
 
 // Toggle handles the switch being toggled
-func (s *ComponentToggler) Toggle() {
+func (s *componentToggler) Toggle() {
 	s.enabled = !s.enabled
 }

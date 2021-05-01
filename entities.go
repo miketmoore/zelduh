@@ -20,20 +20,20 @@ type EntityID int
 type Entity struct {
 	id       EntityID
 	Category EntityCategory
-	*ComponentInvincible
-	*ComponentHitbox
-	*ComponentAnimation
-	*ComponentColor
-	*ComponentCoins
-	*ComponentDash
-	*ComponentEnabled
-	*ComponentToggler
-	*ComponentHealth
-	*ComponentIgnore
-	*ComponentMovement
-	*ComponentSpatial
-	*ComponentTemporary
-	*ComponentRotation
+	*componentInvincible
+	*componentHitbox
+	*componentAnimation
+	*componentColor
+	*componentCoins
+	*componentDash
+	*componentEnabled
+	*componentToggler
+	*componentHealth
+	*componentIgnore
+	*componentMovement
+	*componentSpatial
+	*componentTemporary
+	*componentRotation
 }
 
 type EntitiesMap map[EntityID]Entity
@@ -63,33 +63,33 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
-		ComponentSpatial: NewComponentSpatial(
+		componentSpatial: NewComponentSpatial(
 			c.Coordinates,
 			c.Dimensions,
 			c.Color,
 		),
-		ComponentIgnore: NewComponentIgnore(c.Ignore),
+		componentIgnore: NewComponentIgnore(c.Ignore),
 	}
 
 	if c.Expiration > 0 {
-		entity.ComponentTemporary = NewComponentTemporary(c.Expiration)
+		entity.componentTemporary = NewComponentTemporary(c.Expiration)
 	}
 
 	if c.Category == CategoryWarp {
-		entity.ComponentEnabled = NewComponentEnabled(true)
+		entity.componentEnabled = NewComponentEnabled(true)
 	}
 
 	if c.Health > 0 {
-		entity.ComponentHealth = NewComponentHealth(c.Health)
+		entity.componentHealth = NewComponentHealth(c.Health)
 	}
 
 	if c.Hitbox != nil {
-		entity.ComponentHitbox = NewComponentHitbox(c.Hitbox.Radius, float64(c.Hitbox.CollisionWithRectMod))
+		entity.componentHitbox = NewComponentHitbox(c.Hitbox.Radius, float64(c.Hitbox.CollisionWithRectMod))
 	}
 
 	if c.Transform != nil {
 		// How to rotate pixel.Rect?
-		// entity.ComponentSpatial.
+		// entity.componentSpatial.
 
 		// https://github.com/faiface/pixel/wiki/Moving,-scaling-and-rotating-with-Matrix#rotation
 		// mat := pixel.IM
@@ -98,23 +98,21 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		// sprite.Draw(win, mat)
 
 		// matrix := pixel.IM
-		// vector := entity.ComponentSpatial.Rect.Center()
+		// vector := entity.componentSpatial.Rect.Center()
 		// matrix = matrix.Rotated(vector, 90)
 
-		entity.ComponentRotation = NewComponentRotation(c.Transform.Rotation)
-		// entity.ComponentSpatial.Transform = &ComponentSpatialTransform{
-		// 	Rotation: c.Transform.Rotation,
-		// }
+		entity.componentRotation = NewComponentRotation(c.Transform.Rotation)
+
 	}
 
 	if c.Toggleable {
-		entity.ComponentToggler = NewComponentToggler(c.Toggled)
+		entity.componentToggler = NewComponentToggler(c.Toggled)
 	}
 
-	entity.ComponentInvincible = NewComponentInvincible(c.Invincible)
+	entity.componentInvincible = NewComponentInvincible(c.Invincible)
 
 	if c.Movement != nil {
-		entity.ComponentMovement = NewComponentMovement(
+		entity.componentMovement = NewComponentMovement(
 			c.Movement.Direction,
 			c.Movement.Speed,
 			c.Movement.MaxSpeed,
@@ -128,11 +126,11 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	}
 
 	if c.Coins {
-		entity.ComponentCoins = NewComponentCoins(0)
+		entity.componentCoins = NewComponentCoins(0)
 	}
 
 	if c.Dash != nil {
-		entity.ComponentDash = NewComponentDash(
+		entity.componentDash = NewComponentDash(
 			c.Dash.Charge,
 			c.Dash.MaxCharge,
 			c.Dash.SpeedMod,
@@ -142,11 +140,11 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	// An animation is a sprite graphic that may have one or more frames
 	// so technically it might not be an animation
 	if c.Animation != nil {
-		entity.ComponentAnimation = NewComponentAnimation(c.Animation, frameRate)
+		entity.componentAnimation = NewComponentAnimation(c.Animation, frameRate)
 	} else {
 		// If the "animation" configuration is not set, then this is not a sprite graphic
 		// instead, it is a simple shape
-		entity.ComponentColor = NewComponentColor(colornames.Sandybrown)
+		entity.componentColor = NewComponentColor(colornames.Sandybrown)
 	}
 
 	return entity

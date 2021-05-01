@@ -1,7 +1,7 @@
 package zelduh
 
-// ComponentMovement contains data about movement
-type ComponentMovement struct {
+// componentMovement contains data about movement
+type componentMovement struct {
 	LastDirection  Direction
 	Direction      Direction
 	MaxSpeed       float64
@@ -23,8 +23,8 @@ func NewComponentMovement(
 	hitBackMoves int,
 	patternName string,
 
-) *ComponentMovement {
-	return &ComponentMovement{
+) *componentMovement {
+	return &componentMovement{
 		Direction:      direction,
 		MaxSpeed:       maxSpeed,
 		Speed:          speed,
@@ -39,7 +39,7 @@ func NewComponentMovement(
 
 type movementEntity struct {
 	ID EntityID
-	*ComponentMovement
+	*componentMovement
 }
 
 type MovementSystem struct {
@@ -58,12 +58,12 @@ func NewMovementSystem(playerID EntityID) MovementSystem {
 func (s *MovementSystem) AddEntity(entity Entity) {
 	e := movementEntity{
 		ID:                entity.ID(),
-		ComponentMovement: entity.ComponentMovement,
+		componentMovement: entity.componentMovement,
 	}
 	s.entityByID[e.ID] = e
 	// switch entity.Category {
 	// case CategoryPlayer:
-	// 	// r.ComponentDash = entity.ComponentDash
+	// 	// r.componentDash = entity.componentDash
 	// 	// s.player = r
 	// 	// case CategorySword:
 	// 	// 	s.sword = r
@@ -89,7 +89,7 @@ func (s *MovementSystem) Update() error {
 
 	// for i := 0; i < len(s.enemies); i++ {
 	// 	enemy := s.enemies[i]
-	// 	switch enemy.ComponentMovement.PatternName {
+	// 	switch enemy.componentMovement.PatternName {
 	// 	case "random":
 	// 		s.moveEnemyRandom(enemy)
 	// 	case "left-right":
@@ -102,28 +102,28 @@ func (s *MovementSystem) Update() error {
 func (s *MovementSystem) SetMaxSpeed(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentMovement.Speed = entity.ComponentMovement.MaxSpeed
+		entity.componentMovement.Speed = entity.componentMovement.MaxSpeed
 	}
 }
 
 func (s *MovementSystem) SetZeroSpeed(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentMovement.Speed = 0
+		entity.componentMovement.Speed = 0
 	}
 }
 
 func (s *MovementSystem) ChangeSpeed(entityID EntityID, speed float64) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentMovement.Speed = speed
+		entity.componentMovement.Speed = speed
 	}
 }
 
 func (s *MovementSystem) ChangeDirection(entityID EntityID, direction Direction) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentMovement.Direction = direction
+		entity.componentMovement.Direction = direction
 	}
 }
 
@@ -131,20 +131,35 @@ func (s *MovementSystem) MatchDirectionToPlayer(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	player, playerOk := s.entityByID[s.playerID]
 	if ok && playerOk {
-		entity.ComponentMovement.Direction = player.ComponentMovement.Direction
+		entity.componentMovement.Direction = player.componentMovement.Direction
 	}
 }
 
 func (s *MovementSystem) SetRemainingMoves(entityID EntityID, value int) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentMovement.RemainingMoves = value
+		entity.componentMovement.RemainingMoves = value
 	}
 }
 
 func (s *MovementSystem) DecrementRemainingMoves(entityID EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
-		entity.ComponentMovement.RemainingMoves--
+		entity.componentMovement.RemainingMoves--
+	}
+}
+
+func (s *MovementSystem) RemainingMoves(entityID EntityID) int {
+	entity, ok := s.entityByID[entityID]
+	if ok {
+		return entity.componentMovement.RemainingMoves
+	}
+	return 0
+}
+
+func (s *MovementSystem) UpdateLastDirection(entityID EntityID) {
+	entity, ok := s.entityByID[entityID]
+	if ok {
+		entity.componentMovement.LastDirection = entity.componentMovement.Direction
 	}
 }
