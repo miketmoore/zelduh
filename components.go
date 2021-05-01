@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/faiface/pixel"
+
 // componentCoins contains info about an entity's coins
 type componentCoins struct {
 	Coins int
@@ -59,4 +61,15 @@ type componentCoordinates struct {
 
 func NewComponentCoordinates(x, y float64) *componentCoordinates {
 	return &componentCoordinates{x, y}
+}
+
+type componentRectangle struct {
+	PrevRect pixel.Rect
+	Rect     pixel.Rect
+}
+
+func NewComponentRectangle(x, y, width, height float64) *componentRectangle {
+	return &componentRectangle{
+		Rect: pixel.R(x, y, x+width, y+height),
+	}
 }

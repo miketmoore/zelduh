@@ -72,6 +72,7 @@ type renderEntity struct {
 	*componentIgnore
 	*componentToggler
 	*componentDimensions
+	*componentRectangle
 }
 
 func newRenderEntity(entity Entity) renderEntity {
@@ -85,6 +86,7 @@ func newRenderEntity(entity Entity) renderEntity {
 		componentIgnore:     entity.componentIgnore,
 		componentColor:      entity.componentColor,
 		componentDimensions: entity.componentDimensions,
+		componentRectangle:  entity.componentRectangle,
 	}
 }
 
@@ -283,13 +285,13 @@ func (s *RenderSystem) drawSprite(
 	animData *componentAnimationData,
 	entity renderEntity,
 ) {
-	frame, _, matrix := s.getSpriteDrawData(animData, entity.componentSpatial, entity.componentRotation)
+	frame, _, matrix := s.getSpriteDrawData(animData, entity.componentRectangle, entity.componentRotation)
 	frame.Draw(s.Win, matrix)
 }
 
 func (s *RenderSystem) getSpriteDrawData(
 	animData *componentAnimationData,
-	spatialComponent *componentSpatial,
+	componentRectangle *componentRectangle,
 	rotationComponent *componentRotation,
 ) (*pixel.Sprite, pixel.Vec, pixel.Matrix) {
 	rate := determineFrameRate(animData)
@@ -302,7 +304,7 @@ func (s *RenderSystem) getSpriteDrawData(
 
 	frame := s.SpriteMap[frameIndex]
 
-	vector := buildSpriteVector(spatialComponent, s.ActiveSpaceRectangle)
+	vector := buildSpriteVector(componentRectangle, s.ActiveSpaceRectangle)
 	matrix := buildSpriteMatrix(rotationComponent, vector)
 
 	return frame, vector, matrix
@@ -330,9 +332,9 @@ func determineFrameNumber(animData *componentAnimationData) int {
 	return frameNum
 }
 
-func buildSpriteVector(spatialComponent *componentSpatial, activeSpaceRectangle ActiveSpaceRectangle) pixel.Vec {
-	vectorX := spatialComponent.Rect.Center().X + activeSpaceRectangle.X
-	vectorY := spatialComponent.Rect.Center().Y + activeSpaceRectangle.Y
+func buildSpriteVector(componentRectangle *componentRectangle, activeSpaceRectangle ActiveSpaceRectangle) pixel.Vec {
+	vectorX := componentRectangle.Rect.Center().X + activeSpaceRectangle.X
+	vectorY := componentRectangle.Rect.Center().Y + activeSpaceRectangle.Y
 	return pixel.V(vectorX, vectorY)
 }
 
@@ -356,8 +358,8 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect := spatialData.Shape
 	rect.Color = entity.componentColor.Color
 
-	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.componentSpatial.Rect.Min.X)
-	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.componentSpatial.Rect.Min.Y)
+	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.componentRectangle.Rect.Min.X)
+	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.componentRectangle.Rect.Min.Y)
 	point := pixel.V(vectorX, vectorY)
 
 	rect.Push(point)

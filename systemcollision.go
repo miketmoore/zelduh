@@ -38,6 +38,7 @@ type collisionEntity struct {
 	*componentInvincible
 	*componentHitbox
 	*componentDimensions
+	*componentRectangle
 }
 
 // CollisionSystem is a custom system for detecting collisions and what to do when they occur
@@ -79,6 +80,7 @@ func (s *CollisionSystem) AddEntity(entity Entity) {
 		componentHitbox:     entity.componentHitbox,
 		componentInvincible: entity.componentInvincible,
 		componentDimensions: entity.componentDimensions,
+		componentRectangle:  entity.componentRectangle,
 	}
 	switch entity.Category {
 	case CategoryPlayer:
@@ -167,13 +169,13 @@ func (s *CollisionSystem) handlePlayerAtMapEdge() {
 
 	// fmt.Println(player.componentSpatial.Rect.Min.Y, mapBounds.Min.Y)
 
-	if player.componentSpatial.Rect.Min.Y <= mapBounds.Min.Y {
+	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
-	} else if player.componentSpatial.Rect.Min.X <= mapBounds.Min.X {
+	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundLeft)
-	} else if player.componentSpatial.Rect.Max.X >= mapBounds.Max.X {
+	} else if player.componentRectangle.Rect.Max.X >= mapBounds.Max.X {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundRight)
-	} else if player.componentSpatial.Rect.Max.Y >= mapBounds.Max.Y {
+	} else if player.componentRectangle.Rect.Max.Y >= mapBounds.Max.Y {
 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
 	}
 }
@@ -198,7 +200,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 		// enemyR := enemy.componentSpatial.Rect
 
 		// v := s.buildSpriteVector(player.componentSpatial)
-		playerRect := player.componentSpatial.Rect
+		playerRect := player.componentRectangle.Rect
 		// playerVector := pixel.V(
 		// 	playerRect.Min.X+player.componentSpatial.Width/2,
 		// 	playerRect.Min.Y+player.componentSpatial.Height/2,
@@ -206,7 +208,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 		// m := s.buildSpriteMatrix(player.componentSpatial, v)
 		s.drawHitbox(playerRect, player.componentHitbox.HitBoxRadius)
 
-		enemyRect := enemy.componentSpatial.Rect
+		enemyRect := enemy.componentRectangle.Rect
 		// enemyVector := pixel.V(
 		// 	enemyRect.Min.X+player.componentSpatial.Width/2+200,
 		// 	enemyRect.Min.Y+player.componentSpatial.Height/2+200,
@@ -251,7 +253,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 			if isCircleCollision(
 				s.sword.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
-				w, h, s.sword.componentSpatial.Rect, enemyRect) {
+				w, h, s.sword.componentRectangle.Rect, enemyRect) {
 				s.CollisionHandler.OnSwordCollisionWithEnemy(enemy.ID)
 			}
 
@@ -259,7 +261,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 			if isCircleCollision(
 				s.arrow.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
-				w, h, s.arrow.componentSpatial.Rect, enemyRect) {
+				w, h, s.arrow.componentRectangle.Rect, enemyRect) {
 				s.CollisionHandler.OnArrowCollisionWithEnemy(enemy.ID)
 			}
 		}
@@ -268,7 +270,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 
 func (s *CollisionSystem) handleCoinCollisions() {
 	for _, coin := range s.coins {
-		if isColliding(coin.componentSpatial.Rect, s.player.componentSpatial.Rect) {
+		if isColliding(coin.componentRectangle.Rect, s.player.componentRectangle.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithCoin(coin.ID)
 		}
 	}
@@ -279,28 +281,28 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 
 	for _, obstacle := range s.obstacles {
 		mod := player.componentHitbox.CollisionWithRectMod
-		if isColliding(obstacle.componentSpatial.Rect, pixel.R(
-			s.player.componentSpatial.Rect.Min.X+mod,
-			s.player.componentSpatial.Rect.Min.Y+mod,
-			s.player.componentSpatial.Rect.Max.X-mod,
-			s.player.componentSpatial.Rect.Max.Y-mod,
+		if isColliding(obstacle.componentRectangle.Rect, pixel.R(
+			s.player.componentRectangle.Rect.Min.X+mod,
+			s.player.componentRectangle.Rect.Min.Y+mod,
+			s.player.componentRectangle.Rect.Max.X-mod,
+			s.player.componentRectangle.Rect.Max.Y-mod,
 		)) {
 			s.CollisionHandler.OnPlayerCollisionWithObstacle(obstacle.ID)
 		}
 
 		for _, enemy := range s.enemies {
 			mod = enemy.componentHitbox.CollisionWithRectMod
-			if isColliding(obstacle.componentSpatial.Rect, pixel.R(
-				enemy.componentSpatial.Rect.Min.X+mod,
-				enemy.componentSpatial.Rect.Min.Y+mod,
-				enemy.componentSpatial.Rect.Max.X-mod,
-				enemy.componentSpatial.Rect.Max.Y-mod,
+			if isColliding(obstacle.componentRectangle.Rect, pixel.R(
+				enemy.componentRectangle.Rect.Min.X+mod,
+				enemy.componentRectangle.Rect.Min.Y+mod,
+				enemy.componentRectangle.Rect.Max.X-mod,
+				enemy.componentRectangle.Rect.Max.Y-mod,
 			)) {
 				s.CollisionHandler.OnEnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
 			}
 		}
 
-		if isColliding(obstacle.componentSpatial.Rect, s.arrow.componentSpatial.Rect) {
+		if isColliding(obstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
 			s.CollisionHandler.OnArrowCollisionWithObstacle()
 		}
 	}
@@ -311,12 +313,12 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 	player := s.player
 
 	for _, moveableObstacle := range s.moveableObstacles {
-		if isColliding(moveableObstacle.componentSpatial.Rect, player.componentSpatial.Rect) {
+		if isColliding(moveableObstacle.componentRectangle.Rect, player.componentRectangle.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 		}
 
 		for _, collisionSwitch := range s.collisionSwitches {
-			if isColliding(moveableObstacle.componentSpatial.Rect, collisionSwitch.componentSpatial.Rect) {
+			if isColliding(moveableObstacle.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
 				s.CollisionHandler.OnMoveableObstacleCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.CollisionHandler.OnMoveableObstacleNoCollisionWithSwitch(collisionSwitch.ID)
@@ -335,7 +337,7 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 		// 	}
 		// }
 
-		if isColliding(moveableObstacle.componentSpatial.Rect, s.arrow.componentSpatial.Rect) {
+		if isColliding(moveableObstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
 			s.CollisionHandler.OnArrowCollisionWithObstacle()
 		}
 	}
@@ -351,13 +353,13 @@ func (s *CollisionSystem) handleSwitchCollisions() {
 			if isCircleCollision(
 				s.player.componentHitbox.HitBoxRadius,
 				collisionSwitch.componentHitbox.HitBoxRadius,
-				w, h, player.componentSpatial.Rect, collisionSwitch.componentSpatial.Rect) {
+				w, h, player.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
 				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.CollisionHandler.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
 			}
 		} else {
-			if isColliding(player.componentSpatial.Rect, collisionSwitch.componentSpatial.Rect) {
+			if isColliding(player.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
 				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
 			} else {
 				s.CollisionHandler.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
@@ -372,7 +374,7 @@ func (s *CollisionSystem) handleWarpCollisions() {
 	player := s.player
 
 	for _, warp := range s.warps {
-		if isColliding(player.componentSpatial.Rect, warp.componentSpatial.Rect) {
+		if isColliding(player.componentRectangle.Rect, warp.componentRectangle.Rect) {
 			s.CollisionHandler.OnPlayerCollisionWithWarp(warp.ID)
 		}
 	}

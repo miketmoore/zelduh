@@ -36,6 +36,7 @@ type Entity struct {
 	*componentRotation
 	*componentDimensions
 	*componentCoordinates
+	*componentRectangle
 }
 
 type EntitiesMap map[EntityID]Entity
@@ -65,13 +66,17 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		id:       id,
 		Category: c.Category,
 		componentSpatial: NewComponentSpatial(
-			c.Coordinates,
-			c.Dimensions,
 			c.Color,
 		),
 		componentIgnore:      NewComponentIgnore(c.Ignore),
 		componentCoordinates: NewComponentCoordinates(c.Coordinates.X, c.Coordinates.Y),
 		componentDimensions:  NewComponentDimensions(c.Dimensions.Width, c.Dimensions.Height),
+		componentRectangle: NewComponentRectangle(
+			c.Coordinates.X,
+			c.Coordinates.Y,
+			c.Dimensions.Width,
+			c.Dimensions.Height,
+		),
 	}
 
 	if c.Expiration > 0 {

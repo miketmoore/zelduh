@@ -122,19 +122,19 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 		if !ch.SpatialSystem.EnemyMovingFromHit(enemyID) {
 			dead = ch.HealthSystem.Hit(enemyID, 1)
 			if dead {
-				enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
+				enemyComponentRectangle, _ := ch.SpatialSystem.ComponentRectangle(enemyID)
 
 				ch.TemporarySystem.SetExpiration(
 					ch.Explosion.ID(),
 					len(ch.Explosion.componentAnimation.ComponentAnimationByName["default"].Frames),
 					func() {
-						dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
+						dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentRectangle.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
 					},
 				)
 
 				ch.Explosion.componentDimensions = NewComponentDimensions(ch.TileSize, ch.TileSize)
-				ch.Explosion.componentSpatial = &componentSpatial{
-					Rect: enemySpatial.Rect,
+				ch.Explosion.componentRectangle = &componentRectangle{
+					Rect: enemyComponentRectangle.Rect,
 				}
 
 				ch.SystemsManager.AddEntity(*ch.Explosion)
@@ -153,19 +153,19 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 		dead := ch.HealthSystem.Hit(enemyID, 1)
 		ch.Arrow.componentIgnore.Value = true
 		if dead {
-			enemySpatial, _ := ch.SpatialSystem.GetEnemySpatial(enemyID)
+			enemyComponentRectangle, _ := ch.SpatialSystem.ComponentRectangle(enemyID)
 
 			ch.TemporarySystem.SetExpiration(
 				ch.Explosion.ID(),
 				len(ch.Explosion.componentAnimation.ComponentAnimationByName["default"].Frames),
 				func() {
-					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentSpatial.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
+					dropCoin(ch.EntityConfigPresetFnManager, ch.Explosion.componentRectangle.Rect.Min, ch.SystemsManager, ch.TileSize, ch.FrameRate)
 				},
 			)
 
 			ch.Explosion.componentDimensions = NewComponentDimensions(ch.TileSize, ch.TileSize)
-			ch.Explosion.componentSpatial = &componentSpatial{
-				Rect: enemySpatial.Rect,
+			ch.Explosion.componentRectangle = &componentRectangle{
+				Rect: enemyComponentRectangle.Rect,
 			}
 
 			ch.SystemsManager.AddEntity(*ch.Explosion)
@@ -184,15 +184,15 @@ func (ch *CollisionHandler) OnArrowCollisionWithObstacle() {
 // OnPlayerCollisionWithObstacle handles collision between player and obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithObstacle(obstacleID EntityID) {
 	// "Block" by undoing rect
-	ch.Player.componentSpatial.Rect = ch.Player.componentSpatial.PrevRect
-	ch.Sword.componentSpatial.Rect = ch.Sword.componentSpatial.PrevRect
+	ch.Player.componentRectangle.Rect = ch.Player.componentRectangle.PrevRect
+	ch.Sword.componentRectangle.Rect = ch.Sword.componentRectangle.PrevRect
 }
 
 // OnPlayerCollisionWithMoveableObstacle handles collision between player and moveable obstacle
 func (ch *CollisionHandler) OnPlayerCollisionWithMoveableObstacle(obstacleID EntityID) {
 	moved := ch.SpatialSystem.MoveMoveableObstacle(obstacleID, ch.Player.componentMovement.Direction)
 	if !moved {
-		ch.Player.componentSpatial.Rect = ch.Player.componentSpatial.PrevRect
+		ch.Player.componentRectangle.Rect = ch.Player.componentRectangle.PrevRect
 	}
 }
 

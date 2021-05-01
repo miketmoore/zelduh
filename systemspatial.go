@@ -12,21 +12,21 @@ import (
 type componentSpatial struct {
 	// Width    float64
 	// Height   float64
-	PrevRect pixel.Rect
-	Rect     pixel.Rect
-	Shape    *imdraw.IMDraw
-	Color    color.RGBA
+	// PrevRect pixel.Rect
+	// Rect     pixel.Rect
+	Shape *imdraw.IMDraw
+	Color color.RGBA
 }
 
-func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color color.RGBA) *componentSpatial {
-	width := dimensions.Width
-	height := dimensions.Height
-	x := coordinates.X
-	y := coordinates.Y
+func NewComponentSpatial(color color.RGBA) *componentSpatial {
+	// width := dimensions.Width
+	// height := dimensions.Height
+	// x := coordinates.X
+	// y := coordinates.Y
 	return &componentSpatial{
 		// Width:  width,
 		// Height: height,
-		Rect:  pixel.R(x, y, x+width, y+height),
+		// Rect:  pixel.R(x, y, x+width, y+height),
 		Shape: imdraw.New(nil),
 		Color: color,
 	}
@@ -55,6 +55,7 @@ type spatialEntity struct {
 	*componentSpatial
 	*componentDash
 	*componentDimensions
+	*componentRectangle
 	TotalMoves  int
 	MoveCounter int
 }
@@ -76,6 +77,7 @@ func (s *SpatialSystem) AddEntity(entity Entity) {
 		componentSpatial:    entity.componentSpatial,
 		componentMovement:   entity.componentMovement,
 		componentDimensions: entity.componentDimensions,
+		componentRectangle:  entity.componentRectangle,
 	}
 	switch entity.Category {
 	case CategoryPlayer:
@@ -129,8 +131,8 @@ func (s *SpatialSystem) MovePlayerBack() {
 	case DirectionLeft:
 		v = pixel.V(48, 0)
 	}
-	player.componentSpatial.Rect = player.componentSpatial.PrevRect.Moved(v)
-	player.componentSpatial.PrevRect = player.componentSpatial.Rect
+	player.componentRectangle.Rect = player.componentRectangle.PrevRect.Moved(v)
+	player.componentRectangle.PrevRect = player.componentRectangle.Rect
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
@@ -149,7 +151,7 @@ func (s *SpatialSystem) MoveMoveableObstacle(obstacleID EntityID, dir Direction)
 func (s *SpatialSystem) UndoEnemyRect(enemyID EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
-		enemy.componentSpatial.Rect = enemy.componentSpatial.PrevRect
+		enemy.componentRectangle.Rect = enemy.componentRectangle.PrevRect
 	}
 }
 
@@ -163,14 +165,14 @@ func (s *SpatialSystem) MoveEnemyBack(enemyID EntityID, directionHit Direction) 
 	}
 }
 
-// GetEnemySpatial returns the spatial component
-func (s *SpatialSystem) GetEnemySpatial(enemyID EntityID) (*componentSpatial, bool) {
-	for _, enemy := range s.enemies {
-		if enemy.ID == enemyID {
-			return enemy.componentSpatial, true
+// ComponentRectangle returns the ComponentRectangle for the entity
+func (s *SpatialSystem) ComponentRectangle(entityID EntityID) (*componentRectangle, bool) {
+	for _, entity := range s.enemies {
+		if entity.ID == entityID {
+			return entity.componentRectangle, true
 		}
 	}
-	return &componentSpatial{}, false
+	return &componentRectangle{}, false
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
@@ -246,11 +248,11 @@ func (s *SpatialSystem) moveSword() {
 	w := sword.componentDimensions.Width
 	h := sword.componentDimensions.Height
 	if speed > 0 {
-		sword.componentSpatial.PrevRect = sword.componentSpatial.Rect
+		sword.componentRectangle.PrevRect = sword.componentRectangle.Rect
 		v := delta(sword.componentMovement.Direction, speed+w, speed+h)
-		sword.componentSpatial.Rect = s.player.componentSpatial.Rect.Moved(v)
+		sword.componentRectangle.Rect = s.player.componentRectangle.Rect.Moved(v)
 	} else {
-		sword.componentSpatial.Rect = s.player.componentSpatial.Rect
+		sword.componentRectangle.Rect = s.player.componentRectangle.Rect
 	}
 }
 
@@ -258,11 +260,11 @@ func (s *SpatialSystem) moveArrow() {
 	arrow := s.arrow
 	speed := arrow.componentMovement.Speed
 	if arrow.componentMovement.RemainingMoves > 0 {
-		arrow.componentSpatial.PrevRect = arrow.componentSpatial.Rect
+		arrow.componentRectangle.PrevRect = arrow.componentRectangle.Rect
 		v := delta(arrow.componentMovement.Direction, speed, speed)
-		arrow.componentSpatial.Rect = arrow.componentSpatial.Rect.Moved(v)
+		arrow.componentRectangle.Rect = arrow.componentRectangle.Rect.Moved(v)
 	} else {
-		arrow.componentSpatial.Rect = s.player.componentSpatial.Rect
+		arrow.componentRectangle.Rect = s.player.componentRectangle.Rect
 	}
 }
 
@@ -274,17 +276,17 @@ func (s *SpatialSystem) movePlayer() {
 	}
 	if speed > 0 {
 		v := delta(player.componentMovement.Direction, speed, speed)
-		player.componentSpatial.PrevRect = player.componentSpatial.Rect
-		player.componentSpatial.Rect = player.componentSpatial.Rect.Moved(v)
+		player.componentRectangle.PrevRect = player.componentRectangle.Rect
+		player.componentRectangle.Rect = player.componentRectangle.Rect.Moved(v)
 	}
 }
 
 func (s *SpatialSystem) moveMoveableObstacle(entity *spatialEntity) {
 	if entity.componentMovement.RemainingMoves > 0 {
 		speed := entity.componentMovement.MaxSpeed
-		entity.componentSpatial.PrevRect = entity.componentSpatial.Rect
+		entity.componentRectangle.PrevRect = entity.componentRectangle.Rect
 		moveVec := delta(entity.componentMovement.Direction, speed, speed)
-		entity.componentSpatial.Rect = entity.componentSpatial.Rect.Moved(moveVec)
+		entity.componentRectangle.Rect = entity.componentRectangle.Rect.Moved(moveVec)
 		entity.componentMovement.RemainingMoves--
 	} else {
 		entity.componentMovement.MovingFromHit = false
@@ -304,13 +306,13 @@ func (s *SpatialSystem) moveEnemyRandom(enemy *spatialEntity) {
 		} else {
 			speed = enemy.componentMovement.MaxSpeed
 		}
-		enemy.componentSpatial.PrevRect = enemy.componentSpatial.Rect
+		enemy.componentRectangle.PrevRect = enemy.componentRectangle.Rect
 		moveVec := delta(enemy.componentMovement.Direction, speed, speed)
-		enemy.componentSpatial.Rect = enemy.componentSpatial.Rect.Moved(moveVec)
+		enemy.componentRectangle.Rect = enemy.componentRectangle.Rect.Moved(moveVec)
 		enemy.componentMovement.RemainingMoves--
 	} else {
 		enemy.componentMovement.MovingFromHit = false
-		enemy.componentMovement.RemainingMoves = int(enemy.componentSpatial.Rect.W())
+		enemy.componentMovement.RemainingMoves = int(enemy.componentRectangle.Rect.W())
 	}
 }
 
@@ -331,12 +333,12 @@ func (s *SpatialSystem) moveEnemyLeftRight(enemy *spatialEntity) {
 		} else {
 			speed = enemy.componentMovement.MaxSpeed
 		}
-		enemy.componentSpatial.PrevRect = enemy.componentSpatial.Rect
+		enemy.componentRectangle.PrevRect = enemy.componentRectangle.Rect
 		moveVec := delta(enemy.componentMovement.Direction, speed, speed)
-		enemy.componentSpatial.Rect = enemy.componentSpatial.Rect.Moved(moveVec)
+		enemy.componentRectangle.Rect = enemy.componentRectangle.Rect.Moved(moveVec)
 		enemy.componentMovement.RemainingMoves--
 	} else {
 		enemy.componentMovement.MovingFromHit = false
-		enemy.componentMovement.RemainingMoves = int(enemy.componentSpatial.Rect.W())
+		enemy.componentMovement.RemainingMoves = int(enemy.componentRectangle.Rect.W())
 	}
 }
