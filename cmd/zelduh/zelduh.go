@@ -47,6 +47,7 @@ func run() {
 
 	movementSystem := zelduh.NewMovementSystem(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
+		tileSize,
 	)
 
 	healthSystem := zelduh.NewHealthSystem()
