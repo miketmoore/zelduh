@@ -23,7 +23,7 @@ type Entity struct {
 	*ComponentInvincible
 	*ComponentHitbox
 	*ComponentAnimation
-	*ComponentAppearance
+	*ComponentColor
 	*ComponentCoins
 	*ComponentDash
 	*ComponentEnabled
@@ -145,7 +145,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 			entity.ComponentAnimation.ComponentAnimationByName[key] = NewComponentAnimationData(val, frameRate)
 		}
 	} else {
-		entity.ComponentAppearance = NewComponentAppearance(colornames.Sandybrown)
+		entity.ComponentColor = NewComponentColor(colornames.Sandybrown)
 	}
 
 	return entity

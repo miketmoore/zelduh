@@ -47,15 +47,12 @@ type ComponentAnimation struct {
 	ComponentAnimationByName ComponentAnimationMap
 }
 
-// ComponentAppearance contains data about visual appearance
-type ComponentAppearance struct {
+type ComponentColor struct {
 	Color color.RGBA
 }
 
-func NewComponentAppearance(color color.RGBA) *ComponentAppearance {
-	return &ComponentAppearance{
-		Color: color,
-	}
+func NewComponentColor(color color.RGBA) *ComponentColor {
+	return &ComponentColor{Color: color}
 }
 
 type renderEntity struct {
@@ -63,11 +60,24 @@ type renderEntity struct {
 	Category EntityCategory
 	*ComponentSpatial
 	*ComponentRotation
-	*ComponentAppearance
+	*ComponentColor
 	*ComponentAnimation
 	*ComponentMovement
 	*ComponentIgnore
 	*ComponentToggler
+}
+
+func newRenderEntity(entity Entity) renderEntity {
+	return renderEntity{
+		ID:                 entity.ID(),
+		Category:           entity.Category,
+		ComponentSpatial:   entity.ComponentSpatial,
+		ComponentRotation:  entity.ComponentRotation,
+		ComponentAnimation: entity.ComponentAnimation,
+		ComponentMovement:  entity.ComponentMovement,
+		ComponentIgnore:    entity.ComponentIgnore,
+		ComponentColor:     entity.ComponentColor,
+	}
 }
 
 func (entity *renderEntity) shouldNotIgnore() bool {
@@ -84,8 +94,8 @@ type RenderSystem struct {
 	arrow  renderEntity
 	sword  renderEntity
 
-	entities             []renderEntity
-	obstacles            []renderEntity
+	entities []renderEntity
+	// obstacles            []renderEntity
 	ActiveSpaceRectangle ActiveSpaceRectangle
 
 	TemporarySystem *TemporarySystem
@@ -109,14 +119,7 @@ func NewRenderSystem(
 
 // AddEntity adds an entity to the system
 func (s *RenderSystem) AddEntity(entity Entity) {
-	r := renderEntity{
-		ID:                 entity.ID(),
-		Category:           entity.Category,
-		ComponentSpatial:   entity.ComponentSpatial,
-		ComponentAnimation: entity.ComponentAnimation,
-		ComponentMovement:  entity.ComponentMovement,
-		ComponentIgnore:    entity.ComponentIgnore,
-	}
+	r := newRenderEntity(entity)
 	switch entity.Category {
 	case CategoryPlayer:
 		s.player = r
@@ -343,7 +346,7 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	spatialData := entity.ComponentSpatial
 
 	rect := spatialData.Shape
-	rect.Color = spatialData.Color
+	rect.Color = entity.ComponentColor.Color
 
 	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.ComponentSpatial.Rect.Min.X)
 	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.ComponentSpatial.Rect.Min.Y)
