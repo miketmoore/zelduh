@@ -18,10 +18,16 @@ func NewComponentRotation(degrees float64) *ComponentRotation {
 	return &ComponentRotation{Degrees: degrees}
 }
 
-func NewComponentAnimation() *ComponentAnimation {
-	return &ComponentAnimation{
+func NewComponentAnimation(animationConfig AnimationConfig, frameRate int) *ComponentAnimation {
+	component := ComponentAnimation{
 		ComponentAnimationByName: ComponentAnimationMap{},
 	}
+
+	for key, val := range animationConfig {
+		component.ComponentAnimationByName[key] = NewComponentAnimationData(val, frameRate)
+	}
+
+	return &component
 }
 
 // ComponentAnimationData contains data about animating one sequence of sprites

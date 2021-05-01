@@ -139,12 +139,13 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		)
 	}
 
+	// An animation is a sprite graphic that may have one or more frames
+	// so technically it might not be an animation
 	if c.Animation != nil {
-		entity.ComponentAnimation = NewComponentAnimation()
-		for key, val := range c.Animation {
-			entity.ComponentAnimation.ComponentAnimationByName[key] = NewComponentAnimationData(val, frameRate)
-		}
+		entity.ComponentAnimation = NewComponentAnimation(c.Animation, frameRate)
 	} else {
+		// If the "animation" configuration is not set, then this is not a sprite graphic
+		// instead, it is a simple shape
 		entity.ComponentColor = NewComponentColor(colornames.Sandybrown)
 	}
 
