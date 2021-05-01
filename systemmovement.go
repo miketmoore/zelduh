@@ -70,6 +70,20 @@ type movementEntity struct {
 	MoveCounter int
 }
 
+func newMovementEntity(
+	entityID EntityID,
+	componentMovement *componentMovement,
+	componentDimensions *componentDimensions,
+	componentRectangle *componentRectangle,
+) movementEntity {
+	return movementEntity{
+		ID:                  entityID,
+		componentMovement:   componentMovement,
+		componentDimensions: componentDimensions,
+		componentRectangle:  componentRectangle,
+	}
+}
+
 type MovementSystem struct {
 	entityByID        map[EntityID]movementEntity
 	Rand              *rand.Rand
@@ -89,29 +103,27 @@ func NewMovementSystem(random *rand.Rand) MovementSystem {
 
 // AddEntity adds an entity to the system
 func (s *MovementSystem) AddEntity(entity Entity) {
-	// e := movementEntity{
-	// 	ID:                entity.ID(),
-	// 	componentMovement: entity.componentMovement,
-	// }
-	r := movementEntity{
-		ID:                  entity.ID(),
-		componentMovement:   entity.componentMovement,
-		componentDimensions: entity.componentDimensions,
-		componentRectangle:  entity.componentRectangle,
-	}
-	s.entityByID[entity.ID()] = r
+	systemEntity := newMovementEntity(
+		entity.ID(),
+		entity.componentMovement,
+		entity.componentDimensions,
+		entity.componentRectangle,
+	)
+
+	s.entityByID[entity.ID()] = systemEntity
+
 	switch entity.Category {
 	case CategoryPlayer:
-		r.componentDash = entity.componentDash
-		s.player = r
+		systemEntity.componentDash = entity.componentDash
+		s.player = systemEntity
 	case CategorySword:
-		s.sword = r
+		s.sword = systemEntity
 	case CategoryArrow:
-		s.arrow = r
+		s.arrow = systemEntity
 	case CategoryMovableObstacle:
-		s.moveableObstacles = append(s.moveableObstacles, &r)
+		s.moveableObstacles = append(s.moveableObstacles, &systemEntity)
 	case CategoryEnemy:
-		s.enemies = append(s.enemies, &r)
+		s.enemies = append(s.enemies, &systemEntity)
 	}
 }
 
@@ -201,7 +213,7 @@ func (s *MovementSystem) EnemyMovingFromHit(enemyID EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
-			return enemy.componentMovement.MovingFromHit == true
+			return enemy.componentMovement.MovingFromHit
 		}
 	}
 	return false
