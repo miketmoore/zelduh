@@ -92,12 +92,14 @@ type MovementSystem struct {
 	arrow             movementEntity
 	enemies           []*movementEntity
 	moveableObstacles []*movementEntity
+	tileSize          float64
 }
 
-func NewMovementSystem(random *rand.Rand) MovementSystem {
+func NewMovementSystem(random *rand.Rand, tileSize float64) MovementSystem {
 	return MovementSystem{
 		entityByID: map[EntityID]movementEntity{},
 		Rand:       random,
+		tileSize:   tileSize,
 	}
 }
 
@@ -156,13 +158,13 @@ func (s *MovementSystem) MovePlayerBack() {
 	var v pixel.Vec
 	switch player.componentMovement.Direction {
 	case DirectionUp:
-		v = pixel.V(0, -48)
+		v = pixel.V(0, -s.tileSize)
 	case DirectionRight:
-		v = pixel.V(-48, 0)
+		v = pixel.V(-s.tileSize, 0)
 	case DirectionDown:
-		v = pixel.V(0, 48)
+		v = pixel.V(0, s.tileSize)
 	case DirectionLeft:
-		v = pixel.V(48, 0)
+		v = pixel.V(s.tileSize, 0)
 	}
 	player.componentRectangle.Rect = player.componentRectangle.PrevRect.Moved(v)
 	player.componentRectangle.PrevRect = player.componentRectangle.Rect

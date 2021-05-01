@@ -423,7 +423,7 @@ func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, wi
 		matrix := pixel.IM.Moved(
 			pixel.V(
 				(actualOriginX-18)+(x*tileSize),
-				(actualOriginY-48)+(y*tileSize),
+				(actualOriginY-tileSize)+(y*tileSize),
 			),
 		)
 		txt.Color = colornames.White

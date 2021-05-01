@@ -373,8 +373,8 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect.Push(point)
 
 	point2 := pixel.V(
-		point.X+(entity.componentDimensions.Width*48),
-		point.Y+(entity.componentDimensions.Height*48),
+		point.X+(entity.componentDimensions.Width*s.TileSize),
+		point.Y+(entity.componentDimensions.Height*s.TileSize),
 	)
 	rect.Push(point2)
 
