@@ -37,6 +37,7 @@ type collisionEntity struct {
 	*componentSpatial
 	*componentInvincible
 	*componentHitbox
+	*componentDimensions
 }
 
 // CollisionSystem is a custom system for detecting collisions and what to do when they occur
@@ -77,6 +78,7 @@ func (s *CollisionSystem) AddEntity(entity Entity) {
 		componentSpatial:    entity.componentSpatial,
 		componentHitbox:     entity.componentHitbox,
 		componentInvincible: entity.componentInvincible,
+		componentDimensions: entity.componentDimensions,
 	}
 	switch entity.Category {
 	case CategoryPlayer:
@@ -191,7 +193,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 	player := s.player
 	// playerR := s.player.componentSpatial.Rect
 
-	w, h := player.componentSpatial.Width, player.componentSpatial.Height
+	w, h := player.componentDimensions.Width, player.componentDimensions.Height
 	for _, enemy := range s.enemies {
 		// enemyR := enemy.componentSpatial.Rect
 
@@ -345,7 +347,7 @@ func (s *CollisionSystem) handleSwitchCollisions() {
 
 	for _, collisionSwitch := range s.collisionSwitches {
 		if collisionSwitch.componentHitbox.HitBoxRadius > 0 {
-			w, h := player.componentSpatial.Width, player.componentSpatial.Height
+			w, h := player.componentDimensions.Width, player.componentDimensions.Height
 			if isCircleCollision(
 				s.player.componentHitbox.HitBoxRadius,
 				collisionSwitch.componentHitbox.HitBoxRadius,

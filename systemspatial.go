@@ -10,8 +10,8 @@ import (
 
 // componentSpatial contains spatial data
 type componentSpatial struct {
-	Width    float64
-	Height   float64
+	// Width    float64
+	// Height   float64
 	PrevRect pixel.Rect
 	Rect     pixel.Rect
 	Shape    *imdraw.IMDraw
@@ -24,11 +24,11 @@ func NewComponentSpatial(coordinates Coordinates, dimensions Dimensions, color c
 	x := coordinates.X
 	y := coordinates.Y
 	return &componentSpatial{
-		Width:  width,
-		Height: height,
-		Rect:   pixel.R(x, y, x+width, y+height),
-		Shape:  imdraw.New(nil),
-		Color:  color,
+		// Width:  width,
+		// Height: height,
+		Rect:  pixel.R(x, y, x+width, y+height),
+		Shape: imdraw.New(nil),
+		Color: color,
 	}
 }
 
@@ -54,6 +54,7 @@ type spatialEntity struct {
 	*componentMovement
 	*componentSpatial
 	*componentDash
+	*componentDimensions
 	TotalMoves  int
 	MoveCounter int
 }
@@ -71,9 +72,10 @@ type SpatialSystem struct {
 // AddEntity adds an entity to the system
 func (s *SpatialSystem) AddEntity(entity Entity) {
 	r := spatialEntity{
-		ID:                entity.ID(),
-		componentSpatial:  entity.componentSpatial,
-		componentMovement: entity.componentMovement,
+		ID:                  entity.ID(),
+		componentSpatial:    entity.componentSpatial,
+		componentMovement:   entity.componentMovement,
+		componentDimensions: entity.componentDimensions,
 	}
 	switch entity.Category {
 	case CategoryPlayer:
@@ -241,8 +243,8 @@ func delta(dir Direction, modX, modY float64) pixel.Vec {
 func (s *SpatialSystem) moveSword() {
 	sword := s.sword
 	speed := sword.componentMovement.Speed
-	w := sword.componentSpatial.Width
-	h := sword.componentSpatial.Height
+	w := sword.componentDimensions.Width
+	h := sword.componentDimensions.Height
 	if speed > 0 {
 		sword.componentSpatial.PrevRect = sword.componentSpatial.Rect
 		v := delta(sword.componentMovement.Direction, speed+w, speed+h)

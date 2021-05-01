@@ -71,18 +71,20 @@ type renderEntity struct {
 	*componentMovement
 	*componentIgnore
 	*componentToggler
+	*componentDimensions
 }
 
 func newRenderEntity(entity Entity) renderEntity {
 	return renderEntity{
-		ID:                 entity.ID(),
-		Category:           entity.Category,
-		componentSpatial:   entity.componentSpatial,
-		componentRotation:  entity.componentRotation,
-		componentAnimation: entity.componentAnimation,
-		componentMovement:  entity.componentMovement,
-		componentIgnore:    entity.componentIgnore,
-		componentColor:     entity.componentColor,
+		ID:                  entity.ID(),
+		Category:            entity.Category,
+		componentSpatial:    entity.componentSpatial,
+		componentRotation:   entity.componentRotation,
+		componentAnimation:  entity.componentAnimation,
+		componentMovement:   entity.componentMovement,
+		componentIgnore:     entity.componentIgnore,
+		componentColor:      entity.componentColor,
+		componentDimensions: entity.componentDimensions,
 	}
 }
 
@@ -361,8 +363,8 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect.Push(point)
 
 	point2 := pixel.V(
-		point.X+(spatialData.Width*48),
-		point.Y+(spatialData.Height*48),
+		point.X+(entity.componentDimensions.Width*48),
+		point.Y+(entity.componentDimensions.Height*48),
 	)
 	rect.Push(point2)
 

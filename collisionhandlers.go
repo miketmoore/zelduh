@@ -132,10 +132,9 @@ func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {
 					},
 				)
 
+				ch.Explosion.componentDimensions = NewComponentDimensions(ch.TileSize, ch.TileSize)
 				ch.Explosion.componentSpatial = &componentSpatial{
-					Width:  ch.TileSize,
-					Height: ch.TileSize,
-					Rect:   enemySpatial.Rect,
+					Rect: enemySpatial.Rect,
 				}
 
 				ch.SystemsManager.AddEntity(*ch.Explosion)
@@ -164,10 +163,9 @@ func (ch *CollisionHandler) OnArrowCollisionWithEnemy(enemyID EntityID) {
 				},
 			)
 
+			ch.Explosion.componentDimensions = NewComponentDimensions(ch.TileSize, ch.TileSize)
 			ch.Explosion.componentSpatial = &componentSpatial{
-				Width:  ch.TileSize,
-				Height: ch.TileSize,
-				Rect:   enemySpatial.Rect,
+				Rect: enemySpatial.Rect,
 			}
 
 			ch.SystemsManager.AddEntity(*ch.Explosion)
