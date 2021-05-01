@@ -34,6 +34,8 @@ type Entity struct {
 	*componentSpatial
 	*componentTemporary
 	*componentRotation
+	*componentDimensions
+	*componentCoordinates
 }
 
 type EntitiesMap map[EntityID]Entity
@@ -59,7 +61,6 @@ func BuildEntitiesFromConfigs(newEntityID func() EntityID, frameRate int, config
 
 // BuildEntityFromConfig builds an entity from a configuration
 func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
-
 	entity := Entity{
 		id:       id,
 		Category: c.Category,
@@ -68,7 +69,9 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 			c.Dimensions,
 			c.Color,
 		),
-		componentIgnore: NewComponentIgnore(c.Ignore),
+		componentIgnore:      NewComponentIgnore(c.Ignore),
+		componentCoordinates: NewComponentCoordinates(c.Coordinates.X, c.Coordinates.Y),
+		componentDimensions:  NewComponentDimensions(c.Dimensions.Width, c.Dimensions.Height),
 	}
 
 	if c.Expiration > 0 {
