@@ -403,3 +403,16 @@ func DrawActiveSpace(window *pixelgl.Window, activeSpaceRectangle ActiveSpaceRec
 
 	rect.Draw(window)
 }
+
+func DrawRect(window *pixelgl.Window, rectData pixel.Rect) {
+	rect := imdraw.New(nil)
+	rect.Color = colornames.Blue
+
+	rect.Push(rectData.Min)
+
+	rect.Push(rectData.Max)
+
+	rect.Rectangle(5)
+
+	rect.Draw(window)
+}
