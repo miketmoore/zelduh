@@ -233,10 +233,12 @@ func (s *RenderSystem) Update() error {
 
 	if !sword.componentIgnore.Value {
 		s.drawByPlayerDirection(sword)
+		s.drawRectangle(s.sword)
 	}
 
 	if !arrow.componentIgnore.Value {
 		s.drawByPlayerDirection(arrow)
+		s.drawRectangle(s.arrow)
 	}
 
 	if sword.componentIgnore != nil && sword.componentIgnore.Value && arrow.componentIgnore.Value {
