@@ -85,20 +85,20 @@ func (ch *CollisionHandler) OnPlayerCollisionWithCoin(coinID EntityID) {
 }
 
 // OnPlayerCollisionWithEnemy handles collision between player and enemy
-func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
-	// TODO repeat what I did with the enemies
-	ch.MovementSystem.MovePlayerBack()
-	ch.Player.componentHealth.Total--
+// func (ch *CollisionHandler) OnPlayerCollisionWithEnemy(enemyID EntityID) {
+// 	// TODO repeat what I did with the enemies
+// 	ch.MovementSystem.MovePlayerBack()
+// 	ch.Player.componentHealth.Total--
 
-	// remove heart entity
-	heartIndex := len(ch.Hearts) - 1
-	ch.SystemsManager.Remove(CategoryHeart, ch.Hearts[heartIndex].ID())
-	ch.Hearts = append(ch.Hearts[:heartIndex], ch.Hearts[heartIndex+1:]...)
+// 	// remove heart entity
+// 	heartIndex := len(ch.Hearts) - 1
+// 	ch.SystemsManager.Remove(CategoryHeart, ch.Hearts[heartIndex].ID())
+// 	ch.Hearts = append(ch.Hearts[:heartIndex], ch.Hearts[heartIndex+1:]...)
 
-	if ch.Player.componentHealth.Total == 0 {
-		*ch.CurrentState = StateOver
-	}
-}
+// 	if ch.Player.componentHealth.Total == 0 {
+// 		*ch.CurrentState = StateOver
+// 	}
+// }
 
 // OnSwordCollisionWithEnemy handles collision between sword and enemy
 func (ch *CollisionHandler) OnSwordCollisionWithEnemy(enemyID EntityID) {

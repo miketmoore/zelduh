@@ -40,21 +40,24 @@ type collisionEntity struct {
 	*componentRectangle
 }
 
+type OnCollisionHandlerByNameMap map[string]func(EntityID)
+
 // CollisionSystem is a custom system for detecting collisions and what to do when they occur
 type CollisionSystem struct {
-	MapBounds            pixel.Rect
-	player               collisionEntity
-	sword                collisionEntity
-	arrow                collisionEntity
-	enemies              []collisionEntity
-	coins                []collisionEntity
-	obstacles            []collisionEntity
-	moveableObstacles    []collisionEntity
-	collisionSwitches    []collisionEntity
-	warps                []collisionEntity
-	CollisionHandler     *CollisionHandler
-	ActiveSpaceRectangle ActiveSpaceRectangle
-	Win                  *pixelgl.Window
+	MapBounds                   pixel.Rect
+	player                      collisionEntity
+	sword                       collisionEntity
+	arrow                       collisionEntity
+	enemies                     []collisionEntity
+	coins                       []collisionEntity
+	obstacles                   []collisionEntity
+	moveableObstacles           []collisionEntity
+	collisionSwitches           []collisionEntity
+	warps                       []collisionEntity
+	CollisionHandler            *CollisionHandler
+	ActiveSpaceRectangle        ActiveSpaceRectangle
+	Win                         *pixelgl.Window
+	onCollisionHandlerByNameMap OnCollisionHandlerByNameMap
 }
 
 func NewCollisionSystem(
@@ -62,12 +65,14 @@ func NewCollisionSystem(
 	collisionHandler *CollisionHandler,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	win *pixelgl.Window,
+	onCollisionHandlerByNameMap OnCollisionHandlerByNameMap,
 ) CollisionSystem {
 	return CollisionSystem{
-		MapBounds:            mapBounds,
-		CollisionHandler:     collisionHandler,
-		ActiveSpaceRectangle: activeSpaceRectangle,
-		Win:                  win,
+		MapBounds:                   mapBounds,
+		CollisionHandler:            collisionHandler,
+		ActiveSpaceRectangle:        activeSpaceRectangle,
+		Win:                         win,
+		onCollisionHandlerByNameMap: onCollisionHandlerByNameMap,
 	}
 }
 
@@ -144,7 +149,6 @@ func removeAllEntities(entities []collisionEntity) {
 
 // Update checks for collisions
 func (s *CollisionSystem) Update() error {
-	// s.handlePlayerAtMapEdge()
 	s.handleEnemyCollisions()
 	s.handleCoinCollisions()
 	s.handleObstacleCollisions()
@@ -153,30 +157,6 @@ func (s *CollisionSystem) Update() error {
 	s.handleWarpCollisions()
 	return nil
 }
-
-// func (s *CollisionSystem) handlePlayerAtMapEdge() {
-// 	// DrawActiveSpace(s.Win, ActiveSpaceRectangle{
-// 	// 	X:      s.MapBounds.Min.X,
-// 	// 	Y:      s.MapBounds.Min.Y,
-// 	// 	Width:  s.MapBounds.W(),
-// 	// 	Height: s.MapBounds.H(),
-// 	// })
-// 	DrawRect(s.Win, s.MapBounds)
-// 	DrawRect(s.Win, s.player.componentRectangle.Rect)
-
-// 	player := s.player
-// 	mapBounds := s.MapBounds
-
-// 	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
-// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
-// 	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {
-// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundLeft)
-// 	} else if player.componentRectangle.Rect.Max.X >= mapBounds.Max.X {
-// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundRight)
-// 	} else if player.componentRectangle.Rect.Max.Y >= mapBounds.Max.Y {
-// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
-// 	}
-// }
 
 func (s *CollisionSystem) drawHitbox(rect pixel.Rect, radius float64) {
 
@@ -209,7 +189,8 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 			player.componentHitbox.HitBoxRadius,
 			enemy.componentHitbox.HitBoxRadius,
 			w, h, playerRect, enemyRect) {
-			s.CollisionHandler.OnPlayerCollisionWithEnemy(enemy.ID)
+			// s.CollisionHandler.OnPlayerCollisionWithEnemy(enemy.ID)
+			s.onCollisionHandlerByNameMap["playerWithEnemy"](enemy.ID)
 		}
 
 		if !enemy.componentInvincible.Enabled {

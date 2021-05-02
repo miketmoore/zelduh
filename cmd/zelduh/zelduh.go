@@ -167,6 +167,23 @@ func run() {
 		&collisionHandler,
 		activeSpaceRectangle,
 		ui.Window,
+		zelduh.OnCollisionHandlerByNameMap{
+			"playerWithEnemy": func(entityID zelduh.EntityID) {
+				// TODO repeat what I did with the enemies
+				movementSystem.MovePlayerBack()
+				healthSystem.Hit(playerID, 1)
+				// player.componentHealth.Total--
+
+				// remove heart entity
+				heartIndex := len(hearts) - 1
+				systemsManager.Remove(zelduh.CategoryHeart, hearts[heartIndex].ID())
+				hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
+
+				if healthSystem.Health(playerID) == 0 {
+					currentState = zelduh.StateOver
+				}
+			},
+		},
 	)
 
 	input := Input{window: ui.Window}

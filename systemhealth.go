@@ -45,6 +45,16 @@ func (s *HealthSystem) Hit(entityID EntityID, d int) bool {
 	return false
 }
 
+func (s *HealthSystem) Health(entityID EntityID) int {
+	for i := 0; i < len(s.entities); i++ {
+		entity := s.entities[i]
+		if entity.ID == entityID {
+			return entity.componentHealth.Total
+		}
+	}
+	return 0
+}
+
 // Update is a no-op
 func (s *HealthSystem) Update() error {
 	return nil
