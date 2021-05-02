@@ -144,7 +144,7 @@ func removeAllEntities(entities []collisionEntity) {
 
 // Update checks for collisions
 func (s *CollisionSystem) Update() error {
-	s.handlePlayerAtMapEdge()
+	// s.handlePlayerAtMapEdge()
 	s.handleEnemyCollisions()
 	s.handleCoinCollisions()
 	s.handleObstacleCollisions()
@@ -154,29 +154,29 @@ func (s *CollisionSystem) Update() error {
 	return nil
 }
 
-func (s *CollisionSystem) handlePlayerAtMapEdge() {
-	// DrawActiveSpace(s.Win, ActiveSpaceRectangle{
-	// 	X:      s.MapBounds.Min.X,
-	// 	Y:      s.MapBounds.Min.Y,
-	// 	Width:  s.MapBounds.W(),
-	// 	Height: s.MapBounds.H(),
-	// })
-	DrawRect(s.Win, s.MapBounds)
-	DrawRect(s.Win, s.player.componentRectangle.Rect)
+// func (s *CollisionSystem) handlePlayerAtMapEdge() {
+// 	// DrawActiveSpace(s.Win, ActiveSpaceRectangle{
+// 	// 	X:      s.MapBounds.Min.X,
+// 	// 	Y:      s.MapBounds.Min.Y,
+// 	// 	Width:  s.MapBounds.W(),
+// 	// 	Height: s.MapBounds.H(),
+// 	// })
+// 	DrawRect(s.Win, s.MapBounds)
+// 	DrawRect(s.Win, s.player.componentRectangle.Rect)
 
-	player := s.player
-	mapBounds := s.MapBounds
+// 	player := s.player
+// 	mapBounds := s.MapBounds
 
-	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
-		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
-	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {
-		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundLeft)
-	} else if player.componentRectangle.Rect.Max.X >= mapBounds.Max.X {
-		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundRight)
-	} else if player.componentRectangle.Rect.Max.Y >= mapBounds.Max.Y {
-		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
-	}
-}
+// 	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
+// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
+// 	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {
+// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundLeft)
+// 	} else if player.componentRectangle.Rect.Max.X >= mapBounds.Max.X {
+// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundRight)
+// 	} else if player.componentRectangle.Rect.Max.Y >= mapBounds.Max.Y {
+// 		s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
+// 	}
+// }
 
 func (s *CollisionSystem) drawHitbox(rect pixel.Rect, radius float64) {
 

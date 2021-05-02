@@ -142,6 +142,26 @@ func run() {
 		activeSpaceRectangle.Y+activeSpaceRectangle.Height,
 	)
 
+	boundsCollisionSystem := zelduh.NewBoundsCollisionSystem(
+		ui.Window,
+		mapBounds,
+		func(side zelduh.Bound) {
+			// TODO prevent room transition if no room exists on this side
+			if !roomTransition.Active && nextRoomID > 0 {
+
+				roomTransition.Active = true
+				roomTransition.Side = side
+				roomTransition.Style = zelduh.TransitionSlide
+				roomTransition.Timer = int(roomTransition.Start)
+				currentState = zelduh.StateMapTransition
+				shouldAddEntities = true
+			} else {
+				fmt.Println("ZERO")
+				movementSystem.SetZeroSpeed(playerID)
+			}
+		},
+	)
+
 	collisionSystem := zelduh.NewCollisionSystem(
 		mapBounds,
 		&collisionHandler,
@@ -219,6 +239,7 @@ func run() {
 		&movementSystem,
 		&ignoreSystem,
 		&temporarySystem,
+		&boundsCollisionSystem,
 	)
 
 	systemsManager.AddEntities(
