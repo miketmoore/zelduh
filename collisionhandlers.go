@@ -63,13 +63,18 @@ func NewCollisionHandler(
 
 // OnPlayerCollisionWithBounds handles collisions between player and bounds
 func (ch *CollisionHandler) OnPlayerCollisionWithBounds(side Bound) {
-	if !ch.RoomTransition.Active {
+	// TODO prevent room transition if no room exists on this side
+
+	if !ch.RoomTransition.Active && (*ch.NextRoomID) > 0 {
+
 		ch.RoomTransition.Active = true
 		ch.RoomTransition.Side = side
 		ch.RoomTransition.Style = TransitionSlide
 		ch.RoomTransition.Timer = int(ch.RoomTransition.Start)
 		*ch.CurrentState = StateMapTransition
 		*ch.ShouldAddEntities = true
+	} else {
+		ch.MovementSystem.SetZeroSpeed(ch.Player.ID())
 	}
 }
 
