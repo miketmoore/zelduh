@@ -80,7 +80,7 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 		// might want to remove this later... not sure if creating
 		// shapes that aren't being used increases heap memory
 		componentShape: NewComponentShape(),
-		componentColor: NewComponentColor(colornames.Sandybrown),
+		componentColor: NewComponentColor(colornames.Greenyellow),
 	}
 
 	if c.Expiration > 0 {

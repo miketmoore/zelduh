@@ -34,7 +34,7 @@ func run() {
 
 	entityConfigPresetFnManager := zelduh.NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
-	testLevel := buildTestLevel01(
+	testLevel := buildTestLevel(
 		&entityConfigPresetFnManager,
 		tileSize,
 	)
