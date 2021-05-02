@@ -240,7 +240,7 @@ func (s *RenderSystem) Update() error {
 
 	if sword.componentIgnore != nil && sword.componentIgnore.Value && arrow.componentIgnore.Value {
 		s.drawByPlayerDirection(player)
-		s.drawRectangle(player)
+		// s.drawRectangle(player)
 	} else {
 		animDataKey := swordComponentAnimationByDirection[player.componentMovement.Direction]
 		componentAnimationData, ok := getComponentAnimationByName(player, animDataKey)
@@ -344,9 +344,13 @@ func determineFrameNumber(animData *componentAnimationData) int {
 }
 
 func buildSpriteVector(componentRectangle *componentRectangle, activeSpaceRectangle ActiveSpaceRectangle) pixel.Vec {
-	vectorX := componentRectangle.Rect.Center().X + activeSpaceRectangle.X
-	vectorY := componentRectangle.Rect.Center().Y + activeSpaceRectangle.Y
-	return pixel.V(vectorX, vectorY)
+	// vectorX := componentRectangle.Rect.Center().X + activeSpaceRectangle.X
+	// vectorY := componentRectangle.Rect.Center().Y + activeSpaceRectangle.Y
+	// return pixel.V(vectorX, vectorY)
+	return pixel.V(
+		componentRectangle.Rect.Min.X+24,
+		componentRectangle.Rect.Min.Y+24,
+	)
 }
 
 func buildSpriteMatrix(rotationComponent *componentRotation, vector pixel.Vec) pixel.Matrix {
