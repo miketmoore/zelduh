@@ -240,6 +240,7 @@ func (s *RenderSystem) Update() error {
 
 	if sword.componentIgnore != nil && sword.componentIgnore.Value && arrow.componentIgnore.Value {
 		s.drawByPlayerDirection(player)
+		s.drawRectangle(player)
 	} else {
 		animDataKey := swordComponentAnimationByDirection[player.componentMovement.Direction]
 		componentAnimationData, ok := getComponentAnimationByName(player, animDataKey)
@@ -366,17 +367,9 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 	rect := entity.componentShape.Shape
 	rect.Color = entity.componentColor.Color
 
-	vectorX := s.ActiveSpaceRectangle.X + (s.TileSize * entity.componentRectangle.Rect.Min.X)
-	vectorY := s.ActiveSpaceRectangle.Y + (s.TileSize * entity.componentRectangle.Rect.Min.Y)
-	point := pixel.V(vectorX, vectorY)
+	rect.Push(entity.componentRectangle.Rect.Min)
 
-	rect.Push(point)
-
-	point2 := pixel.V(
-		point.X+(entity.componentDimensions.Width*s.TileSize),
-		point.Y+(entity.componentDimensions.Height*s.TileSize),
-	)
-	rect.Push(point2)
+	rect.Push(entity.componentRectangle.Rect.Max)
 
 	rect.Rectangle(0)
 

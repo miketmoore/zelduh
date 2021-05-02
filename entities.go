@@ -74,6 +74,13 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 			c.Dimensions.Width,
 			c.Dimensions.Height,
 		),
+
+		// Create default shape and color
+		// useful for debugging
+		// might want to remove this later... not sure if creating
+		// shapes that aren't being used increases heap memory
+		componentShape: NewComponentShape(),
+		componentColor: NewComponentColor(colornames.Sandybrown),
 	}
 
 	if c.Expiration > 0 {
@@ -132,10 +139,6 @@ func BuildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
 	// so technically it might not be an animation
 	if c.Animation != nil {
 		entity.componentAnimation = NewComponentAnimation(c.Animation, frameRate)
-	} else {
-		// If the "animation" configuration is not set, then this is not a sprite graphic
-		// instead, it is a simple shape
-		entity.componentColor = NewComponentColor(colornames.Sandybrown)
 	}
 
 	return entity
