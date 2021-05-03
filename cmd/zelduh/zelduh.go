@@ -87,7 +87,7 @@ func run() {
 
 	temporarySystem := zelduh.NewTemporarySystem()
 
-	ui := zelduh.NewUI(currLocaleMsgs, windowConfig)
+	ui := zelduh.NewUISystem(currLocaleMsgs, windowConfig)
 
 	renderSystem := zelduh.NewRenderSystem(
 		ui.Window,

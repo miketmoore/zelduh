@@ -6,7 +6,7 @@ import (
 )
 
 func GameStateGame(
-	ui UI,
+	ui UISystem,
 	roomByIDMap RoomByIDMap,
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,

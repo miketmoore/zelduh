@@ -6,7 +6,7 @@ import (
 )
 
 func GameStateOver(
-	ui UI,
+	ui UISystem,
 	currLocaleMsgs LocaleMessagesMap,
 	currentState *State,
 	activeSpaceRectangle ActiveSpaceRectangle,

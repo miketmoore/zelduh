@@ -8,7 +8,7 @@ import (
 )
 
 func GameStateMapTransition(
-	ui UI,
+	ui UISystem,
 	systemsManager *SystemsManager,
 	roomByIDMap RoomByIDMap,
 	collisionSystem *CollisionSystem,

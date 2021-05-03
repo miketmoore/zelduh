@@ -12,12 +12,12 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-type UI struct {
+type UISystem struct {
 	Window *pixelgl.Window
 	Text   *text.Text
 }
 
-func NewUI(currLocaleMsgs LocaleMessagesMap, windowConfig WindowConfig) UI {
+func NewUISystem(currLocaleMsgs LocaleMessagesMap, windowConfig WindowConfig) UISystem {
 
 	// Initialize text
 	orig := pixel.V(20, 50)
@@ -38,7 +38,7 @@ func NewUI(currLocaleMsgs LocaleMessagesMap, windowConfig WindowConfig) UI {
 		os.Exit(1)
 	}
 
-	return UI{
+	return UISystem{
 		Window: win,
 		Text:   txt,
 	}

@@ -13,7 +13,7 @@ const (
 
 type GameStateManager struct {
 	SystemsManager            *SystemsManager
-	UI                        UI
+	UI                        UISystem
 	LocaleMessages            LocaleMessagesMap
 	CollisionSystem           *CollisionSystem
 	InputSystem               *InputSystem
@@ -38,7 +38,7 @@ type GameStateManager struct {
 
 func NewGameStateManager(
 	systemsManager *SystemsManager,
-	ui UI,
+	ui UISystem,
 	localeMessages LocaleMessagesMap,
 	collisionSystem *CollisionSystem,
 	inputSystem *InputSystem,
