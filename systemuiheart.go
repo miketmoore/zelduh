@@ -1,47 +1,48 @@
 package zelduh
 
-type uiHeartEntity struct {
-	*componentHealth
-}
-
 type UIHeartSystem struct {
-	systemsManager *SystemsManager
-	player         uiHeartEntity
-	heartEntities  []Entity
-	frameRate      int
-	entityFactory  EntityFactory
+	systemsManager     *SystemsManager
+	player             Entity
+	frameRate          int
+	entityFactory      EntityFactory
+	totalHeartEntities int
 }
 
 func NewUIHeartSystem(systemsManager *SystemsManager, entityFactory EntityFactory, frameRate int) UIHeartSystem {
 	return UIHeartSystem{
-		systemsManager: systemsManager,
-		heartEntities:  []Entity{},
-		frameRate:      frameRate,
-		entityFactory:  entityFactory,
+		systemsManager:     systemsManager,
+		frameRate:          frameRate,
+		entityFactory:      entityFactory,
+		totalHeartEntities: 0,
 	}
 }
 
 // AddEntity adds an entity to the system
 func (s *UIHeartSystem) AddEntity(entity Entity) {
 	if entity.Category == CategoryPlayer {
-		s.player = uiHeartEntity{
-			componentHealth: entity.componentHealth,
-		}
+		s.player = entity
 	}
 }
 
 // Update checks for collisions
 func (s *UIHeartSystem) Update() error {
 
-	if s.player.componentHealth.Total != len(s.heartEntities) {
-		s.heartEntities = nil
+	if s.totalHeartEntities != s.player.componentHealth.Total {
+		s.totalHeartEntities = 0
 
 		x := 1.5
-		xMod := 0.65
 		y := 14.0
+
+		xDistanceBetweenHearts := 0.65
+
 		for i := 0.0; i < float64(s.player.componentHealth.Total); i++ {
-			entity := s.entityFactory.NewEntity("heart", NewCoordinates(x+(xMod*i), y), s.frameRate)
-			s.heartEntities = append(s.heartEntities, entity)
+
+			thisX := x + (xDistanceBetweenHearts * i)
+
+			entity := s.entityFactory.NewEntity("heart", NewCoordinates(thisX, y), s.frameRate)
+			s.totalHeartEntities++
+
+			// add heart entity so that it can be rendered
 			s.systemsManager.AddEntities(entity)
 		}
 	}
