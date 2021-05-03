@@ -76,11 +76,12 @@ func run() {
 	arrow := entityFactory.NewEntity("arrow", zelduh.NewCoordinates(0, 0), frameRate)
 	arrowID := arrow.ID()
 
-	hearts := []zelduh.Entity{
-		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 1.5, Y: 14}, frameRate),
-		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.15, Y: 14}, frameRate),
-		entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.80, Y: 14}, frameRate),
-	}
+	// uiHeartMod := 0.65
+	// hearts := []zelduh.Entity{
+	// 	entityFactory.NewEntity("heart", zelduh.Coordinates{X: 1.5, Y: 14}, frameRate),
+	// 	entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.15, Y: 14}, frameRate),
+	// 	entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.80, Y: 14}, frameRate),
+	// }
 
 	windowConfig := zelduh.NewWindowConfig(0, 0, 800, 800)
 
@@ -155,9 +156,9 @@ func run() {
 				// player.componentHealth.Total--
 
 				// remove heart entity
-				heartIndex := len(hearts) - 1
-				systemsManager.Remove(zelduh.CategoryHeart, hearts[heartIndex].ID())
-				hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
+				// heartIndex := len(hearts) - 1
+				// systemsManager.Remove(zelduh.CategoryHeart, hearts[heartIndex].ID())
+				// hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
 
 				if healthSystem.Health(playerID) == 0 {
 					currentState = zelduh.StateOver
@@ -326,6 +327,12 @@ func run() {
 		inputHandlers,
 	)
 
+	uiHeartSystem := zelduh.NewUIHeartSystem(
+		&systemsManager,
+		entityFactory,
+		frameRate,
+	)
+
 	systemsManager.AddSystems(
 		&inputSystem,
 		&healthSystem,
@@ -337,6 +344,7 @@ func run() {
 		&temporarySystem,
 		&boundsCollisionSystem,
 		&coinsSystem,
+		&uiHeartSystem,
 	)
 
 	systemsManager.AddEntities(
@@ -403,7 +411,7 @@ func run() {
 		&roomTransition,
 		entitiesMap,
 		&player,
-		hearts,
+		// hearts,
 		roomWarps,
 		&levelManager,
 		&entityConfigPresetFnManager,

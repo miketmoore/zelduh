@@ -12,20 +12,20 @@ const (
 )
 
 type GameStateManager struct {
-	SystemsManager              *SystemsManager
-	UI                          UI
-	LocaleMessages              LocaleMessagesMap
-	CollisionSystem             *CollisionSystem
-	InputSystem                 *InputSystem
-	ShouldAddEntities           *bool
-	CurrentRoomID, NextRoomID   *RoomID
-	CurrentState                *State
-	SpriteMap                   SpriteMap
-	MapDrawData                 MapDrawData
-	RoomTransition              *RoomTransition
-	EntitiesMap                 EntitiesMap
-	Player                      *Entity
-	Hearts                      []Entity
+	SystemsManager            *SystemsManager
+	UI                        UI
+	LocaleMessages            LocaleMessagesMap
+	CollisionSystem           *CollisionSystem
+	InputSystem               *InputSystem
+	ShouldAddEntities         *bool
+	CurrentRoomID, NextRoomID *RoomID
+	CurrentState              *State
+	SpriteMap                 SpriteMap
+	MapDrawData               MapDrawData
+	RoomTransition            *RoomTransition
+	EntitiesMap               EntitiesMap
+	Player                    *Entity
+	// Hearts                      []Entity
 	RoomWarps                   RoomWarps
 	LevelManager                *LevelManager
 	EntityConfigPresetFnManager *EntityConfigPresetFnManager
@@ -51,7 +51,7 @@ func NewGameStateManager(
 	roomTransition *RoomTransition,
 	entitiesMap EntitiesMap,
 	player *Entity,
-	hearts []Entity,
+	// hearts []Entity,
 	roomWarps RoomWarps,
 	levelManager *LevelManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
@@ -62,21 +62,21 @@ func NewGameStateManager(
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) GameStateManager {
 	return GameStateManager{
-		SystemsManager:              systemsManager,
-		UI:                          ui,
-		LocaleMessages:              localeMessages,
-		CollisionSystem:             collisionSystem,
-		InputSystem:                 inputSystem,
-		ShouldAddEntities:           shouldAddEntities,
-		CurrentRoomID:               currentRoomID,
-		NextRoomID:                  nextRoomID,
-		CurrentState:                currentState,
-		SpriteMap:                   spriteMap,
-		MapDrawData:                 mapDrawData,
-		RoomTransition:              roomTransition,
-		EntitiesMap:                 entitiesMap,
-		Player:                      player,
-		Hearts:                      hearts,
+		SystemsManager:    systemsManager,
+		UI:                ui,
+		LocaleMessages:    localeMessages,
+		CollisionSystem:   collisionSystem,
+		InputSystem:       inputSystem,
+		ShouldAddEntities: shouldAddEntities,
+		CurrentRoomID:     currentRoomID,
+		NextRoomID:        nextRoomID,
+		CurrentState:      currentState,
+		SpriteMap:         spriteMap,
+		MapDrawData:       mapDrawData,
+		RoomTransition:    roomTransition,
+		EntitiesMap:       entitiesMap,
+		Player:            player,
+		// Hearts:                      hearts,
 		RoomWarps:                   roomWarps,
 		LevelManager:                levelManager,
 		EntityConfigPresetFnManager: entityConfigPresetFnManager,
@@ -106,7 +106,7 @@ func (g *GameStateManager) Update() error {
 			g.MapDrawData,
 			g.EntitiesMap,
 			g.Player,
-			g.Hearts,
+			// g.Hearts,
 			g.RoomWarps,
 			g.EntityConfigPresetFnManager,
 			g.TileSize,
