@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -67,7 +65,6 @@ func (s *BoundsCollisionSystem) handlePlayerAtMapEdge() {
 	mapBounds := s.mapBounds
 
 	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
-		fmt.Println("BOTTOM")
 		s.onPlayerCollisionWithBounds(BoundBottom)
 		// s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
 	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {

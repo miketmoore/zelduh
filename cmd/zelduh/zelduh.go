@@ -134,7 +134,6 @@ func run() {
 				currentState = zelduh.StateMapTransition
 				shouldAddEntities = true
 			} else {
-				fmt.Println("ZERO")
 				movementSystem.SetZeroSpeed(playerID)
 			}
 		},
