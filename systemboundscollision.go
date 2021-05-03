@@ -66,15 +66,11 @@ func (s *BoundsCollisionSystem) handlePlayerAtMapEdge() {
 
 	if player.componentRectangle.Rect.Min.Y <= mapBounds.Min.Y {
 		s.onPlayerCollisionWithBounds(BoundBottom)
-		// s.CollisionHandler.OnPlayerCollisionWithBounds(BoundBottom)
 	} else if player.componentRectangle.Rect.Min.X <= mapBounds.Min.X {
 		s.onPlayerCollisionWithBounds(BoundLeft)
-		// s.CollisionHandler.OnPlayerCollisionWithBounds(BoundLeft)
 	} else if player.componentRectangle.Rect.Max.X >= mapBounds.Max.X {
 		s.onPlayerCollisionWithBounds(BoundRight)
-		// s.CollisionHandler.OnPlayerCollisionWithBounds(BoundRight)
 	} else if player.componentRectangle.Rect.Max.Y >= mapBounds.Max.Y {
 		s.onPlayerCollisionWithBounds(BoundTop)
-		// s.CollisionHandler.OnPlayerCollisionWithBounds(BoundTop)
 	}
 }
