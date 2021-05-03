@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -186,7 +188,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 			player.componentHitbox.HitBoxRadius,
 			enemy.componentHitbox.HitBoxRadius,
 			w, h, playerRect, enemyRect) {
-			s.onCollisionHandlerByNameMap["playerWithEnemy"](enemy.ID)
+			s.callHandler("playerWithEnemy", enemy.ID)
 		}
 
 		if !enemy.componentInvincible.Enabled {
@@ -196,7 +198,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.sword.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
 				w, h, s.sword.componentRectangle.Rect, enemyRect) {
-				s.onCollisionHandlerByNameMap["swordWithEnemy"](enemy.ID)
+				s.callHandler("swordWithEnemy", enemy.ID)
 			}
 
 			// Check if the player arrow is colliding with the enemy
@@ -204,7 +206,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.arrow.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
 				w, h, s.arrow.componentRectangle.Rect, enemyRect) {
-				s.onCollisionHandlerByNameMap["arrowWithEnemy"](enemy.ID)
+				s.callHandler("arrowWithEnemy", enemy.ID)
 			}
 		}
 	}
@@ -213,7 +215,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 func (s *CollisionSystem) handleCoinCollisions() {
 	for _, coin := range s.coins {
 		if isColliding(coin.componentRectangle.Rect, s.player.componentRectangle.Rect) {
-			s.onCollisionHandlerByNameMap["playerWithCoin"](coin.ID)
+			s.callHandler("playerWithCoin", coin.ID)
 		}
 	}
 }
@@ -229,7 +231,7 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 			s.player.componentRectangle.Rect.Max.X-mod,
 			s.player.componentRectangle.Rect.Max.Y-mod,
 		)) {
-			s.onCollisionHandlerByNameMap["playerWithObstacle"](obstacle.ID)
+			s.callHandler("playerWithObstacle", obstacle.ID)
 		}
 
 		for _, enemy := range s.enemies {
@@ -240,13 +242,22 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 				enemy.componentRectangle.Rect.Max.X-mod,
 				enemy.componentRectangle.Rect.Max.Y-mod,
 			)) {
-				s.onCollisionHandlerByNameMap["enemyWithObstacle"](enemy.ID)
+				s.callHandler("enemyWithObstacle", enemy.ID)
 			}
 		}
 
 		if isColliding(obstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
-			s.onCollisionHandlerByNameMap["arrowWithObstacle"](s.arrow.ID)
+			s.callHandler("arrowWithObstacle", s.arrow.ID)
 		}
+	}
+}
+
+func (s *CollisionSystem) callHandler(handlerName string, entityID EntityID) {
+	fn, ok := s.onCollisionHandlerByNameMap[handlerName]
+	if ok {
+		fn(entityID)
+	} else {
+		fmt.Printf("WARNING could not find collision handler by name=%s", handlerName)
 	}
 }
 
@@ -256,14 +267,14 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.componentRectangle.Rect, player.componentRectangle.Rect) {
-			s.onCollisionHandlerByNameMap["playerWithMoveableObstacle"](moveableObstacle.ID)
+			s.callHandler("playerWithMoveableObstacle", moveableObstacle.ID)
 		}
 
 		for _, collisionSwitch := range s.collisionSwitches {
 			if isColliding(moveableObstacle.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
-				s.onCollisionHandlerByNameMap["moveableObstacleWithSwitch"](collisionSwitch.ID)
+				s.callHandler("moveableObstacleWithSwitch", collisionSwitch.ID)
 			} else {
-				s.onCollisionHandlerByNameMap["moveableObstacleWithSwitchNoCollision"](collisionSwitch.ID)
+				s.callHandler("moveableObstacleWithSwitchNoCollision", collisionSwitch.ID)
 			}
 		}
 
@@ -280,7 +291,7 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 		// }
 
 		if isColliding(moveableObstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
-			s.onCollisionHandlerByNameMap["arrowWithObstacle"](s.arrow.ID)
+			s.callHandler("arrowWithObstacle", s.arrow.ID)
 		}
 	}
 }
@@ -296,15 +307,15 @@ func (s *CollisionSystem) handleSwitchCollisions() {
 				s.player.componentHitbox.HitBoxRadius,
 				collisionSwitch.componentHitbox.HitBoxRadius,
 				w, h, player.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
-				s.onCollisionHandlerByNameMap["playerWithSwitch"](collisionSwitch.ID)
+				s.callHandler("playerWithSwitch", collisionSwitch.ID)
 			} else {
-				s.onCollisionHandlerByNameMap["playerWithSwitchNoCollision"](collisionSwitch.ID)
+				s.callHandler("playerWithSwitchNoCollision", collisionSwitch.ID)
 			}
 		} else {
 			if isColliding(player.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
-				s.onCollisionHandlerByNameMap["playerWithSwitch"](collisionSwitch.ID)
+				s.callHandler("playerWithSwitch", collisionSwitch.ID)
 			} else {
-				s.onCollisionHandlerByNameMap["playerWithSwitchNoCollision"](collisionSwitch.ID)
+				s.callHandler("playerWithSwitchNoCollision", collisionSwitch.ID)
 			}
 		}
 
@@ -317,8 +328,7 @@ func (s *CollisionSystem) handleWarpCollisions() {
 
 	for _, warp := range s.warps {
 		if isColliding(player.componentRectangle.Rect, warp.componentRectangle.Rect) {
-			// s.CollisionHandler.OnPlayerCollisionWithWarp(warp.ID)
-			s.onCollisionHandlerByNameMap["playerWithWarp"](warp.ID)
+			s.callHandler("playerWithWarp", warp.ID)
 		}
 	}
 }
