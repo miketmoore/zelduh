@@ -54,7 +54,6 @@ type CollisionSystem struct {
 	moveableObstacles           []collisionEntity
 	collisionSwitches           []collisionEntity
 	warps                       []collisionEntity
-	CollisionHandler            *CollisionHandler
 	ActiveSpaceRectangle        ActiveSpaceRectangle
 	Win                         *pixelgl.Window
 	onCollisionHandlerByNameMap OnCollisionHandlerByNameMap
@@ -62,14 +61,12 @@ type CollisionSystem struct {
 
 func NewCollisionSystem(
 	mapBounds pixel.Rect,
-	collisionHandler *CollisionHandler,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	win *pixelgl.Window,
 	onCollisionHandlerByNameMap OnCollisionHandlerByNameMap,
 ) CollisionSystem {
 	return CollisionSystem{
 		MapBounds:                   mapBounds,
-		CollisionHandler:            collisionHandler,
 		ActiveSpaceRectangle:        activeSpaceRectangle,
 		Win:                         win,
 		onCollisionHandlerByNameMap: onCollisionHandlerByNameMap,
@@ -189,7 +186,6 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 			player.componentHitbox.HitBoxRadius,
 			enemy.componentHitbox.HitBoxRadius,
 			w, h, playerRect, enemyRect) {
-			// s.CollisionHandler.OnPlayerCollisionWithEnemy(enemy.ID)
 			s.onCollisionHandlerByNameMap["playerWithEnemy"](enemy.ID)
 		}
 
@@ -200,7 +196,6 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.sword.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
 				w, h, s.sword.componentRectangle.Rect, enemyRect) {
-				// s.CollisionHandler.OnSwordCollisionWithEnemy(enemy.ID)
 				s.onCollisionHandlerByNameMap["swordWithEnemy"](enemy.ID)
 			}
 
@@ -209,7 +204,6 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.arrow.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
 				w, h, s.arrow.componentRectangle.Rect, enemyRect) {
-				// s.CollisionHandler.OnArrowCollisionWithEnemy(enemy.ID)
 				s.onCollisionHandlerByNameMap["arrowWithEnemy"](enemy.ID)
 			}
 		}
@@ -219,7 +213,6 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 func (s *CollisionSystem) handleCoinCollisions() {
 	for _, coin := range s.coins {
 		if isColliding(coin.componentRectangle.Rect, s.player.componentRectangle.Rect) {
-			// s.CollisionHandler.OnPlayerCollisionWithCoin(coin.ID)
 			s.onCollisionHandlerByNameMap["playerWithCoin"](coin.ID)
 		}
 	}
@@ -236,7 +229,6 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 			s.player.componentRectangle.Rect.Max.X-mod,
 			s.player.componentRectangle.Rect.Max.Y-mod,
 		)) {
-			// s.CollisionHandler.OnPlayerCollisionWithObstacle(obstacle.ID)
 			s.onCollisionHandlerByNameMap["playerWithObstacle"](obstacle.ID)
 		}
 
@@ -248,12 +240,11 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 				enemy.componentRectangle.Rect.Max.X-mod,
 				enemy.componentRectangle.Rect.Max.Y-mod,
 			)) {
-				s.CollisionHandler.OnEnemyCollisionWithObstacle(enemy.ID, obstacle.ID)
+				s.onCollisionHandlerByNameMap["enemyWithObstacle"](enemy.ID)
 			}
 		}
 
 		if isColliding(obstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
-			// s.CollisionHandler.OnArrowCollisionWithObstacle()
 			s.onCollisionHandlerByNameMap["arrowWithObstacle"](s.arrow.ID)
 		}
 	}
@@ -265,15 +256,14 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.componentRectangle.Rect, player.componentRectangle.Rect) {
-			// s.CollisionHandler.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
 			s.onCollisionHandlerByNameMap["playerWithMoveableObstacle"](moveableObstacle.ID)
 		}
 
 		for _, collisionSwitch := range s.collisionSwitches {
 			if isColliding(moveableObstacle.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
-				s.CollisionHandler.OnMoveableObstacleCollisionWithSwitch(collisionSwitch.ID)
+				s.onCollisionHandlerByNameMap["moveableObstacleWithSwitch"](collisionSwitch.ID)
 			} else {
-				s.CollisionHandler.OnMoveableObstacleNoCollisionWithSwitch(collisionSwitch.ID)
+				s.onCollisionHandlerByNameMap["moveableObstacleWithSwitchNoCollision"](collisionSwitch.ID)
 			}
 		}
 
@@ -290,7 +280,6 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 		// }
 
 		if isColliding(moveableObstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
-			// s.CollisionHandler.OnArrowCollisionWithObstacle()
 			s.onCollisionHandlerByNameMap["arrowWithObstacle"](s.arrow.ID)
 		}
 	}
@@ -307,15 +296,15 @@ func (s *CollisionSystem) handleSwitchCollisions() {
 				s.player.componentHitbox.HitBoxRadius,
 				collisionSwitch.componentHitbox.HitBoxRadius,
 				w, h, player.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
-				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
+				s.onCollisionHandlerByNameMap["playerWithSwitch"](collisionSwitch.ID)
 			} else {
-				s.CollisionHandler.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
+				s.onCollisionHandlerByNameMap["playerWithSwitchNoCollision"](collisionSwitch.ID)
 			}
 		} else {
 			if isColliding(player.componentRectangle.Rect, collisionSwitch.componentRectangle.Rect) {
-				s.CollisionHandler.OnPlayerCollisionWithSwitch(collisionSwitch.ID)
+				s.onCollisionHandlerByNameMap["playerWithSwitch"](collisionSwitch.ID)
 			} else {
-				s.CollisionHandler.OnPlayerNoCollisionWithSwitch(collisionSwitch.ID)
+				s.onCollisionHandlerByNameMap["playerWithSwitchNoCollision"](collisionSwitch.ID)
 			}
 		}
 
@@ -328,7 +317,8 @@ func (s *CollisionSystem) handleWarpCollisions() {
 
 	for _, warp := range s.warps {
 		if isColliding(player.componentRectangle.Rect, warp.componentRectangle.Rect) {
-			s.CollisionHandler.OnPlayerCollisionWithWarp(warp.ID)
+			// s.CollisionHandler.OnPlayerCollisionWithWarp(warp.ID)
+			s.onCollisionHandlerByNameMap["playerWithWarp"](warp.ID)
 		}
 	}
 }

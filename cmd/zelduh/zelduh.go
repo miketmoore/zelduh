@@ -68,7 +68,7 @@ func run() {
 	playerID := player.ID()
 
 	bomb := entityFactory.NewEntity("bomb", zelduh.NewCoordinates(0, 0), frameRate)
-	explosion := entityFactory.NewEntity("explosion", zelduh.NewCoordinates(0, 0), frameRate)
+	// explosion := entityFactory.NewEntity("explosion", zelduh.NewCoordinates(0, 0), frameRate)
 
 	sword := entityFactory.NewEntity("sword", zelduh.NewCoordinates(0, 0), frameRate)
 	swordID := sword.ID()
@@ -113,28 +113,6 @@ func run() {
 		frameRate,
 	)
 
-	collisionHandler := zelduh.NewCollisionHandler(
-		&systemsManager,
-		&movementSystem,
-		&healthSystem,
-		&temporarySystem,
-		&entityCreator,
-		&shouldAddEntities,
-		&nextRoomID,
-		&currentState,
-		&roomTransition,
-		entitiesMap,
-		&player,
-		&sword,
-		&explosion,
-		&arrow,
-		hearts,
-		roomWarps,
-		&entityConfigPresetFnManager,
-		tileSize,
-		frameRate,
-	)
-
 	mapBounds := pixel.R(
 		activeSpaceRectangle.X,
 		activeSpaceRectangle.Y,
@@ -163,12 +141,11 @@ func run() {
 	)
 
 	ignoreSystem := zelduh.NewIgnoreSystem()
-
 	coinsSystem := zelduh.NewCoinsSystem()
+	toggleSystem := zelduh.NewToggleSystem()
 
 	collisionSystem := zelduh.NewCollisionSystem(
 		mapBounds,
-		&collisionHandler,
 		activeSpaceRectangle,
 		ui.Window,
 		zelduh.OnCollisionHandlerByNameMap{
@@ -247,6 +224,45 @@ func run() {
 				moved := movementSystem.MoveMoveableObstacle(moveableObstacleID, playerDirection)
 				if !moved {
 					movementSystem.UsePreviousRectangle(player.ID())
+				}
+			},
+			"moveableObstacleWithSwitch": func(collisionSwitchID zelduh.EntityID) {
+				entity, ok := entitiesMap[collisionSwitchID]
+				if ok && !toggleSystem.Enabled(entity.ID()) {
+					toggleSystem.Toggle(entity.ID())
+				}
+			},
+			"moveableObstacleWithSwitchNoCollision": func(collisionSwitchID zelduh.EntityID) {
+				entity, ok := entitiesMap[collisionSwitchID]
+				if ok && toggleSystem.Enabled(entity.ID()) {
+					toggleSystem.Toggle(entity.ID())
+				}
+			},
+			"playerWithSwitch": func(collisionSwitchID zelduh.EntityID) {
+				entity, ok := entitiesMap[collisionSwitchID]
+				if ok && !toggleSystem.Enabled(entity.ID()) {
+					toggleSystem.Toggle(entity.ID())
+				}
+			},
+			"playerWithSwitchNoCollision": func(collisionSwitchID zelduh.EntityID) {
+				entity, ok := entitiesMap[collisionSwitchID]
+				if ok && toggleSystem.Enabled(entity.ID()) {
+					toggleSystem.Toggle(entity.ID())
+				}
+			},
+			"enemyWithObstacle": func(enemyEntityID zelduh.EntityID) {
+				// Block enemy within the spatial system by reseting current rect to previous rect
+				movementSystem.UndoEnemyRect(enemyEntityID)
+			},
+			"playerWithWarp": func(warpID zelduh.EntityID) {
+				entityConfig, ok := roomWarps[warpID]
+				if ok && !roomTransition.Active {
+					roomTransition.Active = true
+					roomTransition.Style = zelduh.TransitionWarp
+					roomTransition.Timer = 1
+					currentState = zelduh.StateMapTransition
+					shouldAddEntities = true
+					nextRoomID = entityConfig.WarpToRoomID
 				}
 			},
 		},
