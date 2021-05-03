@@ -76,13 +76,6 @@ func run() {
 	arrow := entityFactory.NewEntity("arrow", zelduh.NewCoordinates(0, 0), frameRate)
 	arrowID := arrow.ID()
 
-	// uiHeartMod := 0.65
-	// hearts := []zelduh.Entity{
-	// 	entityFactory.NewEntity("heart", zelduh.Coordinates{X: 1.5, Y: 14}, frameRate),
-	// 	entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.15, Y: 14}, frameRate),
-	// 	entityFactory.NewEntity("heart", zelduh.Coordinates{X: 2.80, Y: 14}, frameRate),
-	// }
-
 	windowConfig := zelduh.NewWindowConfig(0, 0, 800, 800)
 
 	activeSpaceRectangle := zelduh.NewActiveSpaceRectangle(0, 0, tileSize*14, tileSize*12)
@@ -153,12 +146,6 @@ func run() {
 				// TODO repeat what I did with the enemies
 				movementSystem.MovePlayerBack()
 				healthSystem.Hit(playerID, 1)
-				// player.componentHealth.Total--
-
-				// remove heart entity
-				// heartIndex := len(hearts) - 1
-				// systemsManager.Remove(zelduh.CategoryHeart, hearts[heartIndex].ID())
-				// hearts = append(hearts[:heartIndex], hearts[heartIndex+1:]...)
 
 				if healthSystem.Health(playerID) == 0 {
 					currentState = zelduh.StateOver
@@ -411,7 +398,6 @@ func run() {
 		&roomTransition,
 		entitiesMap,
 		&player,
-		// hearts,
 		roomWarps,
 		&levelManager,
 		&entityConfigPresetFnManager,

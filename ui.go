@@ -100,17 +100,6 @@ func AddUICoin(systemsManager *SystemsManager, entityConfigPresetFnManager *Enti
 	systemsManager.AddEntity(coin)
 }
 
-// make sure only correct number of hearts exists in systems
-// so, if health is reduced, need to remove a heart entity from the systems,
-// the correct one... last one
-func AddUIHearts(systemsManager *SystemsManager, hearts []Entity, health int) {
-	for i, entity := range hearts {
-		if i < health {
-			systemsManager.AddEntity(entity)
-		}
-	}
-}
-
 func DrawObstaclesPerMapTiles(
 	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,

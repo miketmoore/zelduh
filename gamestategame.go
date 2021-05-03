@@ -17,7 +17,6 @@ func GameStateGame(
 	mapDrawData MapDrawData,
 	entitiesMap EntitiesMap,
 	player *Entity,
-	// hearts []Entity,
 	roomWarps RoomWarps,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
@@ -43,7 +42,6 @@ func GameStateGame(
 
 	if *shouldAddEntities {
 		*shouldAddEntities = false
-		// AddUIHearts(systemsManager, hearts, player.componentHealth.Total)
 
 		AddUICoin(systemsManager, entityConfigPresetFnManager, frameRate)
 
