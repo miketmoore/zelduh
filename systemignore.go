@@ -54,3 +54,11 @@ func (s *IgnoreSystem) DoNotIgnore(entityID EntityID) {
 		entity.componentIgnore.Value = false
 	}
 }
+
+func (s *IgnoreSystem) IsCurrentlyIgnored(entityID EntityID) bool {
+	entity, ok := s.entityByID[entityID]
+	if ok {
+		return entity.componentIgnore.Value
+	}
+	return false
+}

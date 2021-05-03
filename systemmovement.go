@@ -1,6 +1,7 @@
 package zelduh
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/faiface/pixel"
@@ -150,6 +151,22 @@ func (s *MovementSystem) RemoveAll(category EntityCategory) {
 			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
 		}
 	}
+}
+
+func (s *MovementSystem) UsePreviousRectangle(entityID EntityID) {
+	entity, ok := s.entityByID[entityID]
+	if ok {
+		entity.componentRectangle.Rect = entity.componentRectangle.PrevRect
+	}
+}
+
+func (s *MovementSystem) Direction(entityID EntityID) (Direction, error) {
+	entity, ok := s.entityByID[entityID]
+	if ok {
+		return entity.componentMovement.Direction, nil
+	}
+	// not 100% confident about this
+	return DirectionUp, fmt.Errorf("entity not found by ID=%d", entityID)
 }
 
 // MovePlayerBack moves the player back

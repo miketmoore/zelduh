@@ -162,6 +162,10 @@ func run() {
 		},
 	)
 
+	ignoreSystem := zelduh.NewIgnoreSystem()
+
+	coinsSystem := zelduh.NewCoinsSystem()
+
 	collisionSystem := zelduh.NewCollisionSystem(
 		mapBounds,
 		&collisionHandler,
@@ -183,12 +187,72 @@ func run() {
 					currentState = zelduh.StateOver
 				}
 			},
+			"playerWithCoin": func(coinEntityID zelduh.EntityID) {
+				coinsSystem.AddCoins(player.ID(), 1)
+				systemsManager.Remove(zelduh.CategoryCoin, coinEntityID)
+			},
+			"swordWithEnemy": func(enemyEntityID zelduh.EntityID) {
+				if !ignoreSystem.IsCurrentlyIgnored(sword.ID()) {
+					// if !sword.componentIgnore.Value {
+					dead := false
+					if !movementSystem.EnemyMovingFromHit(enemyEntityID) {
+						dead = healthSystem.Hit(enemyEntityID, 1)
+						if dead {
+							entityCreator.CreateExplosion(enemyEntityID)
+							systemsManager.RemoveEnemy(enemyEntityID)
+						} else {
+							playerDirection, err := movementSystem.Direction(player.ID())
+							if err != nil {
+								fmt.Println("Error: ", err)
+								os.Exit(0)
+							}
+							movementSystem.MoveEnemyBack(enemyEntityID, playerDirection)
+						}
+					}
+
+				}
+			},
+			"arrowWithEnemy": func(enemyEntityID zelduh.EntityID) {
+				if !ignoreSystem.IsCurrentlyIgnored(arrow.ID()) {
+					dead := healthSystem.Hit(enemyEntityID, 1)
+					// arrow.componentIgnore.Value = true
+					ignoreSystem.Ignore(arrow.ID())
+					if dead {
+						entityCreator.CreateExplosion(enemyEntityID)
+						systemsManager.RemoveEnemy(enemyEntityID)
+					} else {
+						playerDirection, err := movementSystem.Direction(player.ID())
+						if err != nil {
+							fmt.Println("Error: ", err)
+							os.Exit(0)
+						}
+						movementSystem.MoveEnemyBack(enemyEntityID, playerDirection)
+					}
+				}
+			},
+			"arrowWithObstacle": func(arrowID zelduh.EntityID) {
+				movementSystem.SetRemainingMoves(arrowID, 0)
+			},
+			"playerWithObstacle": func(obstacleID zelduh.EntityID) {
+				// "Block" by undoing rect
+				movementSystem.UsePreviousRectangle(player.ID())
+				movementSystem.UsePreviousRectangle(sword.ID())
+			},
+			"playerWithMoveableObstacle": func(moveableObstacleID zelduh.EntityID) {
+				playerDirection, err := movementSystem.Direction(player.ID())
+				if err != nil {
+					fmt.Println("Error: ", err)
+					os.Exit(0)
+				}
+				moved := movementSystem.MoveMoveableObstacle(moveableObstacleID, playerDirection)
+				if !moved {
+					movementSystem.UsePreviousRectangle(player.ID())
+				}
+			},
 		},
 	)
 
 	input := Input{window: ui.Window}
-
-	ignoreSystem := zelduh.NewIgnoreSystem()
 
 	inputHandlers := zelduh.InputHandlers{
 		OnUp: func() {
@@ -257,6 +321,7 @@ func run() {
 		&ignoreSystem,
 		&temporarySystem,
 		&boundsCollisionSystem,
+		&coinsSystem,
 	)
 
 	systemsManager.AddEntities(

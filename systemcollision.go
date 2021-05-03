@@ -200,7 +200,8 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.sword.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
 				w, h, s.sword.componentRectangle.Rect, enemyRect) {
-				s.CollisionHandler.OnSwordCollisionWithEnemy(enemy.ID)
+				// s.CollisionHandler.OnSwordCollisionWithEnemy(enemy.ID)
+				s.onCollisionHandlerByNameMap["swordWithEnemy"](enemy.ID)
 			}
 
 			// Check if the player arrow is colliding with the enemy
@@ -208,7 +209,8 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 				s.arrow.componentHitbox.HitBoxRadius,
 				enemy.componentHitbox.HitBoxRadius,
 				w, h, s.arrow.componentRectangle.Rect, enemyRect) {
-				s.CollisionHandler.OnArrowCollisionWithEnemy(enemy.ID)
+				// s.CollisionHandler.OnArrowCollisionWithEnemy(enemy.ID)
+				s.onCollisionHandlerByNameMap["arrowWithEnemy"](enemy.ID)
 			}
 		}
 	}
@@ -217,7 +219,8 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 func (s *CollisionSystem) handleCoinCollisions() {
 	for _, coin := range s.coins {
 		if isColliding(coin.componentRectangle.Rect, s.player.componentRectangle.Rect) {
-			s.CollisionHandler.OnPlayerCollisionWithCoin(coin.ID)
+			// s.CollisionHandler.OnPlayerCollisionWithCoin(coin.ID)
+			s.onCollisionHandlerByNameMap["playerWithCoin"](coin.ID)
 		}
 	}
 }
@@ -233,7 +236,8 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 			s.player.componentRectangle.Rect.Max.X-mod,
 			s.player.componentRectangle.Rect.Max.Y-mod,
 		)) {
-			s.CollisionHandler.OnPlayerCollisionWithObstacle(obstacle.ID)
+			// s.CollisionHandler.OnPlayerCollisionWithObstacle(obstacle.ID)
+			s.onCollisionHandlerByNameMap["playerWithObstacle"](obstacle.ID)
 		}
 
 		for _, enemy := range s.enemies {
@@ -249,7 +253,8 @@ func (s *CollisionSystem) handleObstacleCollisions() {
 		}
 
 		if isColliding(obstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
-			s.CollisionHandler.OnArrowCollisionWithObstacle()
+			// s.CollisionHandler.OnArrowCollisionWithObstacle()
+			s.onCollisionHandlerByNameMap["arrowWithObstacle"](s.arrow.ID)
 		}
 	}
 }
@@ -260,7 +265,8 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 
 	for _, moveableObstacle := range s.moveableObstacles {
 		if isColliding(moveableObstacle.componentRectangle.Rect, player.componentRectangle.Rect) {
-			s.CollisionHandler.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
+			// s.CollisionHandler.OnPlayerCollisionWithMoveableObstacle(moveableObstacle.ID)
+			s.onCollisionHandlerByNameMap["playerWithMoveableObstacle"](moveableObstacle.ID)
 		}
 
 		for _, collisionSwitch := range s.collisionSwitches {
@@ -284,7 +290,8 @@ func (s *CollisionSystem) handleMoveableObstacleCollisions() {
 		// }
 
 		if isColliding(moveableObstacle.componentRectangle.Rect, s.arrow.componentRectangle.Rect) {
-			s.CollisionHandler.OnArrowCollisionWithObstacle()
+			// s.CollisionHandler.OnArrowCollisionWithObstacle()
+			s.onCollisionHandlerByNameMap["arrowWithObstacle"](s.arrow.ID)
 		}
 	}
 }
