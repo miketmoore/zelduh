@@ -113,9 +113,9 @@ func (g *GameStateManager) Update() error {
 			g.ActiveSpaceRectangle,
 		)
 	case StatePause:
-		err = GameStatePause(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
+		err = GameStatePause(g.UI, g.LocaleMessages, g.CurrentState)
 	case StateOver:
-		err = GameStateOver(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
+		err = GameStateOver(g.UI, g.LocaleMessages, g.CurrentState)
 	case StateMapTransition:
 		err = GameStateMapTransition(
 			g.UI,

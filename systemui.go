@@ -53,11 +53,11 @@ func NewUISystem(
 	}
 }
 
-func DrawCenterText(win *pixelgl.Window, txt *text.Text, s string, c color.RGBA) {
+func (s *UISystem) DrawCenterText(txt *text.Text, str string, c color.RGBA) {
 	txt.Clear()
 	txt.Color = c
-	fmt.Fprintln(txt, s)
-	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
+	fmt.Fprintln(txt, str)
+	txt.Draw(s.Window, pixel.IM.Moved(s.Window.Bounds().Center().Sub(txt.Bounds().Center())))
 }
 
 func (s *UISystem) DrawMapBackground(color color.Color) {
@@ -72,7 +72,7 @@ func (s *UISystem) DrawMapBackground(color color.Color) {
 func (s *UISystem) DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, activeSpaceRectangle ActiveSpaceRectangle) {
 	win.Clear(colornames.Darkgray)
 	s.DrawMapBackground(colornames.White)
-	DrawCenterText(win, txt, currLocaleMsgs["gameTitle"], colornames.Black)
+	s.DrawCenterText(txt, currLocaleMsgs["gameTitle"], colornames.Black)
 }
 
 func (s *UISystem) DrawMapBackgroundImage(
