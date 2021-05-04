@@ -16,12 +16,14 @@ type UISystem struct {
 	Window               *pixelgl.Window
 	Text                 *text.Text
 	activeSpaceRectangle ActiveSpaceRectangle
+	spriteMap            SpriteMap
 }
 
 func NewUISystem(
 	currLocaleMsgs LocaleMessagesMap,
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
+	spriteMap SpriteMap,
 ) UISystem {
 
 	// Initialize text
@@ -47,6 +49,7 @@ func NewUISystem(
 		Window:               win,
 		Text:                 txt,
 		activeSpaceRectangle: activeSpaceRectangle,
+		spriteMap:            spriteMap,
 	}
 }
 
@@ -72,9 +75,7 @@ func (s *UISystem) DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLoca
 	DrawCenterText(win, txt, currLocaleMsgs["gameTitle"], colornames.Black)
 }
 
-func DrawMapBackgroundImage(
-	win *pixelgl.Window,
-	spriteMap SpriteMap,
+func (s *UISystem) DrawMapBackgroundImage(
 	mapDrawData MapDrawData,
 	name RoomName,
 	modX, modY float64,
@@ -85,7 +86,7 @@ func DrawMapBackgroundImage(
 	d := mapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
-			sprite := spriteMap[spriteData.SpriteID]
+			sprite := s.spriteMap[spriteData.SpriteID]
 
 			vec := spriteData.Rect.Min
 
@@ -94,7 +95,7 @@ func DrawMapBackgroundImage(
 				vec.Y+activeSpaceRectangle.Y+modY+tileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
-			sprite.Draw(win, matrix)
+			sprite.Draw(s.Window, matrix)
 		}
 	}
 }

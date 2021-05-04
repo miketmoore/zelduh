@@ -126,7 +126,6 @@ func (g *GameStateManager) Update() error {
 			g.CurrentRoomID,
 			g.NextRoomID,
 			g.CurrentState,
-			g.SpriteMap,
 			g.MapDrawData,
 			g.RoomTransition,
 			g.Player,

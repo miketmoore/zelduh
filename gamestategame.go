@@ -30,9 +30,7 @@ func GameStateGame(
 	ui.Window.Clear(colornames.Darkgray)
 	ui.DrawMapBackground(colornames.White)
 
-	DrawMapBackgroundImage(
-		ui.Window,
-		spriteMap,
+	ui.DrawMapBackgroundImage(
 		mapDrawData,
 		roomByIDMap[*currentRoomID].Name,
 		0, 0,

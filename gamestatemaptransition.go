@@ -16,7 +16,6 @@ func GameStateMapTransition(
 	currentRoomID *RoomID,
 	nextRoomID *RoomID,
 	currentState *State,
-	spriteMap SpriteMap,
 	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
 	player *Entity,
@@ -55,9 +54,7 @@ func GameStateMapTransition(
 		if !currentRoomOk {
 			return fmt.Errorf("current room not found by ID=%d", *currentRoomID)
 		}
-		DrawMapBackgroundImage(
-			ui.Window,
-			spriteMap,
+		ui.DrawMapBackgroundImage(
 			mapDrawData,
 			currentRoom.Name,
 			transitionRoomResp.modX,
@@ -73,9 +70,7 @@ func GameStateMapTransition(
 		if !nextRoomOk {
 			return fmt.Errorf("next room not found by ID=%d", *nextRoomID)
 		}
-		DrawMapBackgroundImage(
-			ui.Window,
-			spriteMap,
+		ui.DrawMapBackgroundImage(
 			mapDrawData,
 			nextRoom.Name,
 			transitionRoomResp.modXNext,

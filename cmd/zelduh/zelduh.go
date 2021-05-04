@@ -91,6 +91,7 @@ func run() {
 		currLocaleMsgs,
 		windowConfig,
 		activeSpaceRectangle,
+		spriteMap,
 	)
 
 	renderSystem := zelduh.NewRenderSystem(
