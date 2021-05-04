@@ -13,11 +13,16 @@ import (
 )
 
 type UISystem struct {
-	Window *pixelgl.Window
-	Text   *text.Text
+	Window               *pixelgl.Window
+	Text                 *text.Text
+	activeSpaceRectangle ActiveSpaceRectangle
 }
 
-func NewUISystem(currLocaleMsgs LocaleMessagesMap, windowConfig WindowConfig) UISystem {
+func NewUISystem(
+	currLocaleMsgs LocaleMessagesMap,
+	windowConfig WindowConfig,
+	activeSpaceRectangle ActiveSpaceRectangle,
+) UISystem {
 
 	// Initialize text
 	orig := pixel.V(20, 50)
@@ -39,8 +44,9 @@ func NewUISystem(currLocaleMsgs LocaleMessagesMap, windowConfig WindowConfig) UI
 	}
 
 	return UISystem{
-		Window: win,
-		Text:   txt,
+		Window:               win,
+		Text:                 txt,
+		activeSpaceRectangle: activeSpaceRectangle,
 	}
 }
 
@@ -51,18 +57,18 @@ func DrawCenterText(win *pixelgl.Window, txt *text.Text, s string, c color.RGBA)
 	txt.Draw(win, pixel.IM.Moved(win.Bounds().Center().Sub(txt.Bounds().Center())))
 }
 
-func DrawMapBackground(win *pixelgl.Window, activeSpaceRectangle ActiveSpaceRectangle, color color.Color) {
-	s := imdraw.New(nil)
-	s.Color = color
-	s.Push(pixel.V(activeSpaceRectangle.X, activeSpaceRectangle.Y))
-	s.Push(pixel.V(activeSpaceRectangle.X+activeSpaceRectangle.Width, activeSpaceRectangle.Y+activeSpaceRectangle.Height))
-	s.Rectangle(0)
-	s.Draw(win)
+func (s *UISystem) DrawMapBackground(color color.Color) {
+	shape := imdraw.New(nil)
+	shape.Color = color
+	shape.Push(pixel.V(s.activeSpaceRectangle.X, s.activeSpaceRectangle.Y))
+	shape.Push(pixel.V(s.activeSpaceRectangle.X+s.activeSpaceRectangle.Width, s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height))
+	shape.Rectangle(0)
+	shape.Draw(s.Window)
 }
 
-func DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, activeSpaceRectangle ActiveSpaceRectangle) {
+func (s *UISystem) DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, activeSpaceRectangle ActiveSpaceRectangle) {
 	win.Clear(colornames.Darkgray)
-	DrawMapBackground(win, activeSpaceRectangle, colornames.White)
+	s.DrawMapBackground(colornames.White)
 	DrawCenterText(win, txt, currLocaleMsgs["gameTitle"], colornames.Black)
 }
 

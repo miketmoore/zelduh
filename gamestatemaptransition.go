@@ -29,7 +29,7 @@ func GameStateMapTransition(
 	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
 		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
-		DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
+		ui.DrawMapBackground(colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
 		systemsManager.RemoveAllEnemies()
@@ -100,7 +100,7 @@ func GameStateMapTransition(
 	} else if roomTransition.Style == TransitionWarp && roomTransition.Timer > 0 {
 		roomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
-		DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
+		ui.DrawMapBackground(colornames.White)
 
 		collisionSystem.RemoveAll(CategoryObstacle)
 		systemsManager.RemoveAllEnemies()

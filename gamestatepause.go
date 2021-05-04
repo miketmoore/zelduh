@@ -12,7 +12,7 @@ func GameStatePause(
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) error {
 	ui.Window.Clear(colornames.Darkgray)
-	DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
+	ui.DrawMapBackground(colornames.White)
 	DrawCenterText(ui.Window, ui.Text, currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {

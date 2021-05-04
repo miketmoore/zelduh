@@ -28,7 +28,7 @@ func GameStateGame(
 	inputSystem.Enable()
 
 	ui.Window.Clear(colornames.Darkgray)
-	DrawMapBackground(ui.Window, activeSpaceRectangle, colornames.White)
+	ui.DrawMapBackground(colornames.White)
 
 	DrawMapBackgroundImage(
 		ui.Window,
