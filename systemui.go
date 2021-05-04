@@ -107,7 +107,7 @@ func AddUICoin(systemsManager *SystemsManager, entityConfigPresetFnManager *Enti
 	systemsManager.AddEntity(coin)
 }
 
-func DrawObstaclesPerMapTiles(
+func (s *UISystem) DrawObstaclesPerMapTiles(
 	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	roomByIDMap RoomByIDMap,
@@ -117,7 +117,6 @@ func DrawObstaclesPerMapTiles(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
-	activeSpaceRectangle ActiveSpaceRectangle,
 ) []Entity {
 	d := mapDrawData[roomByIDMap[*roomID].Name]
 	obstacles := []Entity{}
@@ -126,8 +125,8 @@ func DrawObstaclesPerMapTiles(
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+activeSpaceRectangle.X+modX+tileSize/2,
-				vec.Y+activeSpaceRectangle.Y+modY+tileSize/2,
+				vec.X+s.activeSpaceRectangle.X+modX+tileSize/2,
+				vec.Y+s.activeSpaceRectangle.Y+modY+tileSize/2,
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {

@@ -44,7 +44,7 @@ func GameStateGame(
 		AddUICoin(systemsManager, entityConfigPresetFnManager, frameRate)
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := DrawObstaclesPerMapTiles(
+		obstacles := ui.DrawObstaclesPerMapTiles(
 			systemsManager,
 			entityConfigPresetFnManager,
 			roomByIDMap,
@@ -54,7 +54,6 @@ func GameStateGame(
 			tileSize,
 			frameRate,
 			nonObstacleSprites,
-			activeSpaceRectangle,
 		)
 		systemsManager.AddEntities(obstacles...)
 
