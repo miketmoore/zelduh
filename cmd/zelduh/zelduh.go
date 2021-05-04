@@ -411,6 +411,7 @@ func run() {
 		nonObstacleSprites,
 		windowConfig,
 		activeSpaceRectangle,
+		&entityCreator,
 	)
 
 	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)

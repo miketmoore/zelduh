@@ -34,6 +34,7 @@ type GameStateManager struct {
 	NonObstacleSprites          map[int]bool
 	WindowConfig                WindowConfig
 	ActiveSpaceRectangle        ActiveSpaceRectangle
+	entityCreator               *EntityCreator
 }
 
 func NewGameStateManager(
@@ -59,6 +60,7 @@ func NewGameStateManager(
 	nonObstacleSprites map[int]bool,
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
+	entityCreator *EntityCreator,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:              systemsManager,
@@ -83,6 +85,7 @@ func NewGameStateManager(
 		NonObstacleSprites:          nonObstacleSprites,
 		WindowConfig:                windowConfig,
 		ActiveSpaceRectangle:        activeSpaceRectangle,
+		entityCreator:               entityCreator,
 	}
 }
 
@@ -111,6 +114,7 @@ func (g *GameStateManager) Update() error {
 			g.NonObstacleSprites,
 			g.WindowConfig,
 			g.ActiveSpaceRectangle,
+			g.entityCreator,
 		)
 	case StatePause:
 		err = GameStatePause(g.UI, g.LocaleMessages, g.CurrentState)

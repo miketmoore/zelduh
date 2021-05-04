@@ -24,6 +24,7 @@ func GameStateGame(
 	nonObstacleSprites map[int]bool,
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
+	entityCreator *EntityCreator,
 ) error {
 	inputSystem.Enable()
 
@@ -41,7 +42,7 @@ func GameStateGame(
 	if *shouldAddEntities {
 		*shouldAddEntities = false
 
-		AddUICoin(systemsManager, entityConfigPresetFnManager, frameRate)
+		entityCreator.CreateUICoin()
 
 		// Draw obstacles on appropriate map tiles
 		obstacles := ui.DrawObstaclesPerMapTiles(
@@ -75,7 +76,7 @@ func GameStateGame(
 		}
 	}
 
-	DrawMask(ui.Window, windowConfig, activeSpaceRectangle)
+	ui.DrawMask(windowConfig)
 
 	err := systemsManager.Update()
 	if err != nil {

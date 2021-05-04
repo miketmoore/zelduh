@@ -100,13 +100,6 @@ func (s *UISystem) DrawMapBackgroundImage(
 	}
 }
 
-func AddUICoin(systemsManager *SystemsManager, entityConfigPresetFnManager *EntityConfigPresetFnManager, frameRate int) {
-	presetFn := entityConfigPresetFnManager.GetPreset("uiCoin")
-	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
-	coin := BuildEntityFromConfig(entityConfig, systemsManager.NewEntityID(), frameRate)
-	systemsManager.AddEntity(coin)
-}
-
 func (s *UISystem) DrawObstaclesPerMapTiles(
 	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
@@ -143,36 +136,36 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 	return obstacles
 }
 
-func DrawMask(win *pixelgl.Window, windowConfig WindowConfig, activeSpaceRectangle ActiveSpaceRectangle) {
+func (s *UISystem) DrawMask(windowConfig WindowConfig) {
 	// top
-	s := imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(0, activeSpaceRectangle.Y+activeSpaceRectangle.Height))
-	s.Push(pixel.V(windowConfig.Width, activeSpaceRectangle.Y+activeSpaceRectangle.Height+(windowConfig.Height-(activeSpaceRectangle.Y+activeSpaceRectangle.Height))))
-	s.Rectangle(0)
-	s.Draw(win)
+	shape := imdraw.New(nil)
+	shape.Color = colornames.White
+	shape.Push(pixel.V(0, s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height))
+	shape.Push(pixel.V(windowConfig.Width, s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height+(windowConfig.Height-(s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height))))
+	shape.Rectangle(0)
+	shape.Draw(s.Window)
 
 	// bottom
-	s = imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(windowConfig.Width, (windowConfig.Height - (activeSpaceRectangle.Y + activeSpaceRectangle.Height))))
-	s.Rectangle(0)
-	s.Draw(win)
+	shape = imdraw.New(nil)
+	shape.Color = colornames.White
+	shape.Push(pixel.V(0, 0))
+	shape.Push(pixel.V(windowConfig.Width, (windowConfig.Height - (s.activeSpaceRectangle.Y + s.activeSpaceRectangle.Height))))
+	shape.Rectangle(0)
+	shape.Draw(s.Window)
 
 	// left
-	s = imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(0, 0))
-	s.Push(pixel.V(0+activeSpaceRectangle.X, windowConfig.Height))
-	s.Rectangle(0)
-	s.Draw(win)
+	shape = imdraw.New(nil)
+	shape.Color = colornames.White
+	shape.Push(pixel.V(0, 0))
+	shape.Push(pixel.V(0+s.activeSpaceRectangle.X, windowConfig.Height))
+	shape.Rectangle(0)
+	shape.Draw(s.Window)
 
 	// right
-	s = imdraw.New(nil)
-	s.Color = colornames.White
-	s.Push(pixel.V(activeSpaceRectangle.X+activeSpaceRectangle.Width, activeSpaceRectangle.Y))
-	s.Push(pixel.V(windowConfig.Width, windowConfig.Height))
-	s.Rectangle(0)
-	s.Draw(win)
+	shape = imdraw.New(nil)
+	shape.Color = colornames.White
+	shape.Push(pixel.V(s.activeSpaceRectangle.X+s.activeSpaceRectangle.Width, s.activeSpaceRectangle.Y))
+	shape.Push(pixel.V(windowConfig.Width, windowConfig.Height))
+	shape.Rectangle(0)
+	shape.Draw(s.Window)
 }

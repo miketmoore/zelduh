@@ -78,7 +78,7 @@ func GameStateMapTransition(
 			tileSize,
 			activeSpaceRectangle,
 		)
-		DrawMask(ui.Window, windowConfig, activeSpaceRectangle)
+		ui.DrawMask(windowConfig)
 
 		// Move player with map transition
 		player.componentRectangle.Rect = pixel.R(

@@ -47,6 +47,13 @@ func (ec *EntityCreator) CreateCoin(
 	ec.systemsManager.AddEntity(coin)
 }
 
+func (ec *EntityCreator) CreateUICoin() {
+	presetFn := ec.entityConfigPresetFnManager.GetPreset("uiCoin")
+	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
+	coin := BuildEntityFromConfig(entityConfig, ec.systemsManager.NewEntityID(), ec.frameRate)
+	ec.systemsManager.AddEntity(coin)
+}
+
 func (ec *EntityCreator) CreateExplosion(
 	entityID EntityID,
 ) {
