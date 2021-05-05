@@ -30,7 +30,7 @@ func (g *GameStateManager) stateGame() error {
 		// Iterate through all entity configurations and build entities and add to systems
 		currentRoom := g.LevelManager.CurrentLevel.RoomByIDMap[*g.CurrentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
-			entity := BuildEntityFromConfig(c, g.SystemsManager.NewEntityID(), g.FrameRate)
+			entity := g.entityCreator.entityFactory.NewEntity2(c, g.FrameRate)
 			g.EntitiesMap[entity.ID()] = entity
 			g.SystemsManager.AddEntity(entity)
 

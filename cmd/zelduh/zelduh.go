@@ -137,10 +137,10 @@ func run() {
 		mapDrawData,
 		tileSize,
 		frameRate,
-		&systemsManager,
 		&entityConfigPresetFnManager,
 		&levelManager,
 		nonObstacleSprites,
+		&entityFactory,
 	)
 
 	renderSystem := zelduh.NewRenderSystem(

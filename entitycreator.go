@@ -39,18 +39,14 @@ func (ec *EntityCreator) CreateCoin(
 		X: v.X / ec.tileSize,
 		Y: v.Y / ec.tileSize,
 	}
-	coin := BuildEntityFromConfig(
-		ec.entityConfigPresetFnManager.GetPreset("coin")(coordinates),
-		ec.systemsManager.NewEntityID(),
-		ec.frameRate,
-	)
+	coin := ec.entityFactory.NewEntity("coin", coordinates, ec.frameRate)
 	ec.systemsManager.AddEntity(coin)
 }
 
 func (ec *EntityCreator) CreateUICoin() {
 	presetFn := ec.entityConfigPresetFnManager.GetPreset("uiCoin")
 	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
-	coin := BuildEntityFromConfig(entityConfig, ec.systemsManager.NewEntityID(), ec.frameRate)
+	coin := ec.entityFactory.NewEntity2(entityConfig, ec.frameRate)
 	ec.systemsManager.AddEntity(coin)
 }
 

@@ -21,11 +21,11 @@ type UISystem struct {
 	currLocaleMsgs              LocaleMessagesMap
 	tileSize                    float64
 	frameRate                   int
-	systemsManager              *SystemsManager
 	windowConfig                WindowConfig
 	entityConfigPresetFnManager *EntityConfigPresetFnManager
 	nonObstacleSprites          map[int]bool
 	levelManager                *LevelManager
+	entityFactory               *EntityFactory
 }
 
 func NewUISystem(
@@ -36,10 +36,10 @@ func NewUISystem(
 	mapDrawData MapDrawData,
 	tileSize float64,
 	frameRate int,
-	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	levelManager *LevelManager,
 	nonObstacleSprites map[int]bool,
+	entityFactory *EntityFactory,
 ) UISystem {
 
 	// Initialize text
@@ -70,11 +70,11 @@ func NewUISystem(
 		currLocaleMsgs:              currLocaleMsgs,
 		tileSize:                    tileSize,
 		frameRate:                   frameRate,
-		systemsManager:              systemsManager,
 		windowConfig:                windowConfig,
 		entityConfigPresetFnManager: entityConfigPresetFnManager,
 		levelManager:                levelManager,
 		nonObstacleSprites:          nonObstacleSprites,
+		entityFactory:               entityFactory,
 	}
 }
 
@@ -142,8 +142,7 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 					X: movedVec.X/s.tileSize - mod,
 					Y: movedVec.Y/s.tileSize - mod,
 				}
-				id := s.systemsManager.NewEntityID()
-				obstacle := BuildEntityFromConfig(s.entityConfigPresetFnManager.GetPreset("obstacle")(coordinates), id, s.frameRate)
+				obstacle := s.entityFactory.NewEntity("obstacle", coordinates, s.frameRate)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
