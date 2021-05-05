@@ -12,20 +12,19 @@ const (
 )
 
 type GameStateManager struct {
-	SystemsManager            *SystemsManager
-	UI                        UISystem
-	LocaleMessages            LocaleMessagesMap
-	CollisionSystem           *CollisionSystem
-	InputSystem               *InputSystem
-	ShouldAddEntities         *bool
-	CurrentRoomID, NextRoomID *RoomID
-	CurrentState              *State
-	SpriteMap                 SpriteMap
-	MapDrawData               MapDrawData
-	RoomTransition            *RoomTransition
-	EntitiesMap               EntitiesMap
-	Player                    *Entity
-	// Hearts                      []Entity
+	SystemsManager              *SystemsManager
+	UI                          UISystem
+	LocaleMessages              LocaleMessagesMap
+	CollisionSystem             *CollisionSystem
+	InputSystem                 *InputSystem
+	ShouldAddEntities           *bool
+	CurrentRoomID, NextRoomID   *RoomID
+	CurrentState                *State
+	SpriteMap                   SpriteMap
+	MapDrawData                 MapDrawData
+	RoomTransition              *RoomTransition
+	EntitiesMap                 EntitiesMap
+	Player                      *Entity
 	RoomWarps                   RoomWarps
 	LevelManager                *LevelManager
 	EntityConfigPresetFnManager *EntityConfigPresetFnManager

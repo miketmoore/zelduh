@@ -24,8 +24,8 @@ type UISystem struct {
 	systemsManager              *SystemsManager
 	windowConfig                WindowConfig
 	entityConfigPresetFnManager *EntityConfigPresetFnManager
-	roomByIDMap                 RoomByIDMap
 	nonObstacleSprites          map[int]bool
+	levelManager                *LevelManager
 }
 
 func NewUISystem(
@@ -38,7 +38,7 @@ func NewUISystem(
 	frameRate int,
 	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
-	roomByIDMap RoomByIDMap,
+	levelManager *LevelManager,
 	nonObstacleSprites map[int]bool,
 ) UISystem {
 
@@ -73,7 +73,7 @@ func NewUISystem(
 		systemsManager:              systemsManager,
 		windowConfig:                windowConfig,
 		entityConfigPresetFnManager: entityConfigPresetFnManager,
-		roomByIDMap:                 roomByIDMap,
+		levelManager:                levelManager,
 		nonObstacleSprites:          nonObstacleSprites,
 	}
 }
@@ -126,7 +126,7 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 	roomID *RoomID,
 	modX, modY float64,
 ) []Entity {
-	d := s.mapDrawData[s.roomByIDMap[*roomID].Name]
+	d := s.mapDrawData[s.levelManager.CurrentLevel.RoomByIDMap[*roomID].Name]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {

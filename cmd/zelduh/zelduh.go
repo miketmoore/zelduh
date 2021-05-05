@@ -139,7 +139,7 @@ func run() {
 		frameRate,
 		&systemsManager,
 		&entityConfigPresetFnManager,
-		testLevel.RoomByIDMap,
+		&levelManager,
 		nonObstacleSprites,
 	)
 
