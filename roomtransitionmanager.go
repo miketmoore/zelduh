@@ -53,11 +53,11 @@ func (r *RoomTransitionManager) Active() bool {
 }
 
 func (r *RoomTransitionManager) SetSlide() {
-	r.transition.Style = TransitionSlide
+	r.transition.Style = RoomTransitionSlide
 }
 
 func (r *RoomTransitionManager) SetWarp() {
-	r.transition.Style = TransitionWarp
+	r.transition.Style = RoomTransitionWarp
 }
 
 func (r *RoomTransitionManager) ResetTimer() {

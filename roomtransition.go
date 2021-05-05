@@ -4,10 +4,10 @@ package zelduh
 type TransitionStyle string
 
 const (
-	// TransitionSlide represents a slide transition
-	TransitionSlide TransitionStyle = "slide"
-	// TransitionWarp represents a warp transition
-	TransitionWarp TransitionStyle = "warp"
+	// RoomTransitionSlide represents a slide transition
+	RoomTransitionSlide TransitionStyle = "slide"
+	// RoomTransitionWarp represents a warp transition
+	RoomTransitionWarp TransitionStyle = "warp"
 )
 
 // RoomTransition is used to transition between map room

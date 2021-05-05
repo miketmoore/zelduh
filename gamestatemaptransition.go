@@ -14,7 +14,7 @@ func (s *GameStateManager) stateMapTransition() error {
 
 	s.InputSystem.Disable()
 
-	if s.roomTransitionManager.Style() == TransitionSlide && s.roomTransitionManager.Timer() > 0 {
+	if s.roomTransitionManager.Style() == RoomTransitionSlide && s.roomTransitionManager.Timer() > 0 {
 		s.roomTransitionManager.DecrementTimer()
 		ui.Window.Clear(colornames.Darkgray)
 		ui.DrawMapBackground(colornames.White)
@@ -75,7 +75,7 @@ func (s *GameStateManager) stateMapTransition() error {
 		if err != nil {
 			return err
 		}
-	} else if s.roomTransitionManager.Style() == TransitionWarp && s.roomTransitionManager.Timer() > 0 {
+	} else if s.roomTransitionManager.Style() == RoomTransitionWarp && s.roomTransitionManager.Timer() > 0 {
 		s.roomTransitionManager.DecrementTimer()
 		ui.Window.Clear(colornames.Darkgray)
 		ui.DrawMapBackground(colornames.White)
