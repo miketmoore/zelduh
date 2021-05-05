@@ -111,7 +111,7 @@ func (g *GameStateManager) Update() error {
 			g.entityCreator,
 		)
 	case StatePause:
-		err = GameStatePause(g.UI, g.LocaleMessages, g.CurrentState)
+		err = GameStatePause(g.UI, g.CurrentState)
 	case StateOver:
 		err = GameStateOver(g.UI, g.LocaleMessages, g.CurrentState)
 	case StateMapTransition:

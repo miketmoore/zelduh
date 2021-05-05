@@ -178,3 +178,9 @@ func (s *UISystem) DrawMask() {
 	shape.Rectangle(0)
 	shape.Draw(s.Window)
 }
+
+func (s *UISystem) DrawPauseScreen() {
+	s.Window.Clear(colornames.Darkgray)
+	s.DrawMapBackground(colornames.White)
+	s.DrawCenterText(s.currLocaleMsgs["pauseScreenMessage"], colornames.Black)
+}
