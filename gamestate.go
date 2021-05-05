@@ -101,12 +101,9 @@ func (g *GameStateManager) Update() error {
 			g.CurrentRoomID,
 			g.CurrentState,
 			g.EntitiesMap,
-			g.Player,
 			g.RoomWarps,
-			g.EntityConfigPresetFnManager,
 			g.TileSize,
 			g.FrameRate,
-			g.NonObstacleSprites,
 			g.ActiveSpaceRectangle,
 			g.entityCreator,
 		)

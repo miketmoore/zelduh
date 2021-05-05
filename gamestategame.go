@@ -14,12 +14,9 @@ func GameStateGame(
 	currentRoomID *RoomID,
 	currentState *State,
 	entitiesMap EntitiesMap,
-	player *Entity,
 	roomWarps RoomWarps,
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	tileSize float64,
 	frameRate int,
-	nonObstacleSprites map[int]bool,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	entityCreator *EntityCreator,
 ) error {
@@ -40,11 +37,8 @@ func GameStateGame(
 
 		// Draw obstacles on appropriate map tiles
 		obstacles := ui.DrawObstaclesPerMapTiles(
-			entityConfigPresetFnManager,
-			roomByIDMap,
 			currentRoomID,
 			0, 0,
-			nonObstacleSprites,
 		)
 		systemsManager.AddEntities(obstacles...)
 

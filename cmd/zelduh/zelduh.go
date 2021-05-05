@@ -114,6 +114,21 @@ func run() {
 		tileSize,
 	)
 
+	// NonObstacleSprites defines which sprites are not obstacles
+	var nonObstacleSprites = map[int]bool{
+		8:   true,
+		9:   true,
+		24:  true,
+		37:  true,
+		38:  true,
+		52:  true,
+		53:  true,
+		66:  true,
+		86:  true,
+		136: true,
+		137: true,
+	}
+
 	ui := zelduh.NewUISystem(
 		currLocaleMsgs,
 		windowConfig,
@@ -123,6 +138,9 @@ func run() {
 		tileSize,
 		frameRate,
 		&systemsManager,
+		&entityConfigPresetFnManager,
+		testLevel.RoomByIDMap,
+		nonObstacleSprites,
 	)
 
 	renderSystem := zelduh.NewRenderSystem(
@@ -376,21 +394,6 @@ func run() {
 		arrow,
 		bomb,
 	)
-
-	// NonObstacleSprites defines which sprites are not obstacles
-	var nonObstacleSprites = map[int]bool{
-		8:   true,
-		9:   true,
-		24:  true,
-		37:  true,
-		38:  true,
-		52:  true,
-		53:  true,
-		66:  true,
-		86:  true,
-		136: true,
-		137: true,
-	}
 
 	gameStateManager := zelduh.NewGameStateManager(
 		&systemsManager,

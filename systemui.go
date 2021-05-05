@@ -13,16 +13,19 @@ import (
 )
 
 type UISystem struct {
-	Window               *pixelgl.Window
-	Text                 *text.Text
-	activeSpaceRectangle ActiveSpaceRectangle
-	spriteMap            SpriteMap
-	mapDrawData          MapDrawData
-	currLocaleMsgs       LocaleMessagesMap
-	tileSize             float64
-	frameRate            int
-	systemsManager       *SystemsManager
-	windowConfig         WindowConfig
+	Window                      *pixelgl.Window
+	Text                        *text.Text
+	activeSpaceRectangle        ActiveSpaceRectangle
+	spriteMap                   SpriteMap
+	mapDrawData                 MapDrawData
+	currLocaleMsgs              LocaleMessagesMap
+	tileSize                    float64
+	frameRate                   int
+	systemsManager              *SystemsManager
+	windowConfig                WindowConfig
+	entityConfigPresetFnManager *EntityConfigPresetFnManager
+	roomByIDMap                 RoomByIDMap
+	nonObstacleSprites          map[int]bool
 }
 
 func NewUISystem(
@@ -34,6 +37,9 @@ func NewUISystem(
 	tileSize float64,
 	frameRate int,
 	systemsManager *SystemsManager,
+	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	roomByIDMap RoomByIDMap,
+	nonObstacleSprites map[int]bool,
 ) UISystem {
 
 	// Initialize text
@@ -56,16 +62,19 @@ func NewUISystem(
 	}
 
 	return UISystem{
-		Window:               win,
-		Text:                 txt,
-		activeSpaceRectangle: activeSpaceRectangle,
-		spriteMap:            spriteMap,
-		mapDrawData:          mapDrawData,
-		currLocaleMsgs:       currLocaleMsgs,
-		tileSize:             tileSize,
-		frameRate:            frameRate,
-		systemsManager:       systemsManager,
-		windowConfig:         windowConfig,
+		Window:                      win,
+		Text:                        txt,
+		activeSpaceRectangle:        activeSpaceRectangle,
+		spriteMap:                   spriteMap,
+		mapDrawData:                 mapDrawData,
+		currLocaleMsgs:              currLocaleMsgs,
+		tileSize:                    tileSize,
+		frameRate:                   frameRate,
+		systemsManager:              systemsManager,
+		windowConfig:                windowConfig,
+		entityConfigPresetFnManager: entityConfigPresetFnManager,
+		roomByIDMap:                 roomByIDMap,
+		nonObstacleSprites:          nonObstacleSprites,
 	}
 }
 
@@ -114,13 +123,10 @@ func (s *UISystem) DrawMapBackgroundImage(
 }
 
 func (s *UISystem) DrawObstaclesPerMapTiles(
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
-	roomByIDMap RoomByIDMap,
 	roomID *RoomID,
 	modX, modY float64,
-	nonObstacleSprites map[int]bool,
 ) []Entity {
-	d := s.mapDrawData[roomByIDMap[*roomID].Name]
+	d := s.mapDrawData[s.roomByIDMap[*roomID].Name]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {
@@ -131,13 +137,13 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 				vec.Y+s.activeSpaceRectangle.Y+modY+s.tileSize/2,
 			)
 
-			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
+			if _, ok := s.nonObstacleSprites[spriteData.SpriteID]; !ok {
 				coordinates := Coordinates{
 					X: movedVec.X/s.tileSize - mod,
 					Y: movedVec.Y/s.tileSize - mod,
 				}
 				id := s.systemsManager.NewEntityID()
-				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(coordinates), id, s.frameRate)
+				obstacle := BuildEntityFromConfig(s.entityConfigPresetFnManager.GetPreset("obstacle")(coordinates), id, s.frameRate)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
