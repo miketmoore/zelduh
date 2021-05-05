@@ -32,7 +32,6 @@ type GameStateManager struct {
 	TileSize                    float64
 	FrameRate                   int
 	NonObstacleSprites          map[int]bool
-	WindowConfig                WindowConfig
 	ActiveSpaceRectangle        ActiveSpaceRectangle
 	entityCreator               *EntityCreator
 }
@@ -58,7 +57,6 @@ func NewGameStateManager(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
-	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	entityCreator *EntityCreator,
 ) GameStateManager {
@@ -83,7 +81,6 @@ func NewGameStateManager(
 		TileSize:                    tileSize,
 		FrameRate:                   frameRate,
 		NonObstacleSprites:          nonObstacleSprites,
-		WindowConfig:                windowConfig,
 		ActiveSpaceRectangle:        activeSpaceRectangle,
 		entityCreator:               entityCreator,
 	}
@@ -112,7 +109,6 @@ func (g *GameStateManager) Update() error {
 			g.TileSize,
 			g.FrameRate,
 			g.NonObstacleSprites,
-			g.WindowConfig,
 			g.ActiveSpaceRectangle,
 			g.entityCreator,
 		)
@@ -130,11 +126,9 @@ func (g *GameStateManager) Update() error {
 			g.CurrentRoomID,
 			g.NextRoomID,
 			g.CurrentState,
-			g.MapDrawData,
 			g.RoomTransition,
 			g.Player,
 			g.TileSize,
-			g.WindowConfig,
 			g.ActiveSpaceRectangle,
 		)
 	}

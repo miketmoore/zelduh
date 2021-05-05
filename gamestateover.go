@@ -12,7 +12,7 @@ func GameStateOver(
 ) error {
 	ui.Window.Clear(colornames.Darkgray)
 	ui.DrawMapBackground(colornames.Black)
-	ui.DrawCenterText(ui.Text, currLocaleMsgs["gameOverScreenMessage"], colornames.White)
+	ui.DrawCenterText(currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 
 	if ui.Window.JustPressed(pixelgl.KeyEnter) {
 		*currentState = StateStart

@@ -17,6 +17,12 @@ type UISystem struct {
 	Text                 *text.Text
 	activeSpaceRectangle ActiveSpaceRectangle
 	spriteMap            SpriteMap
+	mapDrawData          MapDrawData
+	currLocaleMsgs       LocaleMessagesMap
+	tileSize             float64
+	frameRate            int
+	systemsManager       *SystemsManager
+	windowConfig         WindowConfig
 }
 
 func NewUISystem(
@@ -24,6 +30,10 @@ func NewUISystem(
 	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	spriteMap SpriteMap,
+	mapDrawData MapDrawData,
+	tileSize float64,
+	frameRate int,
+	systemsManager *SystemsManager,
 ) UISystem {
 
 	// Initialize text
@@ -50,14 +60,20 @@ func NewUISystem(
 		Text:                 txt,
 		activeSpaceRectangle: activeSpaceRectangle,
 		spriteMap:            spriteMap,
+		mapDrawData:          mapDrawData,
+		currLocaleMsgs:       currLocaleMsgs,
+		tileSize:             tileSize,
+		frameRate:            frameRate,
+		systemsManager:       systemsManager,
+		windowConfig:         windowConfig,
 	}
 }
 
-func (s *UISystem) DrawCenterText(txt *text.Text, str string, c color.RGBA) {
-	txt.Clear()
-	txt.Color = c
-	fmt.Fprintln(txt, str)
-	txt.Draw(s.Window, pixel.IM.Moved(s.Window.Bounds().Center().Sub(txt.Bounds().Center())))
+func (s *UISystem) DrawCenterText(str string, c color.RGBA) {
+	s.Text.Clear()
+	s.Text.Color = c
+	fmt.Fprintln(s.Text, str)
+	s.Text.Draw(s.Window, pixel.IM.Moved(s.Window.Bounds().Center().Sub(s.Text.Bounds().Center())))
 }
 
 func (s *UISystem) DrawMapBackground(color color.Color) {
@@ -69,21 +85,18 @@ func (s *UISystem) DrawMapBackground(color color.Color) {
 	shape.Draw(s.Window)
 }
 
-func (s *UISystem) DrawScreenStart(win *pixelgl.Window, txt *text.Text, currLocaleMsgs LocaleMessagesMap, activeSpaceRectangle ActiveSpaceRectangle) {
-	win.Clear(colornames.Darkgray)
+func (s *UISystem) DrawScreenStart() {
+	s.Window.Clear(colornames.Darkgray)
 	s.DrawMapBackground(colornames.White)
-	s.DrawCenterText(txt, currLocaleMsgs["gameTitle"], colornames.Black)
+	s.DrawCenterText(s.currLocaleMsgs["gameTitle"], colornames.Black)
 }
 
 func (s *UISystem) DrawMapBackgroundImage(
-	mapDrawData MapDrawData,
 	name RoomName,
 	modX, modY float64,
-	tileSize float64,
-	activeSpaceRectangle ActiveSpaceRectangle,
 ) {
 
-	d := mapDrawData[name]
+	d := s.mapDrawData[name]
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			sprite := s.spriteMap[spriteData.SpriteID]
@@ -91,8 +104,8 @@ func (s *UISystem) DrawMapBackgroundImage(
 			vec := spriteData.Rect.Min
 
 			movedVec := pixel.V(
-				vec.X+activeSpaceRectangle.X+modX+tileSize/2,
-				vec.Y+activeSpaceRectangle.Y+modY+tileSize/2,
+				vec.X+s.activeSpaceRectangle.X+modX+s.tileSize/2,
+				vec.Y+s.activeSpaceRectangle.Y+modY+s.tileSize/2,
 			)
 			matrix := pixel.IM.Moved(movedVec)
 			sprite.Draw(s.Window, matrix)
@@ -101,34 +114,30 @@ func (s *UISystem) DrawMapBackgroundImage(
 }
 
 func (s *UISystem) DrawObstaclesPerMapTiles(
-	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	roomByIDMap RoomByIDMap,
-	mapDrawData MapDrawData,
 	roomID *RoomID,
 	modX, modY float64,
-	tileSize float64,
-	frameRate int,
 	nonObstacleSprites map[int]bool,
 ) []Entity {
-	d := mapDrawData[roomByIDMap[*roomID].Name]
+	d := s.mapDrawData[roomByIDMap[*roomID].Name]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
-				vec.X+s.activeSpaceRectangle.X+modX+tileSize/2,
-				vec.Y+s.activeSpaceRectangle.Y+modY+tileSize/2,
+				vec.X+s.activeSpaceRectangle.X+modX+s.tileSize/2,
+				vec.Y+s.activeSpaceRectangle.Y+modY+s.tileSize/2,
 			)
 
 			if _, ok := nonObstacleSprites[spriteData.SpriteID]; !ok {
 				coordinates := Coordinates{
-					X: movedVec.X/tileSize - mod,
-					Y: movedVec.Y/tileSize - mod,
+					X: movedVec.X/s.tileSize - mod,
+					Y: movedVec.Y/s.tileSize - mod,
 				}
-				id := systemsManager.NewEntityID()
-				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(coordinates), id, frameRate)
+				id := s.systemsManager.NewEntityID()
+				obstacle := BuildEntityFromConfig(entityConfigPresetFnManager.GetPreset("obstacle")(coordinates), id, s.frameRate)
 				obstacles = append(obstacles, obstacle)
 			}
 		}
@@ -136,12 +145,12 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 	return obstacles
 }
 
-func (s *UISystem) DrawMask(windowConfig WindowConfig) {
+func (s *UISystem) DrawMask() {
 	// top
 	shape := imdraw.New(nil)
 	shape.Color = colornames.White
 	shape.Push(pixel.V(0, s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height))
-	shape.Push(pixel.V(windowConfig.Width, s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height+(windowConfig.Height-(s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height))))
+	shape.Push(pixel.V(s.windowConfig.Width, s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height+(s.windowConfig.Height-(s.activeSpaceRectangle.Y+s.activeSpaceRectangle.Height))))
 	shape.Rectangle(0)
 	shape.Draw(s.Window)
 
@@ -149,7 +158,7 @@ func (s *UISystem) DrawMask(windowConfig WindowConfig) {
 	shape = imdraw.New(nil)
 	shape.Color = colornames.White
 	shape.Push(pixel.V(0, 0))
-	shape.Push(pixel.V(windowConfig.Width, (windowConfig.Height - (s.activeSpaceRectangle.Y + s.activeSpaceRectangle.Height))))
+	shape.Push(pixel.V(s.windowConfig.Width, (s.windowConfig.Height - (s.activeSpaceRectangle.Y + s.activeSpaceRectangle.Height))))
 	shape.Rectangle(0)
 	shape.Draw(s.Window)
 
@@ -157,7 +166,7 @@ func (s *UISystem) DrawMask(windowConfig WindowConfig) {
 	shape = imdraw.New(nil)
 	shape.Color = colornames.White
 	shape.Push(pixel.V(0, 0))
-	shape.Push(pixel.V(0+s.activeSpaceRectangle.X, windowConfig.Height))
+	shape.Push(pixel.V(0+s.activeSpaceRectangle.X, s.windowConfig.Height))
 	shape.Rectangle(0)
 	shape.Draw(s.Window)
 
@@ -165,7 +174,7 @@ func (s *UISystem) DrawMask(windowConfig WindowConfig) {
 	shape = imdraw.New(nil)
 	shape.Color = colornames.White
 	shape.Push(pixel.V(s.activeSpaceRectangle.X+s.activeSpaceRectangle.Width, s.activeSpaceRectangle.Y))
-	shape.Push(pixel.V(windowConfig.Width, windowConfig.Height))
+	shape.Push(pixel.V(s.windowConfig.Width, s.windowConfig.Height))
 	shape.Rectangle(0)
 	shape.Draw(s.Window)
 }

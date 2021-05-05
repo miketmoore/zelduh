@@ -16,11 +16,9 @@ func GameStateMapTransition(
 	currentRoomID *RoomID,
 	nextRoomID *RoomID,
 	currentState *State,
-	mapDrawData MapDrawData,
 	roomTransition *RoomTransition,
 	player *Entity,
 	tileSize float64,
-	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) error {
 	inputSystem.Disable()
@@ -55,12 +53,9 @@ func GameStateMapTransition(
 			return fmt.Errorf("current room not found by ID=%d", *currentRoomID)
 		}
 		ui.DrawMapBackgroundImage(
-			mapDrawData,
 			currentRoom.Name,
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
-			tileSize,
-			activeSpaceRectangle,
 		)
 
 		if nextRoomID == nil {
@@ -71,14 +66,11 @@ func GameStateMapTransition(
 			return fmt.Errorf("next room not found by ID=%d", *nextRoomID)
 		}
 		ui.DrawMapBackgroundImage(
-			mapDrawData,
 			nextRoom.Name,
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
-			tileSize,
-			activeSpaceRectangle,
 		)
-		ui.DrawMask(windowConfig)
+		ui.DrawMask()
 
 		// Move player with map transition
 		player.componentRectangle.Rect = pixel.R(

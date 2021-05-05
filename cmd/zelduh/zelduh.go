@@ -87,11 +87,42 @@ func run() {
 
 	temporarySystem := zelduh.NewTemporarySystem()
 
+	mapDrawData := zelduh.BuildMapDrawData(
+		"assets/tilemaps/",
+		[]string{
+			"overworldOpen",
+			"overworldOpenCircleOfTrees",
+			"overworldFourWallsDoorBottom",
+			"overworldFourWallsDoorLeftTop",
+			"overworldFourWallsDoorRightTop",
+			"overworldFourWallsDoorTopBottom",
+			"overworldFourWallsDoorRightTopBottom",
+			"overworldFourWallsDoorBottomRight",
+			"overworldFourWallsDoorTop",
+			"overworldFourWallsDoorRight",
+			"overworldFourWallsDoorLeft",
+			"overworldTreeClusterTopRight",
+			"overworldFourWallsClusterTrees",
+			"overworldFourWallsDoorsAllSides",
+			"rockPatternTest",
+			"rockPathOpenLeft",
+			"rockWithCaveEntrance",
+			"rockPathLeftRightEntrance",
+			"test",
+			"dungeonFourDoors",
+		},
+		tileSize,
+	)
+
 	ui := zelduh.NewUISystem(
 		currLocaleMsgs,
 		windowConfig,
 		activeSpaceRectangle,
 		spriteMap,
+		mapDrawData,
+		tileSize,
+		frameRate,
+		&systemsManager,
 	)
 
 	renderSystem := zelduh.NewRenderSystem(
@@ -346,33 +377,6 @@ func run() {
 		bomb,
 	)
 
-	mapDrawData := zelduh.BuildMapDrawData(
-		"assets/tilemaps/",
-		[]string{
-			"overworldOpen",
-			"overworldOpenCircleOfTrees",
-			"overworldFourWallsDoorBottom",
-			"overworldFourWallsDoorLeftTop",
-			"overworldFourWallsDoorRightTop",
-			"overworldFourWallsDoorTopBottom",
-			"overworldFourWallsDoorRightTopBottom",
-			"overworldFourWallsDoorBottomRight",
-			"overworldFourWallsDoorTop",
-			"overworldFourWallsDoorRight",
-			"overworldFourWallsDoorLeft",
-			"overworldTreeClusterTopRight",
-			"overworldFourWallsClusterTrees",
-			"overworldFourWallsDoorsAllSides",
-			"rockPatternTest",
-			"rockPathOpenLeft",
-			"rockWithCaveEntrance",
-			"rockPathLeftRightEntrance",
-			"test",
-			"dungeonFourDoors",
-		},
-		tileSize,
-	)
-
 	// NonObstacleSprites defines which sprites are not obstacles
 	var nonObstacleSprites = map[int]bool{
 		8:   true,
@@ -409,7 +413,6 @@ func run() {
 		tileSize,
 		frameRate,
 		nonObstacleSprites,
-		windowConfig,
 		activeSpaceRectangle,
 		&entityCreator,
 	)

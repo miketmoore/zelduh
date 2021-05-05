@@ -22,7 +22,6 @@ func GameStateGame(
 	tileSize float64,
 	frameRate int,
 	nonObstacleSprites map[int]bool,
-	windowConfig WindowConfig,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	entityCreator *EntityCreator,
 ) error {
@@ -32,11 +31,8 @@ func GameStateGame(
 	ui.DrawMapBackground(colornames.White)
 
 	ui.DrawMapBackgroundImage(
-		mapDrawData,
 		roomByIDMap[*currentRoomID].Name,
 		0, 0,
-		tileSize,
-		activeSpaceRectangle,
 	)
 
 	if *shouldAddEntities {
@@ -46,14 +42,10 @@ func GameStateGame(
 
 		// Draw obstacles on appropriate map tiles
 		obstacles := ui.DrawObstaclesPerMapTiles(
-			systemsManager,
 			entityConfigPresetFnManager,
 			roomByIDMap,
-			mapDrawData,
 			currentRoomID,
 			0, 0,
-			tileSize,
-			frameRate,
 			nonObstacleSprites,
 		)
 		systemsManager.AddEntities(obstacles...)
@@ -76,7 +68,7 @@ func GameStateGame(
 		}
 	}
 
-	ui.DrawMask(windowConfig)
+	ui.DrawMask()
 
 	err := systemsManager.Update()
 	if err != nil {

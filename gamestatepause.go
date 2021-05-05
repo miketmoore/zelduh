@@ -12,7 +12,7 @@ func GameStatePause(
 ) error {
 	ui.Window.Clear(colornames.Darkgray)
 	ui.DrawMapBackground(colornames.White)
-	ui.DrawCenterText(ui.Text, currLocaleMsgs["pauseScreenMessage"], colornames.Black)
+	ui.DrawCenterText(currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 
 	if ui.Window.JustPressed(pixelgl.KeyP) {
 		*currentState = StateGame
