@@ -196,3 +196,13 @@ func (s *UISystem) DrawGameOverScreen() {
 	s.DrawMapBackground(colornames.Black)
 	s.DrawCenterText(s.currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 }
+
+func (s *UISystem) DrawLevelBackground(roomName RoomName) {
+	s.Window.Clear(colornames.Darkgray)
+	s.DrawMapBackground(colornames.White)
+
+	s.DrawMapBackgroundImage(
+		roomName,
+		0, 0,
+	)
+}

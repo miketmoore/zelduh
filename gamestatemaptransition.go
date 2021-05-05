@@ -10,7 +10,7 @@ import (
 func GameStateMapTransition(
 	ui UISystem,
 	systemsManager *SystemsManager,
-	roomByIDMap RoomByIDMap,
+	levelManager *LevelManager,
 	collisionSystem *CollisionSystem,
 	inputSystem *InputSystem,
 	currentRoomID *RoomID,
@@ -34,7 +34,7 @@ func GameStateMapTransition(
 		systemsManager.RemoveAllMoveableObstacles()
 		systemsManager.RemoveAllEntities()
 
-		connectedRooms := roomByIDMap[*currentRoomID].ConnectedRooms()
+		connectedRooms := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
 			roomTransition,
@@ -48,7 +48,7 @@ func GameStateMapTransition(
 		if currentRoomID == nil {
 			return fmt.Errorf("current room ID is nil")
 		}
-		currentRoom, currentRoomOk := roomByIDMap[*currentRoomID]
+		currentRoom, currentRoomOk := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID]
 		if !currentRoomOk {
 			return fmt.Errorf("current room not found by ID=%d", *currentRoomID)
 		}
@@ -61,7 +61,7 @@ func GameStateMapTransition(
 		if nextRoomID == nil {
 			return fmt.Errorf("next room ID is nil")
 		}
-		nextRoom, nextRoomOk := roomByIDMap[*nextRoomID]
+		nextRoom, nextRoomOk := levelManager.CurrentLevel.RoomByIDMap[*nextRoomID]
 		if !nextRoomOk {
 			return fmt.Errorf("next room not found by ID=%d", *nextRoomID)
 		}

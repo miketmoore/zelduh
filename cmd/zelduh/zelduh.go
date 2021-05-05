@@ -398,7 +398,6 @@ func run() {
 	gameStateManager := zelduh.NewGameStateManager(
 		&systemsManager,
 		ui,
-		currLocaleMsgs,
 		&collisionSystem,
 		&inputSystem,
 		&shouldAddEntities,

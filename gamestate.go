@@ -14,7 +14,6 @@ const (
 type GameStateManager struct {
 	SystemsManager              *SystemsManager
 	UI                          UISystem
-	LocaleMessages              LocaleMessagesMap
 	CollisionSystem             *CollisionSystem
 	InputSystem                 *InputSystem
 	ShouldAddEntities           *bool
@@ -38,7 +37,6 @@ type GameStateManager struct {
 func NewGameStateManager(
 	systemsManager *SystemsManager,
 	ui UISystem,
-	localeMessages LocaleMessagesMap,
 	collisionSystem *CollisionSystem,
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,
@@ -62,7 +60,6 @@ func NewGameStateManager(
 	return GameStateManager{
 		SystemsManager:              systemsManager,
 		UI:                          ui,
-		LocaleMessages:              localeMessages,
 		CollisionSystem:             collisionSystem,
 		InputSystem:                 inputSystem,
 		ShouldAddEntities:           shouldAddEntities,
@@ -93,7 +90,7 @@ func (g *GameStateManager) Update() error {
 	case StateGame:
 		err = GameStateGame(
 			g.UI,
-			g.LevelManager.CurrentLevel.RoomByIDMap,
+			g.LevelManager,
 			g.SystemsManager,
 			g.InputSystem,
 			g.ShouldAddEntities,
@@ -114,7 +111,7 @@ func (g *GameStateManager) Update() error {
 		err = GameStateMapTransition(
 			g.UI,
 			g.SystemsManager,
-			g.LevelManager.CurrentLevel.RoomByIDMap,
+			g.LevelManager,
 			g.CollisionSystem,
 			g.InputSystem,
 			g.CurrentRoomID,

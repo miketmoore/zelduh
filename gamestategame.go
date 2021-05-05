@@ -2,12 +2,11 @@ package zelduh
 
 import (
 	"github.com/faiface/pixel/pixelgl"
-	"golang.org/x/image/colornames"
 )
 
 func GameStateGame(
 	ui UISystem,
-	roomByIDMap RoomByIDMap,
+	levelManager *LevelManager,
 	systemsManager *SystemsManager,
 	inputSystem *InputSystem,
 	shouldAddEntities *bool,
@@ -22,13 +21,9 @@ func GameStateGame(
 ) error {
 	inputSystem.Enable()
 
-	ui.Window.Clear(colornames.Darkgray)
-	ui.DrawMapBackground(colornames.White)
+	roomName := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID].Name
 
-	ui.DrawMapBackgroundImage(
-		roomByIDMap[*currentRoomID].Name,
-		0, 0,
-	)
+	ui.DrawLevelBackground(roomName)
 
 	if *shouldAddEntities {
 		*shouldAddEntities = false
@@ -47,7 +42,7 @@ func GameStateGame(
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		currentRoom := roomByIDMap[*currentRoomID]
+		currentRoom := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
 			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID(), frameRate)
 			entitiesMap[entity.ID()] = entity
