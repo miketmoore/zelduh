@@ -90,7 +90,7 @@ func (g *GameStateManager) Update() error {
 	var err error
 	switch *g.CurrentState {
 	case StateStart:
-		err = GameStateStart(g.UI, g.LocaleMessages, g.CurrentState, g.ActiveSpaceRectangle)
+		err = GameStateStart(g.UI, g.CurrentState)
 	case StateGame:
 		err = GameStateGame(
 			g.UI,
@@ -113,7 +113,7 @@ func (g *GameStateManager) Update() error {
 	case StatePause:
 		err = GameStatePause(g.UI, g.CurrentState)
 	case StateOver:
-		err = GameStateOver(g.UI, g.LocaleMessages, g.CurrentState)
+		err = GameStateOver(g.UI, g.CurrentState)
 	case StateMapTransition:
 		err = GameStateMapTransition(
 			g.UI,

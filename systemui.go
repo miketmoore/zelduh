@@ -184,3 +184,9 @@ func (s *UISystem) DrawPauseScreen() {
 	s.DrawMapBackground(colornames.White)
 	s.DrawCenterText(s.currLocaleMsgs["pauseScreenMessage"], colornames.Black)
 }
+
+func (s *UISystem) DrawGameOverScreen() {
+	s.Window.Clear(colornames.Darkgray)
+	s.DrawMapBackground(colornames.Black)
+	s.DrawCenterText(s.currLocaleMsgs["gameOverScreenMessage"], colornames.White)
+}
