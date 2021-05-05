@@ -99,3 +99,7 @@ func (g *GameStateManager) Update() error {
 
 	return err
 }
+
+func (g *GameStateManager) setCurrentState(state State) {
+	*g.CurrentState = state
+}

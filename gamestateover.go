@@ -8,7 +8,7 @@ func (g *GameStateManager) stateOver() error {
 	g.UI.DrawGameOverScreen()
 
 	if g.UI.Window.JustPressed(pixelgl.KeyEnter) {
-		*g.CurrentState = StateStart
+		g.setCurrentState(StateStart)
 	}
 
 	return nil

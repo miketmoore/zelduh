@@ -49,11 +49,11 @@ func (g *GameStateManager) stateGame() error {
 	}
 
 	if g.UI.Window.JustPressed(pixelgl.KeyP) {
-		*g.CurrentState = StatePause
+		g.setCurrentState(StatePause)
 	}
 
 	if g.UI.Window.JustPressed(pixelgl.KeyX) {
-		*g.CurrentState = StateOver
+		g.setCurrentState(StateOver)
 	}
 
 	return nil

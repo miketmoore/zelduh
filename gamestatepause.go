@@ -9,10 +9,10 @@ func (g *GameStateManager) statePause() error {
 	g.UI.DrawPauseScreen()
 
 	if g.UI.Window.JustPressed(pixelgl.KeyP) {
-		*g.CurrentState = StateGame
+		g.setCurrentState(StateGame)
 	}
 	if g.UI.Window.JustPressed(pixelgl.KeyEscape) {
-		*g.CurrentState = StateStart
+		g.setCurrentState(StateStart)
 	}
 	return nil
 }

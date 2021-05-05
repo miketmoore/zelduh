@@ -9,7 +9,7 @@ func (g *GameStateManager) stateStart() error {
 	g.UI.DrawScreenStart()
 
 	if g.UI.Window.JustPressed(pixelgl.KeyEnter) {
-		*g.CurrentState = StateGame
+		g.setCurrentState(StateGame)
 	}
 
 	return nil
