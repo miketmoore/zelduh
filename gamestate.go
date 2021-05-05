@@ -100,8 +100,6 @@ func (g *GameStateManager) Update() error {
 			g.ShouldAddEntities,
 			g.CurrentRoomID,
 			g.CurrentState,
-			g.SpriteMap,
-			g.MapDrawData,
 			g.EntitiesMap,
 			g.Player,
 			g.RoomWarps,

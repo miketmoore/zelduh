@@ -13,8 +13,6 @@ func GameStateGame(
 	shouldAddEntities *bool,
 	currentRoomID *RoomID,
 	currentState *State,
-	spriteMap SpriteMap,
-	mapDrawData MapDrawData,
 	entitiesMap EntitiesMap,
 	player *Entity,
 	roomWarps RoomWarps,
