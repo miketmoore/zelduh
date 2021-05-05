@@ -7,50 +7,41 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func GameStateMapTransition(
-	ui UISystem,
-	systemsManager *SystemsManager,
-	levelManager *LevelManager,
-	collisionSystem *CollisionSystem,
-	inputSystem *InputSystem,
-	currentRoomID *RoomID,
-	nextRoomID *RoomID,
-	currentState *State,
-	roomTransition *RoomTransition,
-	player *Entity,
-	tileSize float64,
-	activeSpaceRectangle ActiveSpaceRectangle,
-) error {
-	inputSystem.Disable()
+func (s *GameStateManager) stateMapTransition() error {
 
-	if roomTransition.Style == TransitionSlide && roomTransition.Timer > 0 {
-		roomTransition.Timer--
+	ui := s.UI
+	systemsManager := s.SystemsManager
+
+	s.InputSystem.Disable()
+
+	if s.RoomTransition.Style == TransitionSlide && s.RoomTransition.Timer > 0 {
+		s.RoomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
 		ui.DrawMapBackground(colornames.White)
 
-		collisionSystem.RemoveAll(CategoryObstacle)
+		s.CollisionSystem.RemoveAll(CategoryObstacle)
 		systemsManager.RemoveAllEnemies()
 		systemsManager.RemoveAllCollisionSwitches()
 		systemsManager.RemoveAllMoveableObstacles()
 		systemsManager.RemoveAllEntities()
 
-		connectedRooms := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID].ConnectedRooms()
+		connectedRooms := s.LevelManager.CurrentLevel.RoomByIDMap[*s.CurrentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
-			roomTransition,
+			s.RoomTransition,
 			*connectedRooms,
-			tileSize,
-			activeSpaceRectangle,
+			s.TileSize,
+			s.ActiveSpaceRectangle,
 		)
 
-		*nextRoomID = transitionRoomResp.nextRoomID
+		*s.NextRoomID = transitionRoomResp.nextRoomID
 
-		if currentRoomID == nil {
+		if s.CurrentRoomID == nil {
 			return fmt.Errorf("current room ID is nil")
 		}
-		currentRoom, currentRoomOk := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID]
+		currentRoom, currentRoomOk := s.LevelManager.CurrentLevel.RoomByIDMap[*s.CurrentRoomID]
 		if !currentRoomOk {
-			return fmt.Errorf("current room not found by ID=%d", *currentRoomID)
+			return fmt.Errorf("current room not found by ID=%d", *s.CurrentRoomID)
 		}
 		ui.DrawMapBackgroundImage(
 			currentRoom.Name,
@@ -58,12 +49,12 @@ func GameStateMapTransition(
 			transitionRoomResp.modY,
 		)
 
-		if nextRoomID == nil {
+		if s.NextRoomID == nil {
 			return fmt.Errorf("next room ID is nil")
 		}
-		nextRoom, nextRoomOk := levelManager.CurrentLevel.RoomByIDMap[*nextRoomID]
+		nextRoom, nextRoomOk := s.LevelManager.CurrentLevel.RoomByIDMap[*s.NextRoomID]
 		if !nextRoomOk {
-			return fmt.Errorf("next room not found by ID=%d", *nextRoomID)
+			return fmt.Errorf("next room not found by ID=%d", *s.NextRoomID)
 		}
 		ui.DrawMapBackgroundImage(
 			nextRoom.Name,
@@ -73,33 +64,33 @@ func GameStateMapTransition(
 		ui.DrawMask()
 
 		// Move player with map transition
-		player.componentRectangle.Rect = pixel.R(
-			player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX,
-			player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY,
-			player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX+tileSize,
-			player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY+tileSize,
+		s.Player.componentRectangle.Rect = pixel.R(
+			s.Player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX,
+			s.Player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY,
+			s.Player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX+s.TileSize,
+			s.Player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY+s.TileSize,
 		)
 
 		err := systemsManager.Update()
 		if err != nil {
 			return err
 		}
-	} else if roomTransition.Style == TransitionWarp && roomTransition.Timer > 0 {
-		roomTransition.Timer--
+	} else if s.RoomTransition.Style == TransitionWarp && s.RoomTransition.Timer > 0 {
+		s.RoomTransition.Timer--
 		ui.Window.Clear(colornames.Darkgray)
 		ui.DrawMapBackground(colornames.White)
 
-		collisionSystem.RemoveAll(CategoryObstacle)
+		s.CollisionSystem.RemoveAll(CategoryObstacle)
 		systemsManager.RemoveAllEnemies()
 		systemsManager.RemoveAllCollisionSwitches()
 		systemsManager.RemoveAllMoveableObstacles()
 		systemsManager.RemoveAllEntities()
 	} else {
-		*currentState = StateGame
-		if *nextRoomID != 0 {
-			*currentRoomID = *nextRoomID
+		*s.CurrentState = StateGame
+		if *s.NextRoomID != 0 {
+			*s.CurrentRoomID = *s.NextRoomID
 		}
-		roomTransition.Active = false
+		s.RoomTransition.Active = false
 	}
 
 	return nil

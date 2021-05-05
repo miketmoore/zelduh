@@ -4,70 +4,56 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func GameStateGame(
-	ui UISystem,
-	levelManager *LevelManager,
-	systemsManager *SystemsManager,
-	inputSystem *InputSystem,
-	shouldAddEntities *bool,
-	currentRoomID *RoomID,
-	currentState *State,
-	entitiesMap EntitiesMap,
-	roomWarps RoomWarps,
-	tileSize float64,
-	frameRate int,
-	activeSpaceRectangle ActiveSpaceRectangle,
-	entityCreator *EntityCreator,
-) error {
-	inputSystem.Enable()
+func (g *GameStateManager) stateGame() error {
+	g.InputSystem.Enable()
 
-	roomName := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID].Name
+	roomName := g.LevelManager.CurrentLevel.RoomByIDMap[*g.CurrentRoomID].Name
 
-	ui.DrawLevelBackground(roomName)
+	g.UI.DrawLevelBackground(roomName)
 
-	if *shouldAddEntities {
-		*shouldAddEntities = false
+	if *g.ShouldAddEntities {
+		*g.ShouldAddEntities = false
 
-		entityCreator.CreateUICoin()
+		g.entityCreator.CreateUICoin()
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := ui.DrawObstaclesPerMapTiles(
-			currentRoomID,
+		obstacles := g.UI.DrawObstaclesPerMapTiles(
+			g.CurrentRoomID,
 			0, 0,
 		)
-		systemsManager.AddEntities(obstacles...)
+		g.SystemsManager.AddEntities(obstacles...)
 
-		for k := range roomWarps {
-			delete(roomWarps, k)
+		for k := range g.RoomWarps {
+			delete(g.RoomWarps, k)
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		currentRoom := levelManager.CurrentLevel.RoomByIDMap[*currentRoomID]
+		currentRoom := g.LevelManager.CurrentLevel.RoomByIDMap[*g.CurrentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
-			entity := BuildEntityFromConfig(c, systemsManager.NewEntityID(), frameRate)
-			entitiesMap[entity.ID()] = entity
-			systemsManager.AddEntity(entity)
+			entity := BuildEntityFromConfig(c, g.SystemsManager.NewEntityID(), g.FrameRate)
+			g.EntitiesMap[entity.ID()] = entity
+			g.SystemsManager.AddEntity(entity)
 
 			switch c.Category {
 			case CategoryWarp:
-				roomWarps[entity.ID()] = c
+				g.RoomWarps[entity.ID()] = c
 			}
 		}
 	}
 
-	ui.DrawMask()
+	g.UI.DrawMask()
 
-	err := systemsManager.Update()
+	err := g.SystemsManager.Update()
 	if err != nil {
 		return err
 	}
 
-	if ui.Window.JustPressed(pixelgl.KeyP) {
-		*currentState = StatePause
+	if g.UI.Window.JustPressed(pixelgl.KeyP) {
+		*g.CurrentState = StatePause
 	}
 
-	if ui.Window.JustPressed(pixelgl.KeyX) {
-		*currentState = StateOver
+	if g.UI.Window.JustPressed(pixelgl.KeyX) {
+		*g.CurrentState = StateOver
 	}
 
 	return nil

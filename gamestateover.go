@@ -4,14 +4,11 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func GameStateOver(
-	ui UISystem,
-	currentState *State,
-) error {
-	ui.DrawGameOverScreen()
+func (g *GameStateManager) stateOver() error {
+	g.UI.DrawGameOverScreen()
 
-	if ui.Window.JustPressed(pixelgl.KeyEnter) {
-		*currentState = StateStart
+	if g.UI.Window.JustPressed(pixelgl.KeyEnter) {
+		*g.CurrentState = StateStart
 	}
 
 	return nil

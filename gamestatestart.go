@@ -5,11 +5,11 @@ import (
 )
 
 // GameStateStart handles functionality for the game "start" state
-func GameStateStart(ui UISystem, currentState *State) error {
-	ui.DrawScreenStart()
+func (g *GameStateManager) stateStart() error {
+	g.UI.DrawScreenStart()
 
-	if ui.Window.JustPressed(pixelgl.KeyEnter) {
-		*currentState = StateGame
+	if g.UI.Window.JustPressed(pixelgl.KeyEnter) {
+		*g.CurrentState = StateGame
 	}
 
 	return nil

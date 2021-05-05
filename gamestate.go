@@ -86,42 +86,15 @@ func (g *GameStateManager) Update() error {
 	var err error
 	switch *g.CurrentState {
 	case StateStart:
-		err = GameStateStart(g.UI, g.CurrentState)
+		err = g.stateStart()
 	case StateGame:
-		err = GameStateGame(
-			g.UI,
-			g.LevelManager,
-			g.SystemsManager,
-			g.InputSystem,
-			g.ShouldAddEntities,
-			g.CurrentRoomID,
-			g.CurrentState,
-			g.EntitiesMap,
-			g.RoomWarps,
-			g.TileSize,
-			g.FrameRate,
-			g.ActiveSpaceRectangle,
-			g.entityCreator,
-		)
+		err = g.stateGame()
 	case StatePause:
-		err = GameStatePause(g.UI, g.CurrentState)
+		err = g.statePause()
 	case StateOver:
-		err = GameStateOver(g.UI, g.CurrentState)
+		err = g.stateOver()
 	case StateMapTransition:
-		err = GameStateMapTransition(
-			g.UI,
-			g.SystemsManager,
-			g.LevelManager,
-			g.CollisionSystem,
-			g.InputSystem,
-			g.CurrentRoomID,
-			g.NextRoomID,
-			g.CurrentState,
-			g.RoomTransition,
-			g.Player,
-			g.TileSize,
-			g.ActiveSpaceRectangle,
-		)
+		err = g.stateMapTransition()
 	}
 
 	return err

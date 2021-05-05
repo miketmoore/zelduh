@@ -4,18 +4,15 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func GameStatePause(
-	ui UISystem,
-	currentState *State,
-) error {
+func (g *GameStateManager) statePause() error {
 
-	ui.DrawPauseScreen()
+	g.UI.DrawPauseScreen()
 
-	if ui.Window.JustPressed(pixelgl.KeyP) {
-		*currentState = StateGame
+	if g.UI.Window.JustPressed(pixelgl.KeyP) {
+		*g.CurrentState = StateGame
 	}
-	if ui.Window.JustPressed(pixelgl.KeyEscape) {
-		*currentState = StateStart
+	if g.UI.Window.JustPressed(pixelgl.KeyEscape) {
+		*g.CurrentState = StateStart
 	}
 	return nil
 }
