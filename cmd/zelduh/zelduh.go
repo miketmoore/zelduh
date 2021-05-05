@@ -54,7 +54,7 @@ func run() {
 
 	entitiesMap := zelduh.NewEntitiesMap()
 
-	roomTransition := zelduh.NewRoomTransition(float64(tileSize))
+	roomTransitionManager := zelduh.NewRoomTransitionManager(tileSize)
 
 	roomWarps := zelduh.NewRoomWarps()
 
@@ -173,12 +173,11 @@ func run() {
 		mapBounds,
 		func(side zelduh.Bound) {
 			// TODO prevent room transition if no room exists on this side
-			if !roomTransition.Active && nextRoomID > 0 {
-
-				roomTransition.Active = true
-				roomTransition.Side = side
-				roomTransition.Style = zelduh.TransitionSlide
-				roomTransition.Timer = int(roomTransition.Start)
+			if !roomTransitionManager.Active() && nextRoomID > 0 {
+				roomTransitionManager.Enable()
+				roomTransitionManager.SetSide(side)
+				roomTransitionManager.SetSlide()
+				roomTransitionManager.ResetTimer()
 				currentState = zelduh.StateMapTransition
 				shouldAddEntities = true
 			} else {
@@ -297,10 +296,10 @@ func run() {
 			},
 			"playerWithWarp": func(warpID zelduh.EntityID) {
 				entityConfig, ok := roomWarps[warpID]
-				if ok && !roomTransition.Active {
-					roomTransition.Active = true
-					roomTransition.Style = zelduh.TransitionWarp
-					roomTransition.Timer = 1
+				if ok && !roomTransitionManager.Active() {
+					roomTransitionManager.Enable()
+					roomTransitionManager.SetWarp()
+					roomTransitionManager.SetTimer(1)
 					currentState = zelduh.StateMapTransition
 					shouldAddEntities = true
 					nextRoomID = entityConfig.WarpToRoomID
@@ -406,7 +405,6 @@ func run() {
 		&currentState,
 		spriteMap,
 		mapDrawData,
-		&roomTransition,
 		entitiesMap,
 		&player,
 		roomWarps,
@@ -417,6 +415,7 @@ func run() {
 		nonObstacleSprites,
 		activeSpaceRectangle,
 		&entityCreator,
+		&roomTransitionManager,
 	)
 
 	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)

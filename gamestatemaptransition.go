@@ -14,8 +14,8 @@ func (s *GameStateManager) stateMapTransition() error {
 
 	s.InputSystem.Disable()
 
-	if s.RoomTransition.Style == TransitionSlide && s.RoomTransition.Timer > 0 {
-		s.RoomTransition.Timer--
+	if s.roomTransitionManager.Style() == TransitionSlide && s.roomTransitionManager.Timer() > 0 {
+		s.roomTransitionManager.DecrementTimer()
 		ui.Window.Clear(colornames.Darkgray)
 		ui.DrawMapBackground(colornames.White)
 
@@ -28,7 +28,7 @@ func (s *GameStateManager) stateMapTransition() error {
 		connectedRooms := s.LevelManager.CurrentLevel.RoomByIDMap[*s.CurrentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
-			s.RoomTransition,
+			s.roomTransitionManager,
 			*connectedRooms,
 			s.TileSize,
 			s.ActiveSpaceRectangle,
@@ -75,8 +75,8 @@ func (s *GameStateManager) stateMapTransition() error {
 		if err != nil {
 			return err
 		}
-	} else if s.RoomTransition.Style == TransitionWarp && s.RoomTransition.Timer > 0 {
-		s.RoomTransition.Timer--
+	} else if s.roomTransitionManager.Style() == TransitionWarp && s.roomTransitionManager.Timer() > 0 {
+		s.roomTransitionManager.DecrementTimer()
 		ui.Window.Clear(colornames.Darkgray)
 		ui.DrawMapBackground(colornames.White)
 
@@ -90,7 +90,7 @@ func (s *GameStateManager) stateMapTransition() error {
 		if *s.NextRoomID != 0 {
 			*s.CurrentRoomID = *s.NextRoomID
 		}
-		s.RoomTransition.Active = false
+		s.roomTransitionManager.Disable()
 	}
 
 	return nil
@@ -102,14 +102,14 @@ type transitionRoomResponse struct {
 }
 
 func calculateTransitionSlide(
-	roomTransition *RoomTransition,
+	roomTransitionManager *RoomTransitionManager,
 	connectedRooms ConnectedRooms,
 	tileSize float64,
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) transitionRoomResponse {
 
 	var nextRoomID RoomID
-	inc := (roomTransition.Start - float64(roomTransition.Timer))
+	inc := (roomTransitionManager.Start() - float64(roomTransitionManager.Timer()))
 	incY := inc * (activeSpaceRectangle.Height / tileSize)
 	incX := inc * (activeSpaceRectangle.Width / tileSize)
 	modY := 0.0
@@ -120,22 +120,22 @@ func calculateTransitionSlide(
 	playerModY := 0.0
 	playerIncY := ((activeSpaceRectangle.Height / tileSize) - 1) + 7
 	playerIncX := ((activeSpaceRectangle.Width / tileSize) - 1) + 7
-	if roomTransition.Side == BoundBottom && connectedRooms.Bottom != 0 {
+	if roomTransitionManager.Side() == BoundBottom && connectedRooms.Bottom != 0 {
 		modY = incY
 		modYNext = incY - activeSpaceRectangle.Height
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
-	} else if roomTransition.Side == BoundTop && connectedRooms.Top != 0 {
+	} else if roomTransitionManager.Side() == BoundTop && connectedRooms.Top != 0 {
 		modY = -incY
 		modYNext = -incY + activeSpaceRectangle.Height
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
-	} else if roomTransition.Side == BoundLeft && connectedRooms.Left != 0 {
+	} else if roomTransitionManager.Side() == BoundLeft && connectedRooms.Left != 0 {
 		modX = incX
 		modXNext = incX - activeSpaceRectangle.Width
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
-	} else if roomTransition.Side == BoundRight && connectedRooms.Right != 0 {
+	} else if roomTransitionManager.Side() == BoundRight && connectedRooms.Right != 0 {
 		modX = -incX
 		modXNext = -incX + activeSpaceRectangle.Width
 		nextRoomID = connectedRooms.Right

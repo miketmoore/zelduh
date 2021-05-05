@@ -21,7 +21,6 @@ type GameStateManager struct {
 	CurrentState                *State
 	SpriteMap                   SpriteMap
 	MapDrawData                 MapDrawData
-	RoomTransition              *RoomTransition
 	EntitiesMap                 EntitiesMap
 	Player                      *Entity
 	RoomWarps                   RoomWarps
@@ -32,6 +31,7 @@ type GameStateManager struct {
 	NonObstacleSprites          map[int]bool
 	ActiveSpaceRectangle        ActiveSpaceRectangle
 	entityCreator               *EntityCreator
+	roomTransitionManager       *RoomTransitionManager
 }
 
 func NewGameStateManager(
@@ -45,7 +45,6 @@ func NewGameStateManager(
 	currentState *State,
 	spriteMap SpriteMap,
 	mapDrawData MapDrawData,
-	roomTransition *RoomTransition,
 	entitiesMap EntitiesMap,
 	player *Entity,
 	roomWarps RoomWarps,
@@ -56,6 +55,7 @@ func NewGameStateManager(
 	nonObstacleSprites map[int]bool,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	entityCreator *EntityCreator,
+	roomTransitionManager *RoomTransitionManager,
 ) GameStateManager {
 	return GameStateManager{
 		SystemsManager:              systemsManager,
@@ -68,7 +68,6 @@ func NewGameStateManager(
 		CurrentState:                currentState,
 		SpriteMap:                   spriteMap,
 		MapDrawData:                 mapDrawData,
-		RoomTransition:              roomTransition,
 		EntitiesMap:                 entitiesMap,
 		Player:                      player,
 		RoomWarps:                   roomWarps,
@@ -79,6 +78,7 @@ func NewGameStateManager(
 		NonObstacleSprites:          nonObstacleSprites,
 		ActiveSpaceRectangle:        activeSpaceRectangle,
 		entityCreator:               entityCreator,
+		roomTransitionManager:       roomTransitionManager,
 	}
 }
 
