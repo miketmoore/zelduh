@@ -16,6 +16,13 @@ import (
 
 func run() {
 
+	debugMode := false
+
+	argsWithoutProg := os.Args[1:]
+	if len(argsWithoutProg) >= 1 && argsWithoutProg[0] == "debug" {
+		debugMode = true
+	}
+
 	currLocaleMsgs, err := zelduh.GetLocaleMessageMapByLanguage("en")
 	if err != nil {
 		fmt.Println(err)
@@ -432,6 +439,7 @@ func run() {
 		activeSpaceRectangle,
 		tileSize,
 		ui.Window,
+		debugMode,
 	)
 
 	for !ui.Window.Closed() {

@@ -11,6 +11,7 @@ import (
 )
 
 type Debug struct {
+	debugMode                   bool
 	debugGridCellCachePopulated bool
 	debugGridCellCache          []*imdraw.IMDraw
 	debugTxt                    *text.Text
@@ -23,6 +24,7 @@ func NewDebug(
 	activeSpaceRectangle ActiveSpaceRectangle,
 	tileSize float64,
 	window *pixelgl.Window,
+	debugMode bool,
 ) *Debug {
 	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
 	// debugGridCellCachePopulated := false
@@ -33,6 +35,7 @@ func NewDebug(
 	debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
 
 	return &Debug{
+		debugMode:                   debugMode,
 		debugGridCellCachePopulated: false,
 		debugGridCellCache:          debugGridCellCache,
 		debugTxt:                    debugTxt,
@@ -44,6 +47,9 @@ func NewDebug(
 
 // Draw and overlay representing the virtual grid
 func (d *Debug) DrawGrid() {
+	if !d.debugMode {
+		return
+	}
 	// win.Clear(colornames.White)
 
 	actualOriginX := d.activeSpaceRectangle.X
