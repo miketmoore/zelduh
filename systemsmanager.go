@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/entity"
+
 // System is an interface
 type System interface {
 	Update() error
@@ -10,7 +12,7 @@ type System interface {
 type SystemsManager struct {
 	systems      []System
 	SystemsMap   map[string]System
-	lastEntityID EntityID
+	lastEntityID entity.EntityID
 }
 
 // NewSystemsManager returns a new SystemsManager
@@ -50,7 +52,7 @@ func (w *SystemsManager) Systems() []System {
 }
 
 // NewEntityID generates and returns a new Entity ID
-func (w *SystemsManager) NewEntityID() EntityID {
+func (w *SystemsManager) NewEntityID() entity.EntityID {
 	w.lastEntityID++
 	return w.lastEntityID
 }
@@ -70,7 +72,7 @@ func (w *SystemsManager) AddEntities(all ...Entity) {
 }
 
 // Remove removes the specific entity from all systems
-func (w *SystemsManager) Remove(category EntityCategory, id EntityID) {
+func (w *SystemsManager) Remove(category entity.EntityCategory, id entity.EntityID) {
 	switch category {
 	case CategoryCoin:
 		for _, sys := range w.systems {
@@ -92,7 +94,7 @@ func (w *SystemsManager) Remove(category EntityCategory, id EntityID) {
 }
 
 // RemoveEnemy removes the enemy from all system
-func (w *SystemsManager) RemoveEnemy(id EntityID) {
+func (w *SystemsManager) RemoveEnemy(id entity.EntityID) {
 	for _, sys := range w.systems {
 		switch sys := sys.(type) {
 		case *MovementSystem:

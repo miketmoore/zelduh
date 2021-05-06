@@ -1,17 +1,19 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/entity"
+
 type toggleEntity struct {
 	*componentToggler
 }
 
 // ToggleSystem is a custom system for detecting collisions and what to do when they occur
 type ToggleSystem struct {
-	entityByID map[EntityID]toggleEntity
+	entityByID map[entity.EntityID]toggleEntity
 }
 
 func NewToggleSystem() ToggleSystem {
 	return ToggleSystem{
-		entityByID: map[EntityID]toggleEntity{},
+		entityByID: map[entity.EntityID]toggleEntity{},
 	}
 }
 
@@ -27,7 +29,7 @@ func (s *ToggleSystem) Update() error {
 	return nil
 }
 
-func (s *ToggleSystem) Enabled(entityID EntityID) bool {
+func (s *ToggleSystem) Enabled(entityID entity.EntityID) bool {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		return entity.componentToggler.enabled
@@ -35,7 +37,7 @@ func (s *ToggleSystem) Enabled(entityID EntityID) bool {
 	return false
 }
 
-func (s *ToggleSystem) Toggle(entityID EntityID) {
+func (s *ToggleSystem) Toggle(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentToggler.Toggle()

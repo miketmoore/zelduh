@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/entity"
+
 // componentHealth contains health data
 type componentHealth struct {
 	Total int
@@ -12,7 +14,7 @@ func NewComponentHealth(total int) *componentHealth {
 }
 
 type healthEntity struct {
-	ID EntityID
+	ID entity.EntityID
 	*componentHealth
 }
 
@@ -34,7 +36,7 @@ func (s *HealthSystem) AddEntity(entity Entity) {
 }
 
 // Hit reduces entity health by d
-func (s *HealthSystem) Hit(entityID EntityID, d int) bool {
+func (s *HealthSystem) Hit(entityID entity.EntityID, d int) bool {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {
@@ -45,7 +47,7 @@ func (s *HealthSystem) Hit(entityID EntityID, d int) bool {
 	return false
 }
 
-func (s *HealthSystem) Health(entityID EntityID) int {
+func (s *HealthSystem) Health(entityID entity.EntityID) int {
 	for i := 0; i < len(s.entities); i++ {
 		entity := s.entities[i]
 		if entity.ID == entityID {

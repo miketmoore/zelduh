@@ -4,6 +4,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/core/entity"
 	"golang.org/x/image/colornames"
 )
 
@@ -33,7 +34,7 @@ func NewComponentInvincible(enabled bool) *componentInvincible {
 }
 
 type collisionEntity struct {
-	ID EntityID
+	ID entity.EntityID
 	*componentInvincible
 	*componentHitbox
 	*componentDimensions
@@ -41,19 +42,19 @@ type collisionEntity struct {
 }
 
 type OnCollisionHandlers struct {
-	PlayerWithEnemy                       func(EntityID)
-	PlayerWithCoin                        func(EntityID)
-	SwordWithEnemy                        func(EntityID)
-	ArrowWithEnemy                        func(EntityID)
-	PlayerWithObstacle                    func(EntityID)
-	ArrowWithObstacle                     func(EntityID)
-	EnemyWithObstacle                     func(EntityID)
-	PlayerWithMoveableObstacle            func(EntityID)
-	MoveableObstacleWithSwitch            func(EntityID)
-	MoveableObstacleWithSwitchNoCollision func(EntityID)
-	PlayerWithSwitch                      func(EntityID)
-	PlayerWithSwitchNoCollision           func(EntityID)
-	PlayerWithWarp                        func(EntityID)
+	PlayerWithEnemy                       func(entity.EntityID)
+	PlayerWithCoin                        func(entity.EntityID)
+	SwordWithEnemy                        func(entity.EntityID)
+	ArrowWithEnemy                        func(entity.EntityID)
+	PlayerWithObstacle                    func(entity.EntityID)
+	ArrowWithObstacle                     func(entity.EntityID)
+	EnemyWithObstacle                     func(entity.EntityID)
+	PlayerWithMoveableObstacle            func(entity.EntityID)
+	MoveableObstacleWithSwitch            func(entity.EntityID)
+	MoveableObstacleWithSwitchNoCollision func(entity.EntityID)
+	PlayerWithSwitch                      func(entity.EntityID)
+	PlayerWithSwitchNoCollision           func(entity.EntityID)
+	PlayerWithWarp                        func(entity.EntityID)
 }
 
 // CollisionSystem is a custom system for detecting collisions and what to do when they occur
@@ -120,7 +121,7 @@ func (s *CollisionSystem) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *CollisionSystem) Remove(category EntityCategory, id EntityID) {
+func (s *CollisionSystem) Remove(category entity.EntityCategory, id entity.EntityID) {
 	switch category {
 	case CategoryCoin:
 		removeEntityFromCollection(s.coins, id)
@@ -129,7 +130,7 @@ func (s *CollisionSystem) Remove(category EntityCategory, id EntityID) {
 	}
 }
 
-func removeEntityFromCollection(entities []collisionEntity, entityIDToRemove EntityID) {
+func removeEntityFromCollection(entities []collisionEntity, entityIDToRemove entity.EntityID) {
 	for i := len(entities) - 1; i >= 0; i-- {
 		entity := entities[i]
 		if entity.ID == entityIDToRemove {
@@ -139,7 +140,7 @@ func removeEntityFromCollection(entities []collisionEntity, entityIDToRemove Ent
 }
 
 // RemoveAll removes all entities from one category
-func (s *CollisionSystem) RemoveAll(category EntityCategory) {
+func (s *CollisionSystem) RemoveAll(category entity.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		removeAllEntities(s.enemies)

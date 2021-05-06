@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/zelduh/core/entity"
 )
 
 // AnimationConfig is a map of animation types to sprite index lists
@@ -54,7 +55,7 @@ type Transform struct {
 
 // EntityConfig is used to simplify building entities
 type EntityConfig struct {
-	Category                                                      EntityCategory
+	Category                                                      entity.EntityCategory
 	Moveable, Animated, Toggleable, Impassable, Invincible, Coins bool
 	Coordinates                                                   Coordinates
 	Dimensions                                                    Dimensions

@@ -1,7 +1,9 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/entity"
+
 const (
-	CategoryPlayer = EntityCategory(1 << iota)
+	CategoryPlayer = entity.EntityCategory(1 << iota)
 	CategorySword
 	CategoryArrow
 	CategoryBomb

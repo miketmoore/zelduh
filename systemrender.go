@@ -7,6 +7,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/core/entity"
 	"golang.org/x/image/colornames"
 )
 
@@ -72,8 +73,8 @@ func NewComponentColor(color color.RGBA) *componentColor {
 }
 
 type renderEntity struct {
-	ID       EntityID
-	Category EntityCategory
+	ID       entity.EntityID
+	Category entity.EntityCategory
 	*componentRotation
 	*componentColor
 	*componentAnimation
@@ -172,7 +173,7 @@ func (s *RenderSystem) AddEntity(entity Entity) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *RenderSystem) RemoveAll(category EntityCategory) {
+func (s *RenderSystem) RemoveAll(category entity.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.entities) - 1; i >= 0; i-- {
@@ -184,7 +185,7 @@ func (s *RenderSystem) RemoveAll(category EntityCategory) {
 }
 
 // RemoveEntity removes an entity by ID
-func (s *RenderSystem) RemoveEntity(id EntityID) {
+func (s *RenderSystem) RemoveEntity(id entity.EntityID) {
 	for i := len(s.entities) - 1; i >= 0; i-- {
 		if s.entities[i].ID == id {
 			s.entities = append(s.entities[:i], s.entities[i+1:]...)

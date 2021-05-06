@@ -1,6 +1,9 @@
 package zelduh
 
-import "golang.org/x/image/colornames"
+import (
+	"github.com/miketmoore/zelduh/core/entity"
+	"golang.org/x/image/colornames"
+)
 
 type EntityFactory struct {
 	systemsManager              *SystemsManager
@@ -39,7 +42,7 @@ func (ef *EntityFactory) NewEntity2(entityConfig EntityConfig, frameRate int) En
 }
 
 // BuildEntitiesFromConfigs builds and returns a batch of entities
-func (ef *EntityFactory) buildEntitiesFromConfigs(newEntityID func() EntityID, frameRate int, configs ...EntityConfig) []Entity {
+func (ef *EntityFactory) buildEntitiesFromConfigs(newEntityID func() entity.EntityID, frameRate int, configs ...EntityConfig) []Entity {
 	batch := []Entity{}
 	for _, config := range configs {
 		entity := ef.buildEntityFromConfig(config, newEntityID(), frameRate)
@@ -48,7 +51,7 @@ func (ef *EntityFactory) buildEntitiesFromConfigs(newEntityID func() EntityID, f
 	return batch
 }
 
-func (ef *EntityFactory) buildEntityFromConfig(c EntityConfig, id EntityID, frameRate int) Entity {
+func (ef *EntityFactory) buildEntityFromConfig(c EntityConfig, id entity.EntityID, frameRate int) Entity {
 	entity := Entity{
 		id:                   id,
 		Category:             c.Category,

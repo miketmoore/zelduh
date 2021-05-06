@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/core/entity"
 )
 
 // componentDash indicates that an entity can dash
@@ -62,7 +63,7 @@ func NewComponentMovement(
 }
 
 type movementEntity struct {
-	ID EntityID
+	ID entity.EntityID
 	*componentMovement
 	*componentDash
 	*componentDimensions
@@ -72,7 +73,7 @@ type movementEntity struct {
 }
 
 func newMovementEntity(
-	entityID EntityID,
+	entityID entity.EntityID,
 	componentMovement *componentMovement,
 	componentDimensions *componentDimensions,
 	componentRectangle *componentRectangle,
@@ -86,7 +87,7 @@ func newMovementEntity(
 }
 
 type MovementSystem struct {
-	entityByID        map[EntityID]movementEntity
+	entityByID        map[entity.EntityID]movementEntity
 	Rand              *rand.Rand
 	player            movementEntity
 	sword             movementEntity
@@ -98,7 +99,7 @@ type MovementSystem struct {
 
 func NewMovementSystem(random *rand.Rand, tileSize float64) MovementSystem {
 	return MovementSystem{
-		entityByID: map[EntityID]movementEntity{},
+		entityByID: map[entity.EntityID]movementEntity{},
 		Rand:       random,
 		tileSize:   tileSize,
 	}
@@ -131,7 +132,7 @@ func (s *MovementSystem) AddEntity(entity Entity) {
 }
 
 // Remove removes the entity from the system
-func (s *MovementSystem) Remove(category EntityCategory, id EntityID) {
+func (s *MovementSystem) Remove(category entity.EntityCategory, id entity.EntityID) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -144,7 +145,7 @@ func (s *MovementSystem) Remove(category EntityCategory, id EntityID) {
 }
 
 // RemoveAll removes all entities from one category
-func (s *MovementSystem) RemoveAll(category EntityCategory) {
+func (s *MovementSystem) RemoveAll(category entity.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
@@ -153,14 +154,14 @@ func (s *MovementSystem) RemoveAll(category EntityCategory) {
 	}
 }
 
-func (s *MovementSystem) UsePreviousRectangle(entityID EntityID) {
+func (s *MovementSystem) UsePreviousRectangle(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentRectangle.Rect = entity.componentRectangle.PrevRect
 	}
 }
 
-func (s *MovementSystem) Direction(entityID EntityID) (Direction, error) {
+func (s *MovementSystem) Direction(entityID entity.EntityID) (Direction, error) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		return entity.componentMovement.Direction, nil
@@ -188,7 +189,7 @@ func (s *MovementSystem) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *MovementSystem) MoveMoveableObstacle(obstacleID EntityID, dir Direction) bool {
+func (s *MovementSystem) MoveMoveableObstacle(obstacleID entity.EntityID, dir Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.componentMovement.MovingFromHit {
 		entity.componentMovement.MovingFromHit = true
@@ -200,7 +201,7 @@ func (s *MovementSystem) MoveMoveableObstacle(obstacleID EntityID, dir Direction
 }
 
 // UndoEnemyRect resets current rect to previous rect
-func (s *MovementSystem) UndoEnemyRect(enemyID EntityID) {
+func (s *MovementSystem) UndoEnemyRect(enemyID entity.EntityID) {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		enemy.componentRectangle.Rect = enemy.componentRectangle.PrevRect
@@ -208,7 +209,7 @@ func (s *MovementSystem) UndoEnemyRect(enemyID EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *MovementSystem) MoveEnemyBack(enemyID EntityID, directionHit Direction) {
+func (s *MovementSystem) MoveEnemyBack(enemyID entity.EntityID, directionHit Direction) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.componentMovement.MovingFromHit {
 		enemy.componentMovement.MovingFromHit = true
@@ -218,7 +219,7 @@ func (s *MovementSystem) MoveEnemyBack(enemyID EntityID, directionHit Direction)
 }
 
 // ComponentRectangle returns the ComponentRectangle for the entity
-func (s *MovementSystem) ComponentRectangle(entityID EntityID) (*componentRectangle, bool) {
+func (s *MovementSystem) ComponentRectangle(entityID entity.EntityID) (*componentRectangle, bool) {
 	for _, entity := range s.enemies {
 		if entity.ID == entityID {
 			return entity.componentRectangle, true
@@ -228,7 +229,7 @@ func (s *MovementSystem) ComponentRectangle(entityID EntityID) (*componentRectan
 }
 
 // EnemyMovingFromHit indicates if the enemy is moving after being hit
-func (s *MovementSystem) EnemyMovingFromHit(enemyID EntityID) bool {
+func (s *MovementSystem) EnemyMovingFromHit(enemyID entity.EntityID) bool {
 	enemy, ok := s.enemy(enemyID)
 	if ok {
 		if enemy.ID == enemyID {
@@ -261,56 +262,56 @@ func (s *MovementSystem) Update() error {
 	return nil
 }
 
-func (s *MovementSystem) SetMaxSpeed(entityID EntityID) {
+func (s *MovementSystem) SetMaxSpeed(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.Speed = entity.componentMovement.MaxSpeed
 	}
 }
 
-func (s *MovementSystem) SetZeroSpeed(entityID EntityID) {
+func (s *MovementSystem) SetZeroSpeed(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.Speed = 0
 	}
 }
 
-func (s *MovementSystem) ChangeSpeed(entityID EntityID, speed float64) {
+func (s *MovementSystem) ChangeSpeed(entityID entity.EntityID, speed float64) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.Speed = speed
 	}
 }
 
-func (s *MovementSystem) ChangeDirection(entityID EntityID, direction Direction) {
+func (s *MovementSystem) ChangeDirection(entityID entity.EntityID, direction Direction) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.Direction = direction
 	}
 }
 
-func (s *MovementSystem) MatchDirectionToPlayer(entityID EntityID) {
+func (s *MovementSystem) MatchDirectionToPlayer(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.Direction = s.player.componentMovement.Direction
 	}
 }
 
-func (s *MovementSystem) SetRemainingMoves(entityID EntityID, value int) {
+func (s *MovementSystem) SetRemainingMoves(entityID entity.EntityID, value int) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.RemainingMoves = value
 	}
 }
 
-func (s *MovementSystem) DecrementRemainingMoves(entityID EntityID) {
+func (s *MovementSystem) DecrementRemainingMoves(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.RemainingMoves--
 	}
 }
 
-func (s *MovementSystem) RemainingMoves(entityID EntityID) int {
+func (s *MovementSystem) RemainingMoves(entityID entity.EntityID) int {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		return entity.componentMovement.RemainingMoves
@@ -318,7 +319,7 @@ func (s *MovementSystem) RemainingMoves(entityID EntityID) int {
 	return 0
 }
 
-func (s *MovementSystem) UpdateLastDirection(entityID EntityID) {
+func (s *MovementSystem) UpdateLastDirection(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.LastDirection = entity.componentMovement.Direction
@@ -364,7 +365,7 @@ func (s *MovementSystem) movePlayer() {
 	}
 }
 
-func (s *MovementSystem) moveableObstacle(id EntityID) (movementEntity, bool) {
+func (s *MovementSystem) moveableObstacle(id entity.EntityID) (movementEntity, bool) {
 	for _, e := range s.moveableObstacles {
 		if e.ID == id {
 			return *e, true
@@ -373,7 +374,7 @@ func (s *MovementSystem) moveableObstacle(id EntityID) (movementEntity, bool) {
 	return movementEntity{}, false
 }
 
-func (s *MovementSystem) enemy(id EntityID) (movementEntity, bool) {
+func (s *MovementSystem) enemy(id entity.EntityID) (movementEntity, bool) {
 	for _, e := range s.enemies {
 		if e.ID == id {
 			return *e, true

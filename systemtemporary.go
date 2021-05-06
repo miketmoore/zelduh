@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/entity"
+
 // componentTemporary is used to track when an entity should be removed
 type componentTemporary struct {
 	Expiration   int
@@ -13,18 +15,18 @@ func NewComponentTemporary(expiration int) *componentTemporary {
 }
 
 type temporaryEntity struct {
-	ID EntityID
+	ID entity.EntityID
 	*componentTemporary
 }
 
 type TemporarySystem struct {
-	entityByID map[EntityID]temporaryEntity
+	entityByID map[entity.EntityID]temporaryEntity
 	*componentIgnore
 }
 
 func NewTemporarySystem() TemporarySystem {
 	return TemporarySystem{
-		entityByID: map[EntityID]temporaryEntity{},
+		entityByID: map[entity.EntityID]temporaryEntity{},
 	}
 }
 
@@ -42,7 +44,7 @@ func (s *TemporarySystem) Update() error {
 	return nil
 }
 
-func (s *TemporarySystem) SetExpiration(entityID EntityID, value int, onExpirationHandler func()) {
+func (s *TemporarySystem) SetExpiration(entityID entity.EntityID, value int, onExpirationHandler func()) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentTemporary.Expiration = value
@@ -50,7 +52,7 @@ func (s *TemporarySystem) SetExpiration(entityID EntityID, value int, onExpirati
 	}
 }
 
-func (s *TemporarySystem) IsTemporary(entityID EntityID) bool {
+func (s *TemporarySystem) IsTemporary(entityID entity.EntityID) bool {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		return entity.componentTemporary != nil
@@ -58,7 +60,7 @@ func (s *TemporarySystem) IsTemporary(entityID EntityID) bool {
 	return false
 }
 
-func (s *TemporarySystem) IsExpired(entityID EntityID) bool {
+func (s *TemporarySystem) IsExpired(entityID entity.EntityID) bool {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		return s.IsTemporary(entityID) && entity.componentTemporary.Expiration == 0
@@ -66,14 +68,14 @@ func (s *TemporarySystem) IsExpired(entityID EntityID) bool {
 	return false
 }
 
-func (s *TemporarySystem) DecrementExpiration(entityID EntityID) {
+func (s *TemporarySystem) DecrementExpiration(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentTemporary.Expiration--
 	}
 }
 
-func (s *TemporarySystem) CallOnExpirationHandler(entityID EntityID) {
+func (s *TemporarySystem) CallOnExpirationHandler(entityID entity.EntityID) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentTemporary.OnExpiration()

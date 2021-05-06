@@ -8,6 +8,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/core/entity"
 	"golang.org/x/image/colornames"
 )
 
@@ -187,7 +188,7 @@ func (m *Main) Run() error {
 		activeSpaceRectangle,
 		ui.Window,
 		&OnCollisionHandlers{
-			PlayerWithEnemy: func(entityID EntityID) {
+			PlayerWithEnemy: func(entityID entity.EntityID) {
 				// TODO repeat what I did with the enemies
 				movementSystem.MovePlayerBack()
 				healthSystem.Hit(playerID, 1)
@@ -201,11 +202,11 @@ func (m *Main) Run() error {
 					}
 				}
 			},
-			PlayerWithCoin: func(coinEntityID EntityID) {
+			PlayerWithCoin: func(coinEntityID entity.EntityID) {
 				coinsSystem.AddCoins(player.ID(), 1)
 				systemsManager.Remove(CategoryCoin, coinEntityID)
 			},
-			SwordWithEnemy: func(enemyEntityID EntityID) {
+			SwordWithEnemy: func(enemyEntityID entity.EntityID) {
 				if !ignoreSystem.IsCurrentlyIgnored(sword.ID()) {
 					// if !sword.componentIgnore.Value {
 					dead := false
@@ -226,7 +227,7 @@ func (m *Main) Run() error {
 
 				}
 			},
-			ArrowWithEnemy: func(enemyEntityID EntityID) {
+			ArrowWithEnemy: func(enemyEntityID entity.EntityID) {
 				if !ignoreSystem.IsCurrentlyIgnored(arrow.ID()) {
 					dead := healthSystem.Hit(enemyEntityID, 1)
 					// arrow.componentIgnore.Value = true
@@ -244,17 +245,17 @@ func (m *Main) Run() error {
 					}
 				}
 			},
-			ArrowWithObstacle: func(arrowID EntityID) {
+			ArrowWithObstacle: func(arrowID entity.EntityID) {
 				movementSystem.SetRemainingMoves(arrowID, 0)
 			},
-			PlayerWithObstacle: func(obstacleID EntityID) {
+			PlayerWithObstacle: func(obstacleID entity.EntityID) {
 				// "Block" by undoing rect
 				movementSystem.UsePreviousRectangle(player.ID())
 				movementSystem.SetZeroSpeed(player.ID())
 
 				movementSystem.UsePreviousRectangle(sword.ID())
 			},
-			PlayerWithMoveableObstacle: func(moveableObstacleID EntityID) {
+			PlayerWithMoveableObstacle: func(moveableObstacleID entity.EntityID) {
 				playerDirection, err := movementSystem.Direction(player.ID())
 				if err != nil {
 					fmt.Println("Error: ", err)
@@ -265,35 +266,35 @@ func (m *Main) Run() error {
 					movementSystem.UsePreviousRectangle(player.ID())
 				}
 			},
-			MoveableObstacleWithSwitch: func(collisionSwitchID EntityID) {
+			MoveableObstacleWithSwitch: func(collisionSwitchID entity.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && !toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			MoveableObstacleWithSwitchNoCollision: func(collisionSwitchID EntityID) {
+			MoveableObstacleWithSwitchNoCollision: func(collisionSwitchID entity.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			PlayerWithSwitch: func(collisionSwitchID EntityID) {
+			PlayerWithSwitch: func(collisionSwitchID entity.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && !toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			PlayerWithSwitchNoCollision: func(collisionSwitchID EntityID) {
+			PlayerWithSwitchNoCollision: func(collisionSwitchID entity.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			EnemyWithObstacle: func(enemyEntityID EntityID) {
+			EnemyWithObstacle: func(enemyEntityID entity.EntityID) {
 				// Block enemy within the spatial system by reseting current rect to previous rect
 				movementSystem.UndoEnemyRect(enemyEntityID)
 			},
-			PlayerWithWarp: func(warpID EntityID) {
+			PlayerWithWarp: func(warpID entity.EntityID) {
 				entityConfig, ok := roomWarps[warpID]
 				if ok && !roomTransitionManager.Active() {
 					roomTransitionManager.Enable()

@@ -1,21 +1,11 @@
 package zelduh
 
-// Entity is an interface for implementing concrete "things" in the game. TODO rename...
-type Entityer interface {
-	ID() EntityID
-	Category() EntityCategory
-}
-
-// EntityCategory is used to group entities
-type EntityCategory uint
-
-// EntityID represents an entity ID
-type EntityID int
+import "github.com/miketmoore/zelduh/core/entity"
 
 // Entity is used to represent each character and tangable "thing" in the game
 type Entity struct {
-	id       EntityID
-	Category EntityCategory
+	id       entity.EntityID
+	Category entity.EntityCategory
 	*componentInvincible
 	*componentHitbox
 	*componentAnimation
@@ -35,13 +25,13 @@ type Entity struct {
 	*componentShape
 }
 
-type EntitiesMap map[EntityID]Entity
+type EntitiesMap map[entity.EntityID]Entity
 
 func NewEntitiesMap() EntitiesMap {
 	return EntitiesMap{}
 }
 
 // ID returns the entity ID
-func (e *Entity) ID() EntityID {
+func (e *Entity) ID() entity.EntityID {
 	return e.id
 }

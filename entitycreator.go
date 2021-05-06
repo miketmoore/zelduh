@@ -1,6 +1,9 @@
 package zelduh
 
-import "github.com/faiface/pixel"
+import (
+	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/core/entity"
+)
 
 type EntityCreator struct {
 	systemsManager              *SystemsManager
@@ -51,7 +54,7 @@ func (ec *EntityCreator) CreateUICoin() {
 }
 
 func (ec *EntityCreator) CreateExplosion(
-	entityID EntityID,
+	entityID entity.EntityID,
 ) {
 	explosion := ec.entityFactory.NewEntity("explosion", NewCoordinates(0, 0), ec.frameRate)
 

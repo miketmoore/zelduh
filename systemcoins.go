@@ -1,17 +1,19 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/entity"
+
 type coinsEntity struct {
 	*componentCoins
 }
 
 // CoinsSystem is a custom system for detecting collisions and what to do when they occur
 type CoinsSystem struct {
-	entityByID map[EntityID]coinsEntity
+	entityByID map[entity.EntityID]coinsEntity
 }
 
 func NewCoinsSystem() CoinsSystem {
 	return CoinsSystem{
-		entityByID: map[EntityID]coinsEntity{},
+		entityByID: map[entity.EntityID]coinsEntity{},
 	}
 }
 
@@ -27,7 +29,7 @@ func (s *CoinsSystem) Update() error {
 	return nil
 }
 
-func (s *CoinsSystem) AddCoins(entityID EntityID, value int) {
+func (s *CoinsSystem) AddCoins(entityID entity.EntityID, value int) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentCoins.Coins = entity.componentCoins.Coins + value
