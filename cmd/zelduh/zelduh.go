@@ -182,8 +182,8 @@ func run() {
 		mapBounds,
 		activeSpaceRectangle,
 		ui.Window,
-		zelduh.OnCollisionHandlerByNameMap{
-			"playerWithEnemy": func(entityID zelduh.EntityID) {
+		&zelduh.OnCollisionHandlers{
+			PlayerWithEnemy: func(entityID zelduh.EntityID) {
 				// TODO repeat what I did with the enemies
 				movementSystem.MovePlayerBack()
 				healthSystem.Hit(playerID, 1)
@@ -197,11 +197,11 @@ func run() {
 					}
 				}
 			},
-			"playerWithCoin": func(coinEntityID zelduh.EntityID) {
+			PlayerWithCoin: func(coinEntityID zelduh.EntityID) {
 				coinsSystem.AddCoins(player.ID(), 1)
 				systemsManager.Remove(zelduh.CategoryCoin, coinEntityID)
 			},
-			"swordWithEnemy": func(enemyEntityID zelduh.EntityID) {
+			SwordWithEnemy: func(enemyEntityID zelduh.EntityID) {
 				if !ignoreSystem.IsCurrentlyIgnored(sword.ID()) {
 					// if !sword.componentIgnore.Value {
 					dead := false
@@ -222,7 +222,7 @@ func run() {
 
 				}
 			},
-			"arrowWithEnemy": func(enemyEntityID zelduh.EntityID) {
+			ArrowWithEnemy: func(enemyEntityID zelduh.EntityID) {
 				if !ignoreSystem.IsCurrentlyIgnored(arrow.ID()) {
 					dead := healthSystem.Hit(enemyEntityID, 1)
 					// arrow.componentIgnore.Value = true
@@ -240,17 +240,17 @@ func run() {
 					}
 				}
 			},
-			"arrowWithObstacle": func(arrowID zelduh.EntityID) {
+			ArrowWithObstacle: func(arrowID zelduh.EntityID) {
 				movementSystem.SetRemainingMoves(arrowID, 0)
 			},
-			"playerWithObstacle": func(obstacleID zelduh.EntityID) {
+			PlayerWithObstacle: func(obstacleID zelduh.EntityID) {
 				// "Block" by undoing rect
 				movementSystem.UsePreviousRectangle(player.ID())
 				movementSystem.SetZeroSpeed(player.ID())
 
 				movementSystem.UsePreviousRectangle(sword.ID())
 			},
-			"playerWithMoveableObstacle": func(moveableObstacleID zelduh.EntityID) {
+			PlayerWithMoveableObstacle: func(moveableObstacleID zelduh.EntityID) {
 				playerDirection, err := movementSystem.Direction(player.ID())
 				if err != nil {
 					fmt.Println("Error: ", err)
@@ -261,35 +261,35 @@ func run() {
 					movementSystem.UsePreviousRectangle(player.ID())
 				}
 			},
-			"moveableObstacleWithSwitch": func(collisionSwitchID zelduh.EntityID) {
+			MoveableObstacleWithSwitch: func(collisionSwitchID zelduh.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && !toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			"moveableObstacleWithSwitchNoCollision": func(collisionSwitchID zelduh.EntityID) {
+			MoveableObstacleWithSwitchNoCollision: func(collisionSwitchID zelduh.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			"playerWithSwitch": func(collisionSwitchID zelduh.EntityID) {
+			PlayerWithSwitch: func(collisionSwitchID zelduh.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && !toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			"playerWithSwitchNoCollision": func(collisionSwitchID zelduh.EntityID) {
+			PlayerWithSwitchNoCollision: func(collisionSwitchID zelduh.EntityID) {
 				entity, ok := entitiesMap[collisionSwitchID]
 				if ok && toggleSystem.Enabled(entity.ID()) {
 					toggleSystem.Toggle(entity.ID())
 				}
 			},
-			"enemyWithObstacle": func(enemyEntityID zelduh.EntityID) {
+			EnemyWithObstacle: func(enemyEntityID zelduh.EntityID) {
 				// Block enemy within the spatial system by reseting current rect to previous rect
 				movementSystem.UndoEnemyRect(enemyEntityID)
 			},
-			"playerWithWarp": func(warpID zelduh.EntityID) {
+			PlayerWithWarp: func(warpID zelduh.EntityID) {
 				entityConfig, ok := roomWarps[warpID]
 				if ok && !roomTransitionManager.Active() {
 					roomTransitionManager.Enable()
