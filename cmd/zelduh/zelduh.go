@@ -59,8 +59,9 @@ func run() {
 	roomWarps := zelduh.NewRoomWarps()
 
 	shouldAddEntities := true
-	var currentRoomID zelduh.RoomID = 1
-	var nextRoomID zelduh.RoomID
+
+	roomManager := zelduh.NewRoomManager(1)
+
 	// currentState := zelduh.StateStart
 	spriteMap := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
 
@@ -296,7 +297,7 @@ func run() {
 						os.Exit(0)
 					}
 					shouldAddEntities = true
-					nextRoomID = entityConfig.WarpToRoomID
+					roomManager.SetNext(entityConfig.WarpToRoomID)
 				}
 			},
 		},
@@ -377,8 +378,7 @@ func run() {
 		&entityCreator,
 		roomWarps,
 		entitiesMap,
-		&currentRoomID,
-		&nextRoomID,
+		roomManager,
 		&shouldAddEntities,
 		tileSize,
 		frameRate,
@@ -391,7 +391,7 @@ func run() {
 		mapBounds,
 		func(side zelduh.Bound) {
 			// TODO prevent room transition if no room exists on this side
-			if !roomTransitionManager.Active() && nextRoomID > 0 {
+			if !roomTransitionManager.Active() && roomManager.Next() > 0 {
 				roomTransitionManager.Enable()
 				roomTransitionManager.SetSide(side)
 				roomTransitionManager.SetSlide()

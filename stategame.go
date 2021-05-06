@@ -8,7 +8,6 @@ type StateGame struct {
 	context           *StateContext
 	uiSystem          *UISystem
 	inputSystem       *InputSystem
-	currentRoomID     *RoomID
 	shouldAddEntities *bool
 	levelManager      *LevelManager
 	entityCreator     *EntityCreator
@@ -16,13 +15,14 @@ type StateGame struct {
 	roomWarps         RoomWarps
 	entitiesMap       EntitiesMap
 	frameRate         int
+	roomManager       *RoomManager
 }
 
 func NewStateGame(
 	context *StateContext,
 	uiSystem *UISystem,
 	inputSystem *InputSystem,
-	currentRoomID *RoomID,
+	roomManager *RoomManager,
 	shouldAddEntities *bool,
 	levelManager *LevelManager,
 	entityCreator *EntityCreator,
@@ -35,7 +35,7 @@ func NewStateGame(
 		context:           context,
 		uiSystem:          uiSystem,
 		inputSystem:       inputSystem,
-		currentRoomID:     currentRoomID,
+		roomManager:       roomManager,
 		shouldAddEntities: shouldAddEntities,
 		levelManager:      levelManager,
 		entityCreator:     entityCreator,
@@ -49,7 +49,9 @@ func NewStateGame(
 func (g StateGame) Update() error {
 	g.inputSystem.Enable()
 
-	roomName := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID].Name
+	currentRoomID := g.roomManager.Current()
+
+	roomName := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].Name
 
 	g.uiSystem.DrawLevelBackground(roomName)
 
@@ -60,7 +62,7 @@ func (g StateGame) Update() error {
 
 		// Draw obstacles on appropriate map tiles
 		obstacles := g.uiSystem.DrawObstaclesPerMapTiles(
-			g.currentRoomID,
+			currentRoomID,
 			0, 0,
 		)
 		g.systemsManager.AddEntities(obstacles...)
@@ -70,7 +72,7 @@ func (g StateGame) Update() error {
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID]
+		currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
 			entity := g.entityCreator.entityFactory.NewEntity2(c, g.frameRate)
 			g.entitiesMap[entity.ID()] = entity

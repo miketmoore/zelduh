@@ -69,8 +69,7 @@ type StateTransition struct {
 	collisionSystem       *CollisionSystem
 	systemsManager        *SystemsManager
 	levelManager          *LevelManager
-	currentRoomID         *RoomID
-	nextRoomID            *RoomID
+	roomManager           *RoomManager
 	tileSize              float64
 	activeSpaceRectangle  ActiveSpaceRectangle
 	player                Entity
@@ -84,8 +83,7 @@ func NewStateTransition(
 	collisionSystem *CollisionSystem,
 	systemsManager *SystemsManager,
 	levelManager *LevelManager,
-	currentRoomID *RoomID,
-	nextRoomID *RoomID,
+	roomManager *RoomManager,
 	tileSize float64,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	player Entity,
@@ -98,8 +96,7 @@ func NewStateTransition(
 		collisionSystem:       collisionSystem,
 		systemsManager:        systemsManager,
 		levelManager:          levelManager,
-		currentRoomID:         currentRoomID,
-		nextRoomID:            nextRoomID,
+		roomManager:           roomManager,
 		tileSize:              tileSize,
 		activeSpaceRectangle:  activeSpaceRectangle,
 		player:                player,
@@ -109,6 +106,9 @@ func NewStateTransition(
 func (g StateTransition) Update() error {
 
 	g.inputSystem.Disable()
+
+	currentRoomID := g.roomManager.Current()
+	nextRoomID := g.roomManager.Next()
 
 	if g.roomTransitionManager.Style() == RoomTransitionSlide && g.roomTransitionManager.Timer() > 0 {
 		g.roomTransitionManager.DecrementTimer()
@@ -121,7 +121,7 @@ func (g StateTransition) Update() error {
 		g.systemsManager.RemoveAllMoveableObstacles()
 		g.systemsManager.RemoveAllEntities()
 
-		connectedRooms := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID].ConnectedRooms()
+		connectedRooms := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].ConnectedRooms()
 
 		transitionRoomResp := calculateTransitionSlide(
 			g.roomTransitionManager,
@@ -130,14 +130,11 @@ func (g StateTransition) Update() error {
 			g.activeSpaceRectangle,
 		)
 
-		*g.nextRoomID = transitionRoomResp.nextRoomID
+		nextRoomID = transitionRoomResp.nextRoomID
 
-		if g.currentRoomID == nil {
-			return fmt.Errorf("current room ID is nil")
-		}
-		currentRoom, currentRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID]
+		currentRoom, currentRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
 		if !currentRoomOk {
-			return fmt.Errorf("current room not found by ID=%d", *g.currentRoomID)
+			return fmt.Errorf("current room not found by ID=%d", currentRoomID)
 		}
 		g.uiSystem.DrawMapBackgroundImage(
 			currentRoom.Name,
@@ -145,12 +142,9 @@ func (g StateTransition) Update() error {
 			transitionRoomResp.modY,
 		)
 
-		if g.nextRoomID == nil {
-			return fmt.Errorf("next room ID is nil")
-		}
-		nextRoom, nextRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[*g.nextRoomID]
+		nextRoom, nextRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[nextRoomID]
 		if !nextRoomOk {
-			return fmt.Errorf("next room not found by ID=%d", *g.nextRoomID)
+			return fmt.Errorf("next room not found by ID=%d", nextRoomID)
 		}
 		g.uiSystem.DrawMapBackgroundImage(
 			nextRoom.Name,
@@ -187,8 +181,8 @@ func (g StateTransition) Update() error {
 		if err != nil {
 			return err
 		}
-		if *g.nextRoomID != 0 {
-			*g.currentRoomID = *g.nextRoomID
+		if nextRoomID != 0 {
+			g.roomManager.MoveToNext()
 		}
 		g.roomTransitionManager.Disable()
 	}
