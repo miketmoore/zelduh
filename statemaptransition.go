@@ -61,8 +61,8 @@ func calculateTransitionSlide(
 	}
 }
 
-type GameStateTransition struct {
-	context               *GameStateContext
+type StateTransition struct {
+	context               *StateContext
 	uiSystem              *UISystem
 	inputSystem           *InputSystem
 	roomTransitionManager *RoomTransitionManager
@@ -76,8 +76,8 @@ type GameStateTransition struct {
 	player                Entity
 }
 
-func NewGameStateTransition(
-	context *GameStateContext,
+func NewStateTransition(
+	context *StateContext,
 	uiSystem *UISystem,
 	inputSystem *InputSystem,
 	roomTransitionManager *RoomTransitionManager,
@@ -89,8 +89,8 @@ func NewGameStateTransition(
 	tileSize float64,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	player Entity,
-) GameState {
-	return GameStateTransition{
+) State {
+	return StateTransition{
 		context:               context,
 		uiSystem:              uiSystem,
 		inputSystem:           inputSystem,
@@ -106,7 +106,7 @@ func NewGameStateTransition(
 	}
 }
 
-func (g GameStateTransition) Update() error {
+func (g StateTransition) Update() error {
 
 	g.inputSystem.Disable()
 
@@ -183,7 +183,7 @@ func (g GameStateTransition) Update() error {
 		g.systemsManager.RemoveAllEntities()
 	} else {
 		fmt.Println("state: transition => game")
-		err := g.context.SetState(GameStateNameGame)
+		err := g.context.SetState(StateNameGame)
 		if err != nil {
 			return err
 		}

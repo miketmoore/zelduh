@@ -6,31 +6,31 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-type GameStatePause struct {
-	context  *GameStateContext
+type StatePause struct {
+	context  *StateContext
 	uiSystem *UISystem
 }
 
-func NewGameStatePause(context *GameStateContext, uiSystem *UISystem) GameState {
-	return GameStatePause{
+func NewStatePause(context *StateContext, uiSystem *UISystem) State {
+	return StatePause{
 		context:  context,
 		uiSystem: uiSystem,
 	}
 }
 
-func (g GameStatePause) Update() error {
+func (g StatePause) Update() error {
 
 	g.uiSystem.DrawPauseScreen()
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyP) {
 		fmt.Println("state: pause => game")
-		err := g.context.SetState(GameStateNameGame)
+		err := g.context.SetState(StateNameGame)
 		if err != nil {
 			return err
 		}
 	}
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyEscape) {
-		err := g.context.SetState(GameStateNameStart)
+		err := g.context.SetState(StateNameStart)
 		if err != nil {
 			return err
 		}

@@ -2,29 +2,29 @@ package zelduh
 
 import "fmt"
 
-type GameStateName string
+type StateName string
 
 const (
-	GameStateNameStart      GameStateName = "start"
-	GameStateNameGame       GameStateName = "game"
-	GameStateNamePause      GameStateName = "pause"
-	GameStateNameGameOver   GameStateName = "gameOver"
-	GameStateNameTransition GameStateName = "transition"
+	StateNameStart      StateName = "start"
+	StateNameGame       StateName = "game"
+	StateNamePause      StateName = "pause"
+	StateNameGameOver   StateName = "gameOver"
+	StateNameTransition StateName = "transition"
 )
 
-type GameStateMap map[GameStateName]GameState
+type StateMap map[StateName]State
 
-type GameStateContext struct {
-	current GameState
+type StateContext struct {
+	current State
 
-	stateStart, stateGameOver, statePause, stateTransition, stateGame GameState
+	stateStart, stateGameOver, statePause, stateTransition, stateGame State
 }
 
-func (g *GameStateContext) Update() error {
+func (g *StateContext) Update() error {
 	return g.current.Update()
 }
 
-func NewGameStateContext(
+func NewStateContext(
 	uiSystem *UISystem,
 	inputSystem *InputSystem,
 	roomTransitionManager *RoomTransitionManager,
@@ -41,16 +41,16 @@ func NewGameStateContext(
 	frameRate int,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	player Entity,
-) *GameStateContext {
+) *StateContext {
 
-	context := &GameStateContext{}
+	context := &StateContext{}
 
-	context.stateStart = NewGameStateStart(context, uiSystem)
+	context.stateStart = NewStateStart(context, uiSystem)
 	context.current = context.stateStart
 
-	context.stateGameOver = NewGameStateGameOver(context, uiSystem)
-	context.statePause = NewGameStatePause(context, uiSystem)
-	context.stateTransition = NewGameStateTransition(
+	context.stateGameOver = NewStateGameOver(context, uiSystem)
+	context.statePause = NewStatePause(context, uiSystem)
+	context.stateTransition = NewStateTransition(
 		context,
 		uiSystem,
 		inputSystem,
@@ -64,7 +64,7 @@ func NewGameStateContext(
 		activeSpaceRectangle,
 		player,
 	)
-	context.stateGame = NewGameStateGame(
+	context.stateGame = NewStateGame(
 		context,
 		uiSystem,
 		inputSystem,
@@ -82,20 +82,20 @@ func NewGameStateContext(
 
 }
 
-func (g *GameStateContext) SetState(name GameStateName) error {
+func (g *StateContext) SetState(name StateName) error {
 
-	var state GameState
+	var state State
 
 	switch name {
-	case GameStateNameStart:
+	case StateNameStart:
 		state = g.stateStart
-	case GameStateNameGame:
+	case StateNameGame:
 		state = g.stateGame
-	case GameStateNameGameOver:
+	case StateNameGameOver:
 		state = g.stateGameOver
-	case GameStateNameTransition:
+	case StateNameTransition:
 		state = g.stateTransition
-	case GameStateNamePause:
+	case StateNamePause:
 		state = g.statePause
 	default:
 		return fmt.Errorf("state not found, value=%s", name)
@@ -106,6 +106,6 @@ func (g *GameStateContext) SetState(name GameStateName) error {
 	return nil
 }
 
-type GameState interface {
+type State interface {
 	Update() error
 }

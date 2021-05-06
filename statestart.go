@@ -4,23 +4,23 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-type GameStateStart struct {
-	context  *GameStateContext
+type StateStart struct {
+	context  *StateContext
 	uiSystem *UISystem
 }
 
-func NewGameStateStart(context *GameStateContext, uiSystem *UISystem) GameState {
-	return GameStateStart{
+func NewStateStart(context *StateContext, uiSystem *UISystem) State {
+	return StateStart{
 		context:  context,
 		uiSystem: uiSystem,
 	}
 }
 
-func (g GameStateStart) Update() error {
+func (g StateStart) Update() error {
 	g.uiSystem.DrawScreenStart()
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyEnter) {
-		err := g.context.SetState(GameStateNameGame)
+		err := g.context.SetState(StateNameGame)
 		if err != nil {
 			return err
 		}

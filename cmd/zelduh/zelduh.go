@@ -168,7 +168,7 @@ func run() {
 		activeSpaceRectangle.Y+activeSpaceRectangle.Height,
 	)
 
-	var stateContext *zelduh.GameStateContext
+	var stateContext *zelduh.StateContext
 
 	ignoreSystem := zelduh.NewIgnoreSystem()
 	coinsSystem := zelduh.NewCoinsSystem()
@@ -367,7 +367,7 @@ func run() {
 		frameRate,
 	)
 
-	stateContext = zelduh.NewGameStateContext(
+	stateContext = zelduh.NewStateContext(
 		&ui,
 		&inputSystem,
 		&roomTransitionManager,
@@ -430,7 +430,7 @@ func run() {
 		bomb,
 	)
 
-	// gameStateManager := zelduh.NewGameStateManager(
+	// gameStateManager := zelduh.NewStateManager(
 	// 	&systemsManager,
 	// 	ui,
 	// 	&collisionSystem,

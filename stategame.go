@@ -4,8 +4,8 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-type GameStateGame struct {
-	context           *GameStateContext
+type StateGame struct {
+	context           *StateContext
 	uiSystem          *UISystem
 	inputSystem       *InputSystem
 	currentRoomID     *RoomID
@@ -18,8 +18,8 @@ type GameStateGame struct {
 	frameRate         int
 }
 
-func NewGameStateGame(
-	context *GameStateContext,
+func NewStateGame(
+	context *StateContext,
 	uiSystem *UISystem,
 	inputSystem *InputSystem,
 	currentRoomID *RoomID,
@@ -30,8 +30,8 @@ func NewGameStateGame(
 	roomWarps RoomWarps,
 	entitiesMap EntitiesMap,
 	frameRate int,
-) GameState {
-	return GameStateGame{
+) State {
+	return StateGame{
 		context:           context,
 		uiSystem:          uiSystem,
 		inputSystem:       inputSystem,
@@ -46,7 +46,7 @@ func NewGameStateGame(
 	}
 }
 
-func (g GameStateGame) Update() error {
+func (g StateGame) Update() error {
 	g.inputSystem.Enable()
 
 	roomName := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID].Name
@@ -91,14 +91,14 @@ func (g GameStateGame) Update() error {
 	}
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyP) {
-		err := g.context.SetState(GameStateNamePause)
+		err := g.context.SetState(StateNamePause)
 		if err != nil {
 			return err
 		}
 	}
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyX) {
-		err := g.context.SetState(GameStateNameGameOver)
+		err := g.context.SetState(StateNameGameOver)
 		if err != nil {
 			return err
 		}

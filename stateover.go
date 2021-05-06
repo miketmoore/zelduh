@@ -4,23 +4,23 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-type GameStateGameOver struct {
-	context  *GameStateContext
+type StateGameOver struct {
+	context  *StateContext
 	uiSystem *UISystem
 }
 
-func NewGameStateGameOver(context *GameStateContext, uiSystem *UISystem) GameState {
-	return GameStateStart{
+func NewStateGameOver(context *StateContext, uiSystem *UISystem) State {
+	return StateStart{
 		context:  context,
 		uiSystem: uiSystem,
 	}
 }
 
-func (g GameStateGameOver) Update() error {
+func (g StateGameOver) Update() error {
 	g.uiSystem.DrawGameOverScreen()
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyEnter) {
-		err := g.context.SetState(GameStateNameStart)
+		err := g.context.SetState(StateNameStart)
 		if err != nil {
 			return err
 		}
