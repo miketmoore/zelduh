@@ -84,8 +84,6 @@ func run() {
 	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
 	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
 
-	fmt.Println("active space ", activeSpaceRectangle)
-
 	temporarySystem := zelduh.NewTemporarySystem()
 
 	mapDrawData := zelduh.BuildMapDrawData(
@@ -242,10 +240,10 @@ func run() {
 			},
 			"playerWithObstacle": func(obstacleID zelduh.EntityID) {
 				// "Block" by undoing rect
-				fmt.Println("collision player and obstacle")
 				movementSystem.UsePreviousRectangle(player.ID())
-				movementSystem.UsePreviousRectangle(sword.ID())
 				movementSystem.SetZeroSpeed(player.ID())
+
+				movementSystem.UsePreviousRectangle(sword.ID())
 			},
 			"playerWithMoveableObstacle": func(moveableObstacleID zelduh.EntityID) {
 				playerDirection, err := movementSystem.Direction(player.ID())
@@ -433,7 +431,6 @@ func run() {
 	)
 
 	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
-	fmt.Println(totalCells)
 	debugGridCellCachePopulated := false
 	// debugGridCellCache := []*imdraw.IMDraw{}
 	var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
@@ -513,7 +510,6 @@ func buildDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) 
 
 // Draw and overlay representing the virtual grid
 func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
-	// fmt.Println("draw debug grid")
 	// win.Clear(colornames.White)
 
 	actualOriginX := activeSpaceRectangle.X
@@ -552,10 +548,8 @@ func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, wi
 		}
 	}
 
-	// fmt.Println("drawing debug grid text, ", totalColumns, totalRows)
 	txt.Clear()
 	for ; x < totalColumns; x++ {
-		// fmt.Println("drawing text...", x)
 		message := fmt.Sprintf("%d,%d", int(x), int(y))
 		fmt.Fprintln(txt, message)
 		matrix := pixel.IM.Moved(

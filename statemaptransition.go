@@ -110,7 +110,6 @@ func (g StateTransition) Update() error {
 	currentRoomID := g.roomManager.Current()
 
 	if g.roomTransitionManager.Style() == RoomTransitionSlide && g.roomTransitionManager.Timer() > 0 {
-		fmt.Printf("start normal current=%d next=%d\n", g.roomManager.Current(), g.roomManager.Next())
 		g.roomTransitionManager.DecrementTimer()
 		g.uiSystem.Window.Clear(colornames.Darkgray)
 		g.uiSystem.DrawMapBackground(colornames.White)
@@ -131,7 +130,6 @@ func (g StateTransition) Update() error {
 		)
 
 		// nextRoomID = transitionRoomResp.nextRoomID
-		fmt.Printf("transitionRoomResp.nextRoomID=%d\n", transitionRoomResp.nextRoomID)
 		g.roomManager.SetNext(transitionRoomResp.nextRoomID)
 
 		currentRoom, currentRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
@@ -178,7 +176,6 @@ func (g StateTransition) Update() error {
 		g.systemsManager.RemoveAllMoveableObstacles()
 		g.systemsManager.RemoveAllEntities()
 	} else {
-		fmt.Println("state: transition => game")
 		err := g.context.SetState(StateNameGame)
 		if err != nil {
 			return err
