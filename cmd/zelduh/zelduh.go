@@ -391,7 +391,7 @@ func run() {
 		mapBounds,
 		func(side zelduh.Bound) {
 			// TODO prevent room transition if no room exists on this side
-			if !roomTransitionManager.Active() && roomManager.Next() > 0 {
+			if !roomTransitionManager.Active() {
 				// roomTransitionManager.Start(side, zelduh.RoomTransitionSlide)
 				roomTransitionManager.Enable()
 				roomTransitionManager.SetSide(side)
@@ -404,8 +404,6 @@ func run() {
 					os.Exit(0)
 				}
 				shouldAddEntities = true
-			} else {
-				movementSystem.SetZeroSpeed(playerID)
 			}
 		},
 	)
