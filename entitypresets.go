@@ -1,6 +1,9 @@
 package zelduh
 
-import "github.com/faiface/pixel/imdraw"
+import (
+	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/zelduh/core/direction"
+)
 
 const (
 	PresetNameArrow            PresetName = "arrow"
@@ -94,7 +97,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 			return EntityConfig{
 				Category: CategoryArrow,
 				Movement: &MovementConfig{
-					Direction: DirectionDown,
+					Direction: direction.DirectionDown,
 					Speed:     0.0,
 				},
 				Dimensions:  dimensions,
@@ -115,7 +118,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 			return EntityConfig{
 				Category: CategoryBomb,
 				Movement: &MovementConfig{
-					Direction: DirectionDown,
+					Direction: direction.DirectionDown,
 					Speed:     0.0,
 				},
 				Dimensions:  dimensions,
@@ -167,7 +170,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 					CollisionWithRectMod: 5,
 				},
 				Movement: &MovementConfig{
-					Direction: DirectionDown,
+					Direction: direction.DirectionDown,
 					MaxSpeed:  7.0,
 					Speed:     0.0,
 				},
@@ -193,7 +196,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 			return EntityConfig{
 				Category: CategorySword,
 				Movement: &MovementConfig{
-					Direction: DirectionDown,
+					Direction: direction.DirectionDown,
 					Speed:     0.0,
 				},
 				Dimensions:  dimensions,
@@ -224,7 +227,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 					Radius: 20,
 				},
 				Movement: &MovementConfig{
-					Direction:           DirectionDown,
+					Direction:           direction.DirectionDown,
 					Speed:               1.0,
 					MaxSpeed:            1.0,
 					HitSpeed:            10.0,
@@ -262,7 +265,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 					Radius: 20,
 				},
 				Movement: &MovementConfig{
-					Direction:           DirectionDown,
+					Direction:           direction.DirectionDown,
 					Speed:               1.0,
 					MaxSpeed:            1.0,
 					HitSpeed:            10.0,
@@ -286,7 +289,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 					Radius: 20,
 				},
 				Movement: &MovementConfig{
-					Direction:           DirectionDown,
+					Direction:           direction.DirectionDown,
 					Speed:               1.0,
 					MaxSpeed:            1.0,
 					HitSpeed:            10.0,
@@ -310,7 +313,7 @@ func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfig
 					Radius: 20,
 				},
 				Movement: &MovementConfig{
-					Direction:           DirectionRight,
+					Direction:           direction.DirectionRight,
 					Speed:               1.0,
 					MaxSpeed:            1.0,
 					HitSpeed:            10.0,

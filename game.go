@@ -8,6 +8,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/core/direction"
 	"github.com/miketmoore/zelduh/core/entity"
 	"golang.org/x/image/colornames"
 )
@@ -318,19 +319,19 @@ func (m *Main) Run() error {
 	inputHandlers := InputHandlers{
 		OnUp: func() {
 			movementSystem.SetMaxSpeed(playerID)
-			movementSystem.ChangeDirection(playerID, DirectionUp)
+			movementSystem.ChangeDirection(playerID, direction.DirectionUp)
 		},
 		OnRight: func() {
 			movementSystem.SetMaxSpeed(playerID)
-			movementSystem.ChangeDirection(playerID, DirectionRight)
+			movementSystem.ChangeDirection(playerID, direction.DirectionRight)
 		},
 		OnDown: func() {
 			movementSystem.SetMaxSpeed(playerID)
-			movementSystem.ChangeDirection(playerID, DirectionDown)
+			movementSystem.ChangeDirection(playerID, direction.DirectionDown)
 		},
 		OnLeft: func() {
 			movementSystem.SetMaxSpeed(playerID)
-			movementSystem.ChangeDirection(playerID, DirectionLeft)
+			movementSystem.ChangeDirection(playerID, direction.DirectionLeft)
 		},
 		OnNoDirection: func() {
 			movementSystem.SetZeroSpeed(playerID)

@@ -7,6 +7,7 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/miketmoore/zelduh/core/direction"
 	"github.com/miketmoore/zelduh/core/entity"
 	"golang.org/x/image/colornames"
 )
@@ -271,18 +272,18 @@ func (s *RenderSystem) drawByPlayerDirection(entity renderEntity) {
 	}
 }
 
-var playerComponentAnimationByDirection = map[Direction]string{
-	DirectionUp:    "up",
-	DirectionRight: "right",
-	DirectionDown:  "down",
-	DirectionLeft:  "left",
+var playerComponentAnimationByDirection = map[direction.Direction]string{
+	direction.DirectionUp:    "up",
+	direction.DirectionRight: "right",
+	direction.DirectionDown:  "down",
+	direction.DirectionLeft:  "left",
 }
 
-var swordComponentAnimationByDirection = map[Direction]string{
-	DirectionUp:    "swordAttackUp",
-	DirectionRight: "swordAttackRight",
-	DirectionDown:  "swordAttackDown",
-	DirectionLeft:  "swordAttackLeft",
+var swordComponentAnimationByDirection = map[direction.Direction]string{
+	direction.DirectionUp:    "swordAttackUp",
+	direction.DirectionRight: "swordAttackRight",
+	direction.DirectionDown:  "swordAttackDown",
+	direction.DirectionLeft:  "swordAttackLeft",
 }
 
 func getComponentAnimationByName(entity renderEntity, name string) (*componentAnimationData, bool) {

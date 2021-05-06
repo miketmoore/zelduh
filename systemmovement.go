@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/faiface/pixel"
+	"github.com/miketmoore/zelduh/core/direction"
 	"github.com/miketmoore/zelduh/core/entity"
 )
 
@@ -27,8 +28,8 @@ func NewComponentDash(
 
 // componentMovement contains data about movement
 type componentMovement struct {
-	LastDirection       Direction
-	Direction           Direction
+	LastDirection       direction.Direction
+	Direction           direction.Direction
 	MaxSpeed            float64
 	Speed               float64
 	MaxMoves            int
@@ -40,7 +41,7 @@ type componentMovement struct {
 }
 
 func NewComponentMovement(
-	direction Direction,
+	direction direction.Direction,
 	speed, maxSpeed float64,
 	maxMoves, remainingMoves int,
 	hitSpeed float64,
@@ -161,13 +162,13 @@ func (s *MovementSystem) UsePreviousRectangle(entityID entity.EntityID) {
 	}
 }
 
-func (s *MovementSystem) Direction(entityID entity.EntityID) (Direction, error) {
+func (s *MovementSystem) Direction(entityID entity.EntityID) (direction.Direction, error) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		return entity.componentMovement.Direction, nil
 	}
 	// not 100% confident about this
-	return DirectionUp, fmt.Errorf("entity not found by ID=%d", entityID)
+	return direction.DirectionUp, fmt.Errorf("entity not found by ID=%d", entityID)
 }
 
 // MovePlayerBack moves the player back
@@ -175,13 +176,13 @@ func (s *MovementSystem) MovePlayerBack() {
 	player := s.player
 	var v pixel.Vec
 	switch player.componentMovement.Direction {
-	case DirectionUp:
+	case direction.DirectionUp:
 		v = pixel.V(0, -s.tileSize)
-	case DirectionRight:
+	case direction.DirectionRight:
 		v = pixel.V(-s.tileSize, 0)
-	case DirectionDown:
+	case direction.DirectionDown:
 		v = pixel.V(0, s.tileSize)
-	case DirectionLeft:
+	case direction.DirectionLeft:
 		v = pixel.V(s.tileSize, 0)
 	}
 	player.componentRectangle.Rect = player.componentRectangle.PrevRect.Moved(v)
@@ -189,7 +190,7 @@ func (s *MovementSystem) MovePlayerBack() {
 }
 
 // MoveMoveableObstacle moves a moveable obstacle
-func (s *MovementSystem) MoveMoveableObstacle(obstacleID entity.EntityID, dir Direction) bool {
+func (s *MovementSystem) MoveMoveableObstacle(obstacleID entity.EntityID, dir direction.Direction) bool {
 	entity, ok := s.moveableObstacle(obstacleID)
 	if ok && !entity.componentMovement.MovingFromHit {
 		entity.componentMovement.MovingFromHit = true
@@ -209,7 +210,7 @@ func (s *MovementSystem) UndoEnemyRect(enemyID entity.EntityID) {
 }
 
 // MoveEnemyBack moves the enemy back
-func (s *MovementSystem) MoveEnemyBack(enemyID entity.EntityID, directionHit Direction) {
+func (s *MovementSystem) MoveEnemyBack(enemyID entity.EntityID, directionHit direction.Direction) {
 	enemy, ok := s.enemy(enemyID)
 	if ok && !enemy.componentMovement.MovingFromHit {
 		enemy.componentMovement.MovingFromHit = true
@@ -283,7 +284,7 @@ func (s *MovementSystem) ChangeSpeed(entityID entity.EntityID, speed float64) {
 	}
 }
 
-func (s *MovementSystem) ChangeDirection(entityID entity.EntityID, direction Direction) {
+func (s *MovementSystem) ChangeDirection(entityID entity.EntityID, direction direction.Direction) {
 	entity, ok := s.entityByID[entityID]
 	if ok {
 		entity.componentMovement.Direction = direction
@@ -383,15 +384,15 @@ func (s *MovementSystem) enemy(id entity.EntityID) (movementEntity, bool) {
 	return movementEntity{}, false
 }
 
-func delta(dir Direction, modX, modY float64) pixel.Vec {
+func delta(dir direction.Direction, modX, modY float64) pixel.Vec {
 	switch dir {
-	case DirectionUp:
+	case direction.DirectionUp:
 		return pixel.V(0, modY)
-	case DirectionRight:
+	case direction.DirectionRight:
 		return pixel.V(modX, 0)
-	case DirectionDown:
+	case direction.DirectionDown:
 		return pixel.V(0, -modY)
-	case DirectionLeft:
+	case direction.DirectionLeft:
 		return pixel.V(-modX, 0)
 	default:
 		return pixel.V(0, 0)
@@ -415,7 +416,7 @@ func (s *MovementSystem) moveEnemyRandom(enemy *movementEntity) {
 	if enemy.componentMovement.RemainingMoves == 0 {
 		enemy.componentMovement.MovingFromHit = false
 		enemy.componentMovement.RemainingMoves = s.Rand.Intn(enemy.componentMovement.MaxMoves)
-		enemy.componentMovement.Direction = RandomDirection(s.Rand)
+		enemy.componentMovement.Direction = direction.RandomDirection(s.Rand)
 	} else if enemy.componentMovement.RemainingMoves > 0 {
 		var speed float64
 		if enemy.componentMovement.MovingFromHit {
@@ -438,10 +439,10 @@ func (s *MovementSystem) moveEnemyLeftRight(enemy *movementEntity) {
 		enemy.componentMovement.MovingFromHit = false
 		enemy.componentMovement.RemainingMoves = enemy.componentMovement.MaxMoves
 		switch enemy.componentMovement.Direction {
-		case DirectionLeft:
-			enemy.componentMovement.Direction = DirectionRight
-		case DirectionRight:
-			enemy.componentMovement.Direction = DirectionLeft
+		case direction.DirectionLeft:
+			enemy.componentMovement.Direction = direction.DirectionRight
+		case direction.DirectionRight:
+			enemy.componentMovement.Direction = direction.DirectionLeft
 		}
 	} else if enemy.componentMovement.RemainingMoves > 0 {
 		var speed float64

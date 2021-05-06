@@ -1,4 +1,4 @@
-package zelduh
+package direction
 
 import "math/rand"
 

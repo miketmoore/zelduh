@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/direction"
+
 // RoomID is a room ID
 type RoomID int
 
@@ -29,15 +31,15 @@ func (r Room) ConnectedRooms() *ConnectedRooms {
 }
 
 // SetConnectedRoom sets the connected room IDs
-func (r Room) SetConnectedRoom(direction Direction, id RoomID) {
-	switch direction {
-	case DirectionUp:
+func (r Room) SetConnectedRoom(dir direction.Direction, id RoomID) {
+	switch dir {
+	case direction.DirectionUp:
 		r.connectedRooms.Top = id
-	case DirectionRight:
+	case direction.DirectionRight:
 		r.connectedRooms.Right = id
-	case DirectionDown:
+	case direction.DirectionDown:
 		r.connectedRooms.Bottom = id
-	case DirectionLeft:
+	case direction.DirectionLeft:
 		r.connectedRooms.Left = id
 	}
 }
@@ -61,35 +63,35 @@ func BuildMapRoomIDToRoom(layout [][]RoomID, roomByIDMap RoomByIDMap) {
 			if (row > 0) && (len(layout[row-1]) > col) {
 				roomBID := layout[row-1][col]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, DirectionUp)
+					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionUp)
 				}
 			}
 			// Right
 			if len(layout[row]) > col+1 {
 				roomBID := layout[row][col+1]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, DirectionRight)
+					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionRight)
 				}
 			}
 			// Bottom
 			if (len(layout) > row+1) && (len(layout[row+1]) > col) {
 				roomBID := layout[row+1][col]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, DirectionDown)
+					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionDown)
 				}
 			}
 			// Left
 			if col > 0 {
 				roomBID := layout[row][col-1]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, DirectionLeft)
+					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionLeft)
 				}
 			}
 		}
 	}
 }
 
-func connectRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir Direction) {
+func connectRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir direction.Direction) {
 
 	roomA, roomAOK := roomByIDMap[roomAID]
 	roomB, roomBOK := roomByIDMap[roomBID]
@@ -98,26 +100,26 @@ func connectRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir Directio
 		return
 	}
 
-	var directionAToB Direction
-	var directionBToA Direction
+	var directionAToB direction.Direction
+	var directionBToA direction.Direction
 
 	switch dir {
-	case DirectionUp:
+	case direction.DirectionUp:
 		// b is above a
-		directionAToB = DirectionUp
-		directionBToA = DirectionDown
-	case DirectionRight:
+		directionAToB = direction.DirectionUp
+		directionBToA = direction.DirectionDown
+	case direction.DirectionRight:
 		// b is right of a
-		directionAToB = DirectionRight
-		directionBToA = DirectionLeft
-	case DirectionDown:
+		directionAToB = direction.DirectionRight
+		directionBToA = direction.DirectionLeft
+	case direction.DirectionDown:
 		// b is below a
-		directionAToB = DirectionDown
-		directionBToA = DirectionUp
-	case DirectionLeft:
+		directionAToB = direction.DirectionDown
+		directionBToA = direction.DirectionUp
+	case direction.DirectionLeft:
 		// b is left of a
-		directionAToB = DirectionLeft
-		directionBToA = DirectionRight
+		directionAToB = direction.DirectionLeft
+		directionBToA = direction.DirectionRight
 	}
 
 	// Cache room references by their IDs

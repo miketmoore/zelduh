@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/faiface/pixel/imdraw"
+	"github.com/miketmoore/zelduh/core/direction"
 	"github.com/miketmoore/zelduh/core/entity"
 )
 
@@ -12,8 +13,8 @@ type AnimationConfig map[string][]int
 
 // MovementConfig is used to configure an entity's Movement component
 type MovementConfig struct {
-	LastDirection       Direction
-	Direction           Direction
+	LastDirection       direction.Direction
+	Direction           direction.Direction
 	MaxSpeed            float64
 	Speed               float64
 	MaxMoves            int
