@@ -82,13 +82,7 @@ func NewGameStateContext(
 
 }
 
-func (g *GameStateContext) SetState(name GameStateName) {
-	// fmt.Println("SetState ", name)
-	// state, ok := g.stateMap[name]
-	// if !ok {
-	// 	panic(fmt.Sprintf("state not found, value=%s", name))
-	// }
-	// g.current = state
+func (g *GameStateContext) SetState(name GameStateName) error {
 
 	var state GameState
 
@@ -104,10 +98,12 @@ func (g *GameStateContext) SetState(name GameStateName) {
 	case GameStateNamePause:
 		state = g.statePause
 	default:
-		panic(fmt.Sprintf("state not found, value=%s", name))
+		return fmt.Errorf("state not found, value=%s", name)
 	}
 
 	g.current = state
+
+	return nil
 }
 
 type GameState interface {

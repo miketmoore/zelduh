@@ -183,7 +183,10 @@ func (g GameStateTransition) Update() error {
 		g.systemsManager.RemoveAllEntities()
 	} else {
 		fmt.Println("state: transition => game")
-		g.context.SetState(GameStateNameGame)
+		err := g.context.SetState(GameStateNameGame)
+		if err != nil {
+			return err
+		}
 		if *g.nextRoomID != 0 {
 			*g.currentRoomID = *g.nextRoomID
 		}

@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -22,8 +20,10 @@ func (g GameStateStart) Update() error {
 	g.uiSystem.DrawScreenStart()
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyEnter) {
-		fmt.Println("state: start => game")
-		g.context.SetState(GameStateNameGame)
+		err := g.context.SetState(GameStateNameGame)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

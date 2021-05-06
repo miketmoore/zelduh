@@ -24,10 +24,16 @@ func (g GameStatePause) Update() error {
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyP) {
 		fmt.Println("state: pause => game")
-		g.context.SetState(GameStateNameGame)
+		err := g.context.SetState(GameStateNameGame)
+		if err != nil {
+			return err
+		}
 	}
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyEscape) {
-		g.context.SetState(GameStateNameStart)
+		err := g.context.SetState(GameStateNameStart)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

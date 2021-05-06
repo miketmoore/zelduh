@@ -186,7 +186,11 @@ func run() {
 
 				if healthSystem.Health(playerID) == 0 {
 					// currentState = zelduh.StateOver
-					stateContext.SetState("gameOver")
+					err := stateContext.SetState("gameOver")
+					if err != nil {
+						fmt.Println("Error: ", err)
+						os.Exit(0)
+					}
 				}
 			},
 			"playerWithCoin": func(coinEntityID zelduh.EntityID) {
@@ -286,7 +290,11 @@ func run() {
 					roomTransitionManager.SetWarp()
 					roomTransitionManager.SetTimer(1)
 					// currentState = zelduh.StateMapTransition
-					stateContext.SetState("transition")
+					err := stateContext.SetState("transition")
+					if err != nil {
+						fmt.Println("Error: ", err)
+						os.Exit(0)
+					}
 					shouldAddEntities = true
 					nextRoomID = entityConfig.WarpToRoomID
 				}
@@ -389,7 +397,11 @@ func run() {
 				roomTransitionManager.SetSlide()
 				roomTransitionManager.ResetTimer()
 				// currentState = zelduh.StateMapTransition
-				stateContext.SetState("transition")
+				err := stateContext.SetState("transition")
+				if err != nil {
+					fmt.Println("Error: ", err)
+					os.Exit(0)
+				}
 				shouldAddEntities = true
 			} else {
 				movementSystem.SetZeroSpeed(playerID)

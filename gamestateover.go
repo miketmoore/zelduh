@@ -20,7 +20,10 @@ func (g GameStateGameOver) Update() error {
 	g.uiSystem.DrawGameOverScreen()
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyEnter) {
-		g.context.SetState(GameStateNameStart)
+		err := g.context.SetState(GameStateNameStart)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -91,11 +91,17 @@ func (g GameStateGame) Update() error {
 	}
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyP) {
-		g.context.SetState(GameStateNamePause)
+		err := g.context.SetState(GameStateNamePause)
+		if err != nil {
+			return err
+		}
 	}
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyX) {
-		g.context.SetState(GameStateNameGameOver)
+		err := g.context.SetState(GameStateNameGameOver)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
