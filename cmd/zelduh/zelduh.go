@@ -11,9 +11,7 @@ import (
 	"golang.org/x/image/colornames"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/faiface/pixel/text"
 )
 
 func run() {
@@ -430,13 +428,11 @@ func run() {
 		bomb,
 	)
 
-	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
-	debugGridCellCachePopulated := false
-	// debugGridCellCache := []*imdraw.IMDraw{}
-	var debugGridCellCache []*imdraw.IMDraw = make([]*imdraw.IMDraw, totalCells)
-
-	debugTxtOrigin := pixel.V(20, 50)
-	debugTxt := text.New(debugTxtOrigin, text.Atlas7x13)
+	debug := zelduh.NewDebug(
+		activeSpaceRectangle,
+		tileSize,
+		ui.Window,
+	)
 
 	for !ui.Window.Closed() {
 
@@ -455,14 +451,7 @@ func run() {
 		movementSystem.UpdateLastDirection(playerID)
 
 		// draw grid after everything else is drawn?
-		drawDebugGrid(
-			&debugGridCellCachePopulated,
-			debugGridCellCache,
-			ui.Window,
-			debugTxt,
-			activeSpaceRectangle,
-			tileSize,
-		)
+		debug.DrawGrid()
 
 		// drawDialog(
 		// 	systemsManager,
@@ -492,82 +481,6 @@ func buildRotatedEntityConfig(
 		Rotation: degrees,
 	}
 	return entityConfig
-}
-
-func buildDebugGridCell(win *pixelgl.Window, rect pixel.Rect, tileSize float64) *imdraw.IMDraw {
-
-	imdraw := imdraw.New(nil)
-	imdraw.Color = colornames.Blue
-
-	imdraw.Push(rect.Min)
-	imdraw.Push(rect.Max)
-
-	imdraw.Rectangle(1)
-	// imdraw.Draw(win)
-
-	return imdraw
-}
-
-// Draw and overlay representing the virtual grid
-func drawDebugGrid(debugGridCellCachePopulated *bool, cache []*imdraw.IMDraw, win *pixelgl.Window, txt *text.Text, activeSpaceRectangle zelduh.ActiveSpaceRectangle, tileSize float64) {
-	// win.Clear(colornames.White)
-
-	actualOriginX := activeSpaceRectangle.X
-	actualOriginY := activeSpaceRectangle.Y
-
-	totalColumns := activeSpaceRectangle.Width / tileSize
-	totalRows := activeSpaceRectangle.Height / tileSize
-
-	cacheIndex := 0
-
-	var x float64 = 0
-	var y float64 = 0
-
-	if !(*debugGridCellCachePopulated) {
-		fmt.Println("building cache")
-		for ; x < totalColumns; x++ {
-			cellX := actualOriginX + (x * tileSize)
-			cellY := actualOriginY + (y * tileSize)
-
-			rect := pixel.R(cellX, cellY, cellX+tileSize, cellY+tileSize)
-
-			imdraw := buildDebugGridCell(win, rect, tileSize)
-			cache[cacheIndex] = imdraw
-			cacheIndex++
-
-			if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
-				x = -1
-				y++
-			}
-		}
-		*debugGridCellCachePopulated = true
-		fmt.Println("cache built")
-	} else {
-		for _, imdraw := range cache {
-			imdraw.Draw(win)
-		}
-	}
-
-	txt.Clear()
-	for ; x < totalColumns; x++ {
-		message := fmt.Sprintf("%d,%d", int(x), int(y))
-		fmt.Fprintln(txt, message)
-		matrix := pixel.IM.Moved(
-			pixel.V(
-				(actualOriginX-18)+(x*tileSize),
-				(actualOriginY-tileSize)+(y*tileSize),
-			),
-		)
-		txt.Color = colornames.White
-		txt.Draw(win, matrix)
-		txt.Clear()
-
-		if (x == (totalColumns - 1)) && (y < (totalRows - 1)) {
-			x = -1
-			y++
-		}
-	}
-
 }
 
 func drawDialog(
