@@ -46,6 +46,8 @@ func NewStateContext(
 	context := &StateContext{}
 
 	context.stateStart = NewStateStart(context, uiSystem)
+
+	// Set the first value for the current state
 	context.current = context.stateStart
 
 	context.stateGameOver = NewStateGameOver(context, uiSystem)
