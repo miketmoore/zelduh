@@ -392,6 +392,7 @@ func run() {
 		func(side zelduh.Bound) {
 			// TODO prevent room transition if no room exists on this side
 			if !roomTransitionManager.Active() {
+				fmt.Printf("room transition start %d %d\n", roomManager.Current(), roomManager.Next())
 				// roomTransitionManager.Start(side, zelduh.RoomTransitionSlide)
 				roomTransitionManager.Enable()
 				roomTransitionManager.SetSide(side)

@@ -108,9 +108,9 @@ func (g StateTransition) Update() error {
 	g.inputSystem.Disable()
 
 	currentRoomID := g.roomManager.Current()
-	nextRoomID := g.roomManager.Next()
 
 	if g.roomTransitionManager.Style() == RoomTransitionSlide && g.roomTransitionManager.Timer() > 0 {
+		fmt.Printf("start normal current=%d next=%d\n", g.roomManager.Current(), g.roomManager.Next())
 		g.roomTransitionManager.DecrementTimer()
 		g.uiSystem.Window.Clear(colornames.Darkgray)
 		g.uiSystem.DrawMapBackground(colornames.White)
@@ -130,7 +130,9 @@ func (g StateTransition) Update() error {
 			g.activeSpaceRectangle,
 		)
 
-		nextRoomID = transitionRoomResp.nextRoomID
+		// nextRoomID = transitionRoomResp.nextRoomID
+		fmt.Printf("transitionRoomResp.nextRoomID=%d\n", transitionRoomResp.nextRoomID)
+		g.roomManager.SetNext(transitionRoomResp.nextRoomID)
 
 		currentRoom, currentRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
 		if !currentRoomOk {
@@ -142,9 +144,9 @@ func (g StateTransition) Update() error {
 			transitionRoomResp.modY,
 		)
 
-		nextRoom, nextRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[nextRoomID]
+		nextRoom, nextRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[g.roomManager.Next()]
 		if !nextRoomOk {
-			return fmt.Errorf("next room not found by ID=%d", nextRoomID)
+			return fmt.Errorf("next room not found by ID=%d", g.roomManager.Next())
 		}
 		g.uiSystem.DrawMapBackgroundImage(
 			nextRoom.Name,
@@ -181,7 +183,7 @@ func (g StateTransition) Update() error {
 		if err != nil {
 			return err
 		}
-		if nextRoomID != 0 {
+		if g.roomManager.Next() != 0 {
 			g.roomManager.MoveToNext()
 		}
 		g.roomTransitionManager.Disable()
