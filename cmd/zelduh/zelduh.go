@@ -430,30 +430,6 @@ func run() {
 		bomb,
 	)
 
-	// gameStateManager := zelduh.NewStateManager(
-	// 	&systemsManager,
-	// 	ui,
-	// 	&collisionSystem,
-	// 	&inputSystem,
-	// 	&shouldAddEntities,
-	// 	&currentRoomID,
-	// 	&nextRoomID,
-	// 	&currentState,
-	// 	spriteMap,
-	// 	mapDrawData,
-	// 	entitiesMap,
-	// 	&player,
-	// 	roomWarps,
-	// 	&levelManager,
-	// 	&entityConfigPresetFnManager,
-	// 	tileSize,
-	// 	frameRate,
-	// 	nonObstacleSprites,
-	// 	activeSpaceRectangle,
-	// 	&entityCreator,
-	// 	&roomTransitionManager,
-	// )
-
 	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
 	fmt.Println(totalCells)
 	debugGridCellCachePopulated := false
