@@ -202,10 +202,10 @@ func (s *RenderSystem) RemoveAllEntities() {
 // Update changes spatial data based on movement data
 func (s *RenderSystem) Update() error {
 
-	DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
+	// DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
 
 	for _, entity := range s.entities {
-		s.drawRectangle(entity)
+		// s.drawRectangle(entity)
 
 		if entity.shouldNotIgnore() {
 
@@ -233,12 +233,12 @@ func (s *RenderSystem) Update() error {
 
 	if !sword.componentIgnore.Value {
 		s.drawByPlayerDirection(sword)
-		s.drawRectangle(s.sword)
+		// s.drawRectangle(s.sword)
 	}
 
 	if !arrow.componentIgnore.Value {
 		s.drawByPlayerDirection(arrow)
-		s.drawRectangle(s.arrow)
+		// s.drawRectangle(s.arrow)
 	}
 
 	if sword.componentIgnore != nil && sword.componentIgnore.Value && arrow.componentIgnore.Value {
