@@ -242,8 +242,10 @@ func run() {
 			},
 			"playerWithObstacle": func(obstacleID zelduh.EntityID) {
 				// "Block" by undoing rect
+				fmt.Println("collision player and obstacle")
 				movementSystem.UsePreviousRectangle(player.ID())
 				movementSystem.UsePreviousRectangle(sword.ID())
+				movementSystem.SetZeroSpeed(player.ID())
 			},
 			"playerWithMoveableObstacle": func(moveableObstacleID zelduh.EntityID) {
 				playerDirection, err := movementSystem.Direction(player.ID())
