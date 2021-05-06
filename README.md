@@ -12,10 +12,16 @@ Zelduh is a tile based adventure game.
 go get -u github.com/miketmoore/zelduh/...
 ```
 
-## Play
+## Run
 
 ```
 go run cmd/zelduh/*.go
+```
+
+## Run in debug mode
+
+```
+go run cmd/zelduh/*.go debug
 ```
 
 ## Controls
