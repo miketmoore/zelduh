@@ -4,56 +4,98 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func (g *GameStateManager) stateGame() error {
-	g.InputSystem.Enable()
+type GameStateGame struct {
+	context           *GameStateContext
+	uiSystem          *UISystem
+	inputSystem       *InputSystem
+	currentRoomID     *RoomID
+	shouldAddEntities *bool
+	levelManager      *LevelManager
+	entityCreator     *EntityCreator
+	systemsManager    *SystemsManager
+	roomWarps         RoomWarps
+	entitiesMap       EntitiesMap
+	frameRate         int
+}
 
-	roomName := g.LevelManager.CurrentLevel.RoomByIDMap[*g.CurrentRoomID].Name
+func NewGameStateGame(
+	context *GameStateContext,
+	uiSystem *UISystem,
+	inputSystem *InputSystem,
+	currentRoomID *RoomID,
+	shouldAddEntities *bool,
+	levelManager *LevelManager,
+	entityCreator *EntityCreator,
+	systemsManager *SystemsManager,
+	roomWarps RoomWarps,
+	entitiesMap EntitiesMap,
+	frameRate int,
+) GameState {
+	return GameStateGame{
+		context:           context,
+		uiSystem:          uiSystem,
+		inputSystem:       inputSystem,
+		currentRoomID:     currentRoomID,
+		shouldAddEntities: shouldAddEntities,
+		levelManager:      levelManager,
+		entityCreator:     entityCreator,
+		systemsManager:    systemsManager,
+		roomWarps:         roomWarps,
+		entitiesMap:       entitiesMap,
+		frameRate:         frameRate,
+	}
+}
 
-	g.UI.DrawLevelBackground(roomName)
+func (g GameStateGame) Update() error {
+	g.inputSystem.Enable()
 
-	if *g.ShouldAddEntities {
-		*g.ShouldAddEntities = false
+	roomName := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID].Name
+
+	g.uiSystem.DrawLevelBackground(roomName)
+
+	if *g.shouldAddEntities {
+		*g.shouldAddEntities = false
 
 		g.entityCreator.CreateUICoin()
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := g.UI.DrawObstaclesPerMapTiles(
-			g.CurrentRoomID,
+		obstacles := g.uiSystem.DrawObstaclesPerMapTiles(
+			g.currentRoomID,
 			0, 0,
 		)
-		g.SystemsManager.AddEntities(obstacles...)
+		g.systemsManager.AddEntities(obstacles...)
 
-		for k := range g.RoomWarps {
-			delete(g.RoomWarps, k)
+		for k := range g.roomWarps {
+			delete(g.roomWarps, k)
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		currentRoom := g.LevelManager.CurrentLevel.RoomByIDMap[*g.CurrentRoomID]
+		currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
-			entity := g.entityCreator.entityFactory.NewEntity2(c, g.FrameRate)
-			g.EntitiesMap[entity.ID()] = entity
-			g.SystemsManager.AddEntity(entity)
+			entity := g.entityCreator.entityFactory.NewEntity2(c, g.frameRate)
+			g.entitiesMap[entity.ID()] = entity
+			g.systemsManager.AddEntity(entity)
 
 			switch c.Category {
 			case CategoryWarp:
-				g.RoomWarps[entity.ID()] = c
+				g.roomWarps[entity.ID()] = c
 			}
 		}
 	}
 
-	g.UI.DrawMask()
+	g.uiSystem.DrawMask()
 
-	err := g.SystemsManager.Update()
+	err := g.systemsManager.Update()
 	if err != nil {
 		return err
 	}
 
-	if g.UI.Window.JustPressed(pixelgl.KeyP) {
-		g.setCurrentState(StatePause)
+	if g.uiSystem.Window.JustPressed(pixelgl.KeyP) {
+		g.context.SetState(GameStateNamePause)
 	}
 
-	if g.UI.Window.JustPressed(pixelgl.KeyX) {
-		g.setCurrentState(StateOver)
+	if g.uiSystem.Window.JustPressed(pixelgl.KeyX) {
+		g.context.SetState(GameStateNameGameOver)
 	}
 
 	return nil

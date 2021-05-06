@@ -1,18 +1,34 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func (g *GameStateManager) statePause() error {
+type GameStatePause struct {
+	context  *GameStateContext
+	uiSystem *UISystem
+}
 
-	g.UI.DrawPauseScreen()
+func NewGameStatePause(context *GameStateContext, uiSystem *UISystem) GameState {
+	return GameStatePause{
+		context:  context,
+		uiSystem: uiSystem,
+	}
+}
 
-	if g.UI.Window.JustPressed(pixelgl.KeyP) {
-		g.setCurrentState(StateGame)
+func (g GameStatePause) Update() error {
+
+	g.uiSystem.DrawPauseScreen()
+
+	if g.uiSystem.Window.JustPressed(pixelgl.KeyP) {
+		fmt.Println("state: pause => game")
+		g.context.SetState(GameStateNameGame)
 	}
-	if g.UI.Window.JustPressed(pixelgl.KeyEscape) {
-		g.setCurrentState(StateStart)
+	if g.uiSystem.Window.JustPressed(pixelgl.KeyEscape) {
+		g.context.SetState(GameStateNameStart)
 	}
+
 	return nil
 }

@@ -7,95 +7,6 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func (s *GameStateManager) stateMapTransition() error {
-
-	ui := s.UI
-	systemsManager := s.SystemsManager
-
-	s.InputSystem.Disable()
-
-	if s.roomTransitionManager.Style() == RoomTransitionSlide && s.roomTransitionManager.Timer() > 0 {
-		s.roomTransitionManager.DecrementTimer()
-		ui.Window.Clear(colornames.Darkgray)
-		ui.DrawMapBackground(colornames.White)
-
-		s.CollisionSystem.RemoveAll(CategoryObstacle)
-		systemsManager.RemoveAllEnemies()
-		systemsManager.RemoveAllCollisionSwitches()
-		systemsManager.RemoveAllMoveableObstacles()
-		systemsManager.RemoveAllEntities()
-
-		connectedRooms := s.LevelManager.CurrentLevel.RoomByIDMap[*s.CurrentRoomID].ConnectedRooms()
-
-		transitionRoomResp := calculateTransitionSlide(
-			s.roomTransitionManager,
-			*connectedRooms,
-			s.TileSize,
-			s.ActiveSpaceRectangle,
-		)
-
-		*s.NextRoomID = transitionRoomResp.nextRoomID
-
-		if s.CurrentRoomID == nil {
-			return fmt.Errorf("current room ID is nil")
-		}
-		currentRoom, currentRoomOk := s.LevelManager.CurrentLevel.RoomByIDMap[*s.CurrentRoomID]
-		if !currentRoomOk {
-			return fmt.Errorf("current room not found by ID=%d", *s.CurrentRoomID)
-		}
-		ui.DrawMapBackgroundImage(
-			currentRoom.Name,
-			transitionRoomResp.modX,
-			transitionRoomResp.modY,
-		)
-
-		if s.NextRoomID == nil {
-			return fmt.Errorf("next room ID is nil")
-		}
-		nextRoom, nextRoomOk := s.LevelManager.CurrentLevel.RoomByIDMap[*s.NextRoomID]
-		if !nextRoomOk {
-			return fmt.Errorf("next room not found by ID=%d", *s.NextRoomID)
-		}
-		ui.DrawMapBackgroundImage(
-			nextRoom.Name,
-			transitionRoomResp.modXNext,
-			transitionRoomResp.modYNext,
-		)
-		ui.DrawMask()
-
-		// Move player with map transition
-		s.Player.componentRectangle.Rect = pixel.R(
-			s.Player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX,
-			s.Player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY,
-			s.Player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX+s.TileSize,
-			s.Player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY+s.TileSize,
-		)
-
-		err := systemsManager.Update()
-		if err != nil {
-			return err
-		}
-	} else if s.roomTransitionManager.Style() == RoomTransitionWarp && s.roomTransitionManager.Timer() > 0 {
-		s.roomTransitionManager.DecrementTimer()
-		ui.Window.Clear(colornames.Darkgray)
-		ui.DrawMapBackground(colornames.White)
-
-		s.CollisionSystem.RemoveAll(CategoryObstacle)
-		systemsManager.RemoveAllEnemies()
-		systemsManager.RemoveAllCollisionSwitches()
-		systemsManager.RemoveAllMoveableObstacles()
-		systemsManager.RemoveAllEntities()
-	} else {
-		*s.CurrentState = StateGame
-		if *s.NextRoomID != 0 {
-			*s.CurrentRoomID = *s.NextRoomID
-		}
-		s.roomTransitionManager.Disable()
-	}
-
-	return nil
-}
-
 type transitionRoomResponse struct {
 	nextRoomID                                             RoomID
 	modX, modY, modXNext, modYNext, playerModX, playerModY float64
@@ -148,4 +59,136 @@ func calculateTransitionSlide(
 		nextRoomID,
 		modX, modY, modXNext, modYNext, playerModX, playerModY,
 	}
+}
+
+type GameStateTransition struct {
+	context               *GameStateContext
+	uiSystem              *UISystem
+	inputSystem           *InputSystem
+	roomTransitionManager *RoomTransitionManager
+	collisionSystem       *CollisionSystem
+	systemsManager        *SystemsManager
+	levelManager          *LevelManager
+	currentRoomID         *RoomID
+	nextRoomID            *RoomID
+	tileSize              float64
+	activeSpaceRectangle  ActiveSpaceRectangle
+	player                Entity
+}
+
+func NewGameStateTransition(
+	context *GameStateContext,
+	uiSystem *UISystem,
+	inputSystem *InputSystem,
+	roomTransitionManager *RoomTransitionManager,
+	collisionSystem *CollisionSystem,
+	systemsManager *SystemsManager,
+	levelManager *LevelManager,
+	currentRoomID *RoomID,
+	nextRoomID *RoomID,
+	tileSize float64,
+	activeSpaceRectangle ActiveSpaceRectangle,
+	player Entity,
+) GameState {
+	return GameStateTransition{
+		context:               context,
+		uiSystem:              uiSystem,
+		inputSystem:           inputSystem,
+		roomTransitionManager: roomTransitionManager,
+		collisionSystem:       collisionSystem,
+		systemsManager:        systemsManager,
+		levelManager:          levelManager,
+		currentRoomID:         currentRoomID,
+		nextRoomID:            nextRoomID,
+		tileSize:              tileSize,
+		activeSpaceRectangle:  activeSpaceRectangle,
+		player:                player,
+	}
+}
+
+func (g GameStateTransition) Update() error {
+
+	g.inputSystem.Disable()
+
+	if g.roomTransitionManager.Style() == RoomTransitionSlide && g.roomTransitionManager.Timer() > 0 {
+		g.roomTransitionManager.DecrementTimer()
+		g.uiSystem.Window.Clear(colornames.Darkgray)
+		g.uiSystem.DrawMapBackground(colornames.White)
+
+		g.collisionSystem.RemoveAll(CategoryObstacle)
+		g.systemsManager.RemoveAllEnemies()
+		g.systemsManager.RemoveAllCollisionSwitches()
+		g.systemsManager.RemoveAllMoveableObstacles()
+		g.systemsManager.RemoveAllEntities()
+
+		connectedRooms := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID].ConnectedRooms()
+
+		transitionRoomResp := calculateTransitionSlide(
+			g.roomTransitionManager,
+			*connectedRooms,
+			g.tileSize,
+			g.activeSpaceRectangle,
+		)
+
+		*g.nextRoomID = transitionRoomResp.nextRoomID
+
+		if g.currentRoomID == nil {
+			return fmt.Errorf("current room ID is nil")
+		}
+		currentRoom, currentRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[*g.currentRoomID]
+		if !currentRoomOk {
+			return fmt.Errorf("current room not found by ID=%d", *g.currentRoomID)
+		}
+		g.uiSystem.DrawMapBackgroundImage(
+			currentRoom.Name,
+			transitionRoomResp.modX,
+			transitionRoomResp.modY,
+		)
+
+		if g.nextRoomID == nil {
+			return fmt.Errorf("next room ID is nil")
+		}
+		nextRoom, nextRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[*g.nextRoomID]
+		if !nextRoomOk {
+			return fmt.Errorf("next room not found by ID=%d", *g.nextRoomID)
+		}
+		g.uiSystem.DrawMapBackgroundImage(
+			nextRoom.Name,
+			transitionRoomResp.modXNext,
+			transitionRoomResp.modYNext,
+		)
+		g.uiSystem.DrawMask()
+
+		// Move player with map transition
+		g.player.componentRectangle.Rect = pixel.R(
+			g.player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX,
+			g.player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY,
+			g.player.componentRectangle.Rect.Min.X+transitionRoomResp.playerModX+g.tileSize,
+			g.player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY+g.tileSize,
+		)
+
+		err := g.systemsManager.Update()
+		if err != nil {
+			return err
+		}
+	} else if g.roomTransitionManager.Style() == RoomTransitionWarp && g.roomTransitionManager.Timer() > 0 {
+		g.roomTransitionManager.DecrementTimer()
+		g.uiSystem.Window.Clear(colornames.Darkgray)
+		g.uiSystem.DrawMapBackground(colornames.White)
+
+		g.collisionSystem.RemoveAll(CategoryObstacle)
+		g.systemsManager.RemoveAllEnemies()
+		g.systemsManager.RemoveAllCollisionSwitches()
+		g.systemsManager.RemoveAllMoveableObstacles()
+		g.systemsManager.RemoveAllEntities()
+	} else {
+		fmt.Println("state: transition => game")
+		g.context.SetState(GameStateNameGame)
+		if *g.nextRoomID != 0 {
+			*g.currentRoomID = *g.nextRoomID
+		}
+		g.roomTransitionManager.Disable()
+	}
+
+	return nil
 }

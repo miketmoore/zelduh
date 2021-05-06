@@ -1,15 +1,29 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 )
 
-// GameStateStart handles functionality for the game "start" state
-func (g *GameStateManager) stateStart() error {
-	g.UI.DrawScreenStart()
+type GameStateStart struct {
+	context  *GameStateContext
+	uiSystem *UISystem
+}
 
-	if g.UI.Window.JustPressed(pixelgl.KeyEnter) {
-		g.setCurrentState(StateGame)
+func NewGameStateStart(context *GameStateContext, uiSystem *UISystem) GameState {
+	return GameStateStart{
+		context:  context,
+		uiSystem: uiSystem,
+	}
+}
+
+func (g GameStateStart) Update() error {
+	g.uiSystem.DrawScreenStart()
+
+	if g.uiSystem.Window.JustPressed(pixelgl.KeyEnter) {
+		fmt.Println("state: start => game")
+		g.context.SetState(GameStateNameGame)
 	}
 
 	return nil

@@ -61,7 +61,7 @@ func run() {
 	shouldAddEntities := true
 	var currentRoomID zelduh.RoomID = 1
 	var nextRoomID zelduh.RoomID
-	currentState := zelduh.StateStart
+	// currentState := zelduh.StateStart
 	spriteMap := zelduh.LoadAndBuildSpritesheet("assets/spritesheet.png", tileSize)
 
 	player := entityFactory.NewEntity("player", zelduh.NewCoordinates(6, 6), frameRate)
@@ -168,23 +168,7 @@ func run() {
 		activeSpaceRectangle.Y+activeSpaceRectangle.Height,
 	)
 
-	boundsCollisionSystem := zelduh.NewBoundsCollisionSystem(
-		ui.Window,
-		mapBounds,
-		func(side zelduh.Bound) {
-			// TODO prevent room transition if no room exists on this side
-			if !roomTransitionManager.Active() && nextRoomID > 0 {
-				roomTransitionManager.Enable()
-				roomTransitionManager.SetSide(side)
-				roomTransitionManager.SetSlide()
-				roomTransitionManager.ResetTimer()
-				currentState = zelduh.StateMapTransition
-				shouldAddEntities = true
-			} else {
-				movementSystem.SetZeroSpeed(playerID)
-			}
-		},
-	)
+	var stateContext *zelduh.GameStateContext
 
 	ignoreSystem := zelduh.NewIgnoreSystem()
 	coinsSystem := zelduh.NewCoinsSystem()
@@ -201,7 +185,8 @@ func run() {
 				healthSystem.Hit(playerID, 1)
 
 				if healthSystem.Health(playerID) == 0 {
-					currentState = zelduh.StateOver
+					// currentState = zelduh.StateOver
+					stateContext.SetState("gameOver")
 				}
 			},
 			"playerWithCoin": func(coinEntityID zelduh.EntityID) {
@@ -300,7 +285,8 @@ func run() {
 					roomTransitionManager.Enable()
 					roomTransitionManager.SetWarp()
 					roomTransitionManager.SetTimer(1)
-					currentState = zelduh.StateMapTransition
+					// currentState = zelduh.StateMapTransition
+					stateContext.SetState("transition")
 					shouldAddEntities = true
 					nextRoomID = entityConfig.WarpToRoomID
 				}
@@ -373,6 +359,44 @@ func run() {
 		frameRate,
 	)
 
+	stateContext = zelduh.NewGameStateContext(
+		&ui,
+		&inputSystem,
+		&roomTransitionManager,
+		&collisionSystem,
+		&systemsManager,
+		&levelManager,
+		&entityCreator,
+		roomWarps,
+		entitiesMap,
+		&currentRoomID,
+		&nextRoomID,
+		&shouldAddEntities,
+		tileSize,
+		frameRate,
+		activeSpaceRectangle,
+		player,
+	)
+
+	boundsCollisionSystem := zelduh.NewBoundsCollisionSystem(
+		ui.Window,
+		mapBounds,
+		func(side zelduh.Bound) {
+			// TODO prevent room transition if no room exists on this side
+			if !roomTransitionManager.Active() && nextRoomID > 0 {
+				roomTransitionManager.Enable()
+				roomTransitionManager.SetSide(side)
+				roomTransitionManager.SetSlide()
+				roomTransitionManager.ResetTimer()
+				// currentState = zelduh.StateMapTransition
+				stateContext.SetState("transition")
+				shouldAddEntities = true
+			} else {
+				movementSystem.SetZeroSpeed(playerID)
+			}
+		},
+	)
+
 	systemsManager.AddSystems(
 		&inputSystem,
 		&healthSystem,
@@ -394,29 +418,29 @@ func run() {
 		bomb,
 	)
 
-	gameStateManager := zelduh.NewGameStateManager(
-		&systemsManager,
-		ui,
-		&collisionSystem,
-		&inputSystem,
-		&shouldAddEntities,
-		&currentRoomID,
-		&nextRoomID,
-		&currentState,
-		spriteMap,
-		mapDrawData,
-		entitiesMap,
-		&player,
-		roomWarps,
-		&levelManager,
-		&entityConfigPresetFnManager,
-		tileSize,
-		frameRate,
-		nonObstacleSprites,
-		activeSpaceRectangle,
-		&entityCreator,
-		&roomTransitionManager,
-	)
+	// gameStateManager := zelduh.NewGameStateManager(
+	// 	&systemsManager,
+	// 	ui,
+	// 	&collisionSystem,
+	// 	&inputSystem,
+	// 	&shouldAddEntities,
+	// 	&currentRoomID,
+	// 	&nextRoomID,
+	// 	&currentState,
+	// 	spriteMap,
+	// 	mapDrawData,
+	// 	entitiesMap,
+	// 	&player,
+	// 	roomWarps,
+	// 	&levelManager,
+	// 	&entityConfigPresetFnManager,
+	// 	tileSize,
+	// 	frameRate,
+	// 	nonObstacleSprites,
+	// 	activeSpaceRectangle,
+	// 	&entityCreator,
+	// 	&roomTransitionManager,
+	// )
 
 	totalCells := int(activeSpaceRectangle.Width / tileSize * activeSpaceRectangle.Height / tileSize)
 	fmt.Println(totalCells)
@@ -434,7 +458,8 @@ func run() {
 			os.Exit(1)
 		}
 
-		err := gameStateManager.Update()
+		// err := gameStateManager.Update()
+		err := stateContext.Update()
 		if err != nil {
 			fmt.Println("Error: ", err)
 			os.Exit(0)
