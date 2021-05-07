@@ -20,6 +20,7 @@ type RoomByIDMap map[RoomID]*Room
 
 // Room represents one map section
 type Room struct {
+	ID             RoomID
 	TMXFileName    RoomName
 	connectedRooms *ConnectedRooms
 	EntityConfigs  []EntityConfig
@@ -41,15 +42,6 @@ func (r Room) SetConnectedRoom(dir direction.Direction, id RoomID) {
 		r.connectedRooms.Bottom = id
 	case direction.DirectionLeft:
 		r.connectedRooms.Left = id
-	}
-}
-
-// NewRoom builds a new Room
-func NewRoom(tmxFileName RoomName, entityConfigs ...EntityConfig) *Room {
-	return &Room{
-		TMXFileName:    tmxFileName,
-		connectedRooms: &ConnectedRooms{},
-		EntityConfigs:  entityConfigs,
 	}
 }
 

@@ -45,7 +45,10 @@ func (m *Main) Run() error {
 
 	entityConfigPresetFnManager := NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
 
+	roomFactory := NewRoomFactory()
+
 	testLevel := buildTestLevel(
+		roomFactory,
 		&entityConfigPresetFnManager,
 		m.tileSize,
 	)
