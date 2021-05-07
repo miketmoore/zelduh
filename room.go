@@ -114,10 +114,6 @@ func connectRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir directio
 		directionBToA = direction.DirectionRight
 	}
 
-	// Cache room references by their IDs
-	roomByIDMap[roomAID] = roomA
-	roomByIDMap[roomBID] = roomB
-
 	// Connect rooms
 	roomA.SetConnectedRoom(directionAToB, roomBID)
 	roomB.SetConnectedRoom(directionBToA, roomAID)
