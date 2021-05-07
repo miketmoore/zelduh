@@ -45,8 +45,9 @@ func (r Room) SetConnectedRoom(dir direction.Direction, id RoomID) {
 	}
 }
 
-// buildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
-func buildMapRoomIDToRoom(layout [][]RoomID, roomByIDMap RoomByIDMap) {
+// connectRooms traverses a multi-dimensional slice of room IDs and "connects" adjacent rooms
+// by calling Room.SetConnectedRoom(...) on each room
+func connectRooms(layout [][]RoomID, roomByIDMap RoomByIDMap) {
 
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
@@ -55,35 +56,35 @@ func buildMapRoomIDToRoom(layout [][]RoomID, roomByIDMap RoomByIDMap) {
 			if (row > 0) && (len(layout[row-1]) > col) {
 				roomBID := layout[row-1][col]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionUp)
+					connectTwoRooms(roomByIDMap, roomAID, roomBID, direction.DirectionUp)
 				}
 			}
 			// Right
 			if len(layout[row]) > col+1 {
 				roomBID := layout[row][col+1]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionRight)
+					connectTwoRooms(roomByIDMap, roomAID, roomBID, direction.DirectionRight)
 				}
 			}
 			// Bottom
 			if (len(layout) > row+1) && (len(layout[row+1]) > col) {
 				roomBID := layout[row+1][col]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionDown)
+					connectTwoRooms(roomByIDMap, roomAID, roomBID, direction.DirectionDown)
 				}
 			}
 			// Left
 			if col > 0 {
 				roomBID := layout[row][col-1]
 				if roomBID > 0 {
-					connectRooms(roomByIDMap, roomAID, roomBID, direction.DirectionLeft)
+					connectTwoRooms(roomByIDMap, roomAID, roomBID, direction.DirectionLeft)
 				}
 			}
 		}
 	}
 }
 
-func connectRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir direction.Direction) {
+func connectTwoRooms(roomByIDMap RoomByIDMap, roomAID, roomBID RoomID, dir direction.Direction) {
 
 	roomA, roomAOK := roomByIDMap[roomAID]
 	roomB, roomBOK := roomByIDMap[roomBID]
