@@ -18,7 +18,7 @@ func buildTestLevel01(
 		roomByIDMap[room.ID] = room
 	}
 
-	BuildMapRoomIDToRoom(
+	buildMapRoomIDToRoom(
 		// Overworld is a multi-dimensional array representing the overworld
 		// Each room ID should be unique
 		[][]RoomID{

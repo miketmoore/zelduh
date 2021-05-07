@@ -45,8 +45,8 @@ func (r Room) SetConnectedRoom(dir direction.Direction, id RoomID) {
 	}
 }
 
-// BuildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
-func BuildMapRoomIDToRoom(layout [][]RoomID, roomByIDMap RoomByIDMap) {
+// buildMapRoomIDToRoom transforms a multi-dimensional array of RoomID values into a map of Room structs, indexed by RoomID
+func buildMapRoomIDToRoom(layout [][]RoomID, roomByIDMap RoomByIDMap) {
 
 	for row := 0; row < len(layout); row++ {
 		for col := 0; col < len(layout[row]); col++ {
