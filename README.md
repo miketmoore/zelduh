@@ -49,13 +49,21 @@ Screen is a 15 wide grid (X coordinates 0-14)
 
 ## Create a TMX file to represent a room 
 
-- File attributes
-    - fixed size: 14 wide by 12 high
-    - orientation: orthogonal
-    - format: CSV
-    - tile render order: top down
-- Guidelines
-    - By default, all sprites used in a tmx file will be obstacles, meaning entities will collide with them and 
-        not be able to pass through them
-    - Sprites in the spritesheet can be configured with the `map[int]bool` structure to be non-obstacles
+### File attributes
 
+- fixed size: 14 wide by 12 high
+- orientation: orthogonal
+- format: CSV
+- tile render order: top down
+
+### Obstacle and non-obstacle sprites
+
+- By default, all sprites used in a tmx file will be obstacles, meaning entities will collide with them and 
+    not be able to pass through them
+- Sprites in the spritesheet can be configured with the `map[int]bool` structure to be non-obstacles
+
+## Room transitions
+
+The player can move from one room to the next if the rooms have been connected and if the player
+can touch the edge of the room that is adjacent to the next room. For example, if obstacle sprites
+prevent the player from touching the edge, then the room transition will not be available.
