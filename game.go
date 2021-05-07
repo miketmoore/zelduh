@@ -100,7 +100,7 @@ func (m *Main) Run() error {
 
 	temporarySystem := NewTemporarySystem()
 
-	mapDrawData := BuildMapDrawData(
+	mapDrawData, mapDrawDataErr := BuildMapDrawData(
 		"assets/tilemaps/",
 		[]string{
 			"overworldOpen",
@@ -127,6 +127,11 @@ func (m *Main) Run() error {
 		},
 		m.tileSize,
 	)
+
+	if mapDrawDataErr != nil {
+		fmt.Println(mapDrawData)
+		os.Exit(0)
+	}
 
 	// NonObstacleSprites defines which sprites are not obstacles
 	var nonObstacleSprites = map[int]bool{

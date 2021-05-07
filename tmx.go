@@ -10,28 +10,37 @@ import (
 	"github.com/faiface/pixel"
 )
 
+type TmxMapByNameMap map[string]tmxreader.TmxMap
+
 // Load loads the tmx files
-func Load(tilemapFiles []string, tilemapDir string) map[string]tmxreader.TmxMap {
+func Load(tilemapFiles []string, tilemapDir string) (TmxMapByNameMap, error) {
 	tmxMapData := map[string]tmxreader.TmxMap{}
 	for _, name := range tilemapFiles {
 		path := fmt.Sprintf("%s%s.tmx", tilemapDir, name)
-		tmxMapData[name] = parseTmxFile(path)
+		parsed, err := readAndParseTmxFile(path)
+		if err != nil {
+			fmt.Println(err)
+			return TmxMapByNameMap{}, fmt.Errorf("error reading and parsing file=%s", path)
+		}
+		tmxMapData[name] = parsed
 	}
-	return tmxMapData
+	return tmxMapData, nil
 }
 
-func parseTmxFile(filename string) tmxreader.TmxMap {
+func readAndParseTmxFile(filename string) (tmxreader.TmxMap, error) {
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return tmxreader.TmxMap{}, fmt.Errorf("error reading file=%s\n", filename)
 	}
 
 	tmxMap, err := tmxreader.Parse(raw)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return tmxreader.TmxMap{}, fmt.Errorf("error parsing TMX data")
 	}
 
-	return tmxMap
+	return tmxMap, nil
 }
 
 type mapDrawData struct {
@@ -48,10 +57,14 @@ type MapData struct {
 type MapDrawData map[TMXFileName]MapData
 
 // BuildMapDrawData builds draw data and stores it in a map
-func BuildMapDrawData(dir string, files []string, tileSize float64) MapDrawData {
+func BuildMapDrawData(dir string, files []string, tileSize float64) (MapDrawData, error) {
 
 	// load all TMX file data for each map
-	tmxMapData := Load(files, dir)
+	tmxMapData, err := Load(files, dir)
+	if err != nil {
+		fmt.Println(err)
+		return MapDrawData{}, fmt.Errorf("error loading TMX files")
+	}
 
 	all := MapDrawData{}
 
@@ -90,5 +103,5 @@ func BuildMapDrawData(dir string, files []string, tileSize float64) MapDrawData 
 		}
 	}
 
-	return all
+	return all, nil
 }
