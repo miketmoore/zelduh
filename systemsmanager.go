@@ -2,12 +2,6 @@ package zelduh
 
 import "github.com/miketmoore/zelduh/core/entity"
 
-// System is an interface
-type System interface {
-	Update() error
-	AddEntity(Entity)
-}
-
 // SystemsManager is a world struct
 type SystemsManager struct {
 	systems      []System
