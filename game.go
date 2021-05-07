@@ -117,6 +117,7 @@ func (m *Main) Run() error {
 			"overworldTreeClusterTopRight",
 			"overworldFourWallsClusterTrees",
 			"overworldFourWallsDoorsAllSides",
+			"overworldFourWallsDoorBottomLeft",
 			"rockPatternTest",
 			"rockPathOpenLeft",
 			"rockWithCaveEntrance",

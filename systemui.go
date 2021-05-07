@@ -105,8 +105,11 @@ func (s *UISystem) DrawMapBackgroundImage(
 	modX, modY float64,
 ) {
 
-	d := s.mapDrawData[name]
-	for _, spriteData := range d.Data {
+	data, dataOk := s.mapDrawData[name]
+	if !dataOk {
+		fmt.Printf("DrawMapBackgroundImage: tmx file not found in map by name=%s\n", name)
+	}
+	for _, spriteData := range data.Data {
 		if spriteData.SpriteID != 0 {
 			sprite := s.spriteMap[spriteData.SpriteID]
 
@@ -126,10 +129,19 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 	roomID RoomID,
 	modX, modY float64,
 ) []Entity {
-	d := s.mapDrawData[s.levelManager.CurrentLevel.RoomByIDMap[roomID].TMXFileName]
+	room, roomOk := s.levelManager.CurrentLevel.RoomByIDMap[roomID]
+	if !roomOk {
+		fmt.Printf("DrawObstaclesPerMapTiles: room not found in map by RoomID=%d\n", roomID)
+	}
+
+	data, dataOk := s.mapDrawData[room.TMXFileName]
+	if !dataOk {
+		fmt.Printf("DrawObstaclesPerMapTiles: tmx file not found in map by name=%s\n", room.TMXFileName)
+	}
+
 	obstacles := []Entity{}
 	mod := 0.5
-	for _, spriteData := range d.Data {
+	for _, spriteData := range data.Data {
 		if spriteData.SpriteID != 0 {
 			vec := spriteData.Rect.Min
 			movedVec := pixel.V(
