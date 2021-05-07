@@ -51,9 +51,9 @@ func (g StateGame) Update() error {
 
 	currentRoomID := g.roomManager.Current()
 
-	roomName := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].Name
+	tmxFileName := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].TMXFileName
 
-	g.uiSystem.DrawLevelBackground(roomName)
+	g.uiSystem.DrawLevelBackground(tmxFileName)
 
 	if *g.shouldAddEntities {
 		*g.shouldAddEntities = false

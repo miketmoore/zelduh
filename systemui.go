@@ -126,7 +126,7 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 	roomID RoomID,
 	modX, modY float64,
 ) []Entity {
-	d := s.mapDrawData[s.levelManager.CurrentLevel.RoomByIDMap[roomID].Name]
+	d := s.mapDrawData[s.levelManager.CurrentLevel.RoomByIDMap[roomID].TMXFileName]
 	obstacles := []Entity{}
 	mod := 0.5
 	for _, spriteData := range d.Data {

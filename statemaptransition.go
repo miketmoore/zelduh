@@ -137,7 +137,7 @@ func (g StateTransition) Update() error {
 			return fmt.Errorf("current room not found by ID=%d", currentRoomID)
 		}
 		g.uiSystem.DrawMapBackgroundImage(
-			currentRoom.Name,
+			currentRoom.TMXFileName,
 			transitionRoomResp.modX,
 			transitionRoomResp.modY,
 		)
@@ -147,7 +147,7 @@ func (g StateTransition) Update() error {
 			return fmt.Errorf("next room not found by ID=%d", g.roomManager.Next())
 		}
 		g.uiSystem.DrawMapBackgroundImage(
-			nextRoom.Name,
+			nextRoom.TMXFileName,
 			transitionRoomResp.modXNext,
 			transitionRoomResp.modYNext,
 		)
