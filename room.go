@@ -5,7 +5,7 @@ import "github.com/miketmoore/zelduh/core/direction"
 // RoomID is a room ID
 type RoomID int
 
-type RoomName string
+type TMXFileName string
 
 // ConnectedRooms is used to configure adjacent rooms
 type ConnectedRooms struct {
@@ -21,7 +21,7 @@ type RoomByIDMap map[RoomID]*Room
 // Room represents one map section
 type Room struct {
 	ID             RoomID
-	TMXFileName    RoomName
+	TMXFileName    TMXFileName
 	connectedRooms *ConnectedRooms
 	EntityConfigs  []EntityConfig
 }

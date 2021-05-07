@@ -45,7 +45,7 @@ type MapData struct {
 	Data []mapDrawData
 }
 
-type MapDrawData map[RoomName]MapData
+type MapDrawData map[TMXFileName]MapData
 
 // BuildMapDrawData builds draw data and stores it in a map
 func BuildMapDrawData(dir string, files []string, tileSize float64) MapDrawData {
@@ -86,7 +86,7 @@ func BuildMapDrawData(dir string, files []string, tileSize float64) MapDrawData 
 				}
 
 			}
-			all[RoomName(mapName)] = md
+			all[TMXFileName(mapName)] = md
 		}
 	}
 

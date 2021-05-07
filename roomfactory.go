@@ -16,7 +16,7 @@ func (r *RoomFactory) newID() RoomID {
 }
 
 // NewRoom builds a new Room
-func (r *RoomFactory) NewRoom(tmxFileName RoomName, entityConfigs ...EntityConfig) *Room {
+func (r *RoomFactory) NewRoom(tmxFileName TMXFileName, entityConfigs ...EntityConfig) *Room {
 	return &Room{
 		ID:             r.newID(),
 		TMXFileName:    tmxFileName,

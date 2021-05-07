@@ -101,7 +101,7 @@ func (s *UISystem) DrawScreenStart() {
 }
 
 func (s *UISystem) DrawMapBackgroundImage(
-	name RoomName,
+	name TMXFileName,
 	modX, modY float64,
 ) {
 
@@ -196,7 +196,7 @@ func (s *UISystem) DrawGameOverScreen() {
 	s.DrawCenterText(s.currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 }
 
-func (s *UISystem) DrawLevelBackground(roomName RoomName) {
+func (s *UISystem) DrawLevelBackground(roomName TMXFileName) {
 	s.Window.Clear(colornames.Darkgray)
 	s.DrawMapBackground(colornames.White)
 
