@@ -277,27 +277,23 @@ func (m *Main) Run() error {
 				}
 			},
 			MoveableObstacleWithSwitch: func(collisionSwitchID entity.EntityID) {
-				entity, ok := entitiesMap[collisionSwitchID]
-				if ok && !toggleSystem.Enabled(entity.ID()) {
-					toggleSystem.Toggle(entity.ID())
+				if !toggleSystem.Enabled(collisionSwitchID) {
+					toggleSystem.Toggle(collisionSwitchID)
 				}
 			},
 			MoveableObstacleWithSwitchNoCollision: func(collisionSwitchID entity.EntityID) {
-				entity, ok := entitiesMap[collisionSwitchID]
-				if ok && toggleSystem.Enabled(entity.ID()) {
-					toggleSystem.Toggle(entity.ID())
+				if toggleSystem.Enabled(collisionSwitchID) {
+					toggleSystem.Toggle(collisionSwitchID)
 				}
 			},
 			PlayerWithSwitch: func(collisionSwitchID entity.EntityID) {
-				entity, ok := entitiesMap[collisionSwitchID]
-				if ok && !toggleSystem.Enabled(entity.ID()) {
-					toggleSystem.Toggle(entity.ID())
+				if !toggleSystem.Enabled(collisionSwitchID) {
+					toggleSystem.Toggle(collisionSwitchID)
 				}
 			},
 			PlayerWithSwitchNoCollision: func(collisionSwitchID entity.EntityID) {
-				entity, ok := entitiesMap[collisionSwitchID]
-				if ok && toggleSystem.Enabled(entity.ID()) {
-					toggleSystem.Toggle(entity.ID())
+				if toggleSystem.Enabled(collisionSwitchID) {
+					toggleSystem.Toggle(collisionSwitchID)
 				}
 			},
 			EnemyWithObstacle: func(enemyEntityID entity.EntityID) {
