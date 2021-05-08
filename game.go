@@ -57,8 +57,6 @@ func (m *Main) Run() error {
 
 	systemsManager := NewSystemsManager()
 
-	entityFactory := NewEntityFactory(&systemsManager, &entityConfigPresetFnManager)
-
 	movementSystem := NewMovementSystem(
 		rand.New(rand.NewSource(time.Now().UnixNano())),
 		m.tileSize,
@@ -79,6 +77,17 @@ func (m *Main) Run() error {
 	// currentState := StateStart
 	spriteMap := LoadAndBuildSpritesheet("assets/spritesheet.png", m.tileSize)
 
+	temporarySystem := NewTemporarySystem()
+
+	entityFactory := NewEntityFactory(
+		&systemsManager,
+		&entityConfigPresetFnManager,
+		&temporarySystem,
+		&movementSystem,
+		m.tileSize,
+		m.frameRate,
+	)
+
 	player := entityFactory.NewEntityFromPresetName("player", NewCoordinates(6, 6), m.frameRate)
 	playerID := player.ID()
 
@@ -97,8 +106,6 @@ func (m *Main) Run() error {
 
 	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
 	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
-
-	temporarySystem := NewTemporarySystem()
 
 	mapDrawData, mapDrawDataErr := BuildMapDrawData(
 		"assets/tilemaps/",
@@ -170,16 +177,6 @@ func (m *Main) Run() error {
 		&temporarySystem,
 	)
 
-	entityCreator := NewEntityCreator(
-		&systemsManager,
-		&temporarySystem,
-		&movementSystem,
-		&entityFactory,
-		&entityConfigPresetFnManager,
-		m.tileSize,
-		m.frameRate,
-	)
-
 	mapBounds := pixel.R(
 		activeSpaceRectangle.X,
 		activeSpaceRectangle.Y,
@@ -223,7 +220,7 @@ func (m *Main) Run() error {
 					if !movementSystem.EnemyMovingFromHit(enemyEntityID) {
 						dead = healthSystem.Hit(enemyEntityID, 1)
 						if dead {
-							entityCreator.CreateExplosion(enemyEntityID)
+							entityFactory.CreateExplosion(enemyEntityID)
 							systemsManager.RemoveEnemy(enemyEntityID)
 						} else {
 							playerDirection, err := movementSystem.Direction(player.ID())
@@ -243,7 +240,7 @@ func (m *Main) Run() error {
 					// arrow.componentIgnore.Value = true
 					ignoreSystem.Ignore(arrow.ID())
 					if dead {
-						entityCreator.CreateExplosion(enemyEntityID)
+						entityFactory.CreateExplosion(enemyEntityID)
 						systemsManager.RemoveEnemy(enemyEntityID)
 					} else {
 						playerDirection, err := movementSystem.Direction(player.ID())
@@ -391,7 +388,7 @@ func (m *Main) Run() error {
 		&collisionSystem,
 		&systemsManager,
 		&levelManager,
-		&entityCreator,
+		&entityFactory,
 		roomWarps,
 		entitiesMap,
 		roomManager,

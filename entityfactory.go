@@ -1,6 +1,7 @@
 package zelduh
 
 import (
+	"github.com/faiface/pixel"
 	"github.com/miketmoore/zelduh/core/entity"
 	"golang.org/x/image/colornames"
 )
@@ -8,15 +9,27 @@ import (
 type EntityFactory struct {
 	systemsManager              *SystemsManager
 	entityConfigPresetFnManager *EntityConfigPresetFnManager
+	temporarySystem             *TemporarySystem
+	movementSystem              *MovementSystem
+	tileSize                    float64
+	frameRate                   int
 }
 
 func NewEntityFactory(
 	systemsManager *SystemsManager,
 	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	temporarySystem *TemporarySystem,
+	movementSystem *MovementSystem,
+	tileSize float64,
+	frameRate int,
 ) EntityFactory {
 	return EntityFactory{
 		systemsManager:              systemsManager,
+		temporarySystem:             temporarySystem,
+		movementSystem:              movementSystem,
 		entityConfigPresetFnManager: entityConfigPresetFnManager,
+		tileSize:                    tileSize,
+		frameRate:                   frameRate,
 	}
 }
 
@@ -132,4 +145,44 @@ func (ef *EntityFactory) buildEntityFromConfig(c EntityConfig, id entity.EntityI
 	}
 
 	return entity
+}
+
+func (ef *EntityFactory) CreateCoin(
+	v pixel.Vec,
+) {
+	coordinates := Coordinates{
+		X: v.X / ef.tileSize,
+		Y: v.Y / ef.tileSize,
+	}
+	coin := ef.NewEntityFromPresetName("coin", coordinates, ef.frameRate)
+	ef.systemsManager.AddEntity(coin)
+}
+
+func (ef *EntityFactory) CreateUICoin() {
+	presetFn := ef.entityConfigPresetFnManager.GetPreset("uiCoin")
+	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
+	coin := ef.NewEntityFromConfig(entityConfig, ef.frameRate)
+	ef.systemsManager.AddEntity(coin)
+}
+
+func (ef *EntityFactory) CreateExplosion(
+	entityID entity.EntityID,
+) {
+	explosion := ef.NewEntityFromPresetName("explosion", NewCoordinates(0, 0), ef.frameRate)
+
+	ef.temporarySystem.SetExpiration(
+		explosion.ID(),
+		len(explosion.componentAnimation.ComponentAnimationByName["default"].Frames),
+		func() {
+			ef.CreateCoin(explosion.componentRectangle.Rect.Min)
+		},
+	)
+
+	explosion.componentDimensions = NewComponentDimensions(ef.tileSize, ef.tileSize)
+	enemyComponentRectangle, _ := ef.movementSystem.ComponentRectangle(entityID)
+	explosion.componentRectangle = &componentRectangle{
+		Rect: enemyComponentRectangle.Rect,
+	}
+
+	ef.systemsManager.AddEntity(explosion)
 }

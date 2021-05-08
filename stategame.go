@@ -10,7 +10,7 @@ type StateGame struct {
 	inputSystem       *InputSystem
 	shouldAddEntities *bool
 	levelManager      *LevelManager
-	entityCreator     *EntityCreator
+	entityFactory     *EntityFactory
 	systemsManager    *SystemsManager
 	roomWarps         RoomWarps
 	entitiesMap       EntitiesMap
@@ -25,7 +25,7 @@ func NewStateGame(
 	roomManager *RoomManager,
 	shouldAddEntities *bool,
 	levelManager *LevelManager,
-	entityCreator *EntityCreator,
+	entityFactory *EntityFactory,
 	systemsManager *SystemsManager,
 	roomWarps RoomWarps,
 	entitiesMap EntitiesMap,
@@ -38,7 +38,7 @@ func NewStateGame(
 		roomManager:       roomManager,
 		shouldAddEntities: shouldAddEntities,
 		levelManager:      levelManager,
-		entityCreator:     entityCreator,
+		entityFactory:     entityFactory,
 		systemsManager:    systemsManager,
 		roomWarps:         roomWarps,
 		entitiesMap:       entitiesMap,
@@ -58,7 +58,7 @@ func (g StateGame) Update() error {
 	if *g.shouldAddEntities {
 		*g.shouldAddEntities = false
 
-		g.entityCreator.CreateUICoin()
+		g.entityFactory.CreateUICoin()
 
 		// Draw obstacles on appropriate map tiles
 		obstacles := g.uiSystem.DrawObstaclesPerMapTiles(
@@ -74,7 +74,7 @@ func (g StateGame) Update() error {
 		// Iterate through all entity configurations and build entities and add to systems
 		currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
 		for _, c := range currentRoom.EntityConfigs {
-			entity := g.entityCreator.entityFactory.NewEntityFromConfig(c, g.frameRate)
+			entity := g.entityFactory.NewEntityFromConfig(c, g.frameRate)
 			g.entitiesMap[entity.ID()] = entity
 			g.systemsManager.AddEntity(entity)
 
