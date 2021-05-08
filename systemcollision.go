@@ -151,7 +151,11 @@ func (s *CollisionSystem) RemoveAll(category entity.EntityCategory) {
 	case CategoryMovableObstacle:
 		removeAllEntities(s.moveableObstacles)
 	case CategoryObstacle:
-		removeAllEntities(s.obstacles)
+		// removeAllEntities(s.obstacles)
+
+		for i := len(s.obstacles) - 1; i >= 0; i-- {
+			s.obstacles = append(s.obstacles[:i], s.obstacles[i+1:]...)
+		}
 	}
 }
 
