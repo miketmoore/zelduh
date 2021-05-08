@@ -63,6 +63,7 @@ func NewStateContext(
 		levelManager,
 		activeSpaceRectangle,
 		tileSize,
+		shouldAddEntities,
 	)
 	context.stateTransition = NewStateTransition(
 		context,
@@ -76,6 +77,7 @@ func NewStateContext(
 		tileSize,
 		activeSpaceRectangle,
 		player,
+		shouldAddEntities,
 	)
 	context.stateGame = NewStateGame(
 		context,

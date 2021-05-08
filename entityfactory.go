@@ -183,6 +183,8 @@ func (s *EntityFactory) CreateObstaclesForRoom(
 	roomID RoomID,
 	modX, modY float64,
 ) {
+	fmt.Printf("CreateObstaclesForRoom roomID=%d\n", roomID)
+	s.systemsManager.RemoveAllByCategory(CategoryObstacle)
 	levelManager := s.levelManager
 	currentLevel := levelManager.CurrentLevel
 	room, roomOk := currentLevel.RoomByIDMap[roomID]

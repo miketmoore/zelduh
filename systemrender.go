@@ -175,12 +175,9 @@ func (s *RenderSystem) AddEntity(entity Entity) {
 
 // RemoveAll removes all entities from one category
 func (s *RenderSystem) RemoveAll(category entity.EntityCategory) {
-	switch category {
-	case CategoryEnemy:
-		for i := len(s.entities) - 1; i >= 0; i-- {
-			if s.entities[i].Category == CategoryEnemy {
-				s.entities = append(s.entities[:i], s.entities[i+1:]...)
-			}
+	for i := len(s.entities) - 1; i >= 0; i-- {
+		if s.entities[i].Category == category {
+			s.entities = append(s.entities[:i], s.entities[i+1:]...)
 		}
 	}
 }

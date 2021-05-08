@@ -32,28 +32,28 @@ func calculateTransitionSlide(
 	playerIncY := ((activeSpaceRectangle.Height / tileSize) - 1) + 7
 	playerIncX := ((activeSpaceRectangle.Width / tileSize) - 1) + 7
 
-	fmt.Printf("calculateTransitionSlide [%s] %s\n", roomTransitionManager.Side(), connectedRooms.String())
+	// fmt.Printf("calculateTransitionSlide [%s] %s\n", roomTransitionManager.Side(), connectedRooms.String())
 
 	if roomTransitionManager.Side() == BoundBottom && connectedRooms.Bottom != 0 {
-		fmt.Printf("calculateTransitionSlide bottom\n")
+		// fmt.Printf("calculateTransitionSlide bottom\n")
 		modY = incY
 		modYNext = incY - activeSpaceRectangle.Height
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
 	} else if roomTransitionManager.Side() == BoundTop && connectedRooms.Top != 0 {
-		fmt.Printf("calculateTransitionSlide top\n")
+		// fmt.Printf("calculateTransitionSlide top\n")
 		modY = -incY
 		modYNext = -incY + activeSpaceRectangle.Height
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
 	} else if roomTransitionManager.Side() == BoundLeft && connectedRooms.Left != 0 {
-		fmt.Printf("calculateTransitionSlide left\n")
+		// fmt.Printf("calculateTransitionSlide left\n")
 		modX = incX
 		modXNext = incX - activeSpaceRectangle.Width
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
 	} else if roomTransitionManager.Side() == BoundRight && connectedRooms.Right != 0 {
-		fmt.Printf("calculateTransitionSlide right\n")
+		// fmt.Printf("calculateTransitionSlide right\n")
 		modX = -incX
 		modXNext = -incX + activeSpaceRectangle.Width
 		nextRoomID = connectedRooms.Right
@@ -81,6 +81,7 @@ type StateTransition struct {
 	tileSize              float64
 	activeSpaceRectangle  ActiveSpaceRectangle
 	player                Entity
+	shouldAddEntities     *bool
 }
 
 func NewStateTransition(
@@ -95,6 +96,7 @@ func NewStateTransition(
 	tileSize float64,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	player Entity,
+	shouldAddEntities *bool,
 ) State {
 	return StateTransition{
 		context:               context,
@@ -108,6 +110,7 @@ func NewStateTransition(
 		tileSize:              tileSize,
 		activeSpaceRectangle:  activeSpaceRectangle,
 		player:                player,
+		shouldAddEntities:     shouldAddEntities,
 	}
 }
 
@@ -161,7 +164,7 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 	)
 
 	// nextRoomID = transitionRoomResp.nextRoomID
-	fmt.Printf("slideTransition calling SetNext; currentRoomID=%d nextRoomID=%d\n", currentRoomID, transitionRoomResp.nextRoomID)
+	// fmt.Printf("slideTransition calling SetNext; currentRoomID=%d nextRoomID=%d\n", currentRoomID, transitionRoomResp.nextRoomID)
 	g.roomManager.SetNext(transitionRoomResp.nextRoomID)
 
 	currentRoom, currentRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
@@ -200,6 +203,8 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 	if err != nil {
 		return err
 	}
+
+	*g.shouldAddEntities = true
 
 	return nil
 }

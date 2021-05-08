@@ -149,6 +149,7 @@ func (s *MovementSystem) Remove(category entity.EntityCategory, id entity.Entity
 func (s *MovementSystem) RemoveAll(category entity.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
+	case CategoryObstacle:
 		for i := len(s.enemies) - 1; i >= 0; i-- {
 			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
 		}

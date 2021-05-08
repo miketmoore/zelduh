@@ -17,6 +17,7 @@ type StatePrepareMapTransition struct {
 	levelManager          *LevelManager
 	activeSpaceRectangle  ActiveSpaceRectangle
 	tileSize              float64
+	shouldAddEntities     *bool
 }
 
 func NewStatePrepareMapTransition(
@@ -30,6 +31,7 @@ func NewStatePrepareMapTransition(
 	levelManager *LevelManager,
 	activeSpaceRectangle ActiveSpaceRectangle,
 	tileSize float64,
+	shouldAddEntities *bool,
 ) *StatePrepareMapTransition {
 	return &StatePrepareMapTransition{
 		context:               context,
@@ -42,6 +44,7 @@ func NewStatePrepareMapTransition(
 		levelManager:          levelManager,
 		activeSpaceRectangle:  activeSpaceRectangle,
 		tileSize:              tileSize,
+		shouldAddEntities:     shouldAddEntities,
 	}
 }
 
@@ -103,6 +106,8 @@ func (s StatePrepareMapTransition) Update() error {
 		fmt.Println(err)
 		return fmt.Errorf("error occured when calling updating on system manager")
 	}
+
+	*s.shouldAddEntities = true
 
 	err = s.context.SetState(StateNameTransition)
 	if err != nil {

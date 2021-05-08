@@ -430,6 +430,8 @@ func (m *Main) Run() error {
 				// roomTransitionManager.ResetTimer()
 				// // currentState = StateMapTransition
 
+				// shouldAddEntities = true
+
 				err := stateContext.SetState(StateNamePrepareMapTransition)
 				if err != nil {
 					fmt.Println(err)
@@ -441,7 +443,6 @@ func (m *Main) Run() error {
 				// 	fmt.Println("Error: ", err)
 				// 	os.Exit(0)
 				// }
-				// shouldAddEntities = true
 			}
 		},
 	)
