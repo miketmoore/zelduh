@@ -255,6 +255,7 @@ func (m *Main) Run() error {
 				movementSystem.SetRemainingMoves(arrowID, 0)
 			},
 			PlayerWithObstacle: func(obstacleID entity.EntityID) {
+				fmt.Printf("PlayerWithObstacle collision handler obstacleID=%d\n", obstacleID)
 				// "Block" by undoing rect
 				movementSystem.UsePreviousRectangle(player.ID())
 				movementSystem.SetZeroSpeed(player.ID())
