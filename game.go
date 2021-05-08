@@ -41,7 +41,7 @@ func NewMain(
 
 func (m *Main) Run() error {
 
-	entityConfigPresetFnsMap := BuildEntityConfigPresetFnsMap(m.tileSize)
+	// entityConfigPresetFnsMap := BuildEntityConfigPresetFnsMap(m.tileSize)
 
 	roomFactory := NewRoomFactory()
 
@@ -71,7 +71,6 @@ func (m *Main) Run() error {
 
 	entityFactory := NewEntityFactory(
 		&systemsManager,
-		entityConfigPresetFnsMap,
 		&temporarySystem,
 		&movementSystem,
 		m.tileSize,
@@ -86,16 +85,16 @@ func (m *Main) Run() error {
 
 	levelManager := NewLevelManager(&testLevel)
 
-	player := entityFactory.NewEntityFromPresetName("player", NewCoordinates(6, 6), m.frameRate)
+	player := entityFactory.NewEntityFromConfig(entityFactory.PresetPlayer()(NewCoordinates(6, 6)), m.frameRate)
 	playerID := player.ID()
 
-	bomb := entityFactory.NewEntityFromPresetName("bomb", NewCoordinates(0, 0), m.frameRate)
+	bomb := entityFactory.NewEntityFromConfig(entityFactory.PresetBomb()(NewCoordinates(0, 0)), m.frameRate)
 	// explosion := entityFactory.NewEntityFromPresetName("explosion", NewCoordinates(0, 0), m.frameRate)
 
-	sword := entityFactory.NewEntityFromPresetName("sword", NewCoordinates(0, 0), m.frameRate)
+	sword := entityFactory.NewEntityFromConfig(entityFactory.PresetSword()(NewCoordinates(0, 0)), m.frameRate)
 	swordID := sword.ID()
 
-	arrow := entityFactory.NewEntityFromPresetName("arrow", NewCoordinates(0, 0), m.frameRate)
+	arrow := entityFactory.NewEntityFromConfig(entityFactory.PresetArrow()(NewCoordinates(0, 0)), m.frameRate)
 	arrowID := arrow.ID()
 
 	windowConfig := NewWindowConfig(0, 0, 800, 800)
@@ -481,19 +480,6 @@ func (m *Main) Run() error {
 	return nil
 }
 
-func buildRotatedEntityConfig(
-	presetName PresetName,
-	entityFactory *EntityFactory,
-	x, y, degrees float64,
-) EntityConfig {
-	entityConfigPresetFn := entityFactory.GetPreset(presetName)
-	entityConfig := entityConfigPresetFn(Coordinates{X: x, Y: y})
-	entityConfig.Transform = &Transform{
-		Rotation: degrees,
-	}
-	return entityConfig
-}
-
 func drawDialog(
 	systemsManager SystemsManager,
 	entityFactory *EntityFactory,
@@ -503,29 +489,29 @@ func drawDialog(
 
 	entityConfigs := []EntityConfig{
 		// Top left corner
-		entityFactory.GetPreset(PresetNameDialogCorner)(NewCoordinates(3, 9)),
+		entityFactory.PresetDialogCorner(0)(NewCoordinates(3, 9)),
 		// Top side
-		entityFactory.GetPreset(PresetNameDialogSide)(NewCoordinates(4, 9)),
-		entityFactory.GetPreset(PresetNameDialogSide)(NewCoordinates(5, 9)),
-		entityFactory.GetPreset(PresetNameDialogSide)(NewCoordinates(6, 9)),
+		entityFactory.PresetDialogSide(0)(NewCoordinates(4, 9)),
+		entityFactory.PresetDialogSide(0)(NewCoordinates(5, 9)),
+		entityFactory.PresetDialogSide(0)(NewCoordinates(6, 9)),
 		// Top right corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityFactory, 7, 9, -90),
+		entityFactory.PresetDialogCorner(-90)(NewCoordinates(7, 9)),
 		// Left Side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 3, 8, 90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 3, 7, 90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 3, 6, 90),
+		entityFactory.PresetDialogSide(90)(NewCoordinates(3, 8)),
+		entityFactory.PresetDialogSide(90)(NewCoordinates(3, 7)),
+		entityFactory.PresetDialogSide(90)(NewCoordinates(3, 6)),
 		// Right Side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 7, 8, -90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 7, 7, -90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 7, 6, -90),
+		entityFactory.PresetDialogSide(-90)(NewCoordinates(7, 8)),
+		entityFactory.PresetDialogSide(-90)(NewCoordinates(7, 7)),
+		entityFactory.PresetDialogSide(-90)(NewCoordinates(7, 6)),
 		// Bottom left corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityFactory, 3, 5, 90),
+		entityFactory.PresetDialogCorner(90)(NewCoordinates(3, 5)),
 		// Bottom right corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityFactory, 7, 5, 180),
+		entityFactory.PresetDialogCorner(-180)(NewCoordinates(7, 5)),
 		// Bottom side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 4, 5, 180),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 5, 5, 180),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 6, 5, 180),
+		entityFactory.PresetDialogSide(180)(NewCoordinates(4, 5)),
+		entityFactory.PresetDialogSide(180)(NewCoordinates(5, 5)),
+		entityFactory.PresetDialogSide(180)(NewCoordinates(6, 5)),
 
 		// Center fill
 		{

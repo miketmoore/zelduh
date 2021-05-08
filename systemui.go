@@ -152,7 +152,8 @@ func (s *UISystem) DrawObstaclesPerMapTiles(
 					X: movedVec.X/s.tileSize - mod,
 					Y: movedVec.Y/s.tileSize - mod,
 				}
-				obstacle := s.entityFactory.NewEntityFromPresetName("obstacle", coordinates, s.frameRate)
+				obstacleConfig := s.entityFactory.PresetObstacle()(coordinates)
+				obstacle := s.entityFactory.NewEntityFromConfig(obstacleConfig, s.frameRate)
 				obstacles = append(obstacles, obstacle)
 			}
 		}

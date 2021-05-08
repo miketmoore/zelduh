@@ -39,7 +39,8 @@ func (s *UIHeartSystem) Update() error {
 
 			thisX := x + (xDistanceBetweenHearts * i)
 
-			entity := s.entityFactory.NewEntityFromPresetName("heart", NewCoordinates(thisX, y), s.frameRate)
+			entityConfig := s.entityFactory.PresetHeart()(NewCoordinates(thisX, y))
+			entity := s.entityFactory.NewEntityFromConfig(entityConfig, s.frameRate)
 			s.totalHeartEntities++
 
 			// add heart entity so that it can be rendered
