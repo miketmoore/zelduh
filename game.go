@@ -79,16 +79,16 @@ func (m *Main) Run() error {
 	// currentState := StateStart
 	spriteMap := LoadAndBuildSpritesheet("assets/spritesheet.png", m.tileSize)
 
-	player := entityFactory.NewEntity("player", NewCoordinates(6, 6), m.frameRate)
+	player := entityFactory.NewEntityFromPresetName("player", NewCoordinates(6, 6), m.frameRate)
 	playerID := player.ID()
 
-	bomb := entityFactory.NewEntity("bomb", NewCoordinates(0, 0), m.frameRate)
-	// explosion := entityFactory.NewEntity("explosion", NewCoordinates(0, 0), m.frameRate)
+	bomb := entityFactory.NewEntityFromPresetName("bomb", NewCoordinates(0, 0), m.frameRate)
+	// explosion := entityFactory.NewEntityFromPresetName("explosion", NewCoordinates(0, 0), m.frameRate)
 
-	sword := entityFactory.NewEntity("sword", NewCoordinates(0, 0), m.frameRate)
+	sword := entityFactory.NewEntityFromPresetName("sword", NewCoordinates(0, 0), m.frameRate)
 	swordID := sword.ID()
 
-	arrow := entityFactory.NewEntity("arrow", NewCoordinates(0, 0), m.frameRate)
+	arrow := entityFactory.NewEntityFromPresetName("arrow", NewCoordinates(0, 0), m.frameRate)
 	arrowID := arrow.ID()
 
 	windowConfig := NewWindowConfig(0, 0, 800, 800)
@@ -559,7 +559,7 @@ func drawDialog(
 	// rect.Color = colornames.White
 
 	for _, entityConfig := range entityConfigs {
-		systemsManager.AddEntity(entityFactory.NewEntity2(entityConfig, frameRate))
+		systemsManager.AddEntity(entityFactory.NewEntityFromConfig(entityConfig, frameRate))
 	}
 
 }

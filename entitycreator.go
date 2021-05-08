@@ -42,21 +42,21 @@ func (ec *EntityCreator) CreateCoin(
 		X: v.X / ec.tileSize,
 		Y: v.Y / ec.tileSize,
 	}
-	coin := ec.entityFactory.NewEntity("coin", coordinates, ec.frameRate)
+	coin := ec.entityFactory.NewEntityFromPresetName("coin", coordinates, ec.frameRate)
 	ec.systemsManager.AddEntity(coin)
 }
 
 func (ec *EntityCreator) CreateUICoin() {
 	presetFn := ec.entityConfigPresetFnManager.GetPreset("uiCoin")
 	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
-	coin := ec.entityFactory.NewEntity2(entityConfig, ec.frameRate)
+	coin := ec.entityFactory.NewEntityFromConfig(entityConfig, ec.frameRate)
 	ec.systemsManager.AddEntity(coin)
 }
 
 func (ec *EntityCreator) CreateExplosion(
 	entityID entity.EntityID,
 ) {
-	explosion := ec.entityFactory.NewEntity("explosion", NewCoordinates(0, 0), ec.frameRate)
+	explosion := ec.entityFactory.NewEntityFromPresetName("explosion", NewCoordinates(0, 0), ec.frameRate)
 
 	ec.temporarySystem.SetExpiration(
 		explosion.ID(),

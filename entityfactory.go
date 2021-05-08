@@ -22,7 +22,7 @@ func NewEntityFactory(
 
 type PresetName string
 
-func (ef *EntityFactory) NewEntity(presetName PresetName, coordinates Coordinates, frameRate int) Entity {
+func (ef *EntityFactory) NewEntityFromPresetName(presetName PresetName, coordinates Coordinates, frameRate int) Entity {
 	presetFn := ef.entityConfigPresetFnManager.GetPreset(presetName)
 	entityConfig := presetFn(coordinates)
 	entityID := ef.systemsManager.NewEntityID()
@@ -33,7 +33,7 @@ func (ef *EntityFactory) NewEntity(presetName PresetName, coordinates Coordinate
 	)
 }
 
-func (ef *EntityFactory) NewEntity2(entityConfig EntityConfig, frameRate int) Entity {
+func (ef *EntityFactory) NewEntityFromConfig(entityConfig EntityConfig, frameRate int) Entity {
 	return ef.buildEntityFromConfig(
 		entityConfig,
 		ef.systemsManager.NewEntityID(),
