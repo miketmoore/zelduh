@@ -58,8 +58,8 @@ func (s *BoundsCollisionSystem) handlePlayerAtMapEdge() {
 	// 	Width:  s.MapBounds.W(),
 	// 	Height: s.MapBounds.H(),
 	// })
-	DrawRect(s.window, s.mapBounds)
-	DrawRect(s.window, s.player.componentRectangle.Rect)
+	// DrawRect(s.window, s.mapBounds)
+	// DrawRect(s.window, s.player.componentRectangle.Rect)
 
 	player := s.player
 	mapBounds := s.mapBounds

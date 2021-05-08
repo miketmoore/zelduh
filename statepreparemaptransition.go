@@ -67,6 +67,7 @@ func (s StatePrepareMapTransition) Update() error {
 	fmt.Printf("StatePrepareMapTransition: currentRoomID=%d nextRoomID=%d\n", s.roomManager.Current(), s.roomManager.Next())
 
 	currentRoomID := s.roomManager.Current()
+
 	connectedRooms := s.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].ConnectedRooms()
 
 	fmt.Printf("%s\n", connectedRooms.String())
@@ -77,6 +78,18 @@ func (s StatePrepareMapTransition) Update() error {
 		s.tileSize,
 		s.activeSpaceRectangle,
 	)
+
+	currentRoom, currentRoomOk := s.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
+	if !currentRoomOk {
+		return fmt.Errorf("current room not found by ID=%d", currentRoomID)
+	}
+	s.uiSystem.DrawMapBackgroundImage(
+		currentRoom.TMXFileName,
+		transitionRoomResp.modX,
+		transitionRoomResp.modY,
+	)
+
+	s.uiSystem.DrawMask()
 
 	fmt.Println(transitionRoomResp)
 
