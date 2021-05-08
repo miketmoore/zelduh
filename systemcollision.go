@@ -145,23 +145,21 @@ func removeEntityFromCollection(entities []collisionEntity, entityIDToRemove ent
 func (s *CollisionSystem) RemoveAll(category entity.EntityCategory) {
 	switch category {
 	case CategoryEnemy:
-		removeAllEntities(s.enemies)
+		for i := len(s.enemies) - 1; i >= 0; i-- {
+			s.enemies = append(s.enemies[:i], s.enemies[i+1:]...)
+		}
 	case CategoryCollisionSwitch:
-		removeAllEntities(s.collisionSwitches)
+		for i := len(s.collisionSwitches) - 1; i >= 0; i-- {
+			s.collisionSwitches = append(s.collisionSwitches[:i], s.collisionSwitches[i+1:]...)
+		}
 	case CategoryMovableObstacle:
-		removeAllEntities(s.moveableObstacles)
+		for i := len(s.moveableObstacles) - 1; i >= 0; i-- {
+			s.moveableObstacles = append(s.moveableObstacles[:i], s.moveableObstacles[i+1:]...)
+		}
 	case CategoryObstacle:
-		// removeAllEntities(s.obstacles)
-
 		for i := len(s.obstacles) - 1; i >= 0; i-- {
 			s.obstacles = append(s.obstacles[:i], s.obstacles[i+1:]...)
 		}
-	}
-}
-
-func removeAllEntities(entities []collisionEntity) {
-	for i := len(entities) - 1; i >= 0; i-- {
-		entities = append(entities[:i], entities[i+1:]...)
 	}
 }
 
