@@ -110,30 +110,37 @@ func (g StateTransition) Update() error {
 	currentRoomID := g.roomManager.Current()
 
 	if g.roomTransitionManager.Style() == RoomTransitionSlide && g.roomTransitionManager.Timer() > 0 {
+		g.common()
 		err := g.slideTransition(currentRoomID)
 		if err != nil {
 			fmt.Println(err)
 			return fmt.Errorf("error during slide transition currentRoomID=%d", currentRoomID)
 		}
+		return nil
 	} else if g.roomTransitionManager.Style() == RoomTransitionWarp && g.roomTransitionManager.Timer() > 0 {
-		g.warpTransition()
+		g.common()
+		return nil
 	} else {
-		return g.transitionDone()
+		fmt.Println("transition done")
+		fmt.Printf("g.roomManager.Next()=%d\n", g.roomManager.Next())
+		nextRoom := g.levelManager.CurrentLevel.RoomByIDMap[g.roomManager.Next()]
+		fmt.Println(nextRoom.TMXFileName)
+
+		err := g.context.SetState(StateNameGame)
+		if err != nil {
+			fmt.Println(err)
+			return fmt.Errorf("error occured when changing to game state after map transitiong was finished")
+		}
+		if g.roomManager.Next() != 0 {
+			g.roomManager.MoveToNext()
+		}
+		g.roomTransitionManager.Disable()
+		return nil
 	}
 
-	return nil
 }
 
 func (g StateTransition) slideTransition(currentRoomID RoomID) error {
-	g.roomTransitionManager.DecrementTimer()
-	g.uiSystem.Window.Clear(colornames.Darkgray)
-	g.uiSystem.DrawMapBackground(colornames.White)
-
-	g.collisionSystem.RemoveAll(CategoryObstacle)
-	g.systemsManager.RemoveAllEnemies()
-	g.systemsManager.RemoveAllCollisionSwitches()
-	g.systemsManager.RemoveAllMoveableObstacles()
-	g.systemsManager.RemoveAllEntities()
 
 	connectedRooms := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].ConnectedRooms()
 
@@ -162,6 +169,9 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 	if !nextRoomOk {
 		return fmt.Errorf("next room not found by ID=%d", g.roomManager.Next())
 	}
+	if g.roomTransitionManager.Timer() == 0 {
+		fmt.Printf("drawing nextRoom.TMXFileName=%s\n", nextRoom.TMXFileName)
+	}
 	g.uiSystem.DrawMapBackgroundImage(
 		nextRoom.TMXFileName,
 		transitionRoomResp.modXNext,
@@ -185,7 +195,7 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 	return nil
 }
 
-func (g StateTransition) warpTransition() {
+func (g StateTransition) common() {
 	g.roomTransitionManager.DecrementTimer()
 	g.uiSystem.Window.Clear(colornames.Darkgray)
 	g.uiSystem.DrawMapBackground(colornames.White)
@@ -195,17 +205,4 @@ func (g StateTransition) warpTransition() {
 	g.systemsManager.RemoveAllCollisionSwitches()
 	g.systemsManager.RemoveAllMoveableObstacles()
 	g.systemsManager.RemoveAllEntities()
-}
-
-func (g StateTransition) transitionDone() error {
-	err := g.context.SetState(StateNameGame)
-	if err != nil {
-		fmt.Println(err)
-		return fmt.Errorf("error occured when changing to game state after map transitiong was finished")
-	}
-	if g.roomManager.Next() != 0 {
-		g.roomManager.MoveToNext()
-	}
-	g.roomTransitionManager.Disable()
-	return nil
 }

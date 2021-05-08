@@ -150,6 +150,9 @@ func (m *Main) Run() error {
 		86:  true,
 		136: true,
 		137: true,
+		// for debug
+		// tree
+		// 77: true,
 	}
 
 	ui := NewUISystem(
@@ -399,6 +402,7 @@ func (m *Main) Run() error {
 		ui.Window,
 		mapBounds,
 		func(side Bound) {
+			fmt.Printf("collision with bound=%s\n", side)
 			// TODO prevent room transition if no room exists on this side
 			if !roomTransitionManager.Active() {
 				fmt.Printf("room transition start %d %d\n", roomManager.Current(), roomManager.Next())
@@ -408,6 +412,7 @@ func (m *Main) Run() error {
 				roomTransitionManager.SetSlide()
 				roomTransitionManager.ResetTimer()
 				// currentState = StateMapTransition
+
 				err := stateContext.SetState("transition")
 				if err != nil {
 					fmt.Println("Error: ", err)

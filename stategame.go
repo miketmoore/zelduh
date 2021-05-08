@@ -52,6 +52,7 @@ func (g StateGame) Update() error {
 	currentRoomID := g.roomManager.Current()
 
 	tmxFileName := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].TMXFileName
+	// fmt.Printf("StateGame: currentRoomID=%d tmx=%s\n", currentRoomID, tmxFileName)
 
 	g.uiSystem.DrawLevelBackground(tmxFileName)
 

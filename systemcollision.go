@@ -186,6 +186,7 @@ func (s *CollisionSystem) handleEnemyCollisions() {
 	// playerR := s.player.componentRectangle.Rect
 
 	w, h := player.componentDimensions.Width, player.componentDimensions.Height
+	// fmt.Printf("total enemies %d\n", len(s.enemies))
 	for _, enemy := range s.enemies {
 
 		playerRect := player.componentRectangle.Rect
