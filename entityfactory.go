@@ -8,28 +8,6 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const (
-	PresetNameArrow            PresetName = "arrow"
-	PresetNameBomb             PresetName = "bomb"
-	PresetNameCoin             PresetName = "coin"
-	PresetNameExplosion        PresetName = "explosion"
-	PresetNameObstacle         PresetName = "obstacle"
-	PresetNamePlayer           PresetName = "player"
-	PresetNameFloorSwitch      PresetName = "floorSwitch"
-	PresetNameToggleObstacle   PresetName = "toggleObstacle"
-	PresetNamePuzzleBox        PresetName = "puzzleBox"
-	PresetNameWarpStone        PresetName = "warpStone"
-	PresetNameUICoin           PresetName = "uiCoin"
-	PresetNameEnemySpinner     PresetName = "spinner"
-	PresetNameEnemySkull       PresetName = "skull"
-	PresetNameEnemySkeleton    PresetName = "skeleton"
-	PresetNameHeart            PresetName = "heart"
-	PresetNameEnemyEyeBurrower PresetName = "eyeBurrower"
-	PresetNameSword            PresetName = "sword"
-	PresetNameDialogCorner     PresetName = "dialogCorner"
-	PresetNameDialogSide       PresetName = "dialogSide"
-)
-
 type EntityFactory struct {
 	systemsManager  *SystemsManager
 	temporarySystem *TemporarySystem
@@ -53,8 +31,6 @@ func NewEntityFactory(
 		frameRate:       frameRate,
 	}
 }
-
-type PresetName string
 
 func (ef *EntityFactory) NewEntityFromConfig(entityConfig EntityConfig, frameRate int) Entity {
 	return ef.buildEntityFromConfig(
