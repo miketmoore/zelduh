@@ -5,11 +5,12 @@ import "fmt"
 type StateName string
 
 const (
-	StateNameStart      StateName = "start"
-	StateNameGame       StateName = "game"
-	StateNamePause      StateName = "pause"
-	StateNameGameOver   StateName = "gameOver"
-	StateNameTransition StateName = "transition"
+	StateNameStart                StateName = "start"
+	StateNameGame                 StateName = "game"
+	StateNamePause                StateName = "pause"
+	StateNameGameOver             StateName = "gameOver"
+	StateNamePrepareMapTransition StateName = "prepareMapTransition"
+	StateNameTransition           StateName = "transition"
 )
 
 type StateMap map[StateName]State
@@ -17,7 +18,7 @@ type StateMap map[StateName]State
 type StateContext struct {
 	current State
 
-	stateStart, stateGameOver, statePause, stateTransition, stateGame State
+	stateStart, stateGameOver, statePause, statePrepareMapTransition, stateTransition, stateGame State
 }
 
 func (g *StateContext) Update() error {
@@ -51,6 +52,18 @@ func NewStateContext(
 
 	context.stateGameOver = NewStateGameOver(context, uiSystem)
 	context.statePause = NewStatePause(context, uiSystem)
+	context.statePrepareMapTransition = NewStatePrepareMapTransition(
+		context,
+		systemsManager,
+		inputSystem,
+		uiSystem,
+		collisionSystem,
+		roomManager,
+		roomTransitionManager,
+		levelManager,
+		activeSpaceRectangle,
+		tileSize,
+	)
 	context.stateTransition = NewStateTransition(
 		context,
 		uiSystem,
@@ -93,6 +106,8 @@ func (g *StateContext) SetState(name StateName) error {
 		state = g.stateGame
 	case StateNameGameOver:
 		state = g.stateGameOver
+	case StateNamePrepareMapTransition:
+		state = g.statePrepareMapTransition
 	case StateNameTransition:
 		state = g.stateTransition
 	case StateNamePause:

@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/miketmoore/zelduh/core/direction"
 	"github.com/miketmoore/zelduh/core/tmx"
 )
@@ -14,6 +16,10 @@ type ConnectedRooms struct {
 	Right  RoomID
 	Bottom RoomID
 	Left   RoomID
+}
+
+func (c ConnectedRooms) String() string {
+	return fmt.Sprintf("ConnectedRooms Top=%d Right=%d Bottom=%d Left=%d", c.Top, c.Right, c.Bottom, c.Left)
 }
 
 // RoomByIDMap is a type of map that indexes rooms by their ID

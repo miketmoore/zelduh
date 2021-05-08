@@ -16,6 +16,7 @@ type StateGame struct {
 	entitiesMap       EntitiesMap
 	frameRate         int
 	roomManager       *RoomManager
+	obstacles         []Entity
 }
 
 func NewStateGame(
@@ -62,28 +63,28 @@ func (g StateGame) Update() error {
 		g.entityFactory.CreateUICoin()
 
 		// Draw obstacles on appropriate map tiles
-		obstacles := g.uiSystem.DrawObstaclesPerMapTiles(
-			currentRoomID,
-			0, 0,
-		)
-		g.systemsManager.AddEntities(obstacles...)
+		// g.obstacles = g.uiSystem.DrawObstaclesPerMapTiles(
+		// 	currentRoomID,
+		// 	0, 0,
+		// )
+		// g.systemsManager.AddEntities(g.obstacles...)
 
 		for k := range g.roomWarps {
 			delete(g.roomWarps, k)
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
-		for _, c := range currentRoom.EntityConfigs {
-			entity := g.entityFactory.NewEntityFromConfig(c, g.frameRate)
-			g.entitiesMap[entity.ID()] = entity
-			g.systemsManager.AddEntity(entity)
+		// currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
+		// for _, c := range currentRoom.EntityConfigs {
+		// 	entity := g.entityFactory.NewEntityFromConfig(c, g.frameRate)
+		// 	g.entitiesMap[entity.ID()] = entity
+		// 	g.systemsManager.AddEntity(entity)
 
-			switch c.Category {
-			case CategoryWarp:
-				g.roomWarps[entity.ID()] = c
-			}
-		}
+		// 	switch c.Category {
+		// 	case CategoryWarp:
+		// 		g.roomWarps[entity.ID()] = c
+		// 	}
+		// }
 	}
 
 	g.uiSystem.DrawMask()
@@ -98,6 +99,7 @@ func (g StateGame) Update() error {
 		if err != nil {
 			return err
 		}
+		g.removeObstacles()
 	}
 
 	if g.uiSystem.Window.JustPressed(pixelgl.KeyX) {
@@ -105,7 +107,14 @@ func (g StateGame) Update() error {
 		if err != nil {
 			return err
 		}
+		g.removeObstacles()
 	}
 
 	return nil
+}
+
+func (g *StateGame) removeObstacles() {
+	for _, entity := range g.obstacles {
+		g.systemsManager.Remove(entity.Category, entity.id)
+	}
 }

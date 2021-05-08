@@ -403,23 +403,39 @@ func (m *Main) Run() error {
 		ui.Window,
 		mapBounds,
 		func(side Bound) {
-			fmt.Printf("collision with bound=%s\n", side)
+			fmt.Printf("collision with bound=%s currentRoomID=%d nextRoomID=%d\n", side, roomManager.Current(), roomManager.Next())
 			// TODO prevent room transition if no room exists on this side
-			if !roomTransitionManager.Active() {
-				fmt.Printf("room transition start %d %d\n", roomManager.Current(), roomManager.Next())
-				// roomTransitionManager.Start(side, RoomTransitionSlide)
-				roomTransitionManager.Enable()
-				roomTransitionManager.SetSide(side)
-				roomTransitionManager.SetSlide()
-				roomTransitionManager.ResetTimer()
-				// currentState = StateMapTransition
 
-				err := stateContext.SetState("transition")
+			// // fmt.Printf("bound collision currentRoomID=%d nextRoomID=%d\n", roomManager.Current(), roomManager.Next())
+			// if roomManager.Next() == 0 {
+			// 	// player has collided with a wall where no adjacent room exists
+			// 	// want to prevent the room transition from starting
+			// 	// and want to prevent player from moving out of the active space
+			// 	movementSystem.MovePlayerBack()
+			// 	return
+			// }
+
+			if !roomTransitionManager.Active() {
+				// fmt.Printf("room transition start %d %d\n", roomManager.Current(), roomManager.Next())
+				// // roomTransitionManager.Start(side, RoomTransitionSlide)
+				// roomTransitionManager.Enable()
+				roomTransitionManager.SetSide(side)
+				// roomTransitionManager.SetSlide()
+				// roomTransitionManager.ResetTimer()
+				// // currentState = StateMapTransition
+
+				err := stateContext.SetState(StateNamePrepareMapTransition)
 				if err != nil {
-					fmt.Println("Error: ", err)
+					fmt.Println(err)
 					os.Exit(0)
 				}
-				shouldAddEntities = true
+
+				// err := stateContext.SetState("transition")
+				// if err != nil {
+				// 	fmt.Println("Error: ", err)
+				// 	os.Exit(0)
+				// }
+				// shouldAddEntities = true
 			}
 		},
 	)

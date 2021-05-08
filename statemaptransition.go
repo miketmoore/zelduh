@@ -14,7 +14,7 @@ type transitionRoomResponse struct {
 
 func calculateTransitionSlide(
 	roomTransitionManager *RoomTransitionManager,
-	connectedRooms ConnectedRooms,
+	connectedRooms *ConnectedRooms,
 	tileSize float64,
 	activeSpaceRectangle ActiveSpaceRectangle,
 ) transitionRoomResponse {
@@ -31,27 +31,35 @@ func calculateTransitionSlide(
 	playerModY := 0.0
 	playerIncY := ((activeSpaceRectangle.Height / tileSize) - 1) + 7
 	playerIncX := ((activeSpaceRectangle.Width / tileSize) - 1) + 7
+
+	fmt.Printf("calculateTransitionSlide [%s] %s\n", roomTransitionManager.Side(), connectedRooms.String())
+
 	if roomTransitionManager.Side() == BoundBottom && connectedRooms.Bottom != 0 {
+		fmt.Printf("calculateTransitionSlide bottom\n")
 		modY = incY
 		modYNext = incY - activeSpaceRectangle.Height
 		nextRoomID = connectedRooms.Bottom
 		playerModY += playerIncY
 	} else if roomTransitionManager.Side() == BoundTop && connectedRooms.Top != 0 {
+		fmt.Printf("calculateTransitionSlide top\n")
 		modY = -incY
 		modYNext = -incY + activeSpaceRectangle.Height
 		nextRoomID = connectedRooms.Top
 		playerModY -= playerIncY
 	} else if roomTransitionManager.Side() == BoundLeft && connectedRooms.Left != 0 {
+		fmt.Printf("calculateTransitionSlide left\n")
 		modX = incX
 		modXNext = incX - activeSpaceRectangle.Width
 		nextRoomID = connectedRooms.Left
 		playerModX += playerIncX
 	} else if roomTransitionManager.Side() == BoundRight && connectedRooms.Right != 0 {
+		fmt.Printf("calculateTransitionSlide right\n")
 		modX = -incX
 		modXNext = -incX + activeSpaceRectangle.Width
 		nextRoomID = connectedRooms.Right
 		playerModX -= playerIncX
 	} else {
+		fmt.Printf("calculateTransitionSlide default\n")
 		nextRoomID = 0
 	}
 
@@ -114,7 +122,8 @@ func (g StateTransition) Update() error {
 		err := g.slideTransition(currentRoomID)
 		if err != nil {
 			fmt.Println(err)
-			return fmt.Errorf("error during slide transition currentRoomID=%d", currentRoomID)
+			// return fmt.Errorf("error during slide transition currentRoomID=%d", currentRoomID)
+
 		}
 		return nil
 	} else if g.roomTransitionManager.Style() == RoomTransitionWarp && g.roomTransitionManager.Timer() > 0 {
@@ -146,7 +155,7 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 
 	transitionRoomResp := calculateTransitionSlide(
 		g.roomTransitionManager,
-		*connectedRooms,
+		connectedRooms,
 		g.tileSize,
 		g.activeSpaceRectangle,
 	)
