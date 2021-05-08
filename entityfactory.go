@@ -6,37 +6,43 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type entityConfigPresetFnByNameMap map[PresetName]EntityConfigPresetFn
+
 type EntityFactory struct {
-	systemsManager              *SystemsManager
-	entityConfigPresetFnManager *EntityConfigPresetFnManager
-	temporarySystem             *TemporarySystem
-	movementSystem              *MovementSystem
-	tileSize                    float64
-	frameRate                   int
+	systemsManager                *SystemsManager
+	entityConfigPresetFnByNameMap entityConfigPresetFnByNameMap
+	temporarySystem               *TemporarySystem
+	movementSystem                *MovementSystem
+	tileSize                      float64
+	frameRate                     int
 }
 
 func NewEntityFactory(
 	systemsManager *SystemsManager,
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	entityConfigPresetFnByNameMap entityConfigPresetFnByNameMap,
 	temporarySystem *TemporarySystem,
 	movementSystem *MovementSystem,
 	tileSize float64,
 	frameRate int,
 ) EntityFactory {
 	return EntityFactory{
-		systemsManager:              systemsManager,
-		temporarySystem:             temporarySystem,
-		movementSystem:              movementSystem,
-		entityConfigPresetFnManager: entityConfigPresetFnManager,
-		tileSize:                    tileSize,
-		frameRate:                   frameRate,
+		systemsManager:                systemsManager,
+		temporarySystem:               temporarySystem,
+		movementSystem:                movementSystem,
+		entityConfigPresetFnByNameMap: entityConfigPresetFnByNameMap,
+		tileSize:                      tileSize,
+		frameRate:                     frameRate,
 	}
 }
 
 type PresetName string
 
+func (ef *EntityFactory) GetPreset(presetName PresetName) EntityConfigPresetFn {
+	return ef.entityConfigPresetFnByNameMap[presetName]
+}
+
 func (ef *EntityFactory) NewEntityFromPresetName(presetName PresetName, coordinates Coordinates, frameRate int) Entity {
-	presetFn := ef.entityConfigPresetFnManager.GetPreset(presetName)
+	presetFn := ef.entityConfigPresetFnByNameMap[presetName]
 	entityConfig := presetFn(coordinates)
 	entityID := ef.systemsManager.NewEntityID()
 	return ef.buildEntityFromConfig(
@@ -159,7 +165,7 @@ func (ef *EntityFactory) CreateCoin(
 }
 
 func (ef *EntityFactory) CreateUICoin() {
-	presetFn := ef.entityConfigPresetFnManager.GetPreset("uiCoin")
+	presetFn := ef.entityConfigPresetFnByNameMap["uiCoin"]
 	entityConfig := presetFn(Coordinates{X: 4, Y: 14})
 	coin := ef.NewEntityFromConfig(entityConfig, ef.frameRate)
 	ef.systemsManager.AddEntity(coin)
@@ -185,4 +191,45 @@ func (ef *EntityFactory) CreateExplosion(
 	}
 
 	ef.systemsManager.AddEntity(explosion)
+}
+
+func (ef *EntityFactory) buildWarpFnFactory(
+	dimensions Dimensions,
+) BuildWarpFn {
+
+	return func(
+		warpToRoomID RoomID,
+		coordinates Coordinates,
+		hitboxRadius float64,
+	) EntityConfig {
+		return EntityConfig{
+			Category:     CategoryWarp,
+			WarpToRoomID: warpToRoomID,
+			Dimensions:   dimensions,
+			Coordinates:  coordinates,
+			Hitbox: &HitboxConfig{
+				Radius: hitboxRadius,
+			},
+		}
+	}
+}
+
+type BuildWarpStoneFn func(
+	WarpToRoomID RoomID,
+	coordinates Coordinates,
+	HitBoxRadius float64,
+) EntityConfig
+
+func (ef *EntityFactory) buildWarpStoneFnFactory() BuildWarpStoneFn {
+	return func(
+		WarpToRoomID RoomID,
+		coordinates Coordinates,
+		HitBoxRadius float64,
+	) EntityConfig {
+		presetFn := ef.entityConfigPresetFnByNameMap["warpStone"]
+		e := presetFn(Coordinates{X: coordinates.X, Y: coordinates.Y})
+		e.WarpToRoomID = 6
+		e.Hitbox.Radius = 5
+		return e
+	}
 }

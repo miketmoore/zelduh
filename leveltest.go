@@ -2,7 +2,7 @@ package zelduh
 
 func buildTestLevel(
 	roomFactory *RoomFactory,
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
+	entityFactory *EntityFactory,
 	tileSize float64,
 ) Level {
 

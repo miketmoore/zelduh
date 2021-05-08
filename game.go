@@ -43,17 +43,7 @@ func (m *Main) Run() error {
 
 	entityConfigPresetFnsMap := BuildEntityConfigPresetFnsMap(m.tileSize)
 
-	entityConfigPresetFnManager := NewEntityConfigPresetFnManager(entityConfigPresetFnsMap)
-
 	roomFactory := NewRoomFactory()
-
-	testLevel := buildTestLevel(
-		roomFactory,
-		&entityConfigPresetFnManager,
-		m.tileSize,
-	)
-
-	levelManager := NewLevelManager(&testLevel)
 
 	systemsManager := NewSystemsManager()
 
@@ -81,12 +71,20 @@ func (m *Main) Run() error {
 
 	entityFactory := NewEntityFactory(
 		&systemsManager,
-		&entityConfigPresetFnManager,
+		entityConfigPresetFnsMap,
 		&temporarySystem,
 		&movementSystem,
 		m.tileSize,
 		m.frameRate,
 	)
+
+	testLevel := buildTestLevel(
+		roomFactory,
+		&entityFactory,
+		m.tileSize,
+	)
+
+	levelManager := NewLevelManager(&testLevel)
 
 	player := entityFactory.NewEntityFromPresetName("player", NewCoordinates(6, 6), m.frameRate)
 	playerID := player.ID()
@@ -163,7 +161,6 @@ func (m *Main) Run() error {
 		mapDrawData,
 		m.tileSize,
 		m.frameRate,
-		&entityConfigPresetFnManager,
 		&levelManager,
 		nonObstacleSprites,
 		&entityFactory,
@@ -486,10 +483,10 @@ func (m *Main) Run() error {
 
 func buildRotatedEntityConfig(
 	presetName PresetName,
-	entityConfigPresetFnManager EntityConfigPresetFnManager,
+	entityFactory *EntityFactory,
 	x, y, degrees float64,
 ) EntityConfig {
-	entityConfigPresetFn := entityConfigPresetFnManager.GetPreset(presetName)
+	entityConfigPresetFn := entityFactory.GetPreset(presetName)
 	entityConfig := entityConfigPresetFn(Coordinates{X: x, Y: y})
 	entityConfig.Transform = &Transform{
 		Rotation: degrees,
@@ -499,37 +496,36 @@ func buildRotatedEntityConfig(
 
 func drawDialog(
 	systemsManager SystemsManager,
-	entityConfigPresetFnManager EntityConfigPresetFnManager,
-	entityFactory EntityFactory,
+	entityFactory *EntityFactory,
 	frameRate int,
 	tileSize float64,
 ) {
 
 	entityConfigs := []EntityConfig{
 		// Top left corner
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogCorner)(NewCoordinates(3, 9)),
+		entityFactory.GetPreset(PresetNameDialogCorner)(NewCoordinates(3, 9)),
 		// Top side
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(NewCoordinates(4, 9)),
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(NewCoordinates(5, 9)),
-		entityConfigPresetFnManager.GetPreset(PresetNameDialogSide)(NewCoordinates(6, 9)),
+		entityFactory.GetPreset(PresetNameDialogSide)(NewCoordinates(4, 9)),
+		entityFactory.GetPreset(PresetNameDialogSide)(NewCoordinates(5, 9)),
+		entityFactory.GetPreset(PresetNameDialogSide)(NewCoordinates(6, 9)),
 		// Top right corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 9, -90),
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityFactory, 7, 9, -90),
 		// Left Side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 8, 90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 7, 90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 3, 6, 90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 3, 8, 90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 3, 7, 90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 3, 6, 90),
 		// Right Side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 8, -90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 7, -90),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 7, 6, -90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 7, 8, -90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 7, 7, -90),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 7, 6, -90),
 		// Bottom left corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 3, 5, 90),
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityFactory, 3, 5, 90),
 		// Bottom right corner
-		buildRotatedEntityConfig(PresetNameDialogCorner, entityConfigPresetFnManager, 7, 5, 180),
+		buildRotatedEntityConfig(PresetNameDialogCorner, entityFactory, 7, 5, 180),
 		// Bottom side
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 4, 5, 180),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 5, 5, 180),
-		buildRotatedEntityConfig(PresetNameDialogSide, entityConfigPresetFnManager, 6, 5, 180),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 4, 5, 180),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 5, 5, 180),
+		buildRotatedEntityConfig(PresetNameDialogSide, entityFactory, 6, 5, 180),
 
 		// Center fill
 		{

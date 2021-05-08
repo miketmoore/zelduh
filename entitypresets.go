@@ -33,50 +33,6 @@ type BuildWarpFn func(
 	hitboxRadius float64,
 ) EntityConfig
 
-func buildWarpFnFactory(
-	tileSize float64,
-	dimensions Dimensions,
-) BuildWarpFn {
-
-	return func(
-		warpToRoomID RoomID,
-		coordinates Coordinates,
-		hitboxRadius float64,
-	) EntityConfig {
-		return EntityConfig{
-			Category:     CategoryWarp,
-			WarpToRoomID: warpToRoomID,
-			Dimensions:   dimensions,
-			Coordinates:  coordinates,
-			Hitbox: &HitboxConfig{
-				Radius: hitboxRadius,
-			},
-		}
-	}
-}
-
-type BuildWarpStoneFn func(
-	WarpToRoomID RoomID,
-	coordinates Coordinates,
-	HitBoxRadius float64,
-) EntityConfig
-
-func buildWarpStoneFnFactory(
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
-) BuildWarpStoneFn {
-	return func(
-		WarpToRoomID RoomID,
-		coordinates Coordinates,
-		HitBoxRadius float64,
-	) EntityConfig {
-		presetFn := entityConfigPresetFnManager.GetPreset("warpStone")
-		e := presetFn(Coordinates{X: coordinates.X, Y: coordinates.Y})
-		e.WarpToRoomID = 6
-		e.Hitbox.Radius = 5
-		return e
-	}
-}
-
 // TODO move this to a higher level configuration location
 func BuildEntityConfigPresetFnsMap(tileSize float64) map[PresetName]EntityConfigPresetFn {
 

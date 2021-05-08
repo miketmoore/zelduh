@@ -14,19 +14,18 @@ import (
 )
 
 type UISystem struct {
-	Window                      *pixelgl.Window
-	Text                        *text.Text
-	activeSpaceRectangle        ActiveSpaceRectangle
-	spriteMap                   SpriteMap
-	mapDrawData                 MapDrawData
-	currLocaleMsgs              LocaleMessagesMap
-	tileSize                    float64
-	frameRate                   int
-	windowConfig                WindowConfig
-	entityConfigPresetFnManager *EntityConfigPresetFnManager
-	nonObstacleSprites          map[int]bool
-	levelManager                *LevelManager
-	entityFactory               *EntityFactory
+	Window               *pixelgl.Window
+	Text                 *text.Text
+	activeSpaceRectangle ActiveSpaceRectangle
+	spriteMap            SpriteMap
+	mapDrawData          MapDrawData
+	currLocaleMsgs       LocaleMessagesMap
+	tileSize             float64
+	frameRate            int
+	windowConfig         WindowConfig
+	nonObstacleSprites   map[int]bool
+	levelManager         *LevelManager
+	entityFactory        *EntityFactory
 }
 
 func NewUISystem(
@@ -37,7 +36,6 @@ func NewUISystem(
 	mapDrawData MapDrawData,
 	tileSize float64,
 	frameRate int,
-	entityConfigPresetFnManager *EntityConfigPresetFnManager,
 	levelManager *LevelManager,
 	nonObstacleSprites map[int]bool,
 	entityFactory *EntityFactory,
@@ -63,19 +61,18 @@ func NewUISystem(
 	}
 
 	return UISystem{
-		Window:                      win,
-		Text:                        txt,
-		activeSpaceRectangle:        activeSpaceRectangle,
-		spriteMap:                   spriteMap,
-		mapDrawData:                 mapDrawData,
-		currLocaleMsgs:              currLocaleMsgs,
-		tileSize:                    tileSize,
-		frameRate:                   frameRate,
-		windowConfig:                windowConfig,
-		entityConfigPresetFnManager: entityConfigPresetFnManager,
-		levelManager:                levelManager,
-		nonObstacleSprites:          nonObstacleSprites,
-		entityFactory:               entityFactory,
+		Window:               win,
+		Text:                 txt,
+		activeSpaceRectangle: activeSpaceRectangle,
+		spriteMap:            spriteMap,
+		mapDrawData:          mapDrawData,
+		currLocaleMsgs:       currLocaleMsgs,
+		tileSize:             tileSize,
+		frameRate:            frameRate,
+		windowConfig:         windowConfig,
+		levelManager:         levelManager,
+		nonObstacleSprites:   nonObstacleSprites,
+		entityFactory:        entityFactory,
 	}
 }
 
