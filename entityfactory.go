@@ -8,7 +8,27 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-type entityConfigPresetFnByNameMap map[PresetName]EntityConfigPresetFn
+const (
+	PresetNameArrow            PresetName = "arrow"
+	PresetNameBomb             PresetName = "bomb"
+	PresetNameCoin             PresetName = "coin"
+	PresetNameExplosion        PresetName = "explosion"
+	PresetNameObstacle         PresetName = "obstacle"
+	PresetNamePlayer           PresetName = "player"
+	PresetNameFloorSwitch      PresetName = "floorSwitch"
+	PresetNameToggleObstacle   PresetName = "toggleObstacle"
+	PresetNamePuzzleBox        PresetName = "puzzleBox"
+	PresetNameWarpStone        PresetName = "warpStone"
+	PresetNameUICoin           PresetName = "uiCoin"
+	PresetNameEnemySpinner     PresetName = "spinner"
+	PresetNameEnemySkull       PresetName = "skull"
+	PresetNameEnemySkeleton    PresetName = "skeleton"
+	PresetNameHeart            PresetName = "heart"
+	PresetNameEnemyEyeBurrower PresetName = "eyeBurrower"
+	PresetNameSword            PresetName = "sword"
+	PresetNameDialogCorner     PresetName = "dialogCorner"
+	PresetNameDialogSide       PresetName = "dialogSide"
+)
 
 type EntityFactory struct {
 	systemsManager  *SystemsManager
@@ -36,33 +56,12 @@ func NewEntityFactory(
 
 type PresetName string
 
-// func (ef *EntityFactory) NewEntityFromPresetName(presetName PresetName, coordinates Coordinates, frameRate int) Entity {
-// 	presetFn := ef.entityConfigPresetFnByNameMap[presetName]
-// 	entityConfig := presetFn(coordinates)
-// 	entityID := ef.systemsManager.NewEntityID()
-// 	return ef.buildEntityFromConfig(
-// 		entityConfig,
-// 		entityID,
-// 		frameRate,
-// 	)
-// }
-
 func (ef *EntityFactory) NewEntityFromConfig(entityConfig EntityConfig, frameRate int) Entity {
 	return ef.buildEntityFromConfig(
 		entityConfig,
 		ef.systemsManager.NewEntityID(),
 		frameRate,
 	)
-}
-
-// BuildEntitiesFromConfigs builds and returns a batch of entities
-func (ef *EntityFactory) buildEntitiesFromConfigs(newEntityID func() entity.EntityID, frameRate int, configs ...EntityConfig) []Entity {
-	batch := []Entity{}
-	for _, config := range configs {
-		entity := ef.buildEntityFromConfig(config, newEntityID(), frameRate)
-		batch = append(batch, entity)
-	}
-	return batch
 }
 
 func (ef *EntityFactory) buildEntityFromConfig(c EntityConfig, id entity.EntityID, frameRate int) Entity {
@@ -189,6 +188,12 @@ func (ef *EntityFactory) CreateExplosion(
 
 	ef.systemsManager.AddEntity(explosion)
 }
+
+type BuildWarpFn func(
+	warpToRoomID RoomID,
+	coordinates Coordinates,
+	hitboxRadius float64,
+) EntityConfig
 
 func (ef *EntityFactory) buildWarpFnFactory(
 	dimensions Dimensions,
