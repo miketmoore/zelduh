@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/miketmoore/zelduh/core/direction"
@@ -9,11 +11,15 @@ import (
 )
 
 type EntityFactory struct {
-	systemsManager  *SystemsManager
-	temporarySystem *TemporarySystem
-	movementSystem  *MovementSystem
-	tileSize        float64
-	frameRate       int
+	systemsManager       *SystemsManager
+	temporarySystem      *TemporarySystem
+	movementSystem       *MovementSystem
+	tileSize             float64
+	frameRate            int
+	levelManager         *LevelManager
+	mapDrawData          MapDrawData
+	activeSpaceRectangle ActiveSpaceRectangle
+	nonObstacleSprites   map[int]bool
 }
 
 func NewEntityFactory(
@@ -22,13 +28,21 @@ func NewEntityFactory(
 	movementSystem *MovementSystem,
 	tileSize float64,
 	frameRate int,
+	levelManager *LevelManager,
+	mapDrawData MapDrawData,
+	activeSpaceRectangle ActiveSpaceRectangle,
+	nonObstacleSprites map[int]bool,
 ) EntityFactory {
 	return EntityFactory{
-		systemsManager:  systemsManager,
-		temporarySystem: temporarySystem,
-		movementSystem:  movementSystem,
-		tileSize:        tileSize,
-		frameRate:       frameRate,
+		systemsManager:       systemsManager,
+		temporarySystem:      temporarySystem,
+		movementSystem:       movementSystem,
+		tileSize:             tileSize,
+		frameRate:            frameRate,
+		levelManager:         levelManager,
+		mapDrawData:          mapDrawData,
+		activeSpaceRectangle: activeSpaceRectangle,
+		nonObstacleSprites:   nonObstacleSprites,
 	}
 }
 
@@ -163,6 +177,45 @@ func (ef *EntityFactory) CreateExplosion(
 	}
 
 	ef.systemsManager.AddEntity(explosion)
+}
+
+func (s *EntityFactory) CreateObstaclesForRoom(
+	roomID RoomID,
+	modX, modY float64,
+) {
+	levelManager := s.levelManager
+	currentLevel := levelManager.CurrentLevel
+	room, roomOk := currentLevel.RoomByIDMap[roomID]
+	if !roomOk {
+		fmt.Printf("DrawObstaclesPerMapTiles: room not found in map by RoomID=%d\n", roomID)
+	}
+
+	data, dataOk := s.mapDrawData[room.TMXFileName]
+	if !dataOk {
+		fmt.Printf("DrawObstaclesPerMapTiles: tmx file not found in map by name=%s\n", room.TMXFileName)
+	}
+
+	mod := 0.5
+	for _, spriteData := range data.Data {
+		if spriteData.SpriteID != 0 {
+			vec := spriteData.Rect.Min
+			movedVec := pixel.V(
+				vec.X+s.activeSpaceRectangle.X+modX+s.tileSize/2,
+				vec.Y+s.activeSpaceRectangle.Y+modY+s.tileSize/2,
+			)
+
+			if _, ok := s.nonObstacleSprites[spriteData.SpriteID]; !ok {
+				coordinates := Coordinates{
+					X: movedVec.X/s.tileSize - mod,
+					Y: movedVec.Y/s.tileSize - mod,
+				}
+				obstacleConfig := s.PresetObstacle()(coordinates)
+				obstacle := s.NewEntityFromConfig(obstacleConfig, s.frameRate)
+
+				s.systemsManager.AddEntity(obstacle)
+			}
+		}
+	}
 }
 
 type BuildWarpFn func(

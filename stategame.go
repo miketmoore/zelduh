@@ -63,11 +63,16 @@ func (g StateGame) Update() error {
 		g.entityFactory.CreateUICoin()
 
 		// Draw obstacles on appropriate map tiles
-		g.obstacles = g.uiSystem.DrawObstaclesPerMapTiles(
+		g.entityFactory.CreateObstaclesForRoom(
 			currentRoomID,
-			0, 0,
+			g.uiSystem.activeSpaceRectangle.X,
+			g.uiSystem.activeSpaceRectangle.Y,
 		)
-		g.systemsManager.AddEntities(g.obstacles...)
+		// g.obstacles = g.uiSystem.DrawObstaclesPerMapTiles(
+		// 	currentRoomID,
+		// 	0, 0,
+		// )
+		// g.systemsManager.AddEntities(g.obstacles...)
 
 		for k := range g.roomWarps {
 			delete(g.roomWarps, k)

@@ -69,41 +69,6 @@ func (m *Main) Run() error {
 
 	temporarySystem := NewTemporarySystem()
 
-	entityFactory := NewEntityFactory(
-		&systemsManager,
-		&temporarySystem,
-		&movementSystem,
-		m.tileSize,
-		m.frameRate,
-	)
-
-	testLevel := buildTestLevel(
-		roomFactory,
-		&entityFactory,
-		m.tileSize,
-	)
-
-	levelManager := NewLevelManager(&testLevel)
-
-	player := entityFactory.NewEntityFromConfig(entityFactory.PresetPlayer()(NewCoordinates(6, 6)), m.frameRate)
-	playerID := player.ID()
-
-	bomb := entityFactory.NewEntityFromConfig(entityFactory.PresetBomb()(NewCoordinates(0, 0)), m.frameRate)
-	// explosion := entityFactory.NewEntityFromPresetName("explosion", NewCoordinates(0, 0), m.frameRate)
-
-	sword := entityFactory.NewEntityFromConfig(entityFactory.PresetSword()(NewCoordinates(0, 0)), m.frameRate)
-	swordID := sword.ID()
-
-	arrow := entityFactory.NewEntityFromConfig(entityFactory.PresetArrow()(NewCoordinates(0, 0)), m.frameRate)
-	arrowID := arrow.ID()
-
-	windowConfig := NewWindowConfig(0, 0, 800, 800)
-
-	activeSpaceRectangle := NewActiveSpaceRectangle(0, 0, m.tileSize*14, m.tileSize*12)
-
-	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
-	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
-
 	mapDrawData, mapDrawDataErr := BuildMapDrawData(
 		"assets/tilemaps/",
 		[]string{
@@ -155,6 +120,47 @@ func (m *Main) Run() error {
 		// 77: true,
 	}
 
+	activeSpaceRectangle := NewActiveSpaceRectangle(0, 0, m.tileSize*14, m.tileSize*12)
+
+	levelManager := &LevelManager{}
+
+	entityFactory := NewEntityFactory(
+		&systemsManager,
+		&temporarySystem,
+		&movementSystem,
+		m.tileSize,
+		m.frameRate,
+		levelManager,
+		mapDrawData,
+		activeSpaceRectangle,
+		nonObstacleSprites,
+	)
+
+	testLevel := buildTestLevel(
+		roomFactory,
+		&entityFactory,
+		m.tileSize,
+	)
+	levelManager.SetCurrentLevel(&testLevel)
+	// levelManager = NewLevelManager(&testLevel)
+
+	player := entityFactory.NewEntityFromConfig(entityFactory.PresetPlayer()(NewCoordinates(6, 6)), m.frameRate)
+	playerID := player.ID()
+
+	bomb := entityFactory.NewEntityFromConfig(entityFactory.PresetBomb()(NewCoordinates(0, 0)), m.frameRate)
+	// explosion := entityFactory.NewEntityFromPresetName("explosion", NewCoordinates(0, 0), m.frameRate)
+
+	sword := entityFactory.NewEntityFromConfig(entityFactory.PresetSword()(NewCoordinates(0, 0)), m.frameRate)
+	swordID := sword.ID()
+
+	arrow := entityFactory.NewEntityFromConfig(entityFactory.PresetArrow()(NewCoordinates(0, 0)), m.frameRate)
+	arrowID := arrow.ID()
+
+	windowConfig := NewWindowConfig(0, 0, 800, 800)
+
+	activeSpaceRectangle.X = (windowConfig.Width - activeSpaceRectangle.Width) / 2
+	activeSpaceRectangle.Y = (windowConfig.Height - activeSpaceRectangle.Height) / 2
+
 	ui := NewUISystem(
 		m.currLocaleMsgs,
 		windowConfig,
@@ -163,7 +169,7 @@ func (m *Main) Run() error {
 		mapDrawData,
 		m.tileSize,
 		m.frameRate,
-		&levelManager,
+		levelManager,
 		nonObstacleSprites,
 		&entityFactory,
 	)
@@ -387,7 +393,7 @@ func (m *Main) Run() error {
 		&roomTransitionManager,
 		&collisionSystem,
 		&systemsManager,
-		&levelManager,
+		levelManager,
 		&entityFactory,
 		roomWarps,
 		entitiesMap,

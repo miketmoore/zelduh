@@ -123,44 +123,6 @@ func (s *UISystem) DrawMapBackgroundImage(
 	}
 }
 
-func (s *UISystem) DrawObstaclesPerMapTiles(
-	roomID RoomID,
-	modX, modY float64,
-) []Entity {
-	room, roomOk := s.levelManager.CurrentLevel.RoomByIDMap[roomID]
-	if !roomOk {
-		fmt.Printf("DrawObstaclesPerMapTiles: room not found in map by RoomID=%d\n", roomID)
-	}
-
-	data, dataOk := s.mapDrawData[room.TMXFileName]
-	if !dataOk {
-		fmt.Printf("DrawObstaclesPerMapTiles: tmx file not found in map by name=%s\n", room.TMXFileName)
-	}
-
-	obstacles := []Entity{}
-	mod := 0.5
-	for _, spriteData := range data.Data {
-		if spriteData.SpriteID != 0 {
-			vec := spriteData.Rect.Min
-			movedVec := pixel.V(
-				vec.X+s.activeSpaceRectangle.X+modX+s.tileSize/2,
-				vec.Y+s.activeSpaceRectangle.Y+modY+s.tileSize/2,
-			)
-
-			if _, ok := s.nonObstacleSprites[spriteData.SpriteID]; !ok {
-				coordinates := Coordinates{
-					X: movedVec.X/s.tileSize - mod,
-					Y: movedVec.Y/s.tileSize - mod,
-				}
-				obstacleConfig := s.entityFactory.PresetObstacle()(coordinates)
-				obstacle := s.entityFactory.NewEntityFromConfig(obstacleConfig, s.frameRate)
-				obstacles = append(obstacles, obstacle)
-			}
-		}
-	}
-	return obstacles
-}
-
 func (s *UISystem) DrawMask() {
 	// top
 	shape := imdraw.New(nil)
