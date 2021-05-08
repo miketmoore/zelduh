@@ -1,8 +1,6 @@
 package zelduh
 
 import (
-	"fmt"
-
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -241,7 +239,6 @@ func (s *CollisionSystem) handleCoinCollisions() {
 func (s *CollisionSystem) handleObstacleCollisions() {
 	player := s.player
 
-	fmt.Printf("CollisionSystem total obstacles %d\n", len(s.obstacles))
 	for _, obstacle := range s.obstacles {
 		mod := player.componentHitbox.CollisionWithRectMod
 		if isColliding(obstacle.componentRectangle.Rect, pixel.R(

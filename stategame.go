@@ -79,17 +79,17 @@ func (g StateGame) Update() error {
 		}
 
 		// Iterate through all entity configurations and build entities and add to systems
-		// currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
-		// for _, c := range currentRoom.EntityConfigs {
-		// 	entity := g.entityFactory.NewEntityFromConfig(c, g.frameRate)
-		// 	g.entitiesMap[entity.ID()] = entity
-		// 	g.systemsManager.AddEntity(entity)
+		currentRoom := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID]
+		for _, c := range currentRoom.EntityConfigs {
+			entity := g.entityFactory.NewEntityFromConfig(c, g.frameRate)
+			g.entitiesMap[entity.ID()] = entity
+			g.systemsManager.AddEntity(entity)
 
-		// 	switch c.Category {
-		// 	case CategoryWarp:
-		// 		g.roomWarps[entity.ID()] = c
-		// 	}
-		// }
+			switch c.Category {
+			case CategoryWarp:
+				g.roomWarps[entity.ID()] = c
+			}
+		}
 	}
 
 	g.uiSystem.DrawMask()

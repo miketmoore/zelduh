@@ -61,12 +61,11 @@ func (s StatePrepareMapTransition) Update() error {
 	s.uiSystem.Window.Clear(colornames.Darkgray)
 	s.uiSystem.DrawMapBackground(colornames.White)
 
-	// s.collisionSystem.RemoveAll(CategoryObstacle)
-	// s.systemsManager.RemoveAllEnemies()
-	// s.systemsManager.RemoveAllCollisionSwitches()
-	// s.systemsManager.RemoveAllMoveableObstacles()
-	// s.systemsManager.RemoveAllEntities()
 	s.systemsManager.RemoveAllByCategory(CategoryObstacle)
+	s.systemsManager.RemoveAllEnemies()
+	s.systemsManager.RemoveAllCollisionSwitches()
+	s.systemsManager.RemoveAllMoveableObstacles()
+	s.systemsManager.RemoveAllEntities()
 
 	fmt.Printf("StatePrepareMapTransition: currentRoomID=%d nextRoomID=%d\n", s.roomManager.Current(), s.roomManager.Next())
 

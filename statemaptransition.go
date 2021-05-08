@@ -216,8 +216,8 @@ func (g StateTransition) common() {
 
 	// g.collisionSystem.RemoveAll(CategoryObstacle)
 	g.systemsManager.RemoveAllByCategory(CategoryObstacle)
-	// g.systemsManager.RemoveAllEnemies()
-	// g.systemsManager.RemoveAllCollisionSwitches()
-	// g.systemsManager.RemoveAllMoveableObstacles()
-	// g.systemsManager.RemoveAllEntities()
+	g.systemsManager.RemoveAllEnemies()
+	g.systemsManager.RemoveAllCollisionSwitches()
+	g.systemsManager.RemoveAllMoveableObstacles()
+	g.systemsManager.RemoveAllEntities()
 }
