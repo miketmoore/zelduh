@@ -9,6 +9,7 @@ import (
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"github.com/faiface/pixel/text"
+	"github.com/miketmoore/zelduh/core/tmx"
 	"golang.org/x/image/colornames"
 )
 
@@ -101,7 +102,7 @@ func (s *UISystem) DrawScreenStart() {
 }
 
 func (s *UISystem) DrawMapBackgroundImage(
-	name TMXFileName,
+	name tmx.TMXFileName,
 	modX, modY float64,
 ) {
 
@@ -208,7 +209,7 @@ func (s *UISystem) DrawGameOverScreen() {
 	s.DrawCenterText(s.currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 }
 
-func (s *UISystem) DrawLevelBackground(roomName TMXFileName) {
+func (s *UISystem) DrawLevelBackground(roomName tmx.TMXFileName) {
 	s.Window.Clear(colornames.Darkgray)
 	s.DrawMapBackground(colornames.White)
 

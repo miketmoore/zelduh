@@ -1,4 +1,4 @@
-package zelduh
+package csv
 
 import (
 	"encoding/csv"

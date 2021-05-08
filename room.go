@@ -1,11 +1,12 @@
 package zelduh
 
-import "github.com/miketmoore/zelduh/core/direction"
+import (
+	"github.com/miketmoore/zelduh/core/direction"
+	"github.com/miketmoore/zelduh/core/tmx"
+)
 
 // RoomID is a room ID
 type RoomID int
-
-type TMXFileName string
 
 // ConnectedRooms is used to configure adjacent rooms
 type ConnectedRooms struct {
@@ -21,7 +22,7 @@ type RoomByIDMap map[RoomID]*Room
 // Room represents one map section
 type Room struct {
 	ID             RoomID
-	TMXFileName    TMXFileName
+	TMXFileName    tmx.TMXFileName
 	connectedRooms *ConnectedRooms
 	EntityConfigs  []EntityConfig
 }

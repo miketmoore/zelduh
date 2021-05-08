@@ -1,5 +1,7 @@
 package zelduh
 
+import "github.com/miketmoore/zelduh/core/tmx"
+
 type RoomFactory struct {
 	lastID RoomID
 }
@@ -16,7 +18,7 @@ func (r *RoomFactory) newID() RoomID {
 }
 
 // NewRoom builds a new Room
-func (r *RoomFactory) NewRoom(tmxFileName TMXFileName, entityConfigs ...EntityConfig) *Room {
+func (r *RoomFactory) NewRoom(tmxFileName tmx.TMXFileName, entityConfigs ...EntityConfig) *Room {
 	return &Room{
 		ID:             r.newID(),
 		TMXFileName:    tmxFileName,
