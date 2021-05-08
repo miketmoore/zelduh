@@ -146,3 +146,16 @@ func (w *SystemsManager) RemoveAllCollisionSwitches() {
 		}
 	}
 }
+
+func (w *SystemsManager) RemoveAllByCategory(category entity.EntityCategory) {
+	for _, system := range w.Systems() {
+		switch sys := system.(type) {
+		case *CollisionSystem:
+			sys.RemoveAll(category)
+		case *RenderSystem:
+			sys.RemoveAll(category)
+		case *MovementSystem:
+			sys.RemoveAll(category)
+		}
+	}
+}

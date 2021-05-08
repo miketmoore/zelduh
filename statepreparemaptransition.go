@@ -58,11 +58,12 @@ func (s StatePrepareMapTransition) Update() error {
 	s.uiSystem.Window.Clear(colornames.Darkgray)
 	s.uiSystem.DrawMapBackground(colornames.White)
 
-	s.collisionSystem.RemoveAll(CategoryObstacle)
-	s.systemsManager.RemoveAllEnemies()
-	s.systemsManager.RemoveAllCollisionSwitches()
-	s.systemsManager.RemoveAllMoveableObstacles()
-	s.systemsManager.RemoveAllEntities()
+	// s.collisionSystem.RemoveAll(CategoryObstacle)
+	// s.systemsManager.RemoveAllEnemies()
+	// s.systemsManager.RemoveAllCollisionSwitches()
+	// s.systemsManager.RemoveAllMoveableObstacles()
+	// s.systemsManager.RemoveAllEntities()
+	s.systemsManager.RemoveAllByCategory(CategoryObstacle)
 
 	fmt.Printf("StatePrepareMapTransition: currentRoomID=%d nextRoomID=%d\n", s.roomManager.Current(), s.roomManager.Next())
 
@@ -97,7 +98,13 @@ func (s StatePrepareMapTransition) Update() error {
 
 	// panic("blop")
 
-	err := s.context.SetState(StateNameTransition)
+	err := s.systemsManager.Update()
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Errorf("error occured when calling updating on system manager")
+	}
+
+	err = s.context.SetState(StateNameTransition)
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("error occured when setting state from StatePrepareMapTransition to StateNameTransition")
