@@ -75,7 +75,11 @@ func buildTestLevel(
 	// )
 
 	// top left
-	room1 := roomFactory.NewRoom("overworldFourWallsDoorBottomRight")
+	room1 := roomFactory.NewRoom("overworldFourWallsDoorBottomRight",
+		entityFactory.PresetSkeleton()(NewCoordinates(4, 4)),
+		entityFactory.PresetSkull()(NewCoordinates(5, 4)),
+		entityFactory.PresetEyeBurrower()(NewCoordinates(6, 4)),
+	)
 
 	// top right
 	room2 := roomFactory.NewRoom("overworldFourWallsDoorBottomLeft")

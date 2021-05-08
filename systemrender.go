@@ -207,7 +207,7 @@ func (s *RenderSystem) Update() error {
 	// DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
 
 	for _, entity := range s.entities {
-		s.drawRectangle(entity)
+		// s.drawRectangle(entity)
 
 		if entity.shouldNotIgnore() {
 
