@@ -1,6 +1,8 @@
 package zelduh
 
 import (
+	"fmt"
+
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -55,7 +57,11 @@ func (g StateGame) Update() error {
 	tmxFileName := g.levelManager.CurrentLevel.RoomByIDMap[currentRoomID].TMXFileName
 	// fmt.Printf("StateGame: currentRoomID=%d tmx=%s\n", currentRoomID, tmxFileName)
 
-	g.uiSystem.DrawLevelBackground(tmxFileName)
+	err := g.uiSystem.DrawLevelBackground(tmxFileName)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	if *g.shouldAddEntities {
 		*g.shouldAddEntities = false
@@ -94,7 +100,7 @@ func (g StateGame) Update() error {
 
 	g.uiSystem.DrawMask()
 
-	err := g.systemsManager.Update()
+	err = g.systemsManager.Update()
 	if err != nil {
 		return err
 	}

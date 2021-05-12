@@ -171,11 +171,15 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 	if !currentRoomOk {
 		return fmt.Errorf("current room not found by ID=%d", currentRoomID)
 	}
-	g.uiSystem.DrawMapBackgroundImage(
+	err := g.uiSystem.DrawMapBackgroundImage(
 		currentRoom.TMXFileName,
 		transitionRoomResp.modX,
 		transitionRoomResp.modY,
 	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	nextRoom, nextRoomOk := g.levelManager.CurrentLevel.RoomByIDMap[g.roomManager.Next()]
 	if !nextRoomOk {
@@ -184,11 +188,19 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 	if g.roomTransitionManager.Timer() == 0 {
 		fmt.Printf("drawing nextRoom.TMXFileName=%s\n", nextRoom.TMXFileName)
 	}
-	g.uiSystem.DrawMapBackgroundImage(
+	err = g.uiSystem.DrawMapBackgroundImage(
 		nextRoom.TMXFileName,
 		transitionRoomResp.modXNext,
 		transitionRoomResp.modYNext,
 	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	g.uiSystem.DrawMask()
 
 	// Move player with map transition
@@ -199,7 +211,7 @@ func (g StateTransition) slideTransition(currentRoomID RoomID) error {
 		g.player.componentRectangle.Rect.Min.Y+transitionRoomResp.playerModY+g.tileSize,
 	)
 
-	err := g.systemsManager.Update()
+	err = g.systemsManager.Update()
 	if err != nil {
 		return err
 	}

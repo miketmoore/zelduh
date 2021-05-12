@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"os"
+	"strings"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -101,11 +102,14 @@ func (s *UISystem) DrawScreenStart() {
 func (s *UISystem) DrawMapBackgroundImage(
 	name tmx.TMXFileName,
 	modX, modY float64,
-) {
+) error {
 
 	data, dataOk := s.mapDrawData[name]
+	if strings.TrimSpace(string(name)) == "" {
+		return fmt.Errorf("background image name is an empty string")
+	}
 	if !dataOk {
-		fmt.Printf("DrawMapBackgroundImage: tmx file not found in map by name=%s\n", name)
+		return fmt.Errorf("DrawMapBackgroundImage: tmx file not found in map by name=%s", name)
 	}
 	for _, spriteData := range data.Data {
 		if spriteData.SpriteID != 0 {
@@ -121,6 +125,7 @@ func (s *UISystem) DrawMapBackgroundImage(
 			sprite.Draw(s.Window, matrix)
 		}
 	}
+	return nil
 }
 
 func (s *UISystem) DrawMask() {
@@ -169,12 +174,18 @@ func (s *UISystem) DrawGameOverScreen() {
 	s.DrawCenterText(s.currLocaleMsgs["gameOverScreenMessage"], colornames.White)
 }
 
-func (s *UISystem) DrawLevelBackground(roomName tmx.TMXFileName) {
+func (s *UISystem) DrawLevelBackground(roomName tmx.TMXFileName) error {
 	s.Window.Clear(colornames.Darkgray)
 	s.DrawMapBackground(colornames.White)
 
-	s.DrawMapBackgroundImage(
+	err := s.DrawMapBackgroundImage(
 		roomName,
 		0, 0,
 	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 }

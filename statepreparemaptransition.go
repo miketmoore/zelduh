@@ -86,11 +86,15 @@ func (s StatePrepareMapTransition) Update() error {
 	if !currentRoomOk {
 		return fmt.Errorf("current room not found by ID=%d", currentRoomID)
 	}
-	s.uiSystem.DrawMapBackgroundImage(
+	err := s.uiSystem.DrawMapBackgroundImage(
 		currentRoom.TMXFileName,
 		transitionRoomResp.modX,
 		transitionRoomResp.modY,
 	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
 	s.uiSystem.DrawMask()
 
@@ -100,7 +104,7 @@ func (s StatePrepareMapTransition) Update() error {
 
 	// panic("blop")
 
-	err := s.systemsManager.Update()
+	err = s.systemsManager.Update()
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("error occured when calling updating on system manager")
