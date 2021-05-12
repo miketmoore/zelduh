@@ -17,8 +17,8 @@ func buildLevelMaze(
 	fmt.Println("building level...")
 
 	fmt.Println("building maze data...")
-	rows := 2
-	cols := 2
+	rows := 3
+	cols := 3
 	random := mazegen.NewRandom()
 	grid, err := mazegen.BuildMaze(rows, cols, random)
 	if err != nil {
@@ -28,35 +28,18 @@ func buildLevelMaze(
 	fmt.Println("maze data built")
 
 	tmxNameMap := map[string]tmx.TMXFileName{
-		//  ___
-		//     |
-		//  ---
 		"nes_": "overworldFourWallsDoorLeft",
-		//  ___
-		// |   |
-		//
 		"ne_w": "overworldFourWallsDoorBottom",
-		//  ___
-		// |
-		//  ---
 		"n_sw": "overworldFourWallsDoorRight",
-		//
-		// |   |
-		//  ---
 		"_esw": "overworldFourWallsDoorTop",
-		//  ___
-		//     |
-		//
 		"ne__": "overworldFourWallsDoorBottomLeft",
-		//  ___
-		// |
-		//
 		"n__w": "overworldFourWallsDoorBottomRight",
-		//
-		// |   |
-		//
 		"_es_": "overworldFourWallsDoorLeftTop",
 		"__sw": "overworldFourWallsDoorRightTop",
+		"_e__": "overworldFourWallsDoorTopBottomLeft",
+		"n_s_": "overworldFourWallsDoorRightLeft",
+		"n___": "overworldFourWallsDoorRightBottomLeft",
+		"_e_w": "overworldFourWallsDoorTopBottom",
 	}
 
 	roomByIdMap := RoomByIDMap{}
@@ -73,13 +56,13 @@ func buildLevelMaze(
 	var layout [][]RoomID = make([][]RoomID, grid.Rows)
 
 	for rowIndex, row := range grid.Cells {
-		fmt.Printf("building row index=%d\n", rowIndex)
+		// fmt.Printf("building row index=%d\n", rowIndex)
 
 		// Make row of cells slice
 		layout[rowIndex] = make([]RoomID, len(row))
 
 		for columnIndex, cell := range row {
-			fmt.Println(rowIndex, columnIndex, cell)
+			// fmt.Println(rowIndex, columnIndex, cell)
 
 			// Determine room TMX name
 			key := fmt.Sprintf("%s%s%s%s",

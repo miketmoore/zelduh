@@ -208,9 +208,9 @@ func (s *RenderSystem) Update() error {
 
 		if entity.shouldNotIgnore() {
 
-			if entity.Category == CategoryObstacle {
-				s.drawRectangle(entity)
-			}
+			// if entity.Category == CategoryObstacle {
+			// 	s.drawRectangle(entity)
+			// }
 
 			if entity.Category == CategoryRectangle {
 				s.drawRectangle(entity)

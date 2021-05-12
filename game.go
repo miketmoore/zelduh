@@ -69,6 +69,18 @@ func (m *Main) Run() error {
 
 	temporarySystem := NewTemporarySystem()
 
+	// "nes_": "overworldFourWallsDoorLeft",
+	// "ne_w": "overworldFourWallsDoorBottom",
+	// "n_sw": "overworldFourWallsDoorRight",
+	// "_esw": "overworldFourWallsDoorTop",
+	// "ne__": "overworldFourWallsDoorBottomLeft",
+	// "n__w": "overworldFourWallsDoorBottomRight",
+	// "_es_": "overworldFourWallsDoorLeftTop",
+	// "__sw": "overworldFourWallsDoorRightTop",
+	// "_e__": "overworldFourWallsDoorTopBottomLeft",
+	// "n_s_": "overworldFourWallsDoorRightLeft",
+	// "n___": "overworldFourWallsDoorRightBottomLeft",
+	// "_e_w": "overworldFourWallsDoorTopBottom",
 	mapDrawData, mapDrawDataErr := BuildMapDrawData(
 		"assets/tilemaps/",
 		[]string{
@@ -93,6 +105,9 @@ func (m *Main) Run() error {
 			"rockPathLeftRightEntrance",
 			"test",
 			"dungeonFourDoors",
+			"overworldFourWallsDoorTopBottomLeft",
+			"overworldFourWallsDoorRightLeft",
+			"overworldFourWallsDoorRightBottomLeft",
 		},
 		m.tileSize,
 	)
@@ -262,7 +277,7 @@ func (m *Main) Run() error {
 				movementSystem.SetRemainingMoves(arrowID, 0)
 			},
 			PlayerWithObstacle: func(obstacleID entity.EntityID) {
-				fmt.Printf("PlayerWithObstacle collision handler obstacleID=%d\n", obstacleID)
+				// fmt.Printf("PlayerWithObstacle collision handler obstacleID=%d\n", obstacleID)
 				// "Block" by undoing rect
 				movementSystem.UsePreviousRectangle(player.ID())
 				movementSystem.SetZeroSpeed(player.ID())
