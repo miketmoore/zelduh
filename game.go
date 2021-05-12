@@ -136,11 +136,12 @@ func (m *Main) Run() error {
 		nonObstacleSprites,
 	)
 
-	testLevel := buildTestLevel(
-		roomFactory,
-		&entityFactory,
-		m.tileSize,
-	)
+	// testLevel := buildTestLevel(
+	// 	roomFactory,
+	// 	&entityFactory,
+	// 	m.tileSize,
+	// )
+	testLevel := buildLevelMaze(roomFactory, &entityFactory, m.tileSize)
 	levelManager.SetCurrentLevel(&testLevel)
 	// levelManager = NewLevelManager(&testLevel)
 
