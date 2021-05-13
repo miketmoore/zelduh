@@ -194,7 +194,7 @@ func (s *EntityFactory) CreateObstaclesForRoom(
 
 	data, dataOk := s.mapDrawData[room.TMXFileName]
 	if !dataOk {
-		fmt.Printf("DrawObstaclesPerMapTiles: tmx file not found in map by name=%s\n", room.TMXFileName)
+		fmt.Printf("DrawObstaclesPerMapTiles: tmx file not found in map by name=%s if the file exists, it may not be configured yet\n", room.TMXFileName)
 	}
 
 	mod := 0.5

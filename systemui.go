@@ -109,7 +109,7 @@ func (s *UISystem) DrawMapBackgroundImage(
 		return fmt.Errorf("background image name is an empty string")
 	}
 	if !dataOk {
-		return fmt.Errorf("DrawMapBackgroundImage: tmx file not found in map by name=%s", name)
+		return fmt.Errorf("DrawMapBackgroundImage: tmx file not found in map by name=%s if the file exists, it may not be configured yet", name)
 	}
 	for _, spriteData := range data.Data {
 		if spriteData.SpriteID != 0 {
