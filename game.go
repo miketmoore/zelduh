@@ -108,6 +108,7 @@ func (m *Main) Run() error {
 			"overworldFourWallsDoorTopBottomLeft",
 			"overworldFourWallsDoorRightLeft",
 			"overworldFourWallsDoorRightBottomLeft",
+			"overworldFourWallsDoorTopRightLeft",
 		},
 		m.tileSize,
 	)
