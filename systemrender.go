@@ -286,7 +286,7 @@ func (s *RenderSystem) drawMiniMap() {
 		columns:   len(s.levelManager.CurrentLevel.RoomIdLayout[0]),
 		originX:   655,
 		originY:   windowHeight - 10,
-		cellSize:  25,
+		cellSize:  5,
 		wallWidth: 1,
 		thickness: 0,
 		drawWalls: true,
@@ -311,7 +311,7 @@ func (s *RenderSystem) drawMiniMap() {
 	originX := mazeDrawData.originX
 	cellSize := mazeDrawData.cellSize
 
-	cellMargin := 5
+	cellMargin := 1
 
 	// draw minimap
 	for y, row := range s.levelManager.CurrentLevel.RoomIdLayout {
