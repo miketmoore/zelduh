@@ -197,6 +197,8 @@ func (m *Main) Run() error {
 		m.tileSize,
 		&temporarySystem,
 		spritesheetPicture,
+		levelManager,
+		roomManager,
 	)
 
 	mapBounds := pixel.R(

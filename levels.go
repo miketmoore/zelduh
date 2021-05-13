@@ -1,7 +1,8 @@
 package zelduh
 
 type Level struct {
-	RoomByIDMap RoomByIDMap
+	RoomByIDMap  RoomByIDMap
+	RoomIdLayout [][]RoomID
 }
 
 type LevelManager struct {

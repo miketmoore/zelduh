@@ -135,6 +135,7 @@ func buildLevelMaze(
 	)
 
 	return Level{
-		RoomByIDMap: roomByIdMap,
+		RoomByIDMap:  roomByIdMap,
+		RoomIdLayout: layout,
 	}
 }

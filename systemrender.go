@@ -122,7 +122,9 @@ type RenderSystem struct {
 
 	TemporarySystem *TemporarySystem
 
-	batch *pixel.Batch
+	batch        *pixel.Batch
+	levelManager *LevelManager
+	roomManager  *RoomManager
 }
 
 func NewRenderSystem(
@@ -132,6 +134,8 @@ func NewRenderSystem(
 	tileSize float64,
 	temporarySystem *TemporarySystem,
 	spritesheetPicture *pixel.Picture,
+	levelManager *LevelManager,
+	roomManager *RoomManager,
 ) RenderSystem {
 	return RenderSystem{
 		Win:                  window,
@@ -140,6 +144,8 @@ func NewRenderSystem(
 		TileSize:             tileSize,
 		TemporarySystem:      temporarySystem,
 		batch:                pixel.NewBatch(&pixel.TrianglesData{}, *spritesheetPicture),
+		levelManager:         levelManager,
+		roomManager:          roomManager,
 	}
 }
 
@@ -260,8 +266,81 @@ func (s *RenderSystem) Update() error {
 		}
 	}
 
+	s.drawMiniMap()
+
 	s.batch.Draw(s.Win)
 	return nil
+}
+
+func (s *RenderSystem) drawMiniMap() {
+	type MazeDrawData struct {
+		rows, columns                                    int
+		originX, originY, cellSize, wallWidth, thickness float64
+		drawWalls                                        bool
+	}
+
+	windowHeight := 800.0
+
+	var mazeDrawData = &MazeDrawData{
+		rows:      len(s.levelManager.CurrentLevel.RoomIdLayout),
+		columns:   len(s.levelManager.CurrentLevel.RoomIdLayout[0]),
+		originX:   655,
+		originY:   windowHeight - 10,
+		cellSize:  25,
+		wallWidth: 1,
+		thickness: 0,
+		drawWalls: true,
+	}
+
+	// draw minimap background
+	{
+		shape := imdraw.New(nil)
+		shape.Color = colornames.Gray
+		p0 := pixel.V(mazeDrawData.originX, mazeDrawData.originY)
+		shape.Push(p0)
+
+		width := float64(mazeDrawData.columns)*mazeDrawData.cellSize + (2.0 * float64(mazeDrawData.columns))
+		height := float64(mazeDrawData.rows)*mazeDrawData.cellSize + (2.0 * float64(mazeDrawData.rows))
+		shape.Push(pixel.V(mazeDrawData.originX+width, mazeDrawData.originY-height))
+
+		shape.Rectangle(mazeDrawData.thickness)
+		shape.Draw(s.batch)
+	}
+
+	originY := mazeDrawData.originY - 5
+	originX := mazeDrawData.originX
+	cellSize := mazeDrawData.cellSize
+
+	cellMargin := 5
+
+	// draw minimap
+	for y, row := range s.levelManager.CurrentLevel.RoomIdLayout {
+		drawY := originY - (float64(y+1) * cellSize)
+		for x, roomId := range row {
+			drawX := originX + (float64(x) * cellSize)
+			color := colornames.Black
+			if s.roomManager.Current() == roomId {
+				color = colornames.White
+			}
+			cellEntity := renderEntity{
+				componentColor: &componentColor{
+					Color: color,
+				},
+				componentShape: &componentShape{
+					Shape: imdraw.New(nil),
+				},
+				componentRectangle: &componentRectangle{
+					Rect: pixel.R(
+						drawX+float64(cellMargin),
+						drawY+float64(cellMargin),
+						drawX+mazeDrawData.cellSize,
+						drawY+mazeDrawData.cellSize,
+					),
+				},
+			}
+			s.drawRectangle(cellEntity)
+		}
+	}
 }
 
 func (s *RenderSystem) drawDefaultFrame(entity renderEntity) {
