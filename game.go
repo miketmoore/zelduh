@@ -65,7 +65,7 @@ func (m *Main) Run() error {
 	roomManager := NewRoomManager(1)
 
 	// currentState := StateStart
-	spriteMap := LoadAndBuildSpritesheet("assets/spritesheet.png", m.tileSize)
+	spritesheetPicture, spriteMap := LoadAndBuildSpritesheet("assets/spritesheet.png", m.tileSize)
 
 	temporarySystem := NewTemporarySystem()
 
@@ -196,6 +196,7 @@ func (m *Main) Run() error {
 		activeSpaceRectangle,
 		m.tileSize,
 		&temporarySystem,
+		spritesheetPicture,
 	)
 
 	mapBounds := pixel.R(

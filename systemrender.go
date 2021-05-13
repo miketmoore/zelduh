@@ -121,6 +121,8 @@ type RenderSystem struct {
 	ActiveSpaceRectangle ActiveSpaceRectangle
 
 	TemporarySystem *TemporarySystem
+
+	batch *pixel.Batch
 }
 
 func NewRenderSystem(
@@ -129,6 +131,7 @@ func NewRenderSystem(
 	activeSpaceRectangle ActiveSpaceRectangle,
 	tileSize float64,
 	temporarySystem *TemporarySystem,
+	spritesheetPicture *pixel.Picture,
 ) RenderSystem {
 	return RenderSystem{
 		Win:                  window,
@@ -136,6 +139,7 @@ func NewRenderSystem(
 		ActiveSpaceRectangle: activeSpaceRectangle,
 		TileSize:             tileSize,
 		TemporarySystem:      temporarySystem,
+		batch:                pixel.NewBatch(&pixel.TrianglesData{}, *spritesheetPicture),
 	}
 }
 
@@ -201,6 +205,7 @@ func (s *RenderSystem) RemoveAllEntities() {
 // Update changes spatial data based on movement data
 func (s *RenderSystem) Update() error {
 
+	s.batch.Clear()
 	// DrawActiveSpace(s.Win, s.ActiveSpaceRectangle)
 
 	for _, entity := range s.entities {
@@ -255,6 +260,7 @@ func (s *RenderSystem) Update() error {
 		}
 	}
 
+	s.batch.Draw(s.Win)
 	return nil
 }
 
@@ -303,7 +309,7 @@ func (s *RenderSystem) drawSprite(
 	entity renderEntity,
 ) {
 	frame, _, matrix := s.getSpriteDrawData(animData, entity.componentRectangle, entity.componentRotation)
-	frame.Draw(s.Win, matrix)
+	frame.Draw(s.batch, matrix)
 }
 
 func (s *RenderSystem) getSpriteDrawData(
@@ -383,7 +389,7 @@ func (s *RenderSystem) drawRectangle(entity renderEntity) {
 
 	rect.Rectangle(0)
 
-	rect.Draw(s.Win)
+	rect.Draw(s.batch)
 }
 
 func DrawActiveSpace(window *pixelgl.Window, activeSpaceRectangle ActiveSpaceRectangle) {

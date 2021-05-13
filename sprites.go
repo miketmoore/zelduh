@@ -29,7 +29,7 @@ func loadPicture(path string) pixel.Picture {
 type SpriteMap map[int]*pixel.Sprite
 
 // LoadAndBuildSpritesheet this is a map of pixel engine sprites
-func LoadAndBuildSpritesheet(path string, tileSize float64) SpriteMap {
+func LoadAndBuildSpritesheet(path string, tileSize float64) (*pixel.Picture, SpriteMap) {
 	pic := loadPicture(path)
 
 	cols := pic.Bounds().W() / tileSize
@@ -54,7 +54,7 @@ func LoadAndBuildSpritesheet(path string, tileSize float64) SpriteMap {
 			id--
 		}
 	}
-	return spriteMap
+	return &pic, spriteMap
 }
 
 // GetSpriteSet returns a sprite set by key
