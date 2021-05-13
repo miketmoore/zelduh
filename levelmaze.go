@@ -40,6 +40,7 @@ func buildLevelMaze(
 		"n_s_": "overworldFourWallsDoorRightLeft",
 		"n___": "overworldFourWallsDoorRightBottomLeft",
 		"_e_w": "overworldFourWallsDoorTopBottom",
+		"__s_": "overworldFourWallsDoorTopRightLeft",
 	}
 
 	roomByIdMap := RoomByIDMap{}
