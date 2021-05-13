@@ -17,8 +17,8 @@ func buildLevelMaze(
 	fmt.Println("building level...")
 
 	fmt.Println("building maze data...")
-	rows := 3
-	cols := 3
+	rows := 6
+	cols := 6
 	random := mazegen.NewRandom()
 	grid, err := mazegen.BuildMaze(rows, cols, random)
 	if err != nil {
@@ -41,6 +41,7 @@ func buildLevelMaze(
 		"n___": "overworldFourWallsDoorRightBottomLeft",
 		"_e_w": "overworldFourWallsDoorTopBottom",
 		"__s_": "overworldFourWallsDoorTopRightLeft",
+		"___w": "overworldFourWallsDoorTopRightBottom",
 	}
 
 	roomByIdMap := RoomByIDMap{}
