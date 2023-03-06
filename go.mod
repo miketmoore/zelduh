@@ -9,5 +9,5 @@ require (
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20210311203641-62640a716d48 // indirect
 	github.com/go-gl/mathgl v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
+	golang.org/x/image v0.5.0
 )
